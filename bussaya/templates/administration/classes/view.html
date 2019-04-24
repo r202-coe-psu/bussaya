@@ -1,0 +1,96 @@
+{% extends '/administration/classes/index.html' %}
+{% import '/base/error-handler.html' as eh %}
+
+
+{% block content %}
+<div class="row">
+  <div class="col s12">
+		<h3>{{ class_.name }}</h3>
+  </div>
+</div>
+
+<div class="row">
+	<div class="col s12">
+		<div>
+			<b>Description:</b> {{ class_.description }}
+		</div>
+		<div>
+			<b>Code:</b> {{ class_.code }}
+		</div>
+		<div>
+			<b>Course:</b> <a href="{{ url_for('administration.courses.view', course_id=class_.course.id) }}">{{ class_.course.name }}</a>
+		</div>
+		<div>
+			<b>Limited Class:</b> {{ class_.limited }}
+		</div>
+		{% if class_.limited_enrollment %}
+		<div>
+			<b>Limited Method:</b> {{ class_.limited_enrollment.method }}
+		</div>
+		<div>
+			<b>Limited Grantees:</b> {{ class_.limited_enrollment.grantees | join(', ') }}
+		</div>
+	{% endif %}
+		<div>
+			<b>Started Date:</b> {{ class_.started_date }}
+		</div>
+		<div>
+			<b>Ended Date:</b> {{ class_.ended_date }}
+		</div>
+
+		<div>
+			<b>Tag:</b> {{ class_.tags | join(', ') }}
+    </div>
+    <div>
+      <b>Teaching Assistant</b> 
+      {% for ta in class_.teaching_assistants %}
+        {{ ta.user.first_name }} {{ ta.user.last_name }}, 
+      {% endfor %}
+    </div>
+    <div>
+      {% if class_.owner == current_user %}
+      <a class="btn-floating waves-effect waves-light red" href="{{ url_for('administration.classes.edit', class_id=class_.id) }}"><i class="material-icons">edit</i></a>
+      <a class="btn-floating waves-effect waves-light red" href="{{ url_for('administration.classes.list_students', class_id=class_.id) }}"><i class="material-icons">people</i></a>
+      <a class="btn-floating waves-effect waves-light red" href="{{ url_for('administration.classes.add_teaching_assistant', class_id=class_.id) }}"><i class="material-icons">assistant</i></a>
+    {% elif class_.is_teaching_assistant(current_user) %}
+      <a class="btn-floating waves-effect waves-light red" href="{{ url_for('teaching_assistants.classes.list_students', class_id=class_.id) }}"><i class="material-icons">people</i></a>
+    {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="row">
+	<div class="col s12">
+		<h5>Assignments</h5>
+		<table>
+			<thead>
+				<tr>
+						<th>Name</th>
+						<th>Challenges</th>
+						<th>Scores</th>
+						<th>Start Date</th>
+						<th>End Date</th>
+						<th>Operation</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for assignment in class_.course.assignments %}
+					<tr>{% set ass_time=class_.get_assignment_schedule(assignment) %}
+					<td>{{ assignment.name }}</td>
+					<td>{{ assignment.challenges | count }}</td>
+					<td>{{ assignment.score }}</td>
+					<td>{{ ass_time.started_date if ass_time else '-' }}</td>
+					<td>{{ ass_time.ended_date if ass_time else '-' }}</td>
+					<td>
+            {% if class_.owner == current_user %}
+              <a href="{{ url_for('administration.classes.set_assignment_time', class_id=class_.id, assignment_id=assignment.id) }}"><i class="material-icons">access_alarm</i></a>
+            {% endif %}
+					</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+            	
+  </div>
+</div>
+{% endblock %}

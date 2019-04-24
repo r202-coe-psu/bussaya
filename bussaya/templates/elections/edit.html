@@ -1,0 +1,72 @@
+{% extends '/base/default-dashboard.html' %}
+
+{% block content %}
+<div class="ui segment" style="min-height: 80vh;">
+  <div class="ui icon header center aligned">
+    <i class="icon snowflake end"></i>
+    <h1>Edit election for class: {{ election.class_.name }}</h1>
+  </div>
+  <div style="padding-top: 20px;">
+
+  <form method="POST">
+    <div class="ui form">
+      <div class="two fields">
+        <div class="field">
+          {{ form.started_date.label }}
+          <div class="ui calendar" id="rangestart">
+            <div class="ui input left icon">
+              <i class="calendar icon"></i>
+              {{ form.started_date(autocomplete='off') }}
+              {# <input type="text" placeholder="Start"> #}
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          {{ form.ended_date.label }}
+          <div class="ui calendar" id="rangeend">
+            <div class="ui input left icon">
+              <i class="calendar icon"></i>
+              {{ form.ended_date(autocomplete='off') }}
+              {# <input type="text" placeholder="End"> #}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        {{ form.csrf_token }}
+        <button class="ui button primary" type="submit">Submit</button>
+      </div>
+    </div>
+  </form>
+
+  </div>
+<div>
+
+{% endblock %}
+
+{% block additional_js %}
+  <script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
+  <script type="text/javascript">
+    datetime_formatter = {
+      datetime: function (datetime, settings) {
+        if (!datetime) return '';
+        var day = datetime.getDate();
+        var month = datetime.getMonth() + 1;
+        var year = datetime.getFullYear();
+        var hour = datetime.getHours();
+        var minute = datetime.getMinutes();
+        return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2)  ;
+      }};
+    $('#rangestart').calendar({
+      // type: 'date',
+      formatter: datetime_formatter,
+      endCalendar: $('#rangeend')
+    });
+    $('#rangeend').calendar({
+      // type: 'date',
+      formatter: datetime_formatter,
+      startCalendar: $('#rangestart')
+    });
+  </script>
+{% endblock %}

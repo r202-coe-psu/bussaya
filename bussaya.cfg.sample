@@ -1,0 +1,5 @@
+MONGODB_DB = 'bussayadb'
+SECRET_KEY = 'bussaya-secretkey' # change it when deploy web
+
+GOOGLE_CLIENT_ID = ''
+GOOGLE_CLIENT_SECRET = ''

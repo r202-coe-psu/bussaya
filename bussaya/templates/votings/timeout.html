@@ -1,0 +1,11 @@
+{% extends '/base/default-dashboard.html' %}
+
+{% block content %}
+<div class="ui placeholder segment" style="height: 80vh;">
+  <div class="ui icon header">
+    <i class="icon hourglass end"></i>
+    Time Out
+  </div>
+  <a class="ui primary button" href="{{ url_for('dashboard.index') }}">Try Again</a>
+</div>
+{% endblock %}

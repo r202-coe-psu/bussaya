@@ -1,0 +1,16 @@
+{% extends "/base/base-layout.html" %}
+
+{% block title %}{{ config.get('APP_TITLE') }} Dashboard{% endblock %}
+
+{% block additional_head %}
+{% endblock additional_head %}
+
+{% block header %}
+  {% include "/base/toolbar-dashboard.html" with context %}
+{% endblock %}
+
+{% block main %}
+  <div class="ui container">           
+    {% block content %}{% endblock %}
+  </div>
+{% endblock %}

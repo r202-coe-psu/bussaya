@@ -1,0 +1,46 @@
+{% extends '/base/default-dashboard.html' %}
+
+{% macro print_results(votings) -%}
+<table class="ui celled selectable table">
+  <thead class="center aligned">
+    <th>Project</th>
+    <th>Student</th>
+    <th>Votes</th>
+  </thead>
+  <tbody>
+    {% for p, v in votings.items() %}
+    <tr>
+      <td>{{ p.name }}</td>
+      <td>
+        {% if p.owners | count > 0 %}
+          {%- for s in p.owners %}
+            {{ s.username + ' (' + s.first_name + ' ' + s.last_name + ')' }},
+          {%- endfor %}
+        {% else %}
+          {{ p.student_ids | join(', ') }}
+        {% endif %}
+      </td>
+      <td class="right aligned">{{ v }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
+
+{% block content %}
+<div class="ui segment" style="min-height: 80vh;">
+  <div class="ui icon header center aligned">
+    <i class="icon snowflake end"></i>
+    <h1>Student Result</h1>
+  </div>
+  <div style="padding-top: 20px;">
+    <h3>CoE Lecturer</h3>
+    {{ print_results(lec_votings) }}
+  </div>
+  <div style="padding-top: 20px;">
+    <h3>Participant</h3>
+    {{ print_results(std_votings) }}
+  </div>
+<div>
+
+{% endblock %}

@@ -1,0 +1,43 @@
+{% import '/base/error-handler.html' as eh %}
+
+{% macro render_field(field, class_='') -%}
+{%- set style = '%s' | format(eh.get_validate_class(field.errors)) -%}
+{%- if class_ != '' -%}
+{%- set style = '%s %s' | format(class_, eh.get_validate_class(field.errors)) -%}
+{%- endif -%}
+{{ field(class_=style) }}
+{{ field.label }}
+{{ eh.get_error_messages(field.errors) }}
+{%- endmacro %}
+
+
+{% macro render_textarea(field) -%}
+{{render_field(field, 'materialize-textarea')}}
+{%- endmacro %}
+
+
+{% macro render_checkbox(field) -%}
+ <label>
+	{{ field }}
+	<span>{{ field.label.text }}</span>
+</label>
+{%- endmacro %}
+
+
+{% macro render_fileinput(field) -%}
+<div class="file-field input-field">
+  <div class="btn btn-small">
+		<span>{{ field.label.text }}</span>
+		{{ field }}
+  </div>
+	<div class="file-path-wrapper">
+		<input class="file-path validate" type="text">
+	</div>
+</div>
+{%- endmacro %}
+
+{% macro render_select(field) -%}
+  {{ field }}
+  {{ field.label }}
+  {{ eh.get_error_messages(field.errors) }}
+{%- endmacro %}

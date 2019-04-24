@@ -1,0 +1,15 @@
+{% extends '/base/default-dashboard.html' %}
+
+{% block content %}
+<div class="ui placeholder segment" style="height: 80vh;">
+  <div class="ui icon header">
+    <i class="icon cogs end"></i>
+    <p>Waiting results, See you next year.</p>
+    <div>
+    {% if 'lecturer' in current_user.roles %}
+      <a class="ui primary button" href="{{ url_for('dashboard.index') }}">Go to Dashbard</a>
+    {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+flask
+requests
+flask-mongoengine
+flask-login
+flask-allows
+authlib
+loginpass
+pygments
+markdown
+python-markdown-math 
