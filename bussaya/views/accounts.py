@@ -130,7 +130,7 @@ def authorized_engpsu():
             project = models.Project.objects(
                     student_ids=userinfo['username']).first()
 
-            if user not in project.owners:
+            if project and user not in project.owners:
                 project.owners.append(user)
                 project.save()
 
