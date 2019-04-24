@@ -1,0 +1,31 @@
+version: '3'
+services:
+    mongodb:
+        image: mongo
+        container_name: mongodb-bussaya
+        ports:
+            - 27017:27017
+        volumes:
+            - ./data/db:/data/db
+            - /etc/localtime:/etc/localtime:ro
+        restart: always
+        networks:
+            - bussaya_nw
+        web:
+            build: .
+            image: bussaya-image
+            container_name: bussaya-web
+            volumes:
+                - .:/app
+            ports:
+                - 9001:9001
+            links:
+                - mongodb-bussaya
+            networks:
+                - bussaya_nw
+            restart: always
+            # command: sadhu-web --host 0.0.0.0 --port 8080
+networks:
+    sadhu_nw:
+        driver: bridge
+       
