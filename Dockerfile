@@ -7,12 +7,13 @@ RUN apt install -y g++ gcc build-essential python3 python3-dev python3-pip pytho
 COPY . /app
 WORKDIR /app
 RUN pip3 install flask
-RUN python3.7 setup.py develop
+RUN python3 setup.py develop
 RUN pip3 install uwsgi
-ENV BUSSAYA_SETTINGS=/app/BUSSAYA-production.cfg
+ENV BUSSAYA_SETTINGS=/app/bussaya-production.cfg
 ENV FLASK_ENV=prodoction
 ENV AUTHLIB_INSECURE_TRANSPORT=true
 
 
 EXPOSE 9001
 CMD scripts/bussaya-uwsgi.sh
+
