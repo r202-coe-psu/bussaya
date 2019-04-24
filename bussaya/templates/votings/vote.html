@@ -18,6 +18,9 @@
     </div>
   {% endif %}
   <div class="ui info message">
+    {% if 'CoE-lecturer' in current_user.roles %}
+      <h2>Hello Aj. {{ current_user.first_name }} {{ current_user.last_name }}</h2>
+    {% endif %}
     <p>Click the selection box and select a project name; only three projects will be selected.</p>
   </div>
   <form method="POST" class="ui form">
