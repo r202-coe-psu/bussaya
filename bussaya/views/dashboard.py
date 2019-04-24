@@ -93,6 +93,7 @@ def index():
     if not form.validate_on_submit():
         return render_template('/votings/vote.html',
                                form=form,
+                               now = datetime.datetime.now(),
                                election=election)
  
     voting = models.Voting(user=current_user._get_current_object(),
