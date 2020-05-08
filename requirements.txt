@@ -3,6 +3,8 @@ requests
 flask-mongoengine
 flask-login
 flask-allows
+flask-wtf
+email_validator
 authlib
 loginpass
 pygments

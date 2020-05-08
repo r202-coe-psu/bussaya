@@ -6,8 +6,8 @@ from . import classes
 from . import votings
 from . import elections
 
-#from . import admin
-#from . import administration
+from . import admin
+# from . import administration
 
 
 def get_subblueprints(views=[]):
@@ -32,6 +32,7 @@ def register_blueprint(app):
                                     classes,
                                     votings,
                                     elections,
+                                    admin
                                     ])
 
     for blueprint in blueprints:

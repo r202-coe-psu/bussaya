@@ -33,6 +33,7 @@
             PSU Passport by Eng
           </a>
         </div>
+        {% if 'GOOGLE' in config.LOGIN_PROVIDER %}
         <div class="row" style="padding: 10px;">
           <div class="column header" style="text-align: left;">
             <h3>For Participant</h3>
@@ -44,6 +45,7 @@
             Google
           </a>
         </div>
+        {% endif %}
       </div>
     </div>
   </div>

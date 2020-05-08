@@ -1,45 +1,28 @@
-  <div class="ui fixed inverted menu">
-    <div class="ui container">
-      <a href="{{ url_for('site.index') }}" class="header item">
-        <img class="logo" src="{{ url_for('static', filename='images/lotus-full-100px.png') }}"> 
-        {# <i class="ui icon cannabis"></i> #}
-        <span style="padding-left:10px;">
-          {{ config['APP_TITLE'] }}
-        </span>
-      </a>
-      <a href="{{ url_for('dashboard.index') }}" class="item">Dashboard</a>
-      {#
-      <div class="ui simple dropdown item">
-        Dropdown <i class="dropdown icon"></i>
-        <div class="menu">
-          <a class="item" href="#">Link Item</a>
-          <a class="item" href="#">Link Item</a>
-          <div class="divider"></div>
-          <div class="header">Header Item</div>
-          <div class="item">
-            <i class="dropdown icon"></i>
-            Sub Menu
-            <div class="menu">
-              <a class="item" href="#">Link Item</a>
-              <a class="item" href="#">Link Item</a>
-            </div>
-          </div>
-          <a class="item" href="#">Link Item</a>
-        </div>
-      </div>
-      #}
-      <div class="right menu">
-        {#
-        <div class="item">
-          <div class="ui transparent inverted icon input">
-            <i class="search icon"></i>
-            <input type="text" placeholder="Search">
-          </div>
-        </div>
-        #}
-        <a class="item" href="{{ url_for('accounts.logout') }}">Logout</a>
-      </div>
-    </div>
-  </div> 
-  <div style="padding-top: 40px;"> </div>
+
+<div class="item">
+  <a href="{{ url_for('accounts.index') }}" class="ui image">
+    {%- if current_user.get_image() %}
+      <img class="ui avatar image" src="{{ current_user.get_image() }}">
+    {% else %}
+      <i class="user icon"></i>
+    {% endif -%}
+  </a>
+  <a href="{{ url_for('accounts.index') }}"><span class="white-text name">{{ current_user.first_name }} {{ current_user.last_name }}</span></a><br/>
+  <a href="{{ url_for('accounts.index') }}"><span class="white-text email">{{ current_user.email }}</span></a>
+</div>
+
+<a class="item" href="{{ url_for('dashboard.index') }}"><i class="icon dashboard"></i>Dashboard</a>
+{% if current_user.has_roles(['lecturer', 'admin']) %}
+  <a class="item" href="{{ url_for('votings.index') }}"><i class="icon award"></i>View Vote</a>
+{% else %}
+{% endif %}
+
+{% if current_user.has_roles(['admin']) %}
+  <a class="item" href="{{ url_for('admin.index') }}"><i class="icon users"></i>Admin</a>
+  <a class="item" href="{{ url_for('elections.index') }}"><i class="icon vote yea"></i>Manage Election</a>
+{% endif %}
+
+<a class="item" href="{{ url_for('accounts.index') }}"><i class="address book icon"></i>Account</a>
+<a class="item" href="{{ url_for('accounts.logout') }}"><i class="sign out icon"></i>Logout</a>
+
 

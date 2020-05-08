@@ -155,3 +155,8 @@ def authorized_engpsu():
 def logout():
     logout_user()
     return redirect(url_for('site.index'))
+
+
+@module.route('/accounts')
+def index():
+    return 'Hello ' + current_user.username

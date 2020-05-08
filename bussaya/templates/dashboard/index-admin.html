@@ -6,6 +6,7 @@
     <i class="icon university end"></i>
     <h3>Hello, {{ current_user.first_name }} {{ current_user.last_name }} </p>
     <div>
+      <a class="ui primary button" href="{{ url_for('classes.index') }}">Class</a>
       <a class="ui primary button" href="{{ url_for('votings.index') }}">View Vote</a>
       <a class="ui primary button" href="{{ url_for('elections.index') }}">Manage Election</a>
     </div>

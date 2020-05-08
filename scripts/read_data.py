@@ -1,5 +1,10 @@
+'''
+read class information
+'''
+
 import sys
-import datetime 
+import datetime
+import csv
 
 from bussaya import models
 
@@ -37,8 +42,6 @@ if not class_:
     print('Cannot Save Class')
     sys.exit(1)
 
-
-import csv
 
 with open('grid-export.csv') as csv_file:
     csv_reader = csv.reader(csv_file)

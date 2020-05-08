@@ -1,0 +1,14 @@
+#!/bin/bash
+echo "==================== Start flake8 ======================="
+flake8 --max-line-length=120 
+echo "==================== End flake8   ======================="
+echo ""
+
+echo "==================== Start pylint ======================="
+pylint -d C0301 *.py
+echo "==================== End pylint   ======================="
+echo ""
+
+echo "==================== Start nosetests ===================="
+nosetests -v --with-coverage --cover-erase --cover-tests --cover-package=bussaya -w tests
+echo "==================== End nosetests   ===================="
