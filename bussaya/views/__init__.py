@@ -27,8 +27,8 @@ def get_subblueprints(views=[]):
 
 def register_blueprint(app):
     blueprints = get_subblueprints([site,
-                                    accounts,
                                     dashboard,
+                                    accounts,
                                     classes,
                                     votings,
                                     elections,

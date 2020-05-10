@@ -5,6 +5,7 @@ from flask import (Blueprint,
                    redirect,
                    current_app)
 from flask_login import login_user, logout_user, login_required, current_user
+from flask_principal import Identity, identity_changed
 
 from .. import models
 from .. import oauth2
@@ -136,6 +137,9 @@ def authorized_engpsu():
                 project.save()
 
     login_user(user)
+    identity_changed.send(
+            current_app._get_current_object(),
+            identity=Identity(str(user.id)))
 
     oauth2token = models.OAuth2Token(
             name=client.engpsu.name,
