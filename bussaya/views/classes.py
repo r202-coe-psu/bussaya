@@ -5,8 +5,6 @@ from flask import (Blueprint,
                    )
 from flask_login import current_user, login_required
 
-from .. import acl
-from .. import forms
 from .. import models
 
 module = Blueprint('classes',
@@ -23,6 +21,7 @@ def index():
     return render_template('/classes/index.html',
                            enrollments=enrollments)
 
+
 @module.route('/<class_id>')
 @login_required
 def view(class_id):
@@ -33,6 +32,7 @@ def view(class_id):
     return render_template('/classes/view.html',
                            enrollment=enrollment,
                            class_=class_)
+
 
 @module.route('/<class_id>/enroll')
 @login_required
@@ -50,4 +50,3 @@ def enroll(class_id):
         class_.save()
 
     return redirect(url_for('classes.view', class_id=class_.id))
-

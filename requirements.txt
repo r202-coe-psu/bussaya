@@ -4,6 +4,7 @@ flask-mongoengine
 flask-login
 flask-allows
 flask-wtf
+flask-principal
 email_validator
 authlib
 loginpass

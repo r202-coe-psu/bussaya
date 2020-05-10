@@ -1,5 +1,6 @@
 import bussaya
 
+
 def main():
     options = bussaya.get_program_options()
     app = bussaya.create_app()

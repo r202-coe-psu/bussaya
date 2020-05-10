@@ -4,13 +4,22 @@ from .classes import Class
 from .projects import Project
 from .votings import Voting, Election
 
-
 from flask_mongoengine import MongoEngine
 
 db = MongoEngine()
 
+__all__ = [
+        User,
+        OAuth2Token,
+        Class,
+        Project,
+        Voting, Election,
+        ]
+
+
 def init_db(app):
     db.init_app(app)
+
 
 def init_mongoengine(settings):
     import mongoengine as me
@@ -25,4 +34,3 @@ def init_mongoengine(settings):
                port=port,
                username=username,
                password=password)
-

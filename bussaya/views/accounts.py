@@ -3,8 +3,6 @@ from flask import (Blueprint,
                    render_template,
                    url_for,
                    redirect,
-                   session,
-                   request,
                    current_app)
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -52,18 +50,20 @@ def login():
 def login_principal():
     client = oauth2.oauth2_client
     redirect_uri = url_for('accounts.authorized_principal',
-                       _external=True)
+                           _external=True)
     response = client.principal.authorize_redirect(redirect_uri)
 
     return response
+
 
 @module.route('/login-engpsu')
 def login_engpsu():
     client = oauth2.oauth2_client
     redirect_uri = url_for('accounts.authorized_engpsu',
-                       _external=True)
+                           _external=True)
     response = client.engpsu.authorize_redirect(redirect_uri)
     return response
+
 
 @module.route('/authorized-principal')
 def authorized_principal():
@@ -89,6 +89,7 @@ def authorized_principal():
 
     return redirect(url_for('dashboard.index'))
 
+
 @module.route('/authorized-engpsu')
 def authorized_engpsu():
     client = oauth2.oauth2_client
@@ -100,7 +101,7 @@ def authorized_engpsu():
 
     userinfo_response = client.engpsu.get('userinfo')
     userinfo = userinfo_response.json()
- 
+
     user = models.User.objects(username=userinfo.get('username')).first()
 
     if not user:

@@ -14,8 +14,7 @@ with open(os.path.join(here, 'CHANGES.md')) as f:
 
 requires = []
 with open('requirements.txt', 'r') as fp:
-    requires = [t.strip() for t in fp.read().split('\n') \
-                if len(t.strip()) > 0]
+    requires = [t.strip() for t in fp.read().split('\n') if len(t.strip()) > 0]
 
 PACKAGE_NAME = 'bussaya'
 init = os.path.join(os.path.dirname(__file__), PACKAGE_NAME, '__init__.py')

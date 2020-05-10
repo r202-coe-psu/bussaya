@@ -21,6 +21,6 @@ class Class(me.Document):
                                     default=datetime.datetime.now)
 
     ended_date = me.DateTimeField(required=True,
-                                    default=datetime.datetime.now)
+                                  default=datetime.datetime.now)
 
     owner = me.ReferenceField('User', dbref=True, required=True)

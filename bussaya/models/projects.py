@@ -51,4 +51,3 @@ class Project(me.Document):
     approvals = me.ListField(me.EmbeddedDocumentField(Approval))
 
     resources = me.ListField(me.EmbeddedDocumentField(Resource))
-

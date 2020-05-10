@@ -30,15 +30,7 @@ class User(me.Document, UserMixin):
                 return True
         return False
 
-    def get_teaching_assistant_class(self):
-        from sadhu import models
-        classes = models.Class.objects(
-                teaching_assistants__user=self)
-
-        return classes
-
     def get_image(self):
         if 'google' in self.resources:
             return self.resources['google'].get('picture', None)
         return None
-

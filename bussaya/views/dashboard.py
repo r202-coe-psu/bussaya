@@ -2,8 +2,6 @@ from flask import Blueprint, render_template
 from flask_login import login_required, current_user
 
 from .. import models
-import mongoengine as me
-
 from .. import forms
 
 import datetime
@@ -12,9 +10,9 @@ module = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 subviews = []
 
 
-
 def index_admin():
     return render_template('/dashboard/index-admin.html')
+
 
 def index_user():
     return render_template('/votings/waiting-results.html')
@@ -23,12 +21,11 @@ def index_user():
     # now = datetime.datetime.now()
 
     # available_classes = models.Class.objects(
-    #         (me.Q(limited_enrollment__grantees=user.email) | 
+    #         (me.Q(limited_enrollment__grantees=user.email) |
     #              me.Q(limited_enrollment__grantees=user.username)) &
     #         (me.Q(started_date__lte=now) &
     #              me.Q(ended_date__gte=now))
     #         ).order_by('ended_date')
-
 
     # ass_schedule = []
     # for class_ in available_classes:
@@ -51,7 +48,7 @@ def index_user():
     #                        assignment_schedule=ass_schedule
     #                        )
 
-@module.route('/', methods=['GET', 'POST'])
+
 @login_required
 def index():
     now = datetime.datetime.now()
@@ -78,24 +75,23 @@ def index():
             return render_template('/dashboard/index-lecturer.html')
         return index_user()
 
-
     projects = models.Project.objects(class_=election.class_)
 
     form = forms.votings.VotingForm()
-    
+
     project_choices = [('', 'กรุณาเลือกโปรเจค')]
     project_choices.extend([
-            (str(project.id),
-             '{} ({})'.format(project.name,', '.join(project.student_ids))) \
+            (str(project.id), '{} ({})'.format(
+                project.name, ', '.join(project.student_ids)))
             for project in projects])
     form.projects.choices = project_choices
 
     if not form.validate_on_submit():
         return render_template('/votings/vote.html',
                                form=form,
-                               now = datetime.datetime.now(),
+                               now=datetime.datetime.now(),
                                election=election)
- 
+
     voting = models.Voting(user=current_user._get_current_object(),
                            election=election,
                            class_=election.class_,

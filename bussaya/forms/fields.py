@@ -1,6 +1,7 @@
 from wtforms import widgets
 from wtforms.fields import Field
 
+
 class TagListField(Field):
     widget = widgets.TextInput()
 
@@ -31,6 +32,7 @@ class TagListField(Field):
             if item.lower() not in d:
                 d[item.lower()] = True
                 yield item
+
 
 class TextListField(TagListField):
     widget = widgets.TextArea()

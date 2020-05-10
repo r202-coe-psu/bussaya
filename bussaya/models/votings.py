@@ -16,6 +16,7 @@ class Voting(me.Document):
     voted_date = me.DateTimeField(required=True,
                                   default=datetime.datetime.now)
 
+
 class Election(me.Document):
     meta = {'collection': 'elections'}
 
@@ -30,7 +31,6 @@ class Election(me.Document):
                                     auto_now=True)
 
     started_date = me.DateTimeField(required=True,
-                                   default=datetime.datetime.now)
+                                    default=datetime.datetime.now)
     ended_date = me.DateTimeField(required=True,
                                   default=datetime.datetime.now)
-

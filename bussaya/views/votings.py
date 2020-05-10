@@ -1,17 +1,12 @@
 from flask import Blueprint, render_template
-from flask_login import login_required, current_user
+from flask_login import login_required
 
-import mongoengine as me
-
-from .. import forms
 from .. import models
 
-import datetime
 import collections
 
 module = Blueprint('votings', __name__, url_prefix='/votings')
 subviews = []
-
 
 
 @module.route('/', methods=['GET'])
@@ -37,7 +32,3 @@ def index():
     return render_template('/votings/index.html',
                            std_votings=collections.OrderedDict(std_votings),
                            lec_votings=collections.OrderedDict(lec_votings))
-
-
-
-
