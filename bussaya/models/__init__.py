@@ -12,7 +12,7 @@ __all__ = [
         User,
         OAuth2Token,
         Class,
-        Project,
+        Project, ProjectResource, ProjectApproval,
         Voting, Election,
         ]
 

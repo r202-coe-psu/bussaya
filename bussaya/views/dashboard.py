@@ -16,10 +16,12 @@ def index_admin():
 def index_lecturer():
     return render_template('/dashboard/index-lecture.html')
 
+
 def index_student():
     projects = models.Project.objects(students=current_user._get_current_object())
     return render_template('/dashboard/index-student.html',
                            projects=projects)
+
 
 def index_user():
     return render_template('/dashboard/index-user.html')

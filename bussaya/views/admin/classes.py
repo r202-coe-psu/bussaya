@@ -45,4 +45,3 @@ def view(class_id):
     class_ = models.Class.objects.get(id=class_id)
     return render_template('/admin/classes/view.html',
                            class_=class_)
-

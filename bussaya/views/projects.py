@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, send_file, Response
 from flask_login import login_required, current_user
 
 from .. import forms
@@ -22,25 +22,26 @@ def create():
     form = forms.projects.ProjectForm()
 
     lecturers = models.User.objects(roles='lecturer').order_by('first_name')
-    lec_choices = [(str(l.id), f'{l.first_name} {l.last_name}') for l in lecturers ]
+    lec_choices = [(str(l.id), f'{l.first_name} {l.last_name}') for l in lecturers]
     form.advisor.choices = lec_choices
     form.committees.choices = lec_choices
     form.public.choices = [(d, d.title()) for d in form.public.choices]
 
     classes = models.Class.objects().order_by('-id')
     form.class_.choices = [(str(c.id), c.name) for c in classes]
-    
+
     student_ids = []
     for c in classes:
         student_ids.extend(c.student_ids)
 
-    form.contributors.choices = form.contributors.choices + [(str(s.id), f'{s.first_name} {s.last_name}') 
-             for s in models.User.objects(username__in=student_ids)]
+    form.contributors.choices = form.contributors.choices + [
+            (str(s.id), f'{s.first_name} {s.last_name}')
+            for s in models.User.objects(username__in=student_ids)]
 
     if not form.validate_on_submit():
         return render_template('/projects/create-edit.html',
                                form=form)
-    
+
     project = models.Project()
     form.populate_obj(project)
     project.class_ = models.Class.objects.get(id=form.class_.data)
@@ -54,6 +55,7 @@ def create():
 
     return redirect(url_for('dashboard.index'))
 
+
 @module.route('/<project_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit(project_id):
@@ -61,20 +63,21 @@ def edit(project_id):
     form = forms.projects.ProjectForm(obj=project)
 
     lecturers = models.User.objects(roles='lecturer').order_by('first_name')
-    lec_choices = [(str(l.id), f'{l.first_name} {l.last_name}') for l in lecturers ]
+    lec_choices = [(str(l.id), f'{l.first_name} {l.last_name}') for l in lecturers]
     form.advisor.choices = lec_choices
     form.committees.choices = lec_choices
     form.public.choices = [(d, d.title()) for d in form.public.choices]
 
     classes = models.Class.objects().order_by('-id')
     form.class_.choices = [(str(c.id), c.name) for c in classes]
-    
+
     student_ids = []
     for c in classes:
         student_ids.extend(c.student_ids)
 
-    form.contributors.choices = form.contributors.choices + [(str(s.id), f'{s.first_name} {s.last_name}') 
-             for s in models.User.objects(username__in=student_ids)]
+    form.contributors.choices = form.contributors.choices + [
+            (str(s.id), f'{s.first_name} {s.last_name}')
+            for s in models.User.objects(username__in=student_ids)]
 
     if not form.validate_on_submit():
         form.advisor.data = str(project.advisor.id)
@@ -86,7 +89,7 @@ def edit(project_id):
             form.contributors.data = str(contributors[0].id)
         return render_template('/projects/create-edit.html',
                                form=form)
-    
+
     form.populate_obj(project)
     project.class_ = models.Class.objects.get(id=form.class_.data)
     project.advisor = models.User.objects.get(id=form.advisor.data)
@@ -115,8 +118,6 @@ def get_resource(data, type, project_id):
     return resource
 
 
-
-
 @module.route('/<project_id>/upload', methods=['GET', 'POST'])
 @login_required
 def upload(project_id):
@@ -126,7 +127,6 @@ def upload(project_id):
         return render_template('/projects/upload.html',
                                form=form,
                                project=project)
-
 
     files = [form.report.data,
              form.presentation.data,
@@ -141,7 +141,7 @@ def upload(project_id):
         resource = get_resource(f, t, project_id)
         project.resources.append(resource)
     project.save()
-    
+
     return redirect(url_for('dashboard.index'))
 
 
@@ -150,10 +150,11 @@ def upload(project_id):
 def download(project_id, resource_id, filename):
     project = models.Project.objects.get(id=project_id)
     response = Response()
+
     if not project:
         response.status_code = 404
         return response
-    
+
     resource = None
     for r in project.resources:
         if str(r.id) == resource_id:
@@ -165,8 +166,6 @@ def download(project_id, resource_id, filename):
             resource.data, attachment_filename=resource.data.filename, as_attachment=True)
 
     return response
-
-
 
 
 @module.route('/<project_id>')

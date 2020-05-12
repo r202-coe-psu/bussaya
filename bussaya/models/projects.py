@@ -46,7 +46,6 @@ class Project(me.Document):
     class_ = me.ReferenceField('Class', dbref=True, required=True)
     tags = me.ListField(me.StringField())
 
-
     created_date = me.DateTimeField(required=True,
                                     default=datetime.datetime.now)
     updated_date = me.DateTimeField(required=True,
@@ -73,7 +72,6 @@ class Project(me.Document):
                      'abstract and poster',
                      'abstract and report',
                      'abstract, poster and report'])
-
 
     def get_resource(self, type_):
         resources = self.resources

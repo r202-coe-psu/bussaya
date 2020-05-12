@@ -4,3 +4,5 @@
 # from . import elections
 from . import classes
 from . import projects
+
+__all__ = [classes, projects]
