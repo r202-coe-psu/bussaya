@@ -1,0 +1,48 @@
+{% extends '/projects/index.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+
+{% block dashboard_title %}
+  Upload Project Resource
+{% endblock %}
+
+{% block breadcrumbs %}
+  {{ super() }}
+  <a href="{{ url_for('projects.upload', project_id=project.id) }}" class="breadcrumb">Upload</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="ui segment">
+    <form method="POST" enctype="multipart/form-data" class="ui form">
+      {{ form.csrf_token }}
+      {{ renderer.render_fileinput(form.report) }}
+      {{ renderer.render_fileinput(form.presentation) }}
+      {{ renderer.render_fileinput(form.poster) }}
+      {{ renderer.render_fileinput(form.other) }}
+      {{ renderer.render_fileinput(form.similarity) }}
+      {{ renderer.render_field(form.git) }}
+      <button name="create" type="submit" class="ui button primary">Upload</button>
+    </form>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block additional_js %}
+    <script type="text/javascript">
+    {%- for field in form if field.type == 'FileField' %}
+      $(".attach-file-{{ field.name }}").click(function() {
+        $(this).parent().find("#{{ field.name }}").click();
+      });
+
+      $('#{{ field.name }}')
+      .on('change', function(e) {
+        var name = e.target.files[0].name;
+        $('.attach-file-{{ field.name }}', $(e.target).parent()).val(name);
+      });
+    {%- endfor %}
+  </script>
+
+{% endblock additional_js %}

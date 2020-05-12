@@ -1,10 +1,22 @@
 import mongoengine as me
 import datetime
 
+from bson.objectid import ObjectId
 
-class Resource(me.EmbeddedDocument):
+
+class ProjectResource(me.EmbeddedDocument):
+    id = me.ObjectIdField(required=True, default=ObjectId())
     data = me.FileField()
-    file_type = me.StringField()
+    link = me.StringField()
+    type = me.StringField(
+            required=True,
+            choices=['report',
+                     'similarity',
+                     'presentation',
+                     'poster',
+                     'other',
+                     'link'])
+    status = me.StringField(required=True, default='active')
     created_date = me.DateTimeField(required=True,
                                     default=datetime.datetime.now)
     updated_date = me.DateTimeField(required=True,
@@ -12,7 +24,8 @@ class Resource(me.EmbeddedDocument):
                                     auto_now=True)
 
 
-class Approval(me.EmbeddedDocument):
+class ProjectApproval(me.EmbeddedDocument):
+    id = me.ObjectIdField(required=True, default=ObjectId())
     committee = me.ReferenceField('User', dbref=True)
 
     created_date = me.DateTimeField(required=True,
@@ -45,9 +58,9 @@ class Project(me.Document):
 
     advisor = me.ReferenceField('User', dbref=True)
     committees = me.ListField(me.ReferenceField('User', dbref=True))
-    approvals = me.ListField(me.EmbeddedDocumentField(Approval))
+    approvals = me.ListField(me.EmbeddedDocumentField(ProjectApproval))
 
-    resources = me.ListField(me.EmbeddedDocumentField(Resource))
+    resources = me.ListField(me.EmbeddedDocumentField(ProjectResource))
 
     public = me.StringField(
             required=True,
@@ -55,5 +68,19 @@ class Project(me.Document):
             choices=['private',
                      'only name',
                      'abstract',
-                     'report'])
+                     'poster',
+                     'report',
+                     'abstract and poster',
+                     'abstract and report',
+                     'abstract, poster and report'])
 
+
+    def get_resource(self, type_):
+        resources = self.resources
+        resources.reverse()
+        for r in resources:
+            if r.type == type_:
+                print(r.type, type_)
+                return r
+
+        return None

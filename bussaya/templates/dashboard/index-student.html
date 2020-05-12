@@ -15,14 +15,56 @@
   </div>
 
   {%- if projects | count > 0 %}
-  <div class="ui segment">
+  <div class="ui segment row">
+    <h4>Project</h4>
     <div class="ui grid">
-      <div class="two column row">
-        <div class="column">
-        {% for project in projects %}
-          <div class="ui middle aligned divided list">
-            <div class="item">
+      <div class="twelve wide column">
+        <div class="ui middle aligned divided list">
+          {% for project in projects %}
+            <div class="item" style="padding: 10px; 0; 10px; 0;;">
               <div class="right floated content">
+                {% set r = project.get_resource('report') %}
+                {% if r %}
+                  <a href="{{ r.link }}"><i class="large pdf file icon"></i></a>
+                {% else %}
+                  <i class="large pdf file icon disabled"></i>
+                {% endif %}
+
+                {% set r = project.get_resource('similarity') %}
+                {% if r %}
+                  <a href="{{ r.link }}"><i class="large copy icon"></i></a>
+                {% else %}
+                  <i class="large copy icon disabled"></i>
+                {% endif %}
+
+                {% set r = project.get_resource('poster') %}
+                {% if r %}
+                  <a href="{{ r.link }}"><i class="large file image icon"></i></a>
+                {% else %}
+                  <i class="large file image icon disabled"></i>
+                {% endif %}
+
+                {% set r = project.get_resource('presentation') %}
+                {% if r %}
+                  <a href="{{ r.link }}"><i class="large file powerpoint icon"></i></a>
+                {% else %}
+                  <i class="large file powerpoint icon disabled"></i>
+                {% endif %}
+
+                {% set r = project.get_resource('other') %}
+                {% if r %}
+                  <a href="{{ r.link }}"><i class="large archive icon"></i></a>
+                {% else %}
+                  <i class="large archive icon disabled"></i>
+                {% endif %}
+
+                {% set r = project.get_resource('git') %}
+                {% if r %}
+                  <a href="{{ r.link }}"><i class="large git icon"></i></a>
+                {% else %}
+                  <i class="large git icon disabled"></i>
+                {% endif %}
+
                 <a class="ui button" href="{{ url_for('projects.upload', project_id=project.id) }}">Upload</a>
                 <a class="ui button" href="{{ url_for('projects.edit', project_id=project.id) }}">Edit</a>
               </div>
@@ -38,8 +80,7 @@
                 <i class="user tie icon"></i> {{ project.advisor.first_name }} {{ project.advisor.last_name }}
               </div>
             </div>
-          </div>
-        {% endfor %}
+          {% endfor %}
         </div>
       </div>
     </div>

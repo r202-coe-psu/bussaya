@@ -100,14 +100,76 @@ def edit(project_id):
     return redirect(url_for('dashboard.index'))
 
 
+def get_resource(data, type, project_id):
+    resource = models.ProjectResource()
+    resource.type = type
+    resource.link = url_for(
+            'projects.download',
+            project_id=project_id,
+            resource_id=resource.id,
+            filename=data.filename)
+    resource.data.put(data,
+                      filename=data.filename,
+                      content_type=data.content_type)
+
+    return resource
+
+
+
 
 @module.route('/<project_id>/upload', methods=['GET', 'POST'])
 @login_required
 def upload(project_id):
+    project = models.Project.objects.get(id=project_id)
+    form = forms.projects.ProjectResourceUploadForm()
+    if not form.validate_on_submit():
+        return render_template('/projects/upload.html',
+                               form=form,
+                               project=project)
+
+
+    files = [form.report.data,
+             form.presentation.data,
+             form.similarity.data,
+             form.poster.data,
+             form.other.data]
+    types = ['report', 'presentation', 'similarity', 'poster', 'other']
+
+    for f, t in zip(files, types):
+        if not f:
+            continue
+        resource = get_resource(f, t, project_id)
+        project.resources.append(resource)
+    project.save()
     
     return redirect(url_for('dashboard.index'))
+
+
+@module.route('/<project_id>/resources/<resource_id>/<filename>')
+@login_required
+def download(project_id, resource_id, filename):
+    project = models.Project.objects.get(id=project_id)
+    response = Response()
+    if not project:
+        response.status_code = 404
+        return response
+    
+    resource = None
+    for r in project.resources:
+        if str(r.id) == resource_id:
+            resource = r
+            break
+
+    if resource:
+        response = send_file(
+            resource.data, attachment_filename=resource.data.filename, as_attachment=True)
+
+    return response
+
+
+
 
 @module.route('/<project_id>')
 @login_required
 def view(project_id):
-    pass
+    return 'wait for implementation'
