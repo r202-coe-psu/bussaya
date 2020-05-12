@@ -30,12 +30,9 @@ class Project(me.Document):
     abstract = me.StringField(required=True)
     abstract_th = me.StringField(required=True)
 
-    description = me.StringField()
-
     class_ = me.ReferenceField('Class', dbref=True, required=True)
     tags = me.ListField(me.StringField())
 
-    public = me.StringField()
 
     created_date = me.DateTimeField(required=True,
                                     default=datetime.datetime.now)
@@ -43,11 +40,20 @@ class Project(me.Document):
                                     default=datetime.datetime.now,
                                     auto_now=True)
 
-    student_ids = me.ListField(me.StringField(required=True))
     students = me.ListField(me.ReferenceField('User', dbref=True))
+    creator = me.ReferenceField('User', dbref=True)
 
     advisor = me.ReferenceField('User', dbref=True)
     committees = me.ListField(me.ReferenceField('User', dbref=True))
     approvals = me.ListField(me.EmbeddedDocumentField(Approval))
 
     resources = me.ListField(me.EmbeddedDocumentField(Resource))
+
+    public = me.StringField(
+            required=True,
+            default='only name',
+            choices=['private',
+                     'only name',
+                     'abstract',
+                     'report'])
+

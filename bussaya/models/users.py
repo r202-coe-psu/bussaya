@@ -7,7 +7,8 @@ from flask_login import UserMixin
 class User(me.Document, UserMixin):
     username = me.StringField(required=True, unique=True)
 
-    email = me.StringField()
+    title = me.StringField()
+    email = me.StringField(required=True, unique=True)
     first_name = me.StringField(required=True)
     last_name = me.StringField(required=True)
 

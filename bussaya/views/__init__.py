@@ -2,6 +2,7 @@
 from . import site
 from . import accounts
 from . import dashboard
+from . import projects
 from . import classes
 from . import votings
 from . import elections
@@ -29,6 +30,7 @@ def register_blueprint(app):
     blueprints = get_subblueprints([site,
                                     dashboard,
                                     accounts,
+                                    projects,
                                     classes,
                                     votings,
                                     elections,

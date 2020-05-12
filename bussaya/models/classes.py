@@ -5,9 +5,10 @@ import datetime
 class Class(me.Document):
     meta = {'collection': 'classes'}
 
-    name = me.StringField(required=True)
-    description = me.StringField(required=True)
-    code = me.StringField()
+    name = me.StringField(required=True, max_length=255)
+    description = me.StringField()
+    code = me.StringField(max_length=100)
+    student_ids = me.ListField(me.StringField())
 
     tags = me.ListField(me.StringField(required=True))
 

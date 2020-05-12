@@ -13,13 +13,33 @@ def index_admin():
     return render_template('/dashboard/index-admin.html')
 
 
+def index_lecturer():
+    return render_template('/dashboard/index-lecture.html')
+
+def index_student():
+    projects = models.Project.objects(students=current_user._get_current_object())
+    return render_template('/dashboard/index-student.html',
+                           projects=projects)
+
 def index_user():
-    return render_template('/votings/waiting-results.html')
+    return render_template('/dashboard/index-user.html')
 
 
 @module.route('')
 @login_required
 def index():
+    user = current_user
+    if 'admin' in user.roles:
+        return index_admin()
+    elif 'CoE-lecturer' in user.roles:
+        return index_lecturer()
+    elif 'student' in user.roles:
+        return index_student()
+
+    return index_user()
+
+
+def index_voting():
     now = datetime.datetime.now()
     user = current_user._get_current_object()
     election = models.Election.objects(
