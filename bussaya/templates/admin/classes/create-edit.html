@@ -1,0 +1,36 @@
+{% extends '/base/default-dashboard.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+
+{% block dashboard_title %}
+  Create classes
+{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('admin.classes.index') }}" class="breadcrumb">Classes</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <h3>Create Classes</h3>
+</div>
+
+<div class="row">
+  <div class="ui segment">
+    <form method="POST" class="ui form">
+      {{ form.csrf_token }}
+      {{ renderer.render_field(form.name) }}
+      {{ renderer.render_field(form.code) }}
+      {{ renderer.render_field(form.description) }}
+      {{ renderer.render_field(form.student_ids) }}
+      {{ renderer.render_field(form.tags) }}
+      <div class="fields">
+      {{ renderer.render_field(form.started_date) }}
+      {{ renderer.render_field(form.ended_date) }}
+      </div>
+      <button name="create" type="submit" class="ui button primary">{{ 'Create' if 'create' in request.path else 'Edit' }}</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends '/projects/index.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+
+{% block dashboard_title %}
+  Create Project
+{% endblock %}
+
+{% block breadcrumbs %}
+  {{ super() }}
+  <a href="{{ url_for('projects.create') }}" class="breadcrumb">Create Project</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="ui segment">
+    <form method="POST" class="ui form">
+      {{ form.csrf_token }}
+      {{ renderer.render_field(form.name) }}
+      {{ renderer.render_field(form.name_th) }}
+      {{ renderer.render_field(form.abstract) }}
+      {{ renderer.render_field(form.abstract_th) }}
+
+      {{ renderer.render_select(form.contributors) }}
+      {{ renderer.render_select(form.class_) }}
+      {{ renderer.render_select(form.public) }}
+      {{ renderer.render_field(form.tags) }}
+
+      {{ renderer.render_select(form.advisor) }}
+      {{ renderer.render_multiple_select(form.committees) }}
+      <button name="create" type="submit" class="ui button primary">{{ 'Create' if 'create' in request.path else 'Edit' }}</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

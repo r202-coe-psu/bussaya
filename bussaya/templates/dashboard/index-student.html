@@ -1,0 +1,48 @@
+{% extends '/base/default-dashboard.html' %}
+
+{% block content %}
+  <div>    
+    <h3>Hello, {{ current_user.first_name }} {{ current_user.last_name }} </h3>
+  </div>
+
+  <div class="row">
+    <div class="ui labeled icon menu">
+      <a class="item" href="{{ url_for('projects.create') }}">
+        <i class="add icon"></i>
+        Create Project
+      </a>
+    </div>
+  </div>
+
+  {%- if projects | count > 0 %}
+  <div class="ui segment">
+    <div class="ui grid">
+      <div class="two column row">
+        <div class="column">
+        {% for project in projects %}
+          <div class="ui middle aligned divided list">
+            <div class="item">
+              <div class="right floated content">
+                <a class="ui button" href="{{ url_for('projects.upload', project_id=project.id) }}">Upload</a>
+                <a class="ui button" href="{{ url_for('projects.edit', project_id=project.id) }}">Edit</a>
+              </div>
+              <i class="laptop large icon avatar"></i>
+              <div class="content">
+                <div class="header">{{ project.name }}</div>
+                <i class="user icon"></i>
+                {%- for s in project.students %}
+                {{ s.first_name }} {{ s.last_name }}
+                {% if not loop.last %}, {% endif %}
+                {% endfor -%}
+                
+                <i class="user tie icon"></i> {{ project.advisor.first_name }} {{ project.advisor.last_name }}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {%- endif %}
+{% endblock %}
