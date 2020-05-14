@@ -54,7 +54,6 @@ BaseProfileForm = model_form(
                  'roles',
                  'status',
                  'username',
-                 'email',
                  'resources'],
         field_args={
             'title': {'label': 'Title'},
@@ -64,6 +63,7 @@ BaseProfileForm = model_form(
             'th_first_name': {'label': 'Thai First Name'},
             'th_last_name': {'label': 'Thai Last Name'},
             'biography': {'label': 'Biography'},
+            'email': {'label': 'Email'},
             }
         )
 

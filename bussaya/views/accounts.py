@@ -131,13 +131,16 @@ def authorized_engpsu():
 
         user.save()
 
-        if userinfo['username'].isdigit():
-            project = models.Project.objects(
-                    student_ids=userinfo['username']).first()
+        # if userinfo['username'].isdigit():
+        #     project = models.Project.objects(
+        #             student_ids=userinfo['username']).first()
 
-            if project and user not in project.owners:
-                project.owners.append(user)
-                project.save()
+        #     if project and user not in project.owners:
+        #         project.owners.append(user)
+        #         project.save()
+    else:
+        user.resources[client.engpsu.name] = userinfo
+        user.save()
 
     login_user(user)
     identity_changed.send(

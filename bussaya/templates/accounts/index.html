@@ -14,35 +14,27 @@ Profile
   <div class="ui segment">
     <h2 class="ui header">Profile <a class="btn-floating btn-large waves-effect waves-light" href="{{ url_for('accounts.edit_profile') }}" title='Edit profile.'><i class="edit icon"></i></a>
     </h2>
-    <div class="ui grid three column row">
+    <div class="ui grid two column row">
+
       <div class="column">
         <div class="ui small image">
           <img src="{{ current_user.get_picture() }}">
         </div>
       </div>
+
       <div class="column">
-        <div class="ui grid two column">
-          <div class="column">
-            {{ current_user.first_name }}
-          </div>
-          <div class="column">
-            {{ current_user.last_name }}
-          </div>
-          <div class="column">
-            {{ current_user.th_first_name }}
-          </div>
-          <div class="column">
-            {{ current_user.th_last_name }}
-          </div>
-          <div class="column">
-            Role: {{ current_user.roles | join(', ') | title() }}
-          </div>
+        <div>
+          {{ current_user.title }} {{ current_user.first_name }} {{ current_user.last_name }} <br>
+          {{ current_user.th_title }} {{ current_user.th_first_name }} {{ current_user.th_last_name }} <br>
+          {{ current_user.email }} Role: {{ current_user.roles | join(', ') | title() }}
+        </div>
+        <div style="margin-top: 2vh;">
+          <h4>Biography</h4>
+          {{ current_user.biography }}
         </div>
       </div>
-      <div class="column">
-        {{ current_user.biography }}
-      </div>
     </div>
+
   </div>
 </div>
 {% endblock %}
