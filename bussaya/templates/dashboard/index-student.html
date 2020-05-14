@@ -71,13 +71,29 @@
               <i class="laptop large icon avatar"></i>
               <div class="content">
                 <div class="header">{{ project.name }}</div>
-                <i class="user icon"></i>
-                {%- for s in project.students %}
-                {{ s.first_name }} {{ s.last_name }}
-                {% if not loop.last %}, {% endif %}
-                {% endfor -%}
-                
-                <i class="user tie icon"></i> {{ project.advisor.first_name }} {{ project.advisor.last_name }}
+                <div>
+                  <i class="user icon"></i>
+                  {%- for s in project.students %}
+                  {{ s.first_name }} {{ s.last_name }}
+                  {% if not loop.last %}, {% endif %}
+                  {% endfor -%}
+                  
+                  <i class="user tie icon"></i> {{ project.advisor.first_name }} {{ project.advisor.last_name }}
+                </div>
+                <div>
+
+                  <i class="user cog icon"></i>
+                  {% for committee in project.committees %}
+                    {{ committee.first_name }} {{ committee.last_name }} 
+
+                    {% if project.is_approval(committee) %}
+                      <i class="large blue check icon"></i>
+                    {% else %}
+                      <i class="large check icon disabled"></i>
+                    {% endif %}
+
+                  {% endfor %}
+                </div>
               </div>
             </div>
           {% endfor %}

@@ -88,6 +88,7 @@ class Project(me.Document):
 
     def is_approval(self, user):
         for approval in self.approvals:
+            print(user.first_name, approval.committee.first_name)
             if user == approval.committee:
                 return True
 
