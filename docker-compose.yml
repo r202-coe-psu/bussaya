@@ -22,7 +22,7 @@ services:
         ports:
             - 9001:9001
         links:
-            - bussaya-mongodb
+            - mongodb
         networks:
             - default
         restart: always
