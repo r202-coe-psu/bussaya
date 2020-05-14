@@ -180,7 +180,6 @@ def approve(project_id):
 
 
 @module.route('/<project_id>/resources/<resource_id>/<filename>')
-@login_required
 def download(project_id, resource_id, filename):
     project = models.Project.objects.get(id=project_id)
     response = Response()
@@ -189,10 +188,15 @@ def download(project_id, resource_id, filename):
     if not project:
         return response
 
+    resource = None
     for r in project.resources:
         if str(r.id) == resource_id:
             resource = r
             break
+
+    if not current_user.is_authenticated:
+        if resource.type not in project.public:
+            return response
 
     if resource:
         response = send_file(

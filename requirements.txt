@@ -1,6 +1,7 @@
 flask
 requests
 flask-mongoengine
+pillow
 flask-login
 flask-allows
 flask-wtf

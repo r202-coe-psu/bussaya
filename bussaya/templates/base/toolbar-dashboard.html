@@ -1,8 +1,8 @@
 
 <div class="item">
   <a href="{{ url_for('accounts.index') }}" class="ui image">
-    {%- if current_user.get_image() %}
-      <img class="ui avatar image" src="{{ current_user.get_image() }}">
+    {%- if current_user.get_picture() %}
+      <img class="ui avatar image" src="{{ current_user.get_picture() }}">
     {% else %}
       <i class="user icon"></i>
     {% endif -%}

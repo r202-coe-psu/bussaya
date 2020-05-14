@@ -3,12 +3,15 @@ from flask import (Blueprint,
                    render_template,
                    url_for,
                    redirect,
-                   current_app)
+                   current_app,
+                   send_file,
+                   abort)
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_principal import Identity, identity_changed
 
 from .. import models
 from .. import oauth2
+from .. import forms
 
 module = Blueprint('accounts', __name__)
 
@@ -163,5 +166,48 @@ def logout():
 
 
 @module.route('/accounts')
+@login_required
 def index():
-    return 'Hello ' + current_user.username
+    return render_template('/accounts/index.html')
+
+
+@module.route('/accounts/edit-profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = forms.accounts.ProfileForm(
+            obj=current_user,
+            )
+    if not form.validate_on_submit():
+        return render_template('/accounts/edit-profile.html', form=form)
+
+    user = current_user._get_current_object()
+    form.populate_obj(user)
+
+    if form.pic.data:
+        if user.picture:
+            user.picture.replace(form.pic.data,
+                                 filename=form.pic.data.filename,
+                                 content_type=form.pic.data.content_type)
+        else:
+            user.picture.put(form.pic.data,
+                             filename=form.pic.data.filename,
+                             content_type=form.pic.data.content_type)
+
+    user.save()
+
+    return redirect(url_for('accounts.index'))
+
+
+@module.route('/accounts/<user_id>/picture/<filename>', methods=['GET', 'POST'])
+def picture(user_id, filename):
+    user = models.User.objects.get(id=user_id)
+
+    if not user or not user.picture or user.picture.filename != filename:
+        return abort(403)
+
+    response = send_file(
+            user.picture,
+            attachment_filename=user.picture.filename,
+            mimetype=user.picture.content_type
+            )
+    return response

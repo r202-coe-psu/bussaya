@@ -5,6 +5,13 @@ Created on Oct 13, 2013
 '''
 
 from wtforms import validators
+from wtforms import fields
+
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed
+from flask_mongoengine.wtf import model_form
+
+from .. import models
 
 
 def validate_email(form, field):
@@ -36,3 +43,33 @@ def validate_username(form, field):
     if user is not None:
         raise validators.ValidationError(
                 'This user: %s is available on system' % field.data)
+
+
+BaseProfileForm = model_form(
+        models.User,
+        FlaskForm,
+        exclude=['created_date',
+                 'updated_date',
+                 'picture',
+                 'roles',
+                 'status',
+                 'username',
+                 'email',
+                 'resources'],
+        field_args={
+            'title': {'label': 'Title'},
+            'first_name': {'label': 'First Name'},
+            'last_name': {'label': 'Last Name'},
+            'th_title': {'label': 'Thai Title'},
+            'th_first_name': {'label': 'Thai First Name'},
+            'th_last_name': {'label': 'Thai Last Name'},
+            'biography': {'label': 'Biography'},
+            }
+        )
+
+
+class ProfileForm(BaseProfileForm):
+    pic = fields.FileField(
+            'Picture',
+            validators=[FileAllowed(['png', 'jpg'], 'allow png and jpg')]
+            )

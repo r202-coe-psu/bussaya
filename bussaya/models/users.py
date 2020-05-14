@@ -2,15 +2,24 @@ import mongoengine as me
 import datetime
 
 from flask_login import UserMixin
+from flask import url_for
 
 
 class User(me.Document, UserMixin):
     username = me.StringField(required=True, unique=True)
 
-    title = me.StringField()
-    email = me.StringField(required=True, unique=True)
-    first_name = me.StringField(required=True)
-    last_name = me.StringField(required=True)
+    title = me.StringField(max_length=50)
+    email = me.StringField(required=True, unique=True, max_length=200)
+    first_name = me.StringField(required=True, max_length=200)
+    last_name = me.StringField(required=True, max_length=200)
+
+    th_title = me.StringField(max_length=50)
+    th_first_name = me.StringField(max_length=200)
+    th_last_name = me.StringField(max_length=200)
+
+    biography = me.StringField()
+
+    picture = me.ImageField(thumbnail_size=(800, 600, True))
 
     status = me.StringField(required=True, default='disactive')
     roles = me.ListField(me.StringField(), default=['user'])
@@ -31,7 +40,9 @@ class User(me.Document, UserMixin):
                 return True
         return False
 
-    def get_image(self):
+    def get_picture(self):
+        if self.picture:
+            return url_for('accounts.picture', user_id=self.id, filename=self.picture.filename)
         if 'google' in self.resources:
-            return self.resources['google'].get('picture', None)
-        return None
+            return self.resources['google'].get('picture', '')
+        return url_for('static', filename='images/user.png')
