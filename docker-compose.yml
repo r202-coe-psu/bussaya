@@ -3,8 +3,8 @@ services:
     mongodb:
         image: mongo
         container_name: bussaya-mongodb
-        ports:
-            - 27017:27017
+        # ports:
+        #     - 27017:27017
         volumes:
             - ../deployment/mongodb/data/db:/data/db
             - /etc/localtime:/etc/localtime:ro
