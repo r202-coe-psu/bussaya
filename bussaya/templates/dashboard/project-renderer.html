@@ -1,46 +1,44 @@
-{% extends '/base/default-dashboard.html' %}
 
-{% block content %}
-{#
-<div class="ui segment middle algined" style="min-height: 80vh; padding-top: 10vh">
-  <div class="ui icon header center aligned">
-    <i class="icon university end"></i>
-    <h3>Hello, {{ current_user.first_name }} {{ current_user.last_name }} </p>
-    <div>
-      <a class="ui primary button" href="{{ url_for('classes.index') }}">Class</a>
-      <a class="ui primary button" href="{{ url_for('votings.index') }}">View Vote</a>
-      <a class="ui primary button" href="{{ url_for('elections.index') }}">Manage Election</a>
-    </div>
+{% macro render_project_section(projects, current_user, advisees, committees) -%}
+  {%- if advisees | count > 0 or committees | count > 0 %}
+  <div class="ui segment row">
+  {%- if advisees | count > 0 %}
+    <h4>Advisee Project</h4>
+    {{ render_project_table(advisees, current_user) }}
+  {%- endif %}
+  {%- if committees | count > 0 %}
+    <h4>Examination Project</h4>
+    {{ render_project_table(committees, current_user) }}
+  {%- endif %}
   </div>
-</div>
-#}
+  {%- endif %}
+{% endmacro -%}
 
-<h4>Class: {{ class_.name }}</h4>
-<table class="ui celled table">
+{% macro render_project_table(projects, current_user) -%}
+<table class="ui compact celled table">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Students</th>
+      <th>Project</th>
+      <th>Student</th>
       <th>Advisor</th>
       <th>Public</th>
       <th>Document</th>
-      <th>Approve</th>
+      <th>Action</th>
     </tr>
   </thead>
   <tbody>
-
     {% for project in projects %}
     <tr>
       <td>{{ project.name }}</td>
-      <td>
+      <td class="right aligned collapsing">
         {%- for s in project.students %}
         {{ s.first_name }} {{ s.last_name }}
-        {% if not loop.last %}, {% endif %}
+        {% if not loop.last %}<br>{% endif %}
         {% endfor -%}
       </td>
-      <td>{{ project.advisor.first_name }} {{ project.advisor.last_name }}</td>
-      <td>{{ project.public.title() }}</td>
-      <td>
+      <td class="right aligned collapsing">{{ project.advisor.first_name }} {{ project.advisor.last_name }}</td>
+      <td class="right aligned collapsing">{{ project.public.title() }}</td>
+      <td class="right aligned collapsing">
         {% set r = project.get_resource('report') %}
         {% if r %}
           <a target="_blank" href="{{ r.link }}"><i class="large pdf file icon link pop" data-content="Report"></i></a>
@@ -83,21 +81,29 @@
           <i class="large git icon disabled"></i>
         {% endif %}
       </td>
-      <td>
-        {% for committee in project.committees %}
-          {{ committee.first_name }}
-          {% if project.is_approval(committee) %}
-            <i class="large blue check icon"></i>
-          {% else %}
-            <i class="large check icon disabled"></i>
-          {% endif %}
-          <br>
-        {% endfor %}
+      <td class="right aligned collapsing">
+        {% if project.is_approval(current_user) %}
+          <i class="large blue check icon"></i>
+          <a class="ui disabled button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
+        {% else %}
+          <i class="large check icon disabled"></i>
+          <a class="ui primary button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
+        {% endif %}
+
       </td>
     </tr>
-  	{% endfor %}
-
+  {% endfor %}
   </tbody>
 </table>
 
-{% endblock %}
+  <script type="text/javascript">
+  $('.icon.link.pop')
+  .popup({
+    delay: {
+    show: 50,
+    hide: 70
+    }
+  });
+  </script>
+{%- endmacro %}
+

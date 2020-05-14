@@ -10,11 +10,32 @@ module = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
 
 def index_admin():
-    return render_template('/dashboard/index-admin.html')
+    class_ = models.Class.objects().order_by('-id').first()
+    advisees = models.Project.objects(
+            advisor=current_user._get_current_object(),
+            class_=class_)
+    committees = models.Project.objects(
+            committees=current_user._get_current_object(),
+            class_=class_)
+
+    return render_template('/dashboard/index-admin.html',
+                           class_=class_,
+                           advisees=advisees,
+                           committees=committees)
 
 
 def index_lecturer():
-    return render_template('/dashboard/index-lecture.html')
+    class_ = models.Class.objects().order_by('-id').first()
+    advisees = models.Project.objects(
+            advisor=current_user._get_current_object(),
+            class_=class_)
+    committees = models.Project.objects(
+            committees=current_user._get_current_object(),
+            class_=class_)
+    return render_template('/dashboard/index-lecture.html',
+                           class_=class_,
+                           advisees=advisees,
+                           committees=committees)
 
 
 def index_student():

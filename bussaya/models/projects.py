@@ -15,7 +15,8 @@ class ProjectResource(me.EmbeddedDocument):
                      'presentation',
                      'poster',
                      'other',
-                     'link'])
+                     'git',
+                     ])
     status = me.StringField(required=True, default='active')
     created_date = me.DateTimeField(required=True,
                                     default=datetime.datetime.now)
@@ -71,14 +72,31 @@ class Project(me.Document):
                      'report',
                      'abstract and poster',
                      'abstract and report',
-                     'abstract, poster and report'])
+                     'abstract, poster and report',
+                     'abstract, poster and git',
+                     'abstract, poster, report and git',
+                     ])
 
     def get_resource(self, type_):
         resources = self.resources
         resources.reverse()
         for r in resources:
             if r.type == type_:
-                print(r.type, type_)
                 return r
 
         return None
+
+    def is_approval(self, user):
+        for approval in self.approvals:
+            if user == approval.committee:
+                return True
+
+        return False
+
+    def is_advisor_approval(self):
+        for approval in self.approvals:
+            if approval.committee == self.advisor:
+                if approval.type == 'approve':
+                    return True
+
+        return False

@@ -122,6 +122,11 @@ def get_resource(data, type, project_id):
 @login_required
 def upload(project_id):
     project = models.Project.objects.get(id=project_id)
+    if current_user._get_current_object() not in project.students:
+        response = Response()
+        response.status_code = 403
+        return response
+
     form = forms.projects.ProjectResourceUploadForm()
     if not form.validate_on_submit():
         return render_template('/projects/upload.html',
@@ -140,6 +145,35 @@ def upload(project_id):
             continue
         resource = get_resource(f, t, project_id)
         project.resources.append(resource)
+    if form.git.data:
+        resource = models.ProjectResource(
+                type='git',
+                link=form.git.data)
+        project.resources.append(resource)
+    project.save()
+
+    return redirect(url_for('dashboard.index'))
+
+
+@module.route('/<project_id>/approve')
+@login_required
+def approve(project_id):
+    project = models.Project.objects.get(id=project_id)
+    user = current_user._get_current_object()
+    if user not in project.committees and user != project.advisor:
+        response = Response()
+        response.status_code = 403
+        return response
+
+    for approval in project.approvals:
+        if approval.committee == user:
+            return redirect(url_for('dashboard.index'))
+
+    approval = models.ProjectApproval(
+            committee=user,
+            type='approve'
+            )
+    project.approvals.append(approval)
     project.save()
 
     return redirect(url_for('dashboard.index'))
@@ -150,12 +184,11 @@ def upload(project_id):
 def download(project_id, resource_id, filename):
     project = models.Project.objects.get(id=project_id)
     response = Response()
+    response.status_code = 404
 
     if not project:
-        response.status_code = 404
         return response
 
-    resource = None
     for r in project.resources:
         if str(r.id) == resource_id:
             resource = r
@@ -163,7 +196,10 @@ def download(project_id, resource_id, filename):
 
     if resource:
         response = send_file(
-            resource.data, attachment_filename=resource.data.filename, as_attachment=True)
+            resource.data,
+            attachment_filename=resource.data.filename,
+            # as_attachment=True,
+            mimetype=resource.data.content_type)
 
     return response
 

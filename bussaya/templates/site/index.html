@@ -1,4 +1,42 @@
 {% extends "/base/default-page.html" %}
 
 {% block content %}
+
+  <div class="ui container">
+    <div class="ui segment">
+      {% if class_ %}
+        <h3>{{ class_.name }}</h3>
+      {% endif %}
+      <table class="ui single line table">
+        <tbody>
+          {% for project in projects %}
+          <tr>
+            <td>{{ project.name }}</td>
+            <td>
+              <i class="ui user icon"></i>
+              {%- for s in project.students %}
+              {{ s.first_name }} {{ s.last_name }}
+              {% if not loop.last %}<br>{% endif %}
+              {% endfor -%}
+            </td>
+            <td>
+              <i class="ui user tie icon"></i>
+              {{ project.advisor.first_name }} {{ project.advisor.last_name }}
+            </td>
+            <td>
+              {%- for type_ in ['report', 'poster', 'presentation', 'git'] %}
+                {% if type_ in project.public %}
+                  {% set r = project.get_resource(type_) %}
+                  {% if r %}
+                    <a target="_blank" href="{{ r.link }}"><i class="large pdf file icon link pop" data-content="Report"></i></a>
+                  {% endif %}
+                {% endif %}
+              {%- endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endblock content %}

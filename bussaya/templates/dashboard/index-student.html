@@ -25,7 +25,7 @@
               <div class="right floated content">
                 {% set r = project.get_resource('report') %}
                 {% if r %}
-                  <a href="{{ r.link }}"><i class="large pdf file icon"></i></a>
+                  <a target="_blank" href="{{ r.link }}"><i class="large pdf file icon"></i></a>
                 {% else %}
                   <i class="large pdf file icon disabled"></i>
                 {% endif %}
@@ -65,8 +65,8 @@
                   <i class="large git icon disabled"></i>
                 {% endif %}
 
-                <a class="ui button" href="{{ url_for('projects.upload', project_id=project.id) }}">Upload</a>
-                <a class="ui button" href="{{ url_for('projects.edit', project_id=project.id) }}">Edit</a>
+                <a class="ui primary button" href="{{ url_for('projects.upload', project_id=project.id) }}">Upload</a>
+                <a class="ui primary button" href="{{ url_for('projects.edit', project_id=project.id) }}">Edit</a>
               </div>
               <i class="laptop large icon avatar"></i>
               <div class="content">

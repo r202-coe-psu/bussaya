@@ -1,15 +1,20 @@
-{% extends '/base/default-dashboard.html' %}
+{%extends '/base/default-dashboard.html' %}
+{% import '/dashboard/project-renderer.html' as renderer %}
 
 {% block content %}
-<div class="ui segment middle algined" style="min-height: 80vh; padding-top: 10vh">
-  <div class="ui icon header center aligned">
-    <i class="icon university end"></i>
-    <h3>Hello, {{ current_user.first_name }} {{ current_user.last_name }} </p>
-    <div>
-      <a class="ui primary button" href="{{ url_for('admin.classes.index') }}">Class</a>
-      <a class="ui primary button" href="{{ url_for('votings.index') }}">View Vote</a>
-      <a class="ui primary button" href="{{ url_for('elections.index') }}">Manage Election</a>
-    </div>
+  <div>    
+    <h3>Hello, {{ current_user.first_name }} {{ current_user.last_name }} </h3>
   </div>
-</div>
+
+  {% if 'CoE-lecturer' in current_user.roles %}
+  {{ renderer.render_project_section(projects, current_user, advisees, committees) }}
+  {% endif %}
+
+  <div>
+    <a class="ui primary button" href="{{ url_for('admin.classes.index') }}">Class</a>
+    {#
+    <a class="ui primary button" href="{{ url_for('votings.index') }}">View Vote</a>
+    <a class="ui primary button" href="{{ url_for('elections.index') }}">Manage Election</a>
+    #}
+  </div>
 {% endblock %}
