@@ -12,11 +12,13 @@
               <h1 class="ui huge inverted header" style="font-size:4em">{{ config.get('APP_TITLE') }} </h1>
               <h2>CoE Project System, PSU, Please Login.</h2>
             </div>
-            {% if not current_user.is_authenticated %}
             <div style="padding-top: 20px;">
-              <a href="{{ url_for('accounts.login') }}" class="ui huge primary button"><i class="signup icon"></i>Login</a>
+              {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('accounts.login') }}" class="ui huge primary button"><i class="signup icon"></i>Login</a>
+              {% else %}
+                <a href="{{ url_for('dashboard.index') }}" class="ui huge primary button"><i class="dashboard icon"></i>Dashboard</a>
+              {% endif %}
             </div>
-          {% endif %}
           </div>
         </div>
     </div>
