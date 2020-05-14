@@ -36,7 +36,10 @@ class ProjectApproval(me.EmbeddedDocument):
 
 
 class Project(me.Document):
-    meta = {'collection': 'projects'}
+    meta = {
+            'collection': 'projects',
+            'strict': False,
+            }
 
     name = me.StringField(required=True)
     name_th = me.StringField(required=True)
