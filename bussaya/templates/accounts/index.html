@@ -17,7 +17,7 @@ Profile
 <div class="ui container">
   <div class="ui segment">
     <h2 class="ui header">Profile
-      {% if current_user == user %}
+      {% if current_user.is_authenticated and current_user.id == user.id %}
         <a class="btn-floating btn-large waves-effect waves-light" href="{{ url_for('accounts.edit_profile') }}" title='Edit profile.'><i class="edit icon"></i></a>
       {% endif %}
     </h2>
@@ -32,7 +32,7 @@ Profile
       <div class="column">
         <div>
           {{ user.title }} {{ user.first_name }} {{ user.last_name }} <br>
-          {{ user.th_title }} {{ user.th_first_name }} {{ user.th_last_name }} <br>
+          {{ user.title_th }} {{ user.first_name_th }} {{ user.last_name_th }} <br>
           {{ user.email }} 
           {% if current_user == user %}
             Role: {{ user.roles | join(', ') | title() }}
@@ -44,7 +44,36 @@ Profile
         </div>
       </div>
     </div>
-
   </div>
+
+  {% set project = user.get_project() %}
+  {% if project %}
+  <div class="ui segment">
+    <h3>{{ project.name_th }}</h3>
+    <h3>{{ project.name }}</h3>
+    <div class="ui message" >
+      Advisor: {{ project.advisor.title }} {{ project.advisor.first_name }} {{ project.advisor.last_name }}
+    </div>
+    {% if 'abstract' in project.public %}
+      <div class="ui message text large">
+        <div class="header">Abstract</div>
+        <p>{{ project.abstract_th }}</p>
+        <p>{{ project.abstract }}</p>
+      </div>
+    {% endif %}
+    <div class="ui message text large">
+      <div class="header">Public</div>
+      <div>
+      {%- for type_, icon in [('report', 'pdf file'), ('poster', 'image file'), ('presentation', 'powerpoint file'), ('video', 'video file'), ('git', 'git')] %}
+      {% if type_ in project.public %}
+        {% set r = project.get_resource(type_) %}
+        {% if r %}
+          <a target="_blank" href="{{ r.link }}"><i class="{{ icon }} icon link pop" data-content="{{ type_.title() }}"></i></a>
+        {% endif %}
+      {% endif %}
+      {%- endfor %}
+      </div>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}

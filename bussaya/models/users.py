@@ -4,6 +4,7 @@ import datetime
 from flask_login import UserMixin
 from flask import url_for
 
+from .projects import Project
 
 class User(me.Document, UserMixin):
     username = me.StringField(required=True, unique=True)
@@ -13,9 +14,9 @@ class User(me.Document, UserMixin):
     first_name = me.StringField(required=True, max_length=200)
     last_name = me.StringField(required=True, max_length=200)
 
-    th_title = me.StringField(max_length=50)
-    th_first_name = me.StringField(max_length=200)
-    th_last_name = me.StringField(max_length=200)
+    title_th = me.StringField(max_length=50)
+    first_name_th = me.StringField(max_length=200)
+    last_name_th = me.StringField(max_length=200)
 
     biography = me.StringField()
 
@@ -32,7 +33,8 @@ class User(me.Document, UserMixin):
 
     resources = me.DictField()
 
-    meta = {'collection': 'users'}
+    meta = {'collection': 'users',
+            'strict': False}
 
     def has_roles(self, roles):
         for role in roles:
@@ -46,3 +48,8 @@ class User(me.Document, UserMixin):
         if 'google' in self.resources:
             return self.resources['google'].get('picture', '')
         return url_for('static', filename='images/user.png')
+
+    def get_project(self):
+        project = Project.objects(students=self).order_by('-id').first()
+        return project
+
