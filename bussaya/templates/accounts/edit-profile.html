@@ -2,6 +2,10 @@
 {% import '/base/error-handler.html' as eh %}
 {% import '/base/html-renderer.html' as renderer %}
 
+{% block title %}
+  {{ current_user.title }} {{ current_user.first_name }} {{ current_user.last_name }}
+{% endblock %}
+
 {% block breadcrumbs %}
 {{ super() }}
 <i class="right angle icon divider"></i>
