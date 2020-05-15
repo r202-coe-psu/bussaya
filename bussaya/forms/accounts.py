@@ -59,9 +59,9 @@ BaseProfileForm = model_form(
             'title': {'label': 'Title'},
             'first_name': {'label': 'First Name'},
             'last_name': {'label': 'Last Name'},
-            'th_title': {'label': 'Thai Title'},
-            'th_first_name': {'label': 'Thai First Name'},
-            'th_last_name': {'label': 'Thai Last Name'},
+            'title_th': {'label': 'Thai Title'},
+            'first_name_th': {'label': 'Thai First Name'},
+            'last_name_th': {'label': 'Thai Last Name'},
             'biography': {'label': 'Biography'},
             'email': {'label': 'Email'},
             }
