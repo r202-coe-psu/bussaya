@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 
 
 class ProjectResource(me.EmbeddedDocument):
-    id = me.ObjectIdField(required=True, default=ObjectId())
+    id = me.ObjectIdField(required=True, default=ObjectId)
     data = me.FileField()
     link = me.StringField()
     type = me.StringField(

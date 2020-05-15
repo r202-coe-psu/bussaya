@@ -198,7 +198,7 @@ def download(project_id, resource_id, filename):
 
     resource = None
     for r in project.resources:
-        if str(r.id) == resource_id:
+        if str(r.id) == resource_id and r.data.filename == filename:
             resource = r
             break
 
