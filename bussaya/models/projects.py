@@ -86,8 +86,7 @@ class Project(me.Document):
                      ])
 
     def get_resource(self, type_):
-        resources = self.resources
-        resources.reverse()
+        resources = reversed(self.resources)
         for r in resources:
             if r.type == type_:
                 return r

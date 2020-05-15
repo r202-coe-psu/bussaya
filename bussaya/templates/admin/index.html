@@ -40,7 +40,7 @@
       </td>
       <td>{{ project.advisor.first_name }} {{ project.advisor.last_name }}</td>
       <td>{{ project.public.title() }}</td>
-      <td>
+      <td class="single line">
         {% set r = project.get_resource('report') %}
         {% if r %}
           <a target="_blank" href="{{ r.link }}"><i class="large pdf file icon link pop" data-content="Report"></i></a>

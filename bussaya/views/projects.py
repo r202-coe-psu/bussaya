@@ -196,6 +196,7 @@ def download(project_id, resource_id, filename):
     if not project:
         return response
 
+    resources = reversed(project.resources)
     resource = None
     for r in project.resources:
         if str(r.id) == resource_id and r.data.filename == filename:
