@@ -15,6 +15,7 @@ class ProjectResource(me.EmbeddedDocument):
                      'presentation',
                      'poster',
                      'other',
+                     'video',
                      'git',
                      ])
     status = me.StringField(required=True, default='active')
@@ -73,11 +74,15 @@ class Project(me.Document):
                      'abstract',
                      'poster',
                      'report',
+                     'video',
                      'abstract and poster',
                      'abstract and report',
-                     'abstract, poster and report',
+                     'abstract poster, and video',
+                     'abstract, report and poster',
                      'abstract, poster and git',
-                     'abstract, poster, report and git',
+                     'abstract, report, poster and git',
+                     'abstract, poster, video and git',
+                     'abstract, report, poster, video and git',
                      ])
 
     def get_resource(self, type_):

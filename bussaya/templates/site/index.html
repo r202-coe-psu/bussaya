@@ -7,14 +7,14 @@
       {% if class_ %}
         <h3>{{ class_.name }}</h3>
       {% endif %}
-      <table class="ui single line table">
+      <table class="ui table">
         <tbody>
           {% for project in projects %}
           <tr>
-            <td>{{ project.name }}</td>
+            <td class="ten wide">{{ project.name }}</td>
             <td>
-              <i class="ui user icon"></i>
               {%- for s in project.students %}
+              <i class="ui user icon"></i>
               {{ s.first_name }} {{ s.last_name }}
               {% if not loop.last %}<br>{% endif %}
               {% endfor -%}
@@ -23,12 +23,20 @@
               <i class="ui user tie icon"></i>
               {{ project.advisor.first_name }} {{ project.advisor.last_name }}
             </td>
-            <td>
-              {%- for type_ in ['report', 'poster', 'presentation', 'git'] %}
+            <td class="single line">
+              {%- for type_ in ['report', 'poster', 'presentation', 'video', 'git'] %}
                 {% if type_ in project.public %}
                   {% set r = project.get_resource(type_) %}
-                  {% if r %}
+                  {% if r and r.type == 'report' %}
                     <a target="_blank" href="{{ r.link }}"><i class="large pdf file icon link pop" data-content="Report"></i></a>
+                  {% elif r and r.type == 'poster' %}
+                    <a target="_blank" href="{{ r.link }}"><i class="large image file icon link pop" data-content="Poster"></i></a>
+                  {% elif r and r.type == 'presentation' %}
+                    <a target="_blank" href="{{ r.link }}"><i class="large powerpoint file icon link pop" data-content="Rresentation"></i></a>
+                  {% elif r and r.type == 'video' %}
+                    <a target="_blank" href="{{ r.link }}"><i class="large video file icon link pop" data-content="Video"></i></a>
+                  {% elif r and r.type == 'git' %}
+                    <a target="_blank" href="{{ r.link }}"><i class="large git icon link pop" data-content="Git"></i></a>
                   {% endif %}
                 {% endif %}
               {%- endfor %}

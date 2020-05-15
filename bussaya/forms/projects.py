@@ -68,3 +68,4 @@ class ProjectResourceUploadForm(FlaskForm):
             validators=[FileAllowed(['zip', '7z', 'tar.gz'], 'allow zip, 7z, tar.gz')])
 
     git = html5.URLField('Git URL')
+    video = html5.URLField('Video URL')

@@ -76,6 +76,13 @@
           <i class="large archive icon disabled"></i>
         {% endif %}
 
+        {% set r = project.get_resource('video') %}
+        {% if r %}
+          <a href="{{ r.link }}"><i class="large video icon link pop" data-content="Video"></i></a>
+        {% else %}
+          <i class="large video icon disabled"></i>
+        {% endif %}
+
         {% set r = project.get_resource('git') %}
         {% if r %}
           <a href="{{ r.link }}"><i class="large git icon link pop" data-content="Git Repository"></i></a>

@@ -145,10 +145,18 @@ def upload(project_id):
             continue
         resource = get_resource(f, t, project_id)
         project.resources.append(resource)
-    if form.git.data:
+
+
+    files = [form.video.data,
+             form.git.data
+             ]
+    types = ['video', 'git']
+    for f, t in zip(files, types):
+        if not f:
+            continue
         resource = models.ProjectResource(
-                type='git',
-                link=form.git.data)
+                type=t,
+                link=f)
         project.resources.append(resource)
     project.save()
 
