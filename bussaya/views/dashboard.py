@@ -32,7 +32,7 @@ def index_lecturer():
     committees = models.Project.objects(
             committees=current_user._get_current_object(),
             class_=class_)
-    return render_template('/dashboard/index-lecture.html',
+    return render_template('/dashboard/index-lecturer.html',
                            class_=class_,
                            advisees=advisees,
                            committees=committees)
