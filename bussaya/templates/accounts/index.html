@@ -54,6 +54,11 @@ Profile
   <div class="ui segment">
     <h3>{{ project.name_th }}</h3>
     <h3>{{ project.name }}</h3>
+    <div>
+      {% for t in project.tags %}
+        <div class="ui label">{{ t }}</div>
+      {% endfor %}
+    </div>
     <div class="ui message text large" >
       <div class="header">Advisor</div>
       <a target="_blank" href="{{ url_for('accounts.profile', user_id=project.advisor.id) }}">
