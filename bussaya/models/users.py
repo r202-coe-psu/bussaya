@@ -28,8 +28,11 @@ class User(me.Document, UserMixin):
     created_date = me.DateTimeField(required=True,
                                     default=datetime.datetime.now)
     updated_date = me.DateTimeField(required=True,
+                                    default=datetime.datetime.now)
+    last_login_date = me.DateTimeField(required=True,
                                     default=datetime.datetime.now,
                                     auto_now=True)
+
 
     resources = me.DictField()
 

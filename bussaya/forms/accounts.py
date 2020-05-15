@@ -50,6 +50,7 @@ BaseProfileForm = model_form(
         FlaskForm,
         exclude=['created_date',
                  'updated_date',
+                 'last_login_date',
                  'picture',
                  'roles',
                  'status',

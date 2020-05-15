@@ -129,8 +129,6 @@ def authorized_engpsu():
         else:
             user.roles.append('staff')
 
-        user.save()
-
         # if userinfo['username'].isdigit():
         #     project = models.Project.objects(
         #             student_ids=userinfo['username']).first()
@@ -140,7 +138,9 @@ def authorized_engpsu():
         #         project.save()
     else:
         user.resources[client.engpsu.name] = userinfo
-        user.save()
+        user.last_login_date = datetime.datetime.now()
+    
+    user.save()
 
     login_user(user)
     identity_changed.send(
@@ -203,6 +203,7 @@ def edit_profile():
                              filename=form.pic.data.filename,
                              content_type=form.pic.data.content_type)
 
+    user.updated_date = datetime.datetime.now()
     user.save()
 
     return redirect(url_for('accounts.index'))
