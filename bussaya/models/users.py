@@ -6,6 +6,7 @@ from flask import url_for
 
 from .projects import Project
 
+
 class User(me.Document, UserMixin):
     username = me.StringField(required=True, unique=True)
 
@@ -30,9 +31,8 @@ class User(me.Document, UserMixin):
     updated_date = me.DateTimeField(required=True,
                                     default=datetime.datetime.now)
     last_login_date = me.DateTimeField(required=True,
-                                    default=datetime.datetime.now,
-                                    auto_now=True)
-
+                                       default=datetime.datetime.now,
+                                       auto_now=True)
 
     resources = me.DictField()
 
@@ -56,3 +56,6 @@ class User(me.Document, UserMixin):
         project = Project.objects(students=self).order_by('-id').first()
         return project
 
+    def get_advisee_projects(self):
+        projects = Project.objects(advisor=self)
+        return projects

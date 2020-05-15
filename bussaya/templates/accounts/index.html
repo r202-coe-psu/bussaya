@@ -14,33 +14,33 @@ Profile
 
 
 {% block content %}
-<div class="ui container">
+<div class="ui container"> {# start div container #} 
   <div class="ui segment">
     <h2 class="ui header">Profile
       {% if current_user.is_authenticated and current_user.id == user.id %}
         <a class="btn-floating btn-large waves-effect waves-light" href="{{ url_for('accounts.edit_profile') }}" title='Edit profile.'><i class="edit icon"></i></a>
       {% endif %}
     </h2>
-    <div class="ui grid two column row">
+    <div class="ui grid">
 
-      <div class="column">
+      <div class="four wide column">
         <div class="ui small image">
           <img src="{{ user.get_picture() }}">
         </div>
       </div>
 
-      <div class="column">
+      <div class="twelve wide column">
         <div>
           {{ user.title }} {{ user.first_name }} {{ user.last_name }} <br>
           {{ user.title_th }} {{ user.first_name_th }} {{ user.last_name_th }} <br>
           {{ user.email }} 
-          {% if current_user == user %}
+          {% if current_user.is_authenticated and current_user.id == user.id %}
             Role: {{ user.roles | join(', ') | title() }}
           {% endif %}
         </div>
         <div style="margin-top: 2vh;">
           <h4>Biography</h4>
-          {{ user.biography }}
+          {{ biography | safe }}
         </div>
       </div>
     </div>
@@ -79,6 +79,29 @@ Profile
     </div>
   {% endif %}
 
-  {% endif %}
-</div>
+{% endif %}
+
+{%- if 'CoE-lecturer' in user.roles %}
+  <div class="ui segment">
+    <table class="ui table large text">
+      <tbody>
+      {% for project in current_user.get_advisee_projects() %}
+        <tr>
+          <td data-label="Title">{{ project.name }}</td>
+          <td data-label="Student">
+            {%- for s in project.students %}
+            <a target="_blank" href="{{ url_for('accounts.profile', user_id=s.id) }}">
+              {{ s.first_name }} {{ s.last_name }}
+            </a>
+            {% if not loop.last %}, {% endif %}
+            {% endfor -%}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{%- endif %}
+
+</div> {# end div container #}
 {% endblock %}

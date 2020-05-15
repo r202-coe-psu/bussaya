@@ -146,7 +146,6 @@ def upload(project_id):
         resource = get_resource(f, t, project_id)
         project.resources.append(resource)
 
-
     files = [form.video.data,
              form.git.data
              ]
@@ -198,7 +197,7 @@ def download(project_id, resource_id, filename):
 
     resources = reversed(project.resources)
     resource = None
-    for r in project.resources:
+    for r in resources:
         if str(r.id) == resource_id and r.data.filename == filename:
             resource = r
             break

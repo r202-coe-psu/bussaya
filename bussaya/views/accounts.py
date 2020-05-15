@@ -1,4 +1,6 @@
 import datetime
+import markdown
+
 from flask import (Blueprint,
                    render_template,
                    url_for,
@@ -139,7 +141,7 @@ def authorized_engpsu():
     else:
         user.resources[client.engpsu.name] = userinfo
         user.last_login_date = datetime.datetime.now()
-    
+
     user.save()
 
     login_user(user)
@@ -171,14 +173,25 @@ def logout():
 @module.route('/accounts/<user_id>')
 def profile(user_id):
     user = models.User.objects.get(id=user_id)
+
+    biography = ''
+    if user.biography:
+        biography = markdown.markdown(user.biography)
     return render_template('/accounts/index.html',
-                           user=user)
+                           user=user,
+                           biography=biography)
 
 
 @module.route('/accounts')
 @login_required
 def index():
-    return render_template('/accounts/index.html', user=current_user)
+
+    biography = ''
+    if current_user.biography:
+        biography = markdown.markdown(current_user.biography)
+    return render_template('/accounts/index.html',
+                           user=current_user,
+                           biography=biography)
 
 
 @module.route('/accounts/edit-profile', methods=['GET', 'POST'])
