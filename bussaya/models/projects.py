@@ -77,11 +77,14 @@ class Project(me.Document):
                      'video',
                      'abstract and poster',
                      'abstract and report',
-                     'abstract poster, and video',
+                     'abstract and video',
+                     'abstract and git',
+                     'abstract, poster, and video',
                      'abstract, report and poster',
                      'abstract, poster and git',
-                     'abstract, report, poster and git',
+                     'abstract, video and git',
                      'abstract, poster, video and git',
+                     'abstract, report, poster and git',
                      'abstract, report, poster, video and git',
                      ])
 
