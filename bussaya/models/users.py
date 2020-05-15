@@ -57,5 +57,5 @@ class User(me.Document, UserMixin):
         return project
 
     def get_advisee_projects(self):
-        projects = Project.objects(advisor=self)
+        projects = Project.objects(advisor=self).order_by('-id')
         return projects
