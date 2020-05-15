@@ -63,16 +63,16 @@ Profile
     {% endif %}
     <div class="ui message text large">
       <div class="header">Public</div>
-      <div>
+      <p>
       {%- for type_, icon in [('report', 'pdf file'), ('poster', 'image file'), ('presentation', 'powerpoint file'), ('video', 'video file'), ('git', 'git')] %}
       {% if type_ in project.public %}
         {% set r = project.get_resource(type_) %}
         {% if r %}
-          <a target="_blank" href="{{ r.link }}"><i class="{{ icon }} icon link pop" data-content="{{ type_.title() }}"></i></a>
+          <a target="_blank" href="{{ r.link }}"><i class="big {{ icon }} icon link pop" data-content="{{ type_.title() }}"></i></a>
         {% endif %}
       {% endif %}
       {%- endfor %}
-      </div>
+      </p>
   </div>
   {% endif %}
 </div>
