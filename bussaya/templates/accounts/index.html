@@ -12,6 +12,9 @@ Profile
 <a href="{{ url_for('accounts.index') }}" class="section">Accounts</a>
 {% endblock %}
 
+{% block title %}
+  {{ user.title }} {{ user.first_name }} {{ user.last_name }}
+{% endblock %}
 
 {% block content %}
 <div class="ui container"> {# start div container #} 
