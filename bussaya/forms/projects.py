@@ -52,19 +52,19 @@ class ProjectForm(BaseProjectForm):
 
 class ProjectResourceUploadForm(FlaskForm):
     report = fields.FileField(
-            'Report',
+            'Report: pdf',
             validators=[FileAllowed(['pdf'], 'PDF only')])
     similarity = fields.FileField(
-            'Similarity',
+            'Similarity: pdf',
             validators=[FileAllowed(['pdf'], 'PDF only')])
     presentation = fields.FileField(
-            'Presentation',
+            'Presentation: pdf',
             validators=[FileAllowed(['pdf'], 'PDF only')])
     poster = fields.FileField(
-            'Poster',
+            'Poster: pdf, png, jpg',
             validators=[FileAllowed(['pdf', 'png', 'jpg'], 'allow pdf, png, jpg')])
     other = fields.FileField(
-            'Other',
+            'Other: zip 7z tar.gz',
             validators=[FileAllowed(['zip', '7z', 'tar.gz'], 'allow zip, 7z, tar.gz')])
 
     git = html5.URLField('Git URL')
