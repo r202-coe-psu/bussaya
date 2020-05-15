@@ -51,8 +51,9 @@ Profile
   <div class="ui segment">
     <h3>{{ project.name_th }}</h3>
     <h3>{{ project.name }}</h3>
-    <div class="ui message" >
-      Advisor: {{ project.advisor.title }} {{ project.advisor.first_name }} {{ project.advisor.last_name }}
+    <div class="ui message text large" >
+      <div class="header">Advisor</div>
+      {{ project.advisor.title }} {{ project.advisor.first_name }} {{ project.advisor.last_name }}
     </div>
     {% if 'abstract' in project.public %}
       <div class="ui message text large">
