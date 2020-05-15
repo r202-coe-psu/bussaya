@@ -1,4 +1,5 @@
 {% extends '/base/default-dashboard.html' %}
+{% import '/base/project-material-renderer.html' as pm_renderer %}
 
 {% block content %}
   <div>    
@@ -22,55 +23,8 @@
         <div class="ui middle aligned divided list">
           {% for project in projects %}
             <div class="item" style="padding: 10px; 0; 10px; 0;;">
-              <div class="right floated content">
-                {% set r = project.get_resource('report') %}
-                {% if r %}
-                  <a target="_blank" href="{{ r.link }}"><i class="large pdf file icon"></i></a>
-                {% else %}
-                  <i class="large pdf file icon disabled"></i>
-                {% endif %}
-
-                {% set r = project.get_resource('similarity') %}
-                {% if r %}
-                  <a href="{{ r.link }}"><i class="large copy icon"></i></a>
-                {% else %}
-                  <i class="large copy icon disabled"></i>
-                {% endif %}
-
-                {% set r = project.get_resource('poster') %}
-                {% if r %}
-                  <a href="{{ r.link }}"><i class="large file image icon"></i></a>
-                {% else %}
-                  <i class="large file image icon disabled"></i>
-                {% endif %}
-
-                {% set r = project.get_resource('presentation') %}
-                {% if r %}
-                  <a href="{{ r.link }}"><i class="large file powerpoint icon"></i></a>
-                {% else %}
-                  <i class="large file powerpoint icon disabled"></i>
-                {% endif %}
-
-                {% set r = project.get_resource('other') %}
-                {% if r %}
-                  <a href="{{ r.link }}"><i class="large archive icon"></i></a>
-                {% else %}
-                  <i class="large archive icon disabled"></i>
-                {% endif %}
-                {% set r = project.get_resource('video') %}
-                {% if r %}
-                  <a href="{{ r.link }}"><i class="large video file icon"></i></a>
-                {% else %}
-                  <i class="large video file icon disabled"></i>
-                {% endif %}
-
-
-                {% set r = project.get_resource('git') %}
-                {% if r %}
-                  <a href="{{ r.link }}"><i class="large git icon"></i></a>
-                {% else %}
-                  <i class="large git icon disabled"></i>
-                {% endif %}
+              <div class="right floated content single line">
+                {{ pm_renderer.render_project_material(project) }}
 
                 <a class="ui primary button" href="{{ url_for('projects.upload', project_id=project.id) }}">Upload</a>
                 <a class="ui primary button" href="{{ url_for('projects.edit', project_id=project.id) }}">Edit</a>
@@ -86,6 +40,12 @@
                   {% endfor -%}
                   
                   <i class="user tie icon"></i> {{ project.advisor.first_name }} {{ project.advisor.last_name }}
+                  {% if project.is_approval(project.advisor) %}
+                    <i class="large blue check icon"></i>
+                  {% else %}
+                    <i class="large check icon disabled"></i>
+                  {% endif %}
+
                 </div>
                 <div>
 

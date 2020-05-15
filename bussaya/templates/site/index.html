@@ -15,7 +15,9 @@
             <td>
               {%- for s in project.students %}
               <i class="ui user icon"></i>
-              {{ s.first_name }} {{ s.last_name }}
+              <a target="_blank" href="{{ url_for('accounts.profile', user_id=s.id) }}">
+                {{ s.first_name }} {{ s.last_name }}
+              </a>
               {% if not loop.last %}<br>{% endif %}
               {% endfor -%}
             </td>

@@ -1,23 +1,8 @@
 
-{% macro navlink() -%}
-  {% if current_user.is_authenticated %}
-    <li><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
-    <li><a href="{{ url_for('accounts.logout') }}">Logout</a></li>
-  {% else %}
-    <li><a href="{{ url_for('accounts.login') }}">Login</a></li>
-  {% endif %}
-{% endmacro %}
-
-  <nav class="nav-extended light-blue lighten-1">
-    <div class="nav-wrapper">
-      <a href="#" class="brand-logo"><i class="material-icons">home</i> {{ config.get('APP_TITLE') }}</a>
-      <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-      <ul id="nav-mobile" class="right hide-on-med-and-down">
-        {{ navlink() }}
-      </ul>
-    </div>
-  </nav>
-
-  <ul class="sidenav" id="mobile-demo">
-        {{ navlink() }}
-  </ul>
+<div class="ui inverted menu">
+  <div class="ui container">
+    <a class="item" href="{{ url_for('site.index') }}"><img src="{{ url_for('static', filename='images/lotus-full-100px.png') }}" style="padding-right: 5px;"> {{ config.get('APP_TITLE') }}</a>
+    <a class="item" href="{{ url_for('accounts.index') }}"><i class="address book icon"></i>Account</a>
+    <a class="item" href="{{ url_for('dashboard.index') }}"><i class="dashboard icon"></i>Dashboard</a>
+  </div>
+</div

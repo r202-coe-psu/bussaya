@@ -168,10 +168,17 @@ def logout():
     return redirect(url_for('site.index'))
 
 
+@module.route('/accounts/<user_id>')
+def profile(user_id):
+    user = models.User.objects.get(id=user_id)
+    return render_template('/accounts/index.html',
+                           user=user)
+
+
 @module.route('/accounts')
 @login_required
 def index():
-    return render_template('/accounts/index.html')
+    return render_template('/accounts/index.html', user=current_user)
 
 
 @module.route('/accounts/edit-profile', methods=['GET', 'POST'])

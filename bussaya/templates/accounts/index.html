@@ -1,4 +1,8 @@
-{% extends '/base/default-dashboard.html' %}
+{% if current_user.is_authenticated %}
+  {% extends '/base/default-dashboard.html' %}
+{% else %}
+  {% extends '/base/default-page.html' %}
+{% endif %}
 
 {% block dashboard_title %}
 Profile
@@ -12,25 +16,31 @@ Profile
 {% block content %}
 <div class="ui container">
   <div class="ui segment">
-    <h2 class="ui header">Profile <a class="btn-floating btn-large waves-effect waves-light" href="{{ url_for('accounts.edit_profile') }}" title='Edit profile.'><i class="edit icon"></i></a>
+    <h2 class="ui header">Profile
+      {% if current_user == user %}
+        <a class="btn-floating btn-large waves-effect waves-light" href="{{ url_for('accounts.edit_profile') }}" title='Edit profile.'><i class="edit icon"></i></a>
+      {% endif %}
     </h2>
     <div class="ui grid two column row">
 
       <div class="column">
         <div class="ui small image">
-          <img src="{{ current_user.get_picture() }}">
+          <img src="{{ user.get_picture() }}">
         </div>
       </div>
 
       <div class="column">
         <div>
-          {{ current_user.title }} {{ current_user.first_name }} {{ current_user.last_name }} <br>
-          {{ current_user.th_title }} {{ current_user.th_first_name }} {{ current_user.th_last_name }} <br>
-          {{ current_user.email }} Role: {{ current_user.roles | join(', ') | title() }}
+          {{ user.title }} {{ user.first_name }} {{ user.last_name }} <br>
+          {{ user.th_title }} {{ user.th_first_name }} {{ user.th_last_name }} <br>
+          {{ user.email }} 
+          {% if current_user == user %}
+            Role: {{ user.roles | join(', ') | title() }}
+          {% endif %}
         </div>
         <div style="margin-top: 2vh;">
           <h4>Biography</h4>
-          {{ current_user.biography }}
+          {{ user.biography }}
         </div>
       </div>
     </div>
