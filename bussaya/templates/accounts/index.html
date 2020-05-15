@@ -61,6 +61,8 @@ Profile
         <p>{{ project.abstract }}</p>
       </div>
     {% endif %}
+
+    {% if project.public not in ['only name', 'private'] %}
     <div class="ui message text large">
       <div class="header">Public</div>
       <p>
@@ -73,7 +75,9 @@ Profile
       {% endif %}
       {%- endfor %}
       </p>
-  </div>
+    </div>
+  {% endif %}
+
   {% endif %}
 </div>
 {% endblock %}
