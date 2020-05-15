@@ -53,7 +53,9 @@ Profile
     <h3>{{ project.name }}</h3>
     <div class="ui message text large" >
       <div class="header">Advisor</div>
-      {{ project.advisor.title }} {{ project.advisor.first_name }} {{ project.advisor.last_name }}
+      <a target="_blank" href="{{ url_for('accounts.profile', user_id=project.advisor.id) }}">
+        {{ project.advisor.title }} {{ project.advisor.first_name }} {{ project.advisor.last_name }}
+      </a>
     </div>
     {% if 'abstract' in project.public %}
       <div class="ui message text large">
