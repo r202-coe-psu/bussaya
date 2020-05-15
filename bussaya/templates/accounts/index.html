@@ -31,8 +31,8 @@ Profile
 
       <div class="twelve wide column">
         <div>
-          {{ user.title }} {{ user.first_name }} {{ user.last_name }} <br>
-          {{ user.title_th }} {{ user.first_name_th }} {{ user.last_name_th }} <br>
+          <h3 class="ui header">{{ user.title }} {{ user.first_name }} {{ user.last_name }}</h3>
+          <h3 class="ui header">{{ user.title_th }} {{ user.first_name_th }} {{ user.last_name_th }}</h3>
           {{ user.email }} 
           {% if current_user.is_authenticated and current_user.id == user.id %}
             Role: {{ user.roles | join(', ') | title() }}
