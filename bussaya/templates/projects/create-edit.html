@@ -3,7 +3,7 @@
 
 
 {% block dashboard_title %}
-  Create Project
+  {{ 'Create' if 'create' in request.path else 'Edit' }} Project
 {% endblock %}
 
 {% block breadcrumbs %}

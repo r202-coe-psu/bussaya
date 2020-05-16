@@ -95,7 +95,7 @@ Profile
   <div class="ui segment">
     <table class="ui table large text">
       <tbody>
-      {% for project in user.get_advisee_projects() %}
+      {% for project in user.get_advisee_projects() if project.public != 'private' %}
         <tr>
           <td data-label="Title">{{ project.name }}</td>
           <td data-label="Student">
