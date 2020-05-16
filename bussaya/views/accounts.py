@@ -1,5 +1,6 @@
 import datetime
 import markdown
+import mongoengine as me
 
 from flask import (Blueprint,
                    render_template,
@@ -21,15 +22,16 @@ module = Blueprint('accounts', __name__)
 def get_user_and_remember():
     client = oauth2.oauth2_client
     result = client.principal.get('me')
-    print('got: ', result.json())
     data = result.json()
 
     user = models.User.objects(
-            username=data.get('username', '')).first()
+            me.Q(username=data.get('username', '')) |
+            me.Q(email=data.get('email', ''))
+        ).first()
     if not user:
         user = models.User(id=data.get('id'),
-                           first_name=data.get('first_name'),
-                           last_name=data.get('last_name'),
+                           first_name=data.get('first_name').title(),
+                           last_name=data.get('last_name').title(),
                            email=data.get('email'),
                            username=data.get('username'),
                            status='active')
@@ -108,14 +110,17 @@ def authorized_engpsu():
     userinfo_response = client.engpsu.get('userinfo')
     userinfo = userinfo_response.json()
 
-    user = models.User.objects(username=userinfo.get('username')).first()
+    user = models.User.objects(
+            me.Q(username=userinfo.get('username', '')) |
+            me.Q(email=userinfo.get('email', ''))
+        ).first()
 
     if not user:
         user = models.User(
                 username=userinfo.get('username'),
                 email=userinfo.get('email'),
-                first_name=userinfo.get('first_name'),
-                last_name=userinfo.get('last_name'),
+                first_name=userinfo.get('first_name').title(),
+                last_name=userinfo.get('last_name').title(),
                 status='active')
         user.resources[client.engpsu.name] = userinfo
         # if 'staff_id' in userinfo.keys():
