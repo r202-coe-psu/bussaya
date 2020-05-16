@@ -107,7 +107,7 @@ Profile
       <tbody>
       {% for project in user.get_advisee_projects() if project.public != 'private' %}
         <tr>
-          <td data-label="Title">{{ project.name }}</td>
+          <td data-label="Title">{{ project.name }}<br>{{ project.name_th }}</td>
           <td data-label="Student">
             {%- for s in project.students %}
             <a target="_blank" href="{{ url_for('accounts.profile', user_id=s.id) }}">

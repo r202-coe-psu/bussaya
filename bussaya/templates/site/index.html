@@ -11,7 +11,7 @@
         <tbody>
           {% for project in projects %}
           <tr>
-            <td class="ten wide">{{ project.name }}</td>
+            <td class="ten wide">{{ project.name }}<br>{{ project.name_th }}</td>
             <td>
               {%- for s in project.students %}
               <i class="ui user icon"></i>
@@ -20,12 +20,6 @@
               </a>
               {% if not loop.last %}<br>{% endif %}
               {% endfor -%}
-            </td>
-            <td>
-              <i class="ui user tie icon"></i>
-              <a target="_blank" href="{{ url_for('accounts.profile', user_id=project.advisor.id) }}">
-                {{ project.advisor.title }} {{ project.advisor.first_name }} {{ project.advisor.last_name }}
-              </a>
             </td>
             <td class="single line">
               {%- for type_ in ['report', 'poster', 'presentation', 'video', 'git'] %}
