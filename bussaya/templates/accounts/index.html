@@ -13,7 +13,7 @@ Profile
 {% endblock %}
 
 {% block title %}
-  {{ user.title }} {{ user.first_name }} {{ user.last_name }}
+  {{ user.title }}{{ user.first_name }} {{ user.last_name }}
 {% endblock %}
 
 {% block content %}
@@ -36,10 +36,20 @@ Profile
         <div>
           <h3 class="ui header">{{ user.title }} {{ user.first_name }} {{ user.last_name }}</h3>
           <h3 class="ui header">{{ user.title_th }} {{ user.first_name_th }} {{ user.last_name_th }}</h3>
-          {{ user.email }} 
+          <div class="ui label large">
+            <i class="mail icon"></i>
+            {{ user.email }} 
+          </div>
+          <div style="margin-top: .5vh;">
           {% if current_user.is_authenticated and current_user.id == user.id %}
-            Role: {{ user.roles | join(', ') | title() }}
+            Role: 
+            {% for role in user.roles %}
+              <div class="ui label">
+                {{ role }}
+              </div>
+            {% endfor %}
           {% endif %}
+          </div>
         </div>
         <div style="margin-top: 2vh;">
           <h4>Biography</h4>
