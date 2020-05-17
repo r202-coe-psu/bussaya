@@ -1,3 +1,5 @@
+from flask import redirect, url_for
+from flask_login import current_user
 
 from . import site
 from . import accounts
@@ -39,3 +41,13 @@ def register_blueprint(app):
 
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
+
+    app.register_error_handler(403, page_forbidden)
+
+
+def page_forbidden(e):
+
+    if not current_user.is_authenticated:
+        return redirect(url_for('accounts.login'))
+
+    return e
