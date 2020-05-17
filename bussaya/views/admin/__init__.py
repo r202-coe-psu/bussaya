@@ -10,7 +10,7 @@ module = Blueprint('admin', __name__, url_prefix='/admin')
 
 
 @module.route('/')
-@acl.admin_permission.require()
+@acl.admin_permission.require(http_exception=403)
 def index():
     class_ = models.Class.objects().order_by('-id').first()
 
