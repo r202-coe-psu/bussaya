@@ -6,9 +6,8 @@ RUN apt install -y g++ gcc build-essential python3 python3-dev python3-pip pytho
 
 COPY . /app
 WORKDIR /app
-RUN pip3 install flask
+RUN pip3 install flask uwsgi; pip3 install -e git+https://github.com/authlib/loginpass#egg=loginpass
 RUN python3 setup.py develop
-RUN pip3 install uwsgi
 ENV BUSSAYA_SETTINGS=/app/bussaya-production.cfg
 ENV FLASK_ENV=prodoction
 ENV AUTHLIB_INSECURE_TRANSPORT=true
