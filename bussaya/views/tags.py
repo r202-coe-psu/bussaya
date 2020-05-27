@@ -5,8 +5,8 @@ from .. import caches
 module = Blueprint('tags', __name__, url_prefix='/tags')
 
 
-@caches.cache.cached(timeout=3600)
 @module.route('/')
+@caches.cache.cached(timeout=3600)
 def index():
     tags = models.Project.objects(public__ne='private').item_frequencies('tags', normalize=True)
     return render_template(

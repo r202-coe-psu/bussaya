@@ -5,8 +5,8 @@ from .. import caches
 module = Blueprint('site', __name__)
 
 
-@caches.cache.cached(timeout=600)
 @module.route('/')
+@caches.cache.cached(timeout=600)
 def index():
     projects = models.Project.objects(public__ne='private').order_by('-id').limit(150)
     return render_template(
