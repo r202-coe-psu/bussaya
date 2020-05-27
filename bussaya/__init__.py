@@ -8,6 +8,7 @@ from . import views
 from . import acl
 from . import models
 from . import oauth2
+from . import caches
 
 
 def create_app():
@@ -18,6 +19,7 @@ def create_app():
     models.init_db(app)
     acl.init_acl(app)
     oauth2.init_oauth(app)
+    caches.init_cache(app)
 
     views.register_blueprint(app)
 

@@ -1,0 +1,27 @@
+{% extends "/base/default-page.html" %}
+
+{%- macro generate_tag_cloud(tags) %}
+  {%- set size_styles = ['mini', 'tiny', 'small', 'medium', 'large', 'big', 'huge', 'massive'] %}
+  {%- set color_styles = ['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey', 'black'] %}
+  {%- set size_style_size = size_styles | count %}
+  {%- set color_style_size = color_styles | count %}
+  {%- set max_freq = tags.values() | max %}
+  {%- for tag, freq in tags.items() %}
+    {%- set size_id = (freq / max_freq * size_style_size) | round | int - 1 %}
+    {%- set color_id = (freq / max_freq * color_style_size) | round | int - 1 %}
+    <a class="ui {{ size_styles[size_id] }} {{ color_styles[color_id] }} tertiary button" href="{{ url_for('tags.view', name=tag) }}">{{ tag }}</a>
+  {%- endfor %}
+{%- endmacro %}
+
+{% block content %}
+
+  <div class="ui container">
+    <div class="ui segment">
+      <h3>Tags:</h3>
+      <div>
+          {{ generate_tag_cloud(tags) }}
+      </div>
+
+    </div>
+  </div>
+{% endblock content %}

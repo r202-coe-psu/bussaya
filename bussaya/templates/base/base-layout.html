@@ -4,9 +4,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
     <title>{% block title  %}{{ config.get('APP_TITLE') }}{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/fomantic-ui-css/semantic.min.css') }}">
-    <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='node_modules/fomantic-ui-css/semantic.min.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='node_modules/fomantic-ui-css/semantic.min.css', v='2.8.4') }}">
+    <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js', v='3.5.1') }}"></script>
+    <script src="{{ url_for('static', filename='node_modules/fomantic-ui-css/semantic.min.js', v='2.8.4') }}"></script>
     <style type="text/css">
       body {
         background-color: #DADADA;

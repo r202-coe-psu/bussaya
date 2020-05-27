@@ -6,6 +6,7 @@ flask-login
 flask-allows
 flask-wtf
 flask-principal
+flask-caching
 email_validator
 authlib
 loginpass

@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fomantic-ui-css": "^2.7.4"
+    "fomantic-ui-css": "^2.8.4"
   }
 }

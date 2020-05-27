@@ -8,6 +8,7 @@ from . import projects
 from . import classes
 from . import votings
 from . import elections
+from . import tags
 
 from . import admin
 # from . import administration
@@ -36,7 +37,8 @@ def register_blueprint(app):
                                     classes,
                                     votings,
                                     elections,
-                                    admin
+                                    admin,
+                                    tags
                                     ])
 
     for blueprint in blueprints:
