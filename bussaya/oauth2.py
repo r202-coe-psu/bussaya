@@ -82,7 +82,7 @@ def init_oauth(app):
     # oauth2_client.register('google')
 
     google_bp = loginpass.create_flask_blueprint(
-            loginpass.Google,
+            [loginpass.Google],
             oauth2_client,
             handle_authorize_google)
     app.register_blueprint(google_bp, url_prefix='/google')
