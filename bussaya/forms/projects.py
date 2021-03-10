@@ -1,7 +1,6 @@
 from wtforms import fields
 from wtforms import validators
 from wtforms import widgets
-from wtforms.fields import html5
 
 from .fields import TagListField
 
@@ -67,5 +66,5 @@ class ProjectResourceUploadForm(FlaskForm):
             'Other: zip 7z tar.gz',
             validators=[FileAllowed(['zip', '7z', 'tar.gz'], 'allow zip, 7z, tar.gz')])
 
-    git = html5.URLField('Git URL')
-    video = html5.URLField('Video URL')
+    git = fields.URLField('Git URL')
+    video = fields.URLField('Video URL')

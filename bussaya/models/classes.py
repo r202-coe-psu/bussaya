@@ -18,10 +18,10 @@ class Class(me.Document):
                                     default=datetime.datetime.now,
                                     auto_now=True)
 
-    started_date = me.DateTimeField(required=True,
-                                    default=datetime.datetime.now)
+    started_date = me.DateField(required=True,
+                                default=datetime.datetime.today)
 
-    ended_date = me.DateTimeField(required=True,
-                                  default=datetime.datetime.now)
+    ended_date = me.DateField(required=True,
+                              default=datetime.datetime.today)
 
     owner = me.ReferenceField('User', dbref=True, required=True)
