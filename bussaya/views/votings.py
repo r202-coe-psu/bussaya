@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 
 import datetime
@@ -35,7 +35,7 @@ def index():
                            lec_votings=collections.OrderedDict(lec_votings))
 
 
-@module.route('/elections/<election_id>/projects/<project_id>/vote', methods=['GET'])
+@module.route('/elections/<election_id>/projects/<project_id>/vote', methods=['GET', 'POST'])
 @login_required
 def vote(election_id, project_id):
     now = datetime.datetime.now()
@@ -44,8 +44,8 @@ def vote(election_id, project_id):
     if now < election.started_date or election.ended_date < now:
         message = f'ไม่อยู่ในช่วงเวลาลงเวลา'
         return render_template(
-                '/activities/register_fail.html',
-                activity=activity,
+                '/activities/vote_fail.html',
+                election=election,
                 message=message,
                 )
 
@@ -55,14 +55,20 @@ def vote(election_id, project_id):
             class_=election.class_,
             )
     
-    voting = models.Voting.objects(
+    voting = models.Voting.objects.get(
             user=current_user._get_current_object(),
             election=election,
             class_=election.class_,
             )
 
     if voting:
-        return 'You are vote'
+        return redirect(
+            url_for(
+                'votings.vote_success',
+                voting_id=voting.id,
+                ))
+
+
 
     form = forms.votings.VotingForm()
     if not form.validate_on_submit():
@@ -71,46 +77,51 @@ def vote(election_id, project_id):
                                election=election,
                                form=form,
                                )
+    voting = models.Voting()
+    voting.user = current_user._get_current_object()
+    voting.remark = form.remark.data
+    voting.score = 1
 
-    if form.student_id.data != current_user.username:
-        message = f'รหัสนักศึกษา {form.student_id.data} ไม่ตรงกับบัญชีผู้ใช้'
-        return render_template(
-                '/activities/register_fail.html',
-                activity=activity,
-                message=message,
-                )
-
-    ap = models.ActivityParticipator()
-    ap.user = current_user._get_current_object()
-    ap.remark = form.remark.data
-    ap.section = form.section.data
-    ap.accepted = form.accepted.data
-    ap.activity = activity
     if form.location.data:
-        ap.location = [float(f) for f in form.location.data.split(',') if len(f.strip()) > 0]
+        voting.location = [float(f) for f in form.location.data.split(',') if len(f.strip()) > 0]
     else:
         ap.location = [0, 0]
 
-    ap.ip_address = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
-    ap.user_agent = request.environ.get('HTTP_USER_AGENT', '')
-    ap.client = request.environ.get('HTTP_SEC_CH_UA', '')
+    voting.ip_address = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+    voting.user_agent = request.environ.get('HTTP_USER_AGENT', '')
+    voting.client = request.environ.get('HTTP_SEC_CH_UA', '')
+
+    voting.election = election
+    voting.project = project
+    voting.class_ = project.class_
 
     data = form.data
     data.pop('csrf_token')
-    ap.data = data
-    ap.save()
+    voting.data = data
+
+
+    voting.save()
 
     return redirect(
             url_for(
-                'activities.register_success',
-                activity_id=activity.id,
+                'votings.vote_success',
+                voting_id=voting.id,
                 ))
 
 
+@module.route('/<voting_id>/success')
+@login_required
+def vote_success(voting_id):
+    voting = models.Voting.objects.get(
+            id=voting_id,
+            user=current_user._get_current_object(),
+            )
+    return render_template(
+            '/votings/vote_success.html',
+            voting=voting,
+            project=voting.project,
+            class_=voting.class_,
+            election=voting.election,
+            )
 
-
-    return 'Vote Done'
-
-
-    
 

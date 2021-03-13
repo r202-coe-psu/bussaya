@@ -23,8 +23,8 @@ class Voting(me.Document):
 
     user_agent = me.StringField(default='')
     client = me.StringField(default='')
+    data = me.DictField(required=True, default={})
 
-    # raw_voting_projects = me.ListField(me.StringField())
 
     voted_date = me.DateTimeField(required=True,
                                   default=datetime.datetime.now)

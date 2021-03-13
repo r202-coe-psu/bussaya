@@ -24,58 +24,79 @@
 {% endblock %}
 
 {% block content %}
+  <div class="ui container">
+    <div class="ui placeholder segment">
+      {# head #}
+      <div class="ui header center aligned">
+        <h1>
+          {{ project.name }}
+        </h1>
+        <h2>
+          {{ project.class_.name }} 
+        </h2>
+        <h3 class="middle aligned">
+          <i class="ui icon clock"></i> {{ election.started_date }} - {{ election.ended_date }}
+        </h3>
+      </div>
+      {# end head#}
 
-  <div class="ui vertical masthead segment">
-
-    <div class="ui text container">
-      <h1 class="ui header center aligned">
-        {{ activity.class_.name }}
-      </h1>
-      <h2 class="ui header center aligned">
-        ลงทะเบียน {{ activity.name }}
-      </h2>
-      <div class="ui Huge primary">
-
-        <form method="POST" class="ui big form">
-          {{ form.csrf_token }}
-          <div class="two fields">
-            {{ renderer.render_field(form.first_name) }}
-            {{ renderer.render_field(form.last_name) }}
-          </div>
-          <div class="two fields">
-            {{ renderer.render_field(form.student_id) }}
-            {{ renderer.render_select(form.section) }}
-          </div>
-          {{ renderer.render_checkbox(form.accepted) }}
-
-            {{ renderer.render_field(form.remark) }}
-            <button id="register" name="register" type="submit" class="ui button primary disabled">ลงทะเบียน</button>
-
+      {# content #}
+      <div style="margin-top: 1em;">
+        <div class="ui Huge primary">
+          <form method="POST" class="ui big form">
+            {{ form.csrf_token }}
+            <div class="field">
+              <button id="vote" name="vote" type="submit" class="ui button big primary">Vote</button>
+            </div>
             {{ form.location }}
-        </form>
+            {{ form.remark }}
+          </form>
+        </div>
+
+      </div>
+      {# end content #}
+
+
+
+
+      {# user profile #}
+      <div>
+        <div class="ui segment">
+          <div class="ui two column centered grid">
+            <div class="column">
+              <div class="ui two column centered grid">
+                {% for user in project.students %}
+                <div class="column center aligned">
+                  <div class="ui small image">
+                    <img src="{{ user.get_picture() }}">
+                  </div>
+                  <h5>{{ user.first_name }} {{ user.last_name }}</h5>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="column">
+              {{ project.abstract }}
+            </div>
+          
+          </div>
+        </div>
       </div>
 
-      <div class="ui vertical masthead segment" style="width: 100%; height: 500px;">
+      {# end user profile #}
+
+      {# map #}
+      <div style="width: 100%; height: 300px;">
         <div id="color_status" style="text-align: center;"></div>
         <div id="map_id" style="z-index:1;height:inherit;"></div>
       </div>
-  </div>
+      {# end map #}
 
+    </div>
+  </div>
 <script type="text/python">
   from browser import document, window
-
-  def change_button_status(ev):
-      element = ev.target
-      btn = document['register']
-      if element.checked:
-          if 'disabled' in btn.classList:
-              btn.classList.remove('disabled')
-      else:
-          if 'disabled' not in btn.style:
-              btn.classList.add('disabled')
-
-  document['accepted'].bind('click', change_button_status)
-
   Marker = None
   user_coord = None
   leaflet = window.L
@@ -103,7 +124,7 @@
 
   # Create world map
   center = [7.007530, 100.499003]
-  zoom = 13
+  zoom = 17
   map = leaflet.map('map_id', {
       "center":center,
       "zoom":zoom,
@@ -134,8 +155,12 @@
             {'icon': location_icon, 'zIndexOffset':1000}
             ).addTo(map).bindPopup('ต่ำแหน่งของคุณ')
 
+          map.panTo( user_coord)
+
       else:
           user_mark.setLatLng(user_coord)
+          map.panTo( user_coord)
+
 
       if Marker:
           map.removeLayer(Marker)
