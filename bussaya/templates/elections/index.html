@@ -20,12 +20,19 @@
       <td>{{ election.class_.name }}</td>
       <td>{{ election.started_date }}</td>
       <td>{{ election.ended_date }}</td>
-      <td><a href="{{ url_for('elections.edit', election_id=election.id) }}"><i class="edit icon"></i></a></td>
+      <td>
+        <a href="{{ url_for('elections.edit', election_id=election.id) }}"><i class="edit icon"></i></a>
+        <a href="{{ url_for('elections.generate_qrcode', election_id=election.id) }}"><i class="qrcode icon"></i></a>
+
+      </td>
     </tr>
   {% endfor %}
   </tbody>
 </table>
 
+  </div>
+  <div class="padding: 10px;">
+    <a class="ui primary button" href="{{ url_for('elections.create') }}">Create</a>
   </div>
 <div>
 

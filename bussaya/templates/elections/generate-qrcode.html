@@ -1,0 +1,28 @@
+{% extends '/base/default-dashboard.html' %}
+
+{% block content %}
+<div class="ui segment" style="min-height: 80vh;">
+  <div class="ui icon header center aligned">
+    <i class="icon qrcode"></i>
+    <h1>Project QRCode</h1>
+    <a class="ui primary button" href="{{ request.path }}?print=true"><i class="print icon"></i>Print</a>
+  </div>
+  <div style="padding-top: 20px;">
+
+    <div class="ui two column grid">
+    {% for project in projects %}
+      <div class="column">
+        <div>
+          <img class="ui centered image" src="data:image/png;base64,{{ qr_images[project.id]['image'] }}">
+        </div>
+        <div style="text-align: center;">
+          {{ project.name_th }}
+        </div>
+      </div>
+    {% endfor %}
+    </div>
+
+  </div>
+<div>
+
+{% endblock %}

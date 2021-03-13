@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Project QRcode</title>
+
+    <style>
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      @media print {
+        html, body {
+          width: 210mm;
+          height: 297mm;
+        }
+
+      }
+
+
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto;
+  /* background-color: #2196F3;*/
+  padding: 10px;
+}
+
+.item {
+  /* background-color: rgba(255, 255, 255, 0.8);*/
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
+
+    </style>
+  </head>
+  <body>
+    <div>
+      <div style="text-align: center;">
+        <h1>Project QRCode</h1>
+      </div>
+      <div>
+        {% for i in pages %}
+          <div class="grid-container">
+          {% for project in projects[i*4:  (i+1)*4] %}
+            <div class="item">
+              <div>
+                <img src="data:image/png;base64,{{ qr_images[project.id]['image'] }}">
+              </div>
+              <div style="text-align: center;">
+                {{ project.name_th }}
+              </div>
+            </div>
+          {% endfor %}
+          </div>
+          <div style="page-break-after: always;"></div>
+        {% endfor %}
+      </div>
+    </div>
+  </body>
+</html>

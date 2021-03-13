@@ -3,15 +3,28 @@ import datetime
 
 
 class Voting(me.Document):
-    meta = {'collection': 'votings'}
+    meta = {
+            'collection': 'votings',
+            'strict': False,
+            }
 
     user = me.ReferenceField('User', dbref=True, required=True)
-    projects = me.ListField(
-            me.ReferenceField('Project', dbref=True, required=True))
+    # projects = me.ListField(
+    #         me.ReferenceField('Project', dbref=True, required=True))
+    
+    project = me.ReferenceField('Project', dbref=True, required=True)
     class_ = me.ReferenceField('Class', dbref=True, required=True)
     election = me.ReferenceField('Election', dbref=True, required=True)
 
-    raw_voting_projects = me.ListField(me.StringField())
+    score = me.IntField(default=0, required=True)
+    
+    ip_address = me.StringField(required=True)
+    location = me.GeoPointField()
+
+    user_agent = me.StringField(default='')
+    client = me.StringField(default='')
+
+    # raw_voting_projects = me.ListField(me.StringField())
 
     voted_date = me.DateTimeField(required=True,
                                   default=datetime.datetime.now)

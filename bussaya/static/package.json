@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fomantic-ui-css": "^2.8.4"
+    "brython": "^3.9.1",
+    "fomantic-ui-css": "^2.8.7",
+    "leaflet": "^1.7.1"
   }
 }

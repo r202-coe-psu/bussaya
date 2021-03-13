@@ -1,6 +1,8 @@
 from flask import redirect, url_for
 from flask_login import current_user
 
+import datetime
+
 from . import site
 from . import accounts
 from . import dashboard
@@ -12,6 +14,10 @@ from . import tags
 
 from . import admin
 # from . import administration
+
+def add_date_url(url):
+    now = datetime.datetime.now()
+    return f'{url}?date={now.strftime("%Y%m%d")}'
 
 
 def get_subblueprints(views=[]):
@@ -30,6 +36,7 @@ def get_subblueprints(views=[]):
 
 
 def register_blueprint(app):
+    app.add_template_filter(add_date_url)
     blueprints = get_subblueprints([site,
                                     dashboard,
                                     accounts,

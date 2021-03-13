@@ -1,70 +1,154 @@
-{% extends '/base/default-dashboard.html' %}
-{% block content %}
-<div class="ui placeholder segment" style="padding-top:50px;">
-  <div class="ui icon header">
-    <i class="icon hourglass end"></i>
-    
-    <h1 class="header"> {{ election.class_.name }} </h1>
-    <div class="ui segment text container left aligned">
-      <p> Vote Start {{ election.started_date.strftime("%d/%m/%Y, %H:%M:%S")}} </p>
-      <p> Vote Stop {{ election.ended_date.strftime("%d/%m/%Y, %H:%M:%S") }} </p>
-      <p> Current Time {{ now.strftime("%d/%m/%Y, %H:%M:%S") }} </p>
-    </div>
-  </div>
-</div>
-<div class="ui container segment">
-  {% if form.errors %}
-    <div class="ui error message">
-      {{ form.errors }}
-    </div>
-  {% endif %}
-  <div class="ui info message">
-    {% if 'CoE-lecturer' in current_user.roles %}
-      <h2>Hello Aj. {{ current_user.first_name }} {{ current_user.last_name }}</h2>
-    {% endif %}
-    <p>Click the selection box and select a project name; only three projects will be selected.</p>
-  </div>
-  <form method="POST" class="ui form">
-    {{ form.csrf_token }}
-      <div class="field">
-        {{ form.projects.label }}
-        {{ form.projects(class_='ui dropdown') }}
-      </div>
-      <div class="ui vertical center aligned segment">
-        <div class="ui primary submit button">Vote</div>
-      </div>
-      <div class="ui error message"></div>
-    </form>
- </div>
+{% extends '/base/default-page.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+{% block additional_head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/leaflet/dist/leaflet.css') | add_date_url}}" />
+  <script src="{{ url_for('static', filename='node_modules/leaflet/dist/leaflet.js') | add_date_url }}"></script>
 {% endblock %}
 
+
 {% block additional_js %}
-
-  <script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/form.js') }}"></script>
   <script type="text/javascript">
-    $('.ui.dropdown').dropdown(
-      {
-        ignoreDiacritics: true,
-        sortSelect: true,
-        fullTextSearch:'exact'
-      }
-    );
-    $('.ui.form')
-      .form({
-        fields:{
-          projects: {
-            rules: [
-              {
-                type: 'minCount[1]',
-                prompt : 'Please select at least one project'
-              },
-              {
-                type: 'maxCount[3]',
-                prompt : 'Please select not over three projects'
-              }]
-          }
-        }
-      });
-
+    $('.ui.dropdown')
+      .dropdown()
+    ;
   </script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='node_modules/brython/brython.js') | add_date_url}}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='node_modules/brython/brython_stdlib.js') | add_date_url}}"></script>
+  <script type="text/javascript">
+    brython(1);
+  </script>
+
+{% endblock %}
+
+{% block content %}
+
+  <div class="ui vertical masthead segment">
+
+    <div class="ui text container">
+      <h1 class="ui header center aligned">
+        {{ activity.class_.name }}
+      </h1>
+      <h2 class="ui header center aligned">
+        ลงทะเบียน {{ activity.name }}
+      </h2>
+      <div class="ui Huge primary">
+
+        <form method="POST" class="ui big form">
+          {{ form.csrf_token }}
+          <div class="two fields">
+            {{ renderer.render_field(form.first_name) }}
+            {{ renderer.render_field(form.last_name) }}
+          </div>
+          <div class="two fields">
+            {{ renderer.render_field(form.student_id) }}
+            {{ renderer.render_select(form.section) }}
+          </div>
+          {{ renderer.render_checkbox(form.accepted) }}
+
+            {{ renderer.render_field(form.remark) }}
+            <button id="register" name="register" type="submit" class="ui button primary disabled">ลงทะเบียน</button>
+
+            {{ form.location }}
+        </form>
+      </div>
+
+      <div class="ui vertical masthead segment" style="width: 100%; height: 500px;">
+        <div id="color_status" style="text-align: center;"></div>
+        <div id="map_id" style="z-index:1;height:inherit;"></div>
+      </div>
+  </div>
+
+<script type="text/python">
+  from browser import document, window
+
+  def change_button_status(ev):
+      element = ev.target
+      btn = document['register']
+      if element.checked:
+          if 'disabled' in btn.classList:
+              btn.classList.remove('disabled')
+      else:
+          if 'disabled' not in btn.style:
+              btn.classList.add('disabled')
+
+  document['accepted'].bind('click', change_button_status)
+
+  Marker = None
+  user_coord = None
+  leaflet = window.L
+  world_map = document["map_id"]
+
+  openstreet = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      "maxZoom": 30,
+    "attribution": '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  })
+
+  world_imagery = leaflet.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      "maxZoom": 17,
+    "attribution": 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+  })
+
+  world_topo = leaflet.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+    "attribution": 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+  })
+
+  base_maps = {
+      "<b><span style='color: blue'>OpenStreet Map</span></b>": openstreet,
+      "<b><span style='color: green'>World Map</span></b>": world_imagery,
+      "<b><span style='color: teal'>World Topo Map</span></b>": world_topo
+  }
+
+  # Create world map
+  center = [7.007530, 100.499003]
+  zoom = 13
+  map = leaflet.map('map_id', {
+      "center":center,
+      "zoom":zoom,
+      "layers":openstreet
+  })
+
+  leaflet.control.layers(base_maps).addTo(map) 
+
+  location_icon = None
+  user_mark = None
+
+  def navi(pos):
+      global user_coord
+      global user_mark
+      global location_icon
+
+      user_coord = (pos.coords.latitude, pos.coords.longitude)
+      if not location_icon:
+          location_icon = leaflet.icon(dict(
+              iconUrl= '{{ url_for("static", filename="images/marks/my_location.svg") }}',
+              iconSize=[46, 48],
+              iconAnchor=[22,40],
+              popupAnchor=[0,-26]
+          ))
+      if not user_mark:
+          user_mark = leaflet.marker(
+            user_coord,
+            {'icon': location_icon, 'zIndexOffset':1000}
+            ).addTo(map).bindPopup('ต่ำแหน่งของคุณ')
+
+      else:
+          user_mark.setLatLng(user_coord)
+
+      if Marker:
+          map.removeLayer(Marker)
+
+      document['location'].value = f'{user_coord[0]}, {user_coord[1]}'
+
+  def nonavi(error):
+      window.alert(f'เบาร์เซอร์ไม่สามารถเข้าถึงตำแหน่งของคุณได้ กรุณาให้รายละเอียดเพิ่มเติม, {error.message}')
+      document['remark'].value = f'{error.message}'
+
+
+  window.navigator.geolocation.getCurrentPosition(navi, nonavi)   # set user's current location on map(success, error)
+
+  window.navigator.geolocation.watchPosition(navi)
+</script>
 {% endblock %}

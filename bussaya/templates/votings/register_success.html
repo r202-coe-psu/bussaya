@@ -1,0 +1,42 @@
+{% extends '/base/default-page.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+{% block additional_head %}
+  {{ super() }}
+    <link rel="stylesheet" href="/static/node_modules/leaflet/dist/leaflet.css" />
+    <script src="/static/node_modules/leaflet/dist/leaflet.js"></script>
+{% endblock %}
+
+
+{% block additional_js %}
+  <script type="text/javascript">
+    $('.ui.dropdown')
+      .dropdown()
+    ;
+  </script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='node_modules/brython/brython.js') | add_date_url}}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='node_modules/brython/brython_stdlib.js') | add_date_url}}"></script>
+  <script type="text/javascript">
+    brython(1);
+  </script>
+
+{% endblock %}
+
+{% block content %}
+
+  <div class="ui vertical masthead segment">
+
+    <div class="ui text container success message">
+      <h1 class="ui header center aligned">
+        ลงทะเบียน {{ activity.name }} สำเร็จ
+      </h1>
+      <div class="ui header center aligned" style="padding-top: 50px;">
+        <i class="checkmark icon massive"></i>
+      </div>
+      <div style="padding-bottom: 25%;"></div>
+    </div>
+  </div>
+
+{% endblock %}
+

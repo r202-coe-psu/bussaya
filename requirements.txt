@@ -13,3 +13,5 @@ loginpass
 pygments
 markdown
 python-markdown-math 
+
+qrcode

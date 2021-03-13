@@ -1,0 +1,49 @@
+{% extends '/base/default-page.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+{% block additional_head %}
+  {{ super() }}
+    <link rel="stylesheet" href="/static/node_modules/leaflet/dist/leaflet.css" />
+    <script src="/static/node_modules/leaflet/dist/leaflet.js"></script>
+{% endblock %}
+
+
+{% block additional_js %}
+  <script type="text/javascript">
+    $('.ui.dropdown')
+      .dropdown()
+    ;
+  </script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='node_modules/brython/brython.js') | add_date_url}}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='node_modules/brython/brython_stdlib.js') | add_date_url}}"></script>
+  <script type="text/javascript">
+    brython(1);
+  </script>
+
+{% endblock %}
+
+{% block content %}
+
+  <div class="ui vertical masthead segment">
+
+    <div class="ui text container error message">
+      <h1 class="ui header center aligned">
+        ลงทะเบียน {{ activity.name }} ไม่สำเร็จ
+      </h1>
+      <div class="ui big text" style="padding-top: 50px;">
+        <span class="ui big text">
+        {{ message }}
+        </span>
+      </div>
+      <div class="ui header center aligned" style="padding-top: 50px;">
+        <a class="ui negative large button" href="{{ url_for('activities.practice', activity_id=activity.id) }}">กลับไปลงทะเบียนอีกครับ</a>
+      </div>
+
+    </div>
+
+  <div style="padding-bottom: 25%;"></div>
+  </div>
+
+{% endblock %}
+

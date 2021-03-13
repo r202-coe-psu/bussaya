@@ -4,12 +4,20 @@
 <div class="ui segment" style="min-height: 80vh;">
   <div class="ui icon header center aligned">
     <i class="icon snowflake end"></i>
-    <h1>Edit election for class: {{ election.class_.name }}</h1>
+    {% if election %}
+      <h1>Edit election for class: {{ election.class_.name }}</h1>
+    {% else %}
+      <h1>Create Election</h1>
+    {% endif %}
   </div>
   <div style="padding-top: 20px;">
 
   <form method="POST">
     <div class="ui form">
+      <div class="field">
+          {{ form.class_.label }}
+          {{ form.class_(class_='ui fluid dropdown') }}
+      </div>
       <div class="two fields">
         <div class="field">
           {{ form.started_date.label }}
