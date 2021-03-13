@@ -1,6 +1,8 @@
 {% extends '/base/default-page.html' %}
 {% import '/base/html-renderer.html' as renderer %}
 
+{% block title %}Success Vote{% endblock %}
+
 {% block additional_head %}
   {{ super() }}
   <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/leaflet/dist/leaflet.css') | add_date_url}}" />
@@ -56,15 +58,12 @@
       </div>
       {# end content #}
 
-
-
-
       {# user profile #}
       <div>
         <div class="ui segment">
-          <div class="ui two column centered grid">
-            <div class="column">
-              <div class="ui two column centered grid">
+          <div class="ui centered grid">
+            <div class="four wide column">
+              <div class="ui one column centered grid">
                 {% for user in project.students %}
                 <div class="column center aligned">
                   <div class="ui small image">
@@ -76,14 +75,13 @@
               </div>
             </div>
 
-            <div class="column">
+            <div class="twelve wide column">
               {{ project.abstract }}
             </div>
           
           </div>
         </div>
       </div>
-
       {# end user profile #}
 
       {# map #}

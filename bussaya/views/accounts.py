@@ -6,6 +6,8 @@ from flask import (Blueprint,
                    render_template,
                    url_for,
                    redirect,
+                   request,
+                   session,
                    current_app,
                    send_file,
                    abort)
@@ -50,6 +52,9 @@ def get_user_and_remember():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard.index'))
+
+    if 'next' in request.args:
+        session['next'] = request.args.get('next', None)
 
     return render_template('/accounts/login.html')
 
@@ -133,6 +138,11 @@ def authorized_engpsu():
                 and userinfo['username'] in current_app.config['COE_LECTURERS']:
             user.roles.append('lecturer')
             user.roles.append('CoE-lecturer')
+        elif 'COE_STAFFS' in current_app.config \
+                and userinfo['username'] in current_app.config['COE_STAFFS']:
+            user.roles.append('staff')
+            user.roles.append('CoE-staff')
+    
         else:
             user.roles.append('staff')
 
@@ -164,6 +174,11 @@ def authorized_engpsu():
                 token.get('expires_in'))
             )
     oauth2token.save()
+
+    next_uri = session.get('next', None)
+    if next_uri:
+        session.pop('next')
+        return redirect(next_uri)
 
     return redirect(url_for('dashboard.index'))
 

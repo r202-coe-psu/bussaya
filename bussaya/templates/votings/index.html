@@ -12,9 +12,9 @@
     <tr>
       <td>{{ p.name }}</td>
       <td>
-        {% if p.owners | count > 0 %}
-          {%- for s in p.owners %}
-            {{ s.username + ' (' + s.first_name + ' ' + s.last_name + ')' }},
+        {% if p.students | count > 0 %}
+          {%- for s in p.students %}
+            {{ s.username + ' (' + s.first_name_th + ' ' + s.last_name_th + ')' }},
           {%- endfor %}
         {% else %}
           {{ p.student_ids | join(', ') }}
@@ -32,9 +32,11 @@
   <div class="ui icon header center aligned">
     <i class="icon snowflake end"></i>
     <h1>Student Result</h1>
+    <h2>Election: {{ election.started_date }} - {{ election.ended_date }}</h2>
+
   </div>
   <div style="padding-top: 20px;">
-    <h3>CoE Lecturer</h3>
+    <h3>CoE Lecturer & Staff</h3>
     {{ print_results(lec_votings) }}
   </div>
   <div style="padding-top: 20px;">

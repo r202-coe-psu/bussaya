@@ -16,7 +16,7 @@ class Voting(me.Document):
     class_ = me.ReferenceField('Class', dbref=True, required=True)
     election = me.ReferenceField('Election', dbref=True, required=True)
 
-    score = me.IntField(default=0, required=True)
+    # score = me.IntField(default=0, required=True)
     
     ip_address = me.StringField(required=True)
     location = me.GeoPointField()

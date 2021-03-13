@@ -21,18 +21,21 @@ def index():
 
     for v in votings:
         projects = std_votings
-        if 'CoE-lecturer' in v.user.roles:
+        if 'CoE-lecturer' in v.user.roles or 'CoE-staff':
             projects = lec_votings
 
-        for p in v.projects:
-            if p not in projects:
-                projects[p] = 1
-            else:
-                projects[p] += 1
+        project = v.project
+        if project not in projects:
+            projects[project] = 0
+        
+        projects[project] += 1
 
-    return render_template('/votings/index.html',
-                           std_votings=collections.OrderedDict(std_votings),
-                           lec_votings=collections.OrderedDict(lec_votings))
+    return render_template(
+            '/votings/index.html',
+            election=election,
+            std_votings=collections.OrderedDict(std_votings),
+            lec_votings=collections.OrderedDict(lec_votings),
+            )
 
 
 @module.route('/elections/<election_id>/projects/<project_id>/vote', methods=['GET', 'POST'])
@@ -55,11 +58,12 @@ def vote(election_id, project_id):
             class_=election.class_,
             )
     
-    voting = models.Voting.objects.get(
+    voting = models.Voting.objects(
             user=current_user._get_current_object(),
             election=election,
             class_=election.class_,
-            )
+            project=project,
+            ).first()
 
     if voting:
         return redirect(
@@ -80,7 +84,6 @@ def vote(election_id, project_id):
     voting = models.Voting()
     voting.user = current_user._get_current_object()
     voting.remark = form.remark.data
-    voting.score = 1
 
     if form.location.data:
         voting.location = [float(f) for f in form.location.data.split(',') if len(f.strip()) > 0]

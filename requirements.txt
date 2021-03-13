@@ -8,7 +8,7 @@ flask-wtf
 flask-principal
 flask-caching
 email_validator
-authlib
+authlib==0.15.3
 loginpass
 pygments
 markdown
