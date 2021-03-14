@@ -11,9 +11,7 @@ module = Blueprint('projects', __name__, url_prefix='/projects')
 @module.route('/')
 @login_required
 def index():
-    elections = models.Election.objects
-    return render_template('/elections/index.html',
-                           elections=elections)
+    return 'Hello project'
 
 
 def populate_obj(form, project):
@@ -211,6 +209,9 @@ def download(project_id, resource_id, filename):
 
 
 @module.route('/<project_id>')
-@login_required
 def view(project_id):
-    return 'wait for implementation'
+    project = models.Project.objects.get(id=project_id)
+    return render_template(
+            '/projects/view.html',
+            project=project,
+            )

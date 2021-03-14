@@ -16,7 +16,7 @@
   {%- endif %}
 {% endmacro -%}
 
-{% macro render_project_table(projects, current_user) -%}
+{% macro render_project_table(projects, current_user=None) -%}
 <table class="ui compact celled table">
   <thead>
     <tr>
@@ -46,12 +46,13 @@
         {{ pm_renderer.render_project_material(project) }}
       </td>
       <td class="right aligned collapsing">
-        {% if project.is_approval(current_user) %}
+        {% if current_user and project.is_approval(current_user) %}
           <i class="large blue check icon"></i>
           <a class="ui disabled button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
-        {% else %}
+        {% elif current_user %}
           <i class="large check icon disabled"></i>
           <a class="ui primary button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
+        {% else %}
         {% endif %}
 
       </td>

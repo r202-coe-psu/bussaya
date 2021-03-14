@@ -17,8 +17,11 @@
           {% for project in projects %}
           <tr>
             <td class="ten wide">
-              <b>{{ project.name }}</b><br>
-              {{ project.name_th }}</b><br>
+              <a href="{{ url_for('projects.view', project_id=project.id) }}">
+                <b>{{ project.name }}</b><br>
+                <b>{{ project.name_th }}</b>
+              </a>
+              <br>
               {% for tag in project.tags %}
                 <a class="ui tiny label" href="{{ url_for('tags.view', name=tag) }}">
                   {{ tag }}

@@ -8,7 +8,28 @@ module = Blueprint('tags', __name__, url_prefix='/tags')
 @module.route('/')
 @caches.cache.cached(timeout=3600)
 def index():
-    tags = models.Project.objects(public__ne='private').item_frequencies('tags', normalize=True)
+    # tags = models.Project.objects(public__ne='private').item_frequencies('tags', normalize=True)
+    
+    tags = models.Project.objects(public__ne='private').aggregate(
+            [
+                {
+                    '$unwind': '$tags'
+                },
+                {
+                    '$group': {
+                        '_id': '$tags',
+                        'count': {
+                            '$sum': 1
+                        },
+                    },
+
+                },
+
+            ]
+            )
+
+    tags = {t['_id']:t['count'] for t in tags}
+
     return render_template(
             '/tags/index.html',
             tags=tags)
