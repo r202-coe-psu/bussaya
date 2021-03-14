@@ -6,7 +6,7 @@ services:
     # ports:
     #     - 27017:27017
     volumes:
-      - ../deployment/mongodb/data/db:/data/db
+      - ../deployment/bussaya/mongodb/data/db:/data/db
       - /etc/localtime:/etc/localtime:ro
     restart: always
     networks:
