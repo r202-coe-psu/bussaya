@@ -55,8 +55,6 @@ def register_blueprint(app):
 
 
 def page_forbidden(e):
+    return redirect(url_for('site.index'))
 
-    if not current_user.is_authenticated:
-        return redirect(url_for('accounts.login'))
 
-    return e

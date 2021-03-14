@@ -1,0 +1,59 @@
+{% extends '/base/default-page.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+{% block content %}
+  <div class="ui container">
+    <div class="ui placeholder segment">
+      {# head #}
+      <div class="ui header center aligned">
+        <h1>
+          {{ project.name }}
+        </h1>
+        <h2>
+          {{ project.class_.name }} 
+        </h2>
+        <h3 class="middle aligned">
+          <i class="ui icon clock"></i> {{ election.started_date }} - {{ election.ended_date }}
+        </h3>
+      </div>
+      {# end head#}
+
+      {# content #}
+      <div class="ui placeholder segment negative message">
+        <div class="ui icon header">
+          <i class="clock outline icon"></i>
+          {{ message }}
+        </div>
+      </div>
+      {# end content #}
+
+      {# user profile #}
+      <div>
+        <div class="ui segment">
+          <div class="ui centered grid">
+            <div class="four wide column">
+              <div class="ui one column centered grid">
+                {% for user in project.students %}
+                <div class="column center aligned">
+                  <div class="ui small image">
+                    <img src="{{ user.get_picture() }}">
+                  </div>
+                  <h5>{{ user.first_name }} {{ user.last_name }}</h5>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="twelve wide column">
+              {{ project.abstract }}
+            </div>
+          
+          </div>
+        </div>
+      </div>
+
+      {# end user profile #}
+    </div>
+  </div>
+
+{% endblock %}

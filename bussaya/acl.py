@@ -1,4 +1,4 @@
-from flask import redirect, url_for, request
+from flask import redirect, url_for, request, redirect
 from flask_login import LoginManager, current_user, login_url
 from flask_principal import (Principal,
                              Permission,
@@ -21,6 +21,7 @@ lecturer_permission = Permission(RoleNeed('lecturer'))
 
 def init_acl(app):
     # initial login manager
+
     login_manager.init_app(app)
     principals.init_app(app)
 

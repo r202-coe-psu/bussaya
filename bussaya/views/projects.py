@@ -43,7 +43,7 @@ def get_project_form(project=None):
     form.committees.choices = lec_choices
     form.public.choices = [(d, d.title()) for d in form.public.choices]
 
-    classes = models.Class.objects().order_by('-id')
+    classes = models.Class.objects(student_ids=current_user.username).order_by('-id')
     form.class_.choices = [(str(c.id), c.name) for c in classes]
 
     student_ids = []

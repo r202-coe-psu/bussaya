@@ -37,6 +37,8 @@
 				<tr>
 					<td>
 						<a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+            <a class="ui primary icon button" href="{{ url_for('admin.classes.edit', class_id=class_.id) }}"><i class="edit icon"></i></a>
+
 					</td>
 					<td>
 						{{ class_.description }}

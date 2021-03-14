@@ -4,14 +4,14 @@ from flask_login import login_required, current_user
 import datetime
 import collections
 
-from .. import models, forms
+from .. import models, forms, acl
 
 module = Blueprint('votings', __name__, url_prefix='/votings')
 subviews = []
 
 
 @module.route('/', methods=['GET'])
-@login_required
+@acl.admin_permission.require(http_exception=403)
 def index():
     election = models.Election.objects().order_by('-id').first()
 
@@ -21,7 +21,7 @@ def index():
 
     for v in votings:
         projects = std_votings
-        if 'CoE-lecturer' in v.user.roles or 'CoE-staff':
+        if 'CoE-lecturer' in v.user.roles or 'CoE-staff' in v.user.roles:
             projects = lec_votings
 
         project = v.project
@@ -44,19 +44,19 @@ def vote(election_id, project_id):
     now = datetime.datetime.now()
     election = models.Election.objects.get(id=election_id)
 
-    if now < election.started_date or election.ended_date < now:
-        message = f'ไม่อยู่ในช่วงเวลาลงเวลา'
-        return render_template(
-                '/activities/vote_fail.html',
-                election=election,
-                message=message,
-                )
-
-
     project = models.Project.objects.get(
             id=project_id,
             class_=election.class_,
             )
+
+    if now < election.started_date or election.ended_date < now:
+        message = f'ไม่อยู่ในช่วงเวลาลงโหวต'
+        return render_template(
+                '/votings/vote-fail.html',
+                election=election,
+                message=message,
+                project=project,
+                )
     
     voting = models.Voting.objects(
             user=current_user._get_current_object(),
@@ -107,7 +107,7 @@ def vote(election_id, project_id):
 
     return redirect(
             url_for(
-                'votings.vote_success',
+                'votings.vote-success',
                 voting_id=voting.id,
                 ))
 
@@ -120,7 +120,7 @@ def vote_success(voting_id):
             user=current_user._get_current_object(),
             )
     return render_template(
-            '/votings/vote_success.html',
+            '/votings/vote-success.html',
             voting=voting,
             project=voting.project,
             class_=voting.class_,

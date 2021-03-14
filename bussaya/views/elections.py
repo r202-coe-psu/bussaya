@@ -7,9 +7,11 @@ import base64
 from PIL import Image
 import pathlib
 import math
+import datetime
 
 from .. import forms
 from .. import models
+from .. import acl
 
 
 module = Blueprint('elections', __name__, url_prefix='/elections')
@@ -17,15 +19,14 @@ subviews = []
 
 
 @module.route('/', methods=['GET', 'POST'])
-@login_required
-# @acl.allows.requires(acl.is_admin)
+@acl.admin_permission.require(http_exception=403)
 def index():
     elections = models.Election.objects
     return render_template('/elections/index.html',
                            elections=elections)
 
 @module.route('/create', methods=['GET', 'POST'])
-@login_required
+@acl.admin_permission.require(http_exception=403)
 def create():
     form = forms.elections.ElectionForm()
     classes = models.Class.objects()
@@ -45,14 +46,16 @@ def create():
 
 
 @module.route('/<election_id>/edit', methods=['GET', 'POST'])
-@login_required
+@acl.admin_permission.require(http_exception=403)
 def edit(election_id):
     election = models.Election.objects.get(id=election_id)
     form = forms.elections.ElectionForm(obj=election)
 
-
     classes = models.Class.objects()
     form.class_.choices = [ (str(c.id), c.name) for c in classes ]
+
+    if request.method == 'GET':
+        form.class_.data = str(election.class_.id)
 
     if not form.validate_on_submit():
         print('errors', form.errors, form.data)
@@ -62,6 +65,7 @@ def edit(election_id):
 
     election.started_date = form.started_date.data
     election.ended_date = form.ended_date.data
+    election.class_ = models.Class.objects.get(id=form.class_.data)
     election.save()
 
     return redirect(url_for('elections.index'))
@@ -69,7 +73,7 @@ def edit(election_id):
 
 
 @module.route('/<election_id>/generate_qrcode')
-@login_required
+@acl.admin_permission.require(http_exception=403)
 def generate_qrcode(election_id):
     election = models.Election.objects.get(id=election_id)
     
@@ -137,4 +141,32 @@ def generate_qrcode(election_id):
                            projects=projects,
                            qr_images=qr_images,
                            )
+
+
+@module.route('/<election_id>', methods=['GET'])
+# @login_required
+# @acl.allows.requires(acl.is_admin)
+def show_election(election_id):
+
+    now = datetime.datetime.now()
+    election = models.Election.objects(
+            id=election_id,
+            started_date__lte=now,
+            ended_date__gte=now,
+            ).first()
+
+    if not election:
+        return redirect(url_for('site.index'))
+
+    projects = models.Project.objects(
+            class_=election.class_,
+            )
+
+    return render_template(
+            '/elections/show_election.html',
+            election=election,
+            projects=projects,
+
+            )
+
 

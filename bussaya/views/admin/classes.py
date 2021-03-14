@@ -1,12 +1,12 @@
 from flask import (Blueprint,
                    render_template,
                    url_for,
-                   redirect
+                   redirect,
+                   request,
                    )
 from flask_login import current_user, login_required
 
-from bussaya import models
-from bussaya import forms
+from bussaya import models, forms, acl
 
 module = Blueprint('admin.classes',
                    __name__,
@@ -15,7 +15,7 @@ module = Blueprint('admin.classes',
 
 
 @module.route('/')
-@login_required
+@acl.admin_permission.require(http_exception=403)
 def index():
     classes = models.Class.objects()
     return render_template('/admin/classes/index.html',
@@ -23,7 +23,7 @@ def index():
 
 
 @module.route('/create', methods=['GET', 'POST'])
-@login_required
+@acl.admin_permission.require(http_exception=403)
 def create():
     form = forms.classes.ClassForm()
     if not form.validate_on_submit():
@@ -38,9 +38,32 @@ def create():
 
     return redirect(url_for('admin.classes.view', class_id=class_.id))
 
+@module.route('/<class_id>/edit', methods=['GET', 'POST'])
+@acl.admin_permission.require(http_exception=403)
+def edit(class_id):
+    class_ = models.Class.objects.get(id=class_id)
+
+    form = forms.classes.ClassForm()
+    if request.method == 'GET':
+        form = forms.classes.ClassForm(obj=class_)
+        
+
+    if not form.validate_on_submit():
+        return render_template('/admin/classes/create-edit.html',
+                               form=form
+                               )
+
+    form.populate_obj(class_)
+    class_.owner = current_user._get_current_object()
+    class_.save()
+
+    return redirect(url_for('admin.classes.view', class_id=class_.id))
+
+
+
 
 @module.route('/<class_id>')
-@login_required
+@acl.admin_permission.require(http_exception=403)
 def view(class_id):
     class_ = models.Class.objects.get(id=class_id)
     return render_template('/admin/classes/view.html',
