@@ -21,7 +21,9 @@ def index():
                     'elections.show_election',
                     election_id=election.id))
 
-    projects = models.Project.objects(public__ne='private').order_by('-id').limit(150)
+    classes = models.Class.objects(ended_date__lt=now)
+    projects = models.Project.objects(
+            public__ne='private',class___in=classes).order_by('-id').limit(100)
     return render_template(
             '/site/index.html',
             projects=projects)

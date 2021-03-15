@@ -37,7 +37,7 @@ def index():
 
 @module.route('/<name>')
 def view(name):
-    projects = models.Project.objects(tags=name, public__ne='private').order_by('-id')
+    projects = models.Project.objects(tags__iexact=name, public__ne='private').order_by('-id')
     return render_template(
             '/tags/view.html',
             name=name,

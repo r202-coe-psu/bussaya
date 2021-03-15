@@ -9,9 +9,9 @@ module = Blueprint('projects', __name__, url_prefix='/projects')
 
 
 @module.route('/')
-@login_required
 def index():
-    return 'Hello project'
+    # need implement
+    return redirect(url_for('tags.index'))
 
 
 def populate_obj(form, project):
