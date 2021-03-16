@@ -84,13 +84,15 @@ def generate_qrcode(election_id):
     coe_logo = Image.open(coe_logo_path)
     coe_logo_width, coe_logo_height = coe_logo.size
    
-    reduce_factor = 0.05
+    reduce_factor = 0.059
     coe_logo_width = int(coe_logo_width*reduce_factor)
     coe_logo_height = int(coe_logo_height*reduce_factor)
     coe_logo = coe_logo.resize((coe_logo_width, coe_logo_height))
 
-    coe_logo_white = Image.new("RGBA", coe_logo.size, "WHITE")
-    coe_logo_white.paste(coe_logo, (0, 0), coe_logo)
+    coe_logo_white = Image.new("RGBA", (100, 100), "WHITE")
+    coe_logo_white.paste(coe_logo,
+            ((coe_logo_white.size[0] - coe_logo.size[0]) // 2, 
+             (coe_logo_white.size[1] - coe_logo.size[1]) // 2), coe_logo)
 
     qr_images = dict()
     for project in projects:
@@ -112,7 +114,7 @@ def generate_qrcode(election_id):
 
         img = qr.make_image().convert('RGB')
 
-        pos = ((img.size[0] - coe_logo.size[0]) // 2, (img.size[1] - coe_logo.size[1]) // 2)
+        pos = ((img.size[0] - coe_logo_white.size[0]) // 2, (img.size[1] - coe_logo_white.size[1]) // 2)
         img.paste(coe_logo_white, pos)
 
         img_io = io.BytesIO()
