@@ -71,7 +71,14 @@
                   </div>
                   <h5>{{ user.first_name }} {{ user.last_name }}</h5>
                 </div>
-                {% endfor %}
+              {% endfor %}
+              {% set r = project.get_resource('poster') %}
+              {% if r %}
+                <div>
+                  <a target="_blank" class="ui primary icon button big" href="{{ r.link }}"><i class="image file icon" data-content="Poster"></i> Poster</a>
+                </div>
+              {% endif %}
+
               </div>
             </div>
 
@@ -82,16 +89,7 @@
               <div class="ui segment large text">
                 {{ project.abstract }}
               </div>
-
-              {% set r = project.get_resource('poster') %}
-              {% if r %}
-              <div class="ui segment">
-                <a target="_blank" href="{{ r.link }}"><i class="big image file icon link pop" data-content="Poster"></i></a>
-              </div>
-              {% endif %}
-
             </div>
-          
           </div>
         </div>
       </div>
