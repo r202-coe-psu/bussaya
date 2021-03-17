@@ -38,6 +38,10 @@
               {% endfor -%}
             </td>
             <td class="single line">
+              {% set r = project.get_resource('poster') %}
+              {% if r %}
+                <a target="_blank" href="{{ r.link }}"><i class="large image file icon link pop" data-content="Poster"></i></a>
+              {% endif %}
               <a class="ui primary button" href="{{ url_for('votings.vote', election_id=election.id, project_id=project.id) }}">Vote</a>
               {#
               {%- for type_ in ['report', 'poster', 'presentation', 'video', 'git'] %}

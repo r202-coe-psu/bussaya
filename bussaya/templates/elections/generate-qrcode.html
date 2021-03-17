@@ -2,13 +2,17 @@
 
 {% block content %}
 <div class="ui segment" style="min-height: 80vh;">
+  {# begin head #}
   <div class="ui icon header center aligned">
     <i class="icon qrcode"></i>
     <h1>Project QRCode</h1>
-    <a class="ui primary icon button big" href="{{ request.url }}?print=true"><i class="print icon"></i> Print</a>
+    <a class="ui primary icon button big" href="{{ request.url }}?print=true">
+      <i class="print icon"></i> Print
+    </a>
   </div>
+  {# end head #}
+  {# begin qr block #}
   <div style="padding-top: 20px;">
-
     <div class="ui two column grid">
     {% for project in projects %}
       <div class="column">
@@ -22,6 +26,6 @@
     {% endfor %}
     </div>
   </div>
+  {# end qr block #}
 <div>
-
 {% endblock %}
