@@ -61,7 +61,7 @@
       {# user profile #}
       <div>
         <div class="ui segment">
-          <div class="ui centered grid">
+          <div class="ui centered stackable grid">
             <div class="four wide column">
               <div class="ui one column centered grid">
                 {% for user in project.students %}
@@ -76,7 +76,20 @@
             </div>
 
             <div class="twelve wide column">
-              {{ project.abstract }}
+              <div class="ui segment large text">
+                {{ project.abstract_th }}
+              </div>
+              <div class="ui segment large text">
+                {{ project.abstract }}
+              </div>
+
+              {% set r = project.get_resource('poster') %}
+              {% if r %}
+              <div class="ui segment">
+                <a target="_blank" href="{{ r.link }}"><i class="big image file icon link pop" data-content="Poster"></i></a>
+              </div>
+              {% endif %}
+
             </div>
           
           </div>
