@@ -88,7 +88,7 @@ def vote(election_id, project_id):
     if form.location.data:
         voting.location = [float(f) for f in form.location.data.split(',') if len(f.strip()) > 0]
     else:
-        ap.location = [0, 0]
+        voting.location = [0, 0]
 
     voting.ip_address = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
     voting.user_agent = request.environ.get('HTTP_USER_AGENT', '')
@@ -107,7 +107,7 @@ def vote(election_id, project_id):
 
     return redirect(
             url_for(
-                'votings.vote-success',
+                'votings.vote_success',
                 voting_id=voting.id,
                 ))
 
