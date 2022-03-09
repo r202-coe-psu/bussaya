@@ -14,7 +14,7 @@
       <td>
         {% if p.students | count > 0 %}
           {%- for s in p.students %}
-            {{ s.username + ' (' + s.first_name_th + ' ' + s.last_name_th + ')' }},
+            {{ s.username }} ({{ s.first_name_th }} {{ s.last_name_th }}),
           {%- endfor %}
         {% else %}
           {{ p.student_ids | join(', ') }}
