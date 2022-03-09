@@ -1,5 +1,6 @@
 *.pyc
 *.cfg
+venv
 __pycache__
 data
 node_modules
