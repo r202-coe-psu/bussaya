@@ -40,25 +40,26 @@
                   {% endfor -%}
                   
                   <i class="user tie icon"></i> {{ project.advisor.first_name }} {{ project.advisor.last_name }}
+                  {#
                   {% if project.is_approval(project.advisor) %}
                     <i class="large blue check icon"></i>
                   {% else %}
                     <i class="large check icon disabled"></i>
                   {% endif %}
-
+                  #}
                 </div>
                 <div>
 
                   <i class="user cog icon"></i>
                   {% for committee in project.committees %}
                     {{ committee.first_name }} {{ committee.last_name }} 
-
+                    {#
                     {% if project.is_approval(committee) %}
                       <i class="large blue check icon"></i>
                     {% else %}
                       <i class="large check icon disabled"></i>
                     {% endif %}
-
+                    #}
                   {% endfor %}
                 </div>
               </div>
