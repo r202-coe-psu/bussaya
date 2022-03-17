@@ -17,14 +17,14 @@ module = Blueprint(
 
 
 @module.route("/")
-@acl.admin_permission.require(http_exception=403)
+@acl.roles_required("admin")
 def index():
     classes = models.Class.objects()
     return render_template("/admin/classes/index.html", classes=classes)
 
 
 @module.route("/create", methods=["GET", "POST"])
-@acl.admin_permission.require(http_exception=403)
+@acl.roles_required("admin")
 def create():
     form = forms.classes.ClassForm()
     if not form.validate_on_submit():
@@ -39,7 +39,7 @@ def create():
 
 
 @module.route("/<class_id>/edit", methods=["GET", "POST"])
-@acl.admin_permission.require(http_exception=403)
+@acl.roles_required("admin")
 def edit(class_id):
     class_ = models.Class.objects.get(id=class_id)
 
@@ -58,7 +58,7 @@ def edit(class_id):
 
 
 @module.route("/<class_id>")
-@acl.admin_permission.require(http_exception=403)
+@acl.roles_required("admin")
 def view(class_id):
     class_ = models.Class.objects.get(id=class_id)
     projects = models.Project.objects(class_=class_)

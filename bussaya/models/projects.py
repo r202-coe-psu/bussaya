@@ -9,38 +9,38 @@ class ProjectResource(me.EmbeddedDocument):
     data = me.FileField()
     link = me.StringField()
     type = me.StringField(
-            required=True,
-            choices=['report',
-                     'similarity',
-                     'presentation',
-                     'poster',
-                     'other',
-                     'video',
-                     'git',
-                     ])
-    status = me.StringField(required=True, default='active')
-    created_date = me.DateTimeField(required=True,
-                                    default=datetime.datetime.now)
-    updated_date = me.DateTimeField(required=True,
-                                    default=datetime.datetime.now,
-                                    auto_now=True)
+        required=True,
+        choices=[
+            "report",
+            "similarity",
+            "presentation",
+            "poster",
+            "other",
+            "video",
+            "git",
+        ],
+    )
+    status = me.StringField(required=True, default="active")
+    created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
+    updated_date = me.DateTimeField(
+        required=True, default=datetime.datetime.now, auto_now=True
+    )
 
 
 class ProjectApproval(me.EmbeddedDocument):
     id = me.ObjectIdField(required=True, default=ObjectId())
-    committee = me.ReferenceField('User', dbref=True)
+    committee = me.ReferenceField("User", dbref=True)
 
-    created_date = me.DateTimeField(required=True,
-                                    default=datetime.datetime.now)
+    created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
     comment = me.StringField()
     type = me.StringField()
 
 
 class Project(me.Document):
     meta = {
-            'collection': 'projects',
-            'strict': False,
-            }
+        "collection": "projects",
+        "strict": False,
+    }
 
     name = me.StringField(required=True)
     name_th = me.StringField(required=True)
@@ -48,45 +48,46 @@ class Project(me.Document):
     abstract = me.StringField(required=True)
     abstract_th = me.StringField(required=True)
 
-    class_ = me.ReferenceField('Class', dbref=True, required=True)
+    class_ = me.ReferenceField("Class", dbref=True, required=True)
     tags = me.ListField(me.StringField())
 
-    created_date = me.DateTimeField(required=True,
-                                    default=datetime.datetime.now)
-    updated_date = me.DateTimeField(required=True,
-                                    default=datetime.datetime.now,
-                                    auto_now=True)
+    created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
+    updated_date = me.DateTimeField(
+        required=True, default=datetime.datetime.now, auto_now=True
+    )
 
-    students = me.ListField(me.ReferenceField('User', dbref=True))
-    creator = me.ReferenceField('User', dbref=True)
+    students = me.ListField(me.ReferenceField("User", dbref=True))
+    creator = me.ReferenceField("User", dbref=True)
 
-    advisor = me.ReferenceField('User', dbref=True)
-    committees = me.ListField(me.ReferenceField('User', dbref=True))
+    advisor = me.ReferenceField("User", dbref=True)
+    committees = me.ListField(me.ReferenceField("User", dbref=True))
     approvals = me.ListField(me.EmbeddedDocumentField(ProjectApproval))
 
     resources = me.ListField(me.EmbeddedDocumentField(ProjectResource))
 
     public = me.StringField(
-            required=True,
-            default='only name',
-            choices=['private',
-                     'only name',
-                     'abstract',
-                     'poster',
-                     'report',
-                     'video',
-                     'abstract and poster',
-                     'abstract and report',
-                     'abstract and video',
-                     'abstract and git',
-                     'abstract, poster, and video',
-                     'abstract, report and poster',
-                     'abstract, poster and git',
-                     'abstract, video and git',
-                     'abstract, poster, video and git',
-                     'abstract, report, poster and git',
-                     'abstract, report, poster, video and git',
-                     ])
+        required=True,
+        default="only name",
+        choices=[
+            "private",
+            "only name",
+            "abstract",
+            "poster",
+            "report",
+            "video",
+            "abstract and poster",
+            "abstract and report",
+            "abstract and video",
+            "abstract and git",
+            "abstract, poster, and video",
+            "abstract, report and poster",
+            "abstract, poster and git",
+            "abstract, video and git",
+            "abstract, poster, video and git",
+            "abstract, report, poster and git",
+            "abstract, report, poster, video and git",
+        ],
+    )
 
     def get_resource(self, type_):
         resources = reversed(self.resources)
@@ -106,7 +107,7 @@ class Project(me.Document):
     def is_advisor_approval(self):
         for approval in self.approvals:
             if approval.committee == self.advisor:
-                if approval.type == 'approve':
+                if approval.type == "approve":
                     return True
 
         return False

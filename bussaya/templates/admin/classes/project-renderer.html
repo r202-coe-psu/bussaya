@@ -46,16 +46,9 @@
         {{ pm_renderer.render_project_material(project) }}
       </td>
       <td class="right aligned collapsing">
-        {#
-        {% if current_user and project.is_approval(current_user) %}
-          <i class="large blue check icon"></i>
-          <a class="ui disabled button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
-        {% elif current_user %}
-          <i class="large check icon disabled"></i>
-          <a class="ui primary button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
-        {% else %}
-        {% endif %}
-        #}
+        <a class="ui negative circular icon button" href="{{ url_for('admin.projects.delete', project_id=project.id) }}">
+          <i class="trash icon"></i>
+        </a>
       </td>
     </tr>
   {% endfor %}
