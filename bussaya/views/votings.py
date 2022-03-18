@@ -30,11 +30,17 @@ def index():
 
         projects[project] += 1
 
+    std_votings = list(std_votings.items())
+    lec_votings = list(lec_votings.items())
+    std_votings.sort(key=lambda v: v[1], reverse=True)
+    lec_votings.sort(key=lambda v: v[1], reverse=True)
+    print(std_votings)
+
     return render_template(
         "/votings/index.html",
         election=election,
-        std_votings=collections.OrderedDict(std_votings),
-        lec_votings=collections.OrderedDict(lec_votings),
+        std_votings=std_votings,
+        lec_votings=lec_votings,
     )
 
 
