@@ -34,7 +34,6 @@ def index():
     lec_votings = list(lec_votings.items())
     std_votings.sort(key=lambda v: v[1], reverse=True)
     lec_votings.sort(key=lambda v: v[1], reverse=True)
-    print(std_votings)
 
     return render_template(
         "/votings/index.html",
