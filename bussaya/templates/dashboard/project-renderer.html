@@ -12,6 +12,11 @@
     <h4>Examination Project</h4>
     {{ render_project_table(committees, current_user) }}
   {%- endif %}
+  {%- if projects | count > 0 %}
+    <h4>Alumni Project</h4>
+    {{ render_project_table(projects, current_user) }}
+  {%- endif %}
+
   </div>
   {%- endif %}
 {% endmacro -%}

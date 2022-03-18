@@ -7,7 +7,7 @@
   </div>
 
   {% if 'CoE-lecturer' in current_user.roles %}
-  {{ renderer.render_project_section(projects, current_user, advisees, committees) }}
+    {{ renderer.render_project_section(alumni_projects, current_user, advisees, committees) }}
   {% endif %}
 
   <div>
