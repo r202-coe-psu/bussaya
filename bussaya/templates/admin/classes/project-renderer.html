@@ -35,7 +35,7 @@
       <td class="right aligned collapsing">
         {%- for s in project.students %}
         <a target="_blank" href="{{ url_for('accounts.profile', user_id=s.id) }}">
-          {{ s.first_name }} {{ s.last_name }}
+          {{ s.first_name }} {{ s.last_name }} ({{ s.username }})
         </a>
         {% if not loop.last %}<br>{% endif %}
         {% endfor -%}
