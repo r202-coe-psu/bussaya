@@ -17,32 +17,33 @@
           {% for project in projects %}
           <tr>
             <td class="ten wide">
-              <a href="{{ url_for('projects.view', project_id=project.id) }}">
-                <b>{{ project.name }}</b><br>
-                <b>{{ project.name_th }}</b>
-              </a>
-              <br>
+              {# <a href="{{ url_for('projects.view', project_id=project.id) }}"> #}
+                <h4>{{ project.name }}</h4>
+                <h4>{{ project.name_th }}</h4>
+              {# </a> #}
+            <p>
               {% for tag in project.tags %}
-                <a class="ui tiny label" href="{{ url_for('tags.view', name=tag) }}">
-                  {{ tag }}
-                </a>
-              {% endfor %}
+                {# <a class="ui tiny label" href="{{ url_for('tags.view', name=tag) }}"> #}
+                  <span class="ui blue tag label" style="margin-top: 2px; margin-buttom: 2px;">{{ tag }}</span>
+                {# </a> #}
+            {% endfor %}
+            </p>
             </td>
             <td>
               {%- for s in project.students %}
               <i class="ui user icon"></i>
-              <a target="_blank" href="{{ url_for('accounts.profile', user_id=s.id) }}">
+              {# <a target="_blank" href="{{ url_for('accounts.profile', user_id=s.id) }}">#}
                 {{ s.first_name }} {{ s.last_name }}
-              </a>
+              {# </a> #}
               {% if not loop.last %}<br>{% endif %}
               {% endfor -%}
             </td>
             <td class="single line">
               {% set r = project.get_resource('poster') %}
               {% if r %}
-                <a target="_blank" href="{{ r.link }}"><i class="large image file icon link pop" data-content="Poster"></i></a>
+                <a target="_blank" href="{{ r.link }}"><i class="huge image file icon link pop" data-content="Poster"></i></a>
               {% endif %}
-              <a class="ui primary button" href="{{ url_for('votings.vote', election_id=election.id, project_id=project.id) }}">Vote</a>
+              <a class="ui primary huge button" href="{{ url_for('votings.vote', election_id=election.id, project_id=project.id) }}">Vote</a>
               {#
               {%- for type_ in ['report', 'poster', 'presentation', 'video', 'git'] %}
                 {% if type_ in project.public %}

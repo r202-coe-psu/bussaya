@@ -12,6 +12,8 @@ from flask_login import login_required, current_user
 from .. import forms
 from .. import models
 
+import datetime
+
 
 module = Blueprint("projects", __name__, url_prefix="/projects")
 
@@ -195,7 +197,11 @@ def download(project_id, resource_id, filename):
             resource = r
             break
 
-    if not current_user.is_authenticated:
+    now = datetime.datetime.now()
+    election = models.Election.objects(
+        started_date__lte=now, ended_date__gte=now
+    ).first()
+    if not election and not current_user.is_authenticated:
         if resource.type not in project.public:
             return response
 
