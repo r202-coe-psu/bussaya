@@ -22,7 +22,6 @@ class Submission(me.Document):
     remark = me.StringField()
 
     file = me.FileField()
-    deadline = me.DateField(required=True, default=datetime.datetime.today)
 
 
 class StudentWork(me.Document):

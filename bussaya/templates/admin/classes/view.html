@@ -31,7 +31,9 @@
 	</div>
 
 </div>
-
+<a class="ui primary button" href="{{ url_for('submission.add') }}">
+	Add Submission
+</a>
 <div class="ui segment">
 	{{ renderer.render_project_table(projects) }}
 </div>
