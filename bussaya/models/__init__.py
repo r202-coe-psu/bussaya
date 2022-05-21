@@ -3,18 +3,24 @@ from .oauth2 import OAuth2Token
 from .classes import Class
 from .projects import Project, ProjectResource, ProjectApproval
 from .votings import Voting, Election
+from .submissions import Submission, StudentWork
 
 from flask_mongoengine import MongoEngine
 
 db = MongoEngine()
 
 __all__ = [
-        User,
-        OAuth2Token,
-        Class,
-        Project, ProjectResource, ProjectApproval,
-        Voting, Election,
-        ]
+    User,
+    OAuth2Token,
+    Class,
+    Project,
+    ProjectResource,
+    ProjectApproval,
+    Voting,
+    Election,
+    Submission,
+    StudentWork,
+]
 
 
 def init_db(app):
@@ -23,14 +29,11 @@ def init_db(app):
 
 def init_mongoengine(settings):
     import mongoengine as me
-    dbname = settings.get('MONGODB_DB')
-    host = settings.get('MONGODB_HOST', 'localhost')
-    port = int(settings.get('MONGODB_PORT', '27017'))
-    username = settings.get('MONGODB_USERNAME', '')
-    password = settings.get('MONGODB_PASSWORD', '')
 
-    me.connect(db=dbname,
-               host=host,
-               port=port,
-               username=username,
-               password=password)
+    dbname = settings.get("MONGODB_DB")
+    host = settings.get("MONGODB_HOST", "localhost")
+    port = int(settings.get("MONGODB_PORT", "27017"))
+    username = settings.get("MONGODB_USERNAME", "")
+    password = settings.get("MONGODB_PASSWORD", "")
+
+    me.connect(db=dbname, host=host, port=port, username=username, password=password)

@@ -5,29 +5,34 @@
 {% block content %}
 
 <div class="ui info message">
-		<h3>{{ class_.name }}</h3>
-		<div>
-			<b>Description:</b> {{ class_.description }}
-		</div>
-		<div>
-			<b>Code:</b> {{ class_.code }}
-		</div>
-		<div>
-			<b>Started Date:</b> {{ class_.started_date }}
-		</div>
-		<div>
-			<b>Ended Date:</b> {{ class_.ended_date }}
-		</div>
-		<div>
-			<b>Student IDs:</b> {{ class_.student_ids | join(', ') }}
-		</div>
+	<h3>{{ class_.name }}</h3>
+	<div>
+		<b>Description:</b> {{ class_.description }}
+	</div>
+	<div>
+		<b>Code:</b> {{ class_.code }}
+	</div>
+	<div>
+		<b>Started Date:</b> {{ class_.started_date }}
+	</div>
+	<div>
+		<b>Ended Date:</b> {{ class_.ended_date }}
+	</div>
+	<div>
+		<b>Student IDs:</b> {{ class_.student_ids | join(', ') }}
+	</div>
 
-		<div>
-			<b>Tag:</b> {{ class_.tags | join(', ') }}
-		</div>
+	<div>
+		<b>Tag:</b> {{ class_.tags | join(', ') }}
+	</div>
+
+	<div>
+		<b>Type:</b> {{ class_.get_type_display() }}
+	</div>
+
 </div>
 
 <div class="ui segment">
-  {{ renderer.render_project_table(projects) }}
+	{{ renderer.render_project_table(projects) }}
 </div>
 {% endblock %}

@@ -36,3 +36,4 @@ class TagListField(Field):
 
 class TextListField(TagListField):
     widget = widgets.TextArea()
+

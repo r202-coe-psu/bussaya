@@ -4,8 +4,8 @@ import datetime
 from flask_login import UserMixin
 from flask import url_for
 
-from .projects import Project
 
+from .projects import Project
 
 class User(me.Document, UserMixin):
     username = me.StringField(required=True, unique=True)
