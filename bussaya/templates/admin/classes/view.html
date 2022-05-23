@@ -55,7 +55,9 @@
 		{% for submission in submissions %}
 		<tr>
 			<td>
-				{{ submission.type }}
+				<a href="{{ url_for('submission.view', submission_id=submission.id, class_id=class_.id)}}">
+					{{ submission.get_type_display() }}
+				</a>
 			</td>
 			<td>
 				{{ submission.remark}}

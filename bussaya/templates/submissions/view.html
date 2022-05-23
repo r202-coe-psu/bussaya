@@ -1,0 +1,24 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/error-handler.html' as eh %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a class="section" href="{{ url_for('admin.classes.index') }}">Classes</a>
+    <div class="divider"> / </div>
+    <a class="section" href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <div class="active section">Submission:
+        <a href="{{ url_for('submission.view', submission_id=submission.id, class_id=class_.id) }}">{{
+            submission.get_type_display() }}
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="ui info message">
+    Submission Information
+</div>
+{% endblock %}
