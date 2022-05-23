@@ -15,7 +15,7 @@ from bussaya import models
 BaseProjectForm = model_form(
     models.Submission,
     FlaskForm,
-    exclude=["created_date", "updated_date", "owner"],
+    exclude=["created_date", "updated_date", "owner", "class_"],
     field_args={
         "type": {"label": "Type"},
         "remark": {"label": "Remark"},

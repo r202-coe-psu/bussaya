@@ -62,9 +62,11 @@ def edit(class_id):
 def view(class_id):
     class_ = models.Class.objects.get(id=class_id)
     projects = models.Project.objects(class_=class_)
+    submissions = models.Submission.objects(class_=class_)
     return render_template(
         "/admin/classes/view.html",
         class_=class_,
         class_id=class_id,
         projects=projects,
+        submissions=submissions,
     )

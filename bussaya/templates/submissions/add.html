@@ -19,29 +19,17 @@ Add Submission
 <div class="row">
     <div class="ui segment">
         <form method="POST" class="ui form">
+            {{ form.csrf_token }}
             {{ renderer.render_field(form.type) }}
             {{ renderer.render_field(form.remark) }}
             <div class="two fields">
                 <div class="field">
-                    {{ form.started_date.label }}
-                    <div class="ui calendar" id="rangestart">
-                        <div class="ui input left icon">
-                            <i class="calendar icon"></i>
-                            {{ form.started_date(autocomplete='off') }}
-                        </div>
-                    </div>
+                    {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
                 </div>
                 <div class="field">
-                    {{ form.ended_date.label }}
-                    <div class="ui calendar" id="rangeend">
-                        <div class="ui input left icon">
-                            <i class="calendar icon"></i>
-                            {{ form.ended_date(autocomplete='off') }}
-                        </div>
-                    </div>
+                    {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
                 </div>
             </div>
-            {{ form.csrf_token }}
             <button class="ui primary button" type="submit">Add</button>
         </form>
     </div>

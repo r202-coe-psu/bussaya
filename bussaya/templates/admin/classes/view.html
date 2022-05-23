@@ -40,9 +40,41 @@
 	</div>
 
 </div>
+<h2 class="ui header">Submissions</h2>
+<table class="ui selectable celled table unstackable">
+	<thead>
+		<tr>
+			<th>Type</th>
+			<th>Remark</th>
+			<th>Started Date</th>
+			<th>Ended Date</th>
+		</tr>
+	</thead>
+
+	<body>
+		{% for submission in submissions %}
+		<tr>
+			<td>
+				{{ submission.type }}
+			</td>
+			<td>
+				{{ submission.remark}}
+			</td>
+			<td>
+				{{ submission.started_date }}
+			</td>
+			<td>
+				{{ submission.ended_date }}
+			</td>
+		</tr>
+		{% endfor %}
+	</body>
+</table>
+
 <a class="ui primary button" href="{{ url_for('submission.add', class_id=class_.id) }}">
 	Add Submission
 </a>
+<h2 class="ui header">Projects</h2>
 <div class="ui segment">
 	{{ renderer.render_project_table(projects) }}
 </div>

@@ -18,9 +18,10 @@ class Submission(me.Document):
         required=True, default=datetime.datetime.now, auto_now=True
     )
 
-    started_date = me.DateField(required=True, default=datetime.datetime.today)
-    ended_date = me.DateField(required=True, default=datetime.datetime.today)
+    started_date = me.DateTimeField(required=True, default=datetime.datetime.today)
+    ended_date = me.DateTimeField(required=True, default=datetime.datetime.today)
 
+    class_ = me.ReferenceField("Class", dbref=True, required=True)
     owner = me.ReferenceField("User", dbref=True, required=True)
     remark = me.StringField()
 
