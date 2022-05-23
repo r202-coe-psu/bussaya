@@ -48,6 +48,7 @@
 			<th>Remark</th>
 			<th>Started Date</th>
 			<th>Ended Date</th>
+			<th>Edit / Delete</th>
 		</tr>
 	</thead>
 
@@ -68,6 +69,16 @@
 			<td>
 				{{ submission.ended_date }}
 			</td>
+			<td>
+				<a class="ui primary icon button"
+					href="{{ url_for('submission.edit', submission_id=submission.id, class_id=class_.id) }}">
+					<i class="edit icon"></i>
+				</a>
+				<a class="ui red icon button"
+					href="{{ url_for('submission.delete', submission_id=submission.id, class_id=class_.id) }}">
+					<i class="trash icon"></i>
+				</a>
+			</td>
 		</tr>
 		{% endfor %}
 	</body>
@@ -80,4 +91,5 @@
 <div class="ui segment">
 	{{ renderer.render_project_table(projects) }}
 </div>
+
 {% endblock %}

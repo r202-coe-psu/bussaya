@@ -16,7 +16,7 @@ def add(class_id):
     class_ = models.Class.objects.get(id=class_id)
     if not form.validate_on_submit():
         return render_template(
-            "/submissions/add.html",
+            "/submissions/add-edit.html",
             form=form,
             class_=class_,
         )
@@ -42,4 +42,37 @@ def view(submission_id, class_id):
     class_ = models.Class.objects.get(id=class_id)
     return render_template(
         "/submissions/view.html", submission=submission, class_=class_
+    )
+
+
+@module.route("<class_id>/submissions/<submission_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit(submission_id, class_id):
+    class_ = models.Class.objects.get(id=class_id)
+    submission = models.Submission.objects.get(id=submission_id)
+    form = forms.submissions.SubmissionForm(obj=submission)
+    if not form.validate_on_submit():
+        return render_template(
+            "/submissions/add-edit.html",
+            form=form,
+            class_=class_,
+            submission=submission,
+        )
+
+    form.populate_obj(submission)
+    submission.save()
+
+    submissions = models.Submission()
+    return redirect(
+        url_for("admin.classes.view", class_id=class_id, submissions=submissions)
+    )
+
+
+@module.route("/<class_id>/submissions/<submission_id>/delete", methods=["GET", "POST"])
+@login_required
+def delete(submission_id, class_id):
+    submission = models.Submission.objects.get(id=submission_id)
+    submission.delete()
+    return redirect(
+        url_for("admin.classes.view", submission=submission, class_id=class_id)
     )
