@@ -1,1 +1,79 @@
-<div>HEY</div>
+{% extends '/base/default-dashboard.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+{% block dashboard_title %}
+Add Submission
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a class="section" href="{{ url_for('admin.classes.index') }}">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <a class="section" href=" {{ url_for('submission.add', class_id=class_.id) }}">Add Submission</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="ui segment">
+        <form method="POST" class="ui form">
+            {{ renderer.render_field(form.type) }}
+            {{ renderer.render_field(form.remark) }}
+            <div class="two fields">
+                <div class="field">
+                    {{ form.started_date.label }}
+                    <div class="ui calendar" id="rangestart">
+                        <div class="ui input left icon">
+                            <i class="calendar icon"></i>
+                            {{ form.started_date(autocomplete='off') }}
+                            {# <input type="text" placeholder="Start"> #}
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    {{ form.ended_date.label }}
+                    <div class="ui calendar" id="rangeend">
+                        <div class="ui input left icon">
+                            <i class="calendar icon"></i>
+                            {{ form.ended_date(autocomplete='off') }}
+                            {# <input type="text" placeholder="End"> #}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{ form.csrf_token }}
+            <button class="ui primary button" type="submit">Add</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block additional_js %}
+<script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
+<script type="text/javascript">
+    datetime_formatter = {
+        datetime: function (datetime, settings) {
+            if (!datetime) return '';
+            var day = datetime.getDate();
+            var month = datetime.getMonth() + 1;
+            var year = datetime.getFullYear();
+            var hour = datetime.getHours();
+            var minute = datetime.getMinutes();
+            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
+        }
+    };
+    $('#rangestart').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        endCalendar: $('#rangeend')
+    });
+    $('#rangeend').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        startCalendar: $('#rangestart')
+    });
+</script>
+{% endblock %}

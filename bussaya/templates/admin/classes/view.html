@@ -2,6 +2,15 @@
 {% import '/base/error-handler.html' as eh %}
 {% import '/admin/classes/project-renderer.html' as renderer %}
 
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+	<a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+	<div class="divider"> / </div>
+	<a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+</div>
+{% endblock %}
+
+
 {% block content %}
 
 <div class="ui info message">
@@ -31,7 +40,7 @@
 	</div>
 
 </div>
-<a class="ui primary button" href="{{ url_for('submission.add') }}">
+<a class="ui primary button" href="{{ url_for('submission.add', class_id=class_.id) }}">
 	Add Submission
 </a>
 <div class="ui segment">

@@ -6,25 +6,25 @@ import mongoengine as me
 
 import datetime
 
-module = Blueprint("submission", __name__, url_prefix="/submission")
+module = Blueprint("submission", __name__, url_prefix="/")
 
 
-@module.route("/add", methods=["GET", "POST"])
+@module.route("/<class_id>/submission/add", methods=["GET", "POST"])
 @login_required
-def add():
+def add(class_id):
     form = forms.submissions.SubmissionForm()
+    classes = models.Class.objects.get(id=class_id)
     if not form.validate_on_submit():
         return render_template(
             "/submissions/add.html",
             form=form,
+            class_=classes,
         )
 
-    submission = models.Submission(
-        user=current_user._get_current_object(),
-    )
-
+    submission = models.Submission()
     form.populate_obj(submission)
-
+    submission.class_ = models.Class.objects.get(id=class_id)
+    submission.owner = current_user._get_current_object()
     submission.save()
 
-    return redirect(url_for("submission.index"))
+    return redirect(url_for("admin.classes.view", class_id=class_id))

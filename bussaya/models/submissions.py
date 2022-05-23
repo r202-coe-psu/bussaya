@@ -1,3 +1,4 @@
+from email.policy import strict
 from ipaddress import ip_address
 import mongoengine as me
 import datetime
@@ -5,11 +6,13 @@ from pkg_resources import require
 
 from requests import request
 
+SUBMISSION_TYPE = [("report", "Report"), ("presentation", "Presentation")]
+
 
 class Submission(me.Document):
-    meta = {"collection": "submissions"}
+    meta = {"collection": "submissions", "strict": False}
 
-    type = me.StringField()
+    type = me.StringField(choices=SUBMISSION_TYPE)
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
     updated_date = me.DateTimeField(
         required=True, default=datetime.datetime.now, auto_now=True

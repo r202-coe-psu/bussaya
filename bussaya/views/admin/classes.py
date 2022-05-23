@@ -65,5 +65,6 @@ def view(class_id):
     return render_template(
         "/admin/classes/view.html",
         class_=class_,
+        class_id=class_id,
         projects=projects,
     )

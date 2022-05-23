@@ -1,53 +1,57 @@
 {% extends '/base/default-dashboard.html' %}
 
 {% block dashboard_title %}
-  Classes
+Classes
 {% endblock %}
 
 {% block breadcrumbs %}
-<a href="{{ url_for('admin.classes.index') }}" class="breadcrumb">Classes</a>
+<div class="ui breadcrumb">
+	<a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+</div>
 {% endblock %}
 
 {% block content %}
 <div class="row">
-    <h3>Classes</h3>
+	<h3>Classes</h3>
 </div>
 
 <div class="row">
-  <div class="ui labeled icon menu">
-    <a class="item" href="{{ url_for('admin.classes.create') }}">
-      <i class="add icon"></i>
-      Create
-    </a>
-  </div>
+	<div class="ui labeled icon menu">
+		<a class="item" href="{{ url_for('admin.classes.create') }}">
+			<i class="add icon"></i>
+			Create
+		</a>
+	</div>
 </div>
 
 <div class="row">
 
 	{% if classes %}
-	 <table class="ui celled table unstackable">
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Description</th>
-				</tr>
-			</thead>
-			<body>
-{% for class_ in classes %}
-				<tr>
-					<td>
-						<a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-            <a class="ui primary icon button" href="{{ url_for('admin.classes.edit', class_id=class_.id) }}"><i class="edit icon"></i></a>
+	<table class="ui celled table unstackable">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Description</th>
+			</tr>
+		</thead>
 
-					</td>
-					<td>
-						{{ class_.description }}
-					</td>
-				</tr>
-{% endfor %}
-			</body>
-		</table>
-		{% endif %}
+		<body>
+			{% for class_ in classes %}
+			<tr>
+				<td>
+					<a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+					<a class="ui primary icon button" href="{{ url_for('admin.classes.edit', class_id=class_.id) }}"><i
+							class="edit icon"></i></a>
+
+				</td>
+				<td>
+					{{ class_.description }}
+				</td>
+			</tr>
+			{% endfor %}
+		</body>
+	</table>
+	{% endif %}
 
 </div>
 

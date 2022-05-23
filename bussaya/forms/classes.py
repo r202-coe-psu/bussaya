@@ -21,7 +21,7 @@ BaseClassForm = model_form(
     },
 )
 
+
 class ClassForm(BaseClassForm):
     tags = TagListField("Tags")
     student_ids = TextListField("Student IDs")
-   
