@@ -7,7 +7,7 @@
     <div class="divider"> / </div>
     <a class="section" href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
     <div class="divider"> / </div>
-    <div class="active section">Submission:
+    <div class="section">Submission:
         <a href="{{ url_for('submission.view', submission_id=submission.id, class_id=class_.id) }}">{{
             submission.get_type_display() }}
         </a>
@@ -21,4 +21,37 @@
 <div class="ui info message">
     Submission Information
 </div>
-{% endblock %}
+
+<h3 class="ui header">Submission Form: </h3>
+<a href="{{url_for('submission.form', submission_id=submission.id, class_id=class_.id)}}">
+    Form {{submission.get_type_display()}}
+</a>
+
+
+<h4>Submission: {{submission.get_type_display()}}</h4>
+<table class="ui celled table">
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Student Name</th>
+            <th>File</th>
+            <th>Remark</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for student_work in student_works %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ student_work.owner.first_name + " " + student_work.owner.last_name }}</td>
+            <td>{{ student_work.file }}</td>
+            <td>{{ student_work.remark }}</td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
+
+
+
+{% endblock %}>

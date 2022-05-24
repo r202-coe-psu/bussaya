@@ -3,12 +3,12 @@
 
 
 {% block dashboard_title %}
-  Upload Project Resource
+Upload Project Resource
 {% endblock %}
 
 {% block breadcrumbs %}
-  {{ super() }}
-  <a href="{{ url_for('projects.upload', project_id=project.id) }}" class="breadcrumb">Upload</a>
+{{ super() }}
+<a href="{{ url_for('projects.upload', project_id=project.id) }}" class="breadcrumb">Upload</a>
 {% endblock %}
 
 {% block content %}
@@ -32,18 +32,18 @@
 {% endblock content %}
 
 {% block additional_js %}
-    <script type="text/javascript">
-    {%- for field in form if field.type == 'FileField' %}
-      $(".attach-file-{{ field.name }}").click(function() {
-        $(this).parent().find("#{{ field.name }}").click();
-      });
+<script type="text/javascript">
+  {% - for field in form if field.type == 'FileField' %}
+  $(".attach-file-{{ field.name }}").click(function () {
+    $(this).parent().find("#{{ field.name }}").click();
+  });
 
-      $('#{{ field.name }}')
-      .on('change', function(e) {
-        var name = e.target.files[0].name;
-        $('.attach-file-{{ field.name }}', $(e.target).parent()).val(name);
-      });
-    {%- endfor %}
-  </script>
+  $('#{{ field.name }}')
+    .on('change', function (e) {
+      var name = e.target.files[0].name;
+      $('.attach-file-{{ field.name }}', $(e.target).parent()).val(name);
+    });
+  {% - endfor %}
+</script>
 
 {% endblock additional_js %}

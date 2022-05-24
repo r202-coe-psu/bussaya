@@ -37,8 +37,8 @@ class StudentWork(me.Document):
 
     ip_address = me.StringField(required=True)
 
-    submission = me.ReferenceField("Submission")
-    class_ = me.ReferenceField("Class")
+    submission = me.ReferenceField("Submission", dbref=True, required=True)
+    class_ = me.ReferenceField("Class", dbref=True, required=True)
     project = me.ReferenceField("Projects")
 
     started_date = me.DateTimeField(required=True, default=datetime.datetime.now)

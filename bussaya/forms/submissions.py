@@ -15,7 +15,15 @@ from bussaya import models
 BaseProjectForm = model_form(
     models.Submission,
     FlaskForm,
-    exclude=["created_date", "updated_date", "owner", "class_"],
+    exclude=[
+        "created_date",
+        "updated_date",
+        "owner",
+        "class_",
+        "ip_address",
+        "started_date",
+        "ended_date",
+    ],
     field_args={
         "type": {"label": "Type"},
         "remark": {"label": "Remark"},
@@ -33,4 +41,6 @@ class SubmissionForm(BaseProjectForm):
 
 
 class StudentWorkForm(BaseProjectForm):
-    file = fields.FileField(validators=[FileAllowed(["pdf"], "PDF only")])
+    file = fields.FileField(
+        "Upload File: pdf only", validators=[FileAllowed(["pdf"], "PDF only")]
+    )

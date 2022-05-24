@@ -1,0 +1,41 @@
+{% extends '/base/default-dashboard.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+
+{% block dashboard_title %}
+Submission Form
+{% endblock %}
+
+{% block breadcrumbs %}
+Form
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="ui segment">
+        <form method="POST" enctype="multipart/form-data" class="ui form">
+            {{ form.csrf_token }}
+            {{ renderer.render_field(form.remark) }}
+            {{ renderer.render_fileinput(form.file) }}
+            <button name="create" type="submit" class="ui button primary">Upload</button>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block additional_js %}
+<script type="text/javascript">
+    $(".attach-file-{{ form.file.name }}").click(function () {
+        $("#{{ form.file.name }}").click();
+    });
+
+    $('#{{ form.file.name }}')
+        .on('change', function (e) {
+            var name = e.target.files[0].name;
+            $('.attach-file-{{ form.file.name }}', $(e.target).parent()).val(name);
+        });
+</script>
+
+{% endblock additional_js %}
