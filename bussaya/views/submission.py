@@ -44,7 +44,6 @@ def view(submission_id, class_id):
     student_works = models.StudentWork.objects.all().filter(
         class_=class_, submission=submission
     )
-    print(student_works)
 
     return render_template(
         "/submissions/view.html",
@@ -110,8 +109,51 @@ def form(submission_id, class_id):
     student_submission.submission = models.Submission.objects.get(id=submission_id)
 
     form.populate_obj(student_submission)
+
+    if form.file.data:
+        if student_submission.file:
+            student_submission.file.replace(
+                form.file.data,
+                filename=form.file.data.filename,
+                content_type=form.file.data.content_type,
+            )
+        else:
+            student_submission.file.put(
+                form.file.data,
+                filename=form.file.data.filename,
+                content_type=form.file.data.content_type,
+            )
+
     student_submission.save()
 
     return redirect(
         url_for("admin.classes.view", submission=submission, class_id=class_id)
     )
+
+
+@module.route(
+    "/<student_work_id>/<filename>",
+)
+@login_required
+def file(student_work_id, filename):
+
+    student_work = models.StudentWork.objects.get(id=student_work_id)
+
+    if (
+        not student_work
+        or not student_work.file
+        or student_work.file.filename != filename
+    ):
+        return abort(403)
+
+    print(student_work.file)
+
+    response = send_file(
+        student_work.file,
+        attachment_filename=student_work.file.filename,
+        mimetype=student_work.file.content_type,
+    )
+
+    print(response)
+
+    return response

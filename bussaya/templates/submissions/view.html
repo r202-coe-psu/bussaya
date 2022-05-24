@@ -44,7 +44,11 @@
         <tr>
             <td>{{ loop.index }}</td>
             <td>{{ student_work.owner.first_name + " " + student_work.owner.last_name }}</td>
-            <td>{{ student_work.file }}</td>
+            <td><a
+                    href="{{ url_for('submission.file', student_work_id=student_work.id, filename=student_work.file.filename) }}">
+                    {{student_work.file.filename}}
+                </a>
+            </td>
             <td>{{ student_work.remark }}</td>
         </tr>
         {% endfor %}
