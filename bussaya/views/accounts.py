@@ -2,15 +2,17 @@ import datetime
 import markdown
 import mongoengine as me
 
-from flask import (Blueprint,
-                   render_template,
-                   url_for,
-                   redirect,
-                   request,
-                   session,
-                   current_app,
-                   send_file,
-                   abort)
+from flask import (
+    Blueprint,
+    render_template,
+    url_for,
+    redirect,
+    request,
+    session,
+    current_app,
+    send_file,
+    abort,
+)
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_principal import Identity, identity_changed
 
@@ -18,28 +20,29 @@ from .. import models
 from .. import oauth2
 from .. import forms
 
-module = Blueprint('accounts', __name__)
+module = Blueprint("accounts", __name__)
 
 
 def get_user_and_remember():
     client = oauth2.oauth2_client
-    result = client.principal.get('me')
+    result = client.principal.get("me")
     data = result.json()
 
     user = models.User.objects(
-            me.Q(username=data.get('username', '')) |
-            me.Q(email=data.get('email', ''))
-        ).first()
+        me.Q(username=data.get("username", "")) | me.Q(email=data.get("email", ""))
+    ).first()
     if not user:
-        user = models.User(id=data.get('id'),
-                           first_name=data.get('first_name').title(),
-                           last_name=data.get('last_name').title(),
-                           email=data.get('email'),
-                           username=data.get('username'),
-                           status='active')
+        user = models.User(
+            id=data.get("id"),
+            first_name=data.get("first_name").title(),
+            last_name=data.get("last_name").title(),
+            email=data.get("email"),
+            username=data.get("username"),
+            status="active",
+        )
         roles = []
-        for role in ['student', 'lecturer', 'staff']:
-            if role in data.get('roles', []):
+        for role in ["student", "lecturer", "staff"]:
+            if role in data.get("roles", []):
                 roles.append(role)
 
         user.save()
@@ -48,37 +51,35 @@ def get_user_and_remember():
         login_user(user, remember=True)
 
 
-@module.route('/login', methods=('GET', 'POST'))
+@module.route("/login", methods=("GET", "POST"))
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard.index'))
+        return redirect(url_for("dashboard.index"))
 
-    if 'next' in request.args:
-        session['next'] = request.args.get('next', None)
+    if "next" in request.args:
+        session["next"] = request.args.get("next", None)
 
-    return render_template('/accounts/login.html')
+    return render_template("/accounts/login.html")
 
 
-@module.route('/login-principal')
+@module.route("/login-principal")
 def login_principal():
     client = oauth2.oauth2_client
-    redirect_uri = url_for('accounts.authorized_principal',
-                           _external=True)
+    redirect_uri = url_for("accounts.authorized_principal", _external=True)
     response = client.principal.authorize_redirect(redirect_uri)
 
     return response
 
 
-@module.route('/login-engpsu')
+@module.route("/login-engpsu")
 def login_engpsu():
     client = oauth2.oauth2_client
-    redirect_uri = url_for('accounts.authorized_engpsu',
-                           _external=True)
+    redirect_uri = url_for("accounts.authorized_engpsu", _external=True)
     response = client.engpsu.authorize_redirect(redirect_uri)
     return response
 
 
-@module.route('/authorized-principal')
+@module.route("/authorized-principal")
 def authorized_principal():
     client = oauth2.oauth2_client
 
@@ -86,65 +87,69 @@ def authorized_principal():
         token = client.principal.authorize_access_token()
     except Exception as e:
         print(e)
-        return redirect(url_for('accounts.login'))
+        return redirect(url_for("accounts.login"))
 
     get_user_and_remember()
     oauth2token = models.OAuth2Token(
-            name=client.principal.name,
-            user=current_user._get_current_object(),
-            access_token=token.get('access_token'),
-            token_type=token.get('token_type'),
-            refresh_token=token.get('refresh_token', None),
-            expires=datetime.datetime.utcfromtimestamp(
-                token.get('expires_at'))
-            )
+        name=client.principal.name,
+        user=current_user._get_current_object(),
+        access_token=token.get("access_token"),
+        token_type=token.get("token_type"),
+        refresh_token=token.get("refresh_token", None),
+        expires=datetime.datetime.utcfromtimestamp(token.get("expires_at")),
+    )
     oauth2token.save()
 
-    return redirect(url_for('dashboard.index'))
+    return redirect(url_for("dashboard.index"))
 
 
-@module.route('/authorized-engpsu')
+@module.route("/authorized-engpsu")
 def authorized_engpsu():
     client = oauth2.oauth2_client
     try:
         token = client.engpsu.authorize_access_token()
     except Exception as e:
         print(e)
-        return redirect(url_for('accounts.login'))
+        return redirect(url_for("accounts.login"))
 
-    userinfo_response = client.engpsu.get('userinfo')
+    userinfo_response = client.engpsu.get("userinfo")
     userinfo = userinfo_response.json()
 
     user = models.User.objects(
-            me.Q(username=userinfo.get('username', '')) |
-            me.Q(email=userinfo.get('email', ''))
-        ).first()
+        me.Q(username=userinfo.get("username", ""))
+        | me.Q(email=userinfo.get("email", ""))
+    ).first()
 
     if not user:
         user = models.User(
-                username=userinfo.get('username'),
-                email=userinfo.get('email'),
-                first_name=userinfo.get('first_name').title(),
-                last_name=userinfo.get('last_name').title(),
-                status='active')
+            username=userinfo.get("username"),
+            email=userinfo.get("email"),
+            first_name=userinfo.get("first_name").title(),
+            last_name=userinfo.get("last_name").title(),
+            status="active",
+        )
         user.resources[client.engpsu.name] = userinfo
         # if 'staff_id' in userinfo.keys():
         #     user.roles.append('staff')
         # elif 'student_id' in userinfo.keys():
         #     user.roles.append('student')
-        if userinfo['username'].isdigit():
-            user.roles.append('student')
-        elif 'COE_LECTURERS' in current_app.config \
-                and userinfo['username'] in current_app.config['COE_LECTURERS']:
-            user.roles.append('lecturer')
-            user.roles.append('CoE-lecturer')
-        elif 'COE_STAFFS' in current_app.config \
-                and userinfo['username'] in current_app.config['COE_STAFFS']:
-            user.roles.append('staff')
-            user.roles.append('CoE-staff')
-    
+        if userinfo["username"].isdigit():
+            user.roles.append("student")
+        elif (
+            "COE_LECTURERS" in current_app.config
+            and userinfo["username"] in current_app.config["COE_LECTURERS"]
+        ):
+            user.roles.append("lecturer")
+            user.roles.append("CoE-lecturer")
+        elif (
+            "COE_STAFFS" in current_app.config
+            and userinfo["username"] in current_app.config["COE_STAFFS"]
+        ):
+            user.roles.append("staff")
+            user.roles.append("CoE-staff")
+
         else:
-            user.roles.append('staff')
+            user.roles.append("staff")
 
         # if userinfo['username'].isdigit():
         #     project = models.Project.objects(
@@ -161,88 +166,89 @@ def authorized_engpsu():
 
     login_user(user)
     identity_changed.send(
-            current_app._get_current_object(),
-            identity=Identity(str(user.id)))
+        current_app._get_current_object(), identity=Identity(str(user.id))
+    )
 
     oauth2token = models.OAuth2Token(
-            name=client.engpsu.name,
-            user=user,
-            access_token=token.get('access_token'),
-            token_type=token.get('token_type'),
-            refresh_token=token.get('refresh_token', None),
-            expires=datetime.datetime.utcfromtimestamp(
-                token.get('expires_in'))
-            )
+        name=client.engpsu.name,
+        user=user,
+        access_token=token.get("access_token"),
+        token_type=token.get("token_type"),
+        refresh_token=token.get("refresh_token", None),
+        expires=datetime.datetime.utcfromtimestamp(token.get("expires_in")),
+    )
     oauth2token.save()
 
-    next_uri = session.get('next', None)
+    next_uri = session.get("next", None)
     if next_uri:
-        session.pop('next')
+        session.pop("next")
         return redirect(next_uri)
 
-    return redirect(url_for('dashboard.index'))
+    return redirect(url_for("dashboard.index"))
 
 
-@module.route('/logout')
+@module.route("/logout")
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('site.index'))
+    return redirect(url_for("site.index"))
 
 
-@module.route('/accounts/<user_id>')
+@module.route("/accounts/<user_id>")
 def profile(user_id):
     user = models.User.objects.get(id=user_id)
 
-    biography = ''
+    biography = ""
     if user.biography:
         biography = markdown.markdown(user.biography)
-    return render_template('/accounts/index.html',
-                           user=user,
-                           biography=biography)
+    return render_template("/accounts/index.html", user=user, biography=biography)
 
 
-@module.route('/accounts')
+@module.route("/accounts")
 @login_required
 def index():
 
-    biography = ''
+    biography = ""
     if current_user.biography:
         biography = markdown.markdown(current_user.biography)
-    return render_template('/accounts/index.html',
-                           user=current_user,
-                           biography=biography)
+    return render_template(
+        "/accounts/index.html", user=current_user, biography=biography
+    )
 
 
-@module.route('/accounts/edit-profile', methods=['GET', 'POST'])
+@module.route("/accounts/edit-profile", methods=["GET", "POST"])
 @login_required
 def edit_profile():
     form = forms.accounts.ProfileForm(
-            obj=current_user,
-            )
+        obj=current_user,
+    )
     if not form.validate_on_submit():
-        return render_template('/accounts/edit-profile.html', form=form)
+        return render_template("/accounts/edit-profile.html", form=form)
 
     user = current_user._get_current_object()
     form.populate_obj(user)
 
     if form.pic.data:
         if user.picture:
-            user.picture.replace(form.pic.data,
-                                 filename=form.pic.data.filename,
-                                 content_type=form.pic.data.content_type)
+            user.picture.replace(
+                form.pic.data,
+                filename=form.pic.data.filename,
+                content_type=form.pic.data.content_type,
+            )
         else:
-            user.picture.put(form.pic.data,
-                             filename=form.pic.data.filename,
-                             content_type=form.pic.data.content_type)
+            user.picture.put(
+                form.pic.data,
+                filename=form.pic.data.filename,
+                content_type=form.pic.data.content_type,
+            )
 
     user.updated_date = datetime.datetime.now()
     user.save()
 
-    return redirect(url_for('accounts.index'))
+    return redirect(url_for("accounts.index"))
 
 
-@module.route('/accounts/<user_id>/picture/<filename>', methods=['GET', 'POST'])
+@module.route("/accounts/<user_id>/picture/<filename>", methods=["GET", "POST"])
 def picture(user_id, filename):
     user = models.User.objects.get(id=user_id)
 
@@ -250,8 +256,48 @@ def picture(user_id, filename):
         return abort(403)
 
     response = send_file(
-            user.picture,
-            attachment_filename=user.picture.filename,
-            mimetype=user.picture.content_type
-            )
+        user.picture,
+        attachment_filename=user.picture.filename,
+        mimetype=user.picture.content_type,
+    )
     return response
+
+
+@module.route("/add_student")
+def add_student():
+    user = current_user._get_current_object()
+    if "not student" in user.roles:
+        user.roles[user.roles.index("not student")] = "student"
+
+    user.save()
+    return redirect(url_for("accounts.index"))
+
+
+@module.route("/remove_student")
+def remove_student():
+    user = models.User.objects.get(id=current_user._get_current_object().id)
+    if "student" in user.roles:
+        user.roles[user.roles.index("student")] = "not student"
+
+    user.save()
+    return redirect(url_for("accounts.index"))
+
+
+@module.route("/add_admin")
+def add_admin():
+    user = current_user._get_current_object()
+    if "not admin" in user.roles:
+        user.roles[user.roles.index("not admin")] = "admin"
+
+    user.save()
+    return redirect(url_for("accounts.index"))
+
+
+@module.route("/remove_admin")
+def remove_admin():
+    user = current_user._get_current_object()
+    if "admin" in user.roles:
+        user.roles[user.roles.index("admin")] = "not admin"
+
+    user.save()
+    return redirect(url_for("accounts.index"))

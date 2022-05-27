@@ -28,4 +28,3 @@ class Class(me.Document):
     ended_date = me.DateField(required=True, default=datetime.datetime.today)
 
     owner = me.ReferenceField("User", dbref=True, required=True)
-

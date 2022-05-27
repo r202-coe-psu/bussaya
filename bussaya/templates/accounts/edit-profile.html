@@ -3,7 +3,7 @@
 {% import '/base/html-renderer.html' as renderer %}
 
 {% block title %}
-  {{ current_user.title }} {{ current_user.first_name }} {{ current_user.last_name }}
+{{ current_user.title }} {{ current_user.first_name }} {{ current_user.last_name }}
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -46,16 +46,16 @@
 {% endblock content %}
 
 {% block additional_js %}
-    <script type="text/javascript">
-      $(".attach-file-pic").click(function() {
-        $(this).parent().find("#pic").click();
-      });
+<script type="text/javascript">
+  $(".attach-file-pic").click(function () {
+    $(this).parent().find("#pic").click();
+  });
 
-      $('#pic')
-      .on('change', function(e) {
-        var name = e.target.files[0].name;
-        $('.attach-file-pic', $(e.target).parent()).val(name);
-      });
-    </script>
+  $('#pic')
+    .on('change', function (e) {
+      var name = e.target.files[0].name;
+      $('.attach-file-pic', $(e.target).parent()).val(name);
+    });
+</script>
 
 {% endblock additional_js %}
