@@ -48,7 +48,9 @@ def edit(class_id):
         form = forms.classes.ClassForm(obj=class_)
 
     if not form.validate_on_submit():
-        return render_template("/admin/classes/create-edit.html", form=form)
+        return render_template(
+            "/admin/classes/create-edit.html", form=form, class_=class_
+        )
 
     form.populate_obj(class_)
     class_.owner = current_user._get_current_object()

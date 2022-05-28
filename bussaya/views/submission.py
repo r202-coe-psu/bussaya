@@ -79,6 +79,7 @@ def edit(submission_id, class_id):
 @module.route("/<class_id>/submissions/<submission_id>/delete", methods=["GET", "POST"])
 @login_required
 def delete(submission_id, class_id):
+    print(submission_id)
     submission = models.Submission.objects.get(id=submission_id)
     submission.delete()
     return redirect(

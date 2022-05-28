@@ -3,18 +3,26 @@
 
 
 {% block dashboard_title %}
-  Create classes
+{{ 'Create' if 'create' in request.path else 'Edit' }} Classes
 {% endblock %}
 
 {% block breadcrumbs %}
-<a href="{{ url_for('admin.classes.index') }}" class="breadcrumb">Classes</a>
+{% if class_ %}
+<div class="ui breadcrumb">
+  <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+  <div class="divider"> / </div>
+  <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+  <div class="divider"> / </div>
+  <b>Edit</b>
+</div>
+{% else %}
+<div class="ui breadcrumb">
+  <b>Create Classes</b>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <h3>Create Classes</h3>
-</div>
-
 <div class="row">
   <div class="ui segment">
     <form method="POST" class="ui form">
@@ -26,10 +34,12 @@
       {{ renderer.render_field(form.tags) }}
       {{ renderer.render_field(form.type) }}
       <div class="fields">
-      {{ renderer.render_field(form.started_date) }}
-      {{ renderer.render_field(form.ended_date) }}
+        {{ renderer.render_field(form.started_date) }}
+        {{ renderer.render_field(form.ended_date) }}
       </div>
-      <button name="create" type="submit" class="ui button primary">{{ 'Create' if 'create' in request.path else 'Edit' }}</button>
+      <button name="create" type="submit" class="ui button primary">
+        {{ 'Create' if 'create' in request.path else 'Edit'}}
+      </button>
     </form>
   </div>
 </div>

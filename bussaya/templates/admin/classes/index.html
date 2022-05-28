@@ -32,7 +32,6 @@ Classes
 			<tr>
 				<th>Name</th>
 				<th>Description</th>
-				<th>Edit/Delete</th>
 			</tr>
 		</thead>
 
@@ -44,12 +43,6 @@ Classes
 				</td>
 				<td>
 					{{ class_.description }}
-				</td>
-				<td>
-					<a class="ui primary icon button" href="{{ url_for('admin.classes.edit', class_id=class_.id) }}"><i
-							class="edit icon"></i></a>
-					<a class="ui red icon button" href="{{ url_for('admin.classes.delete', class_id=class_.id) }}"><i
-							class="trash icon"></i></a>
 				</td>
 			</tr>
 			{% endfor %}

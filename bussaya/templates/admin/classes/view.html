@@ -14,66 +14,109 @@
 {% block content %}
 
 <div class="ui segment">
-	<div class="ui header">{{ class_.name }}</div>
-	<div>Description: {{ class_.description }}</div>
-	<div>Code: {{ class_.code }}</div>
-	<div>Started Date: {{ class_.started_date }}</div>
-	<div>Ended Date: {{ class_.ended_date }}</div>
-	<div>Student IDs: {{ class_.student_ids | join(', ') }}</div>
-	<div>Tag: {{ class_.tags | join(', ') }}</div>
-	<div>Type: {{ class_.get_type_display() }}</div>
+	<h2 class="ui header">{{ class_.name }}</h2>
+	<div><b>Owner: </b>{{ class_.owner.first_name }} {{ class_.owner.last_name }}</div>
+	<div><b>Code:</b> {{ class_.code }}</div>
+	<div><b>Description:</b> {{ class_.description }}</div>
+	<div><b>Student IDs:</b> {{ class_.student_ids | join(', ') }}</div>
+	<div><b>Tag:</b> {{ class_.tags | join(', ') }}</div>
+	<div><b>Type:</b> {{ class_.get_type_display() }}</div>
+	<div><b>Started Date:</b> {{ class_.started_date }}</div>
+	<div><b>Ended Date:</b> {{ class_.ended_date }}</div>
+	<a class="ui very small primary icon button" style="margin-top:0.5em"
+		href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">
+		<i class="edit icon"></i> Edit
+	</a>
+	<button class="ui very small negative icon button" onclick="showDelete()">
+		<i class="trash icon"></i> Delete Class
+	</button>
 </div>
 
-<h2 class="ui header">Submissions</h2>
-<table class="ui selectable celled table unstackable">
-	<thead>
-		<tr>
-			<th>Type</th>
-			<th>Remark</th>
-			<th>Started Date</th>
-			<th>Ended Date</th>
-			<th>Edit / Delete</th>
-		</tr>
-	</thead>
 
-	<body>
-		{% for submission in submissions %}
-		<tr>
-			<td>
-				<a href="{{ url_for('submissions.view', submission_id=submission.id, class_id=class_.id)}}">
-					{{ submission.get_type_display() }}
-				</a>
-			</td>
-			<td>
-				{{ submission.remark}}
-			</td>
-			<td>
-				{{ submission.started_date }}
-			</td>
-			<td>
-				{{ submission.ended_date }}
-			</td>
-			<td>
-				<a class="ui primary icon button"
-					href="{{ url_for('submissions.edit', submission_id=submission.id, class_id=class_.id) }}">
-					<i class="edit icon"></i>
-				</a>
-				<a class="ui red icon button"
-					href="{{ url_for('submissions.delete', submission_id=submission.id, class_id=class_.id) }}">
-					<i class="trash icon"></i>
-				</a>
-			</td>
-		</tr>
-		{% endfor %}
-	</body>
-</table>
-
-<a class="ui primary button" href="{{ url_for('submissions.add', class_id=class_.id) }}">
-	Add Submission
-</a>
-<h2 class="ui header">Projects</h2>
 <div class="ui segment">
+	<h2 class="ui header">Submissions</h2>
+	<table class="ui selectable celled table unstackable">
+		<thead>
+			<tr>
+				<th>Type</th>
+				<th>Remark</th>
+				<th>Started Date</th>
+				<th>Ended Date</th>
+				<th>Edit / Delete</th>
+			</tr>
+		</thead>
+
+		<body>
+			{% for submission in submissions %}
+			<tr>
+				<td>
+					<a href="{{ url_for('submissions.view', submission_id=submission.id, class_id=class_.id)}}">
+						{{ submission.get_type_display() }}
+					</a>
+				</td>
+				<td>
+					{{ submission.remark}}
+				</td>
+				<td>
+					{{ submission.started_date }}
+				</td>
+				<td>
+					{{ submission.ended_date }}
+				</td>
+				<td>
+					<a class="ui primary icon button"
+						href="{{ url_for('submissions.edit', submission_id=submission.id, class_id=class_.id) }}">
+						<i class="edit icon"></i>
+					</a>
+					<a class="ui red icon button"
+						href="{{ url_for('submissions.delete', submission_id=submission.id, class_id=class_.id) }}">
+						<i class="trash icon"></i>
+					</a>
+				</td>
+			</tr>
+			{% endfor %}
+		</body>
+	</table>
+
+	<a class="ui primary button" href="{{ url_for('submissions.add', class_id=class_.id) }}">
+		Add Submission
+	</a>
+</div>
+
+<div class="ui segment">
+	<h2 class="ui header">Projects</h2>
 	{{ renderer.render_project_table(projects) }}
 </div>
 
+<div class="ui modal delete class">
+	<i class="close icon"></i>
+	<div class="header">
+		Delete {{class_.name}} class
+	</div>
+	<div class="image content">
+		<div class="description">
+			<div class="ui small header">Are you sure you want to delete {{class_.name}} class?</div>
+		</div>
+	</div>
+	<div class="actions">
+		<div class="ui black deny button">
+			No
+		</div>
+		<a class="ui very small red icon button" style="margin-top:0.5em"
+			href="{{ url_for('admin.classes.delete', class_id=class_.id) }}">
+			<i class="trash icon"></i> Delete Class
+		</a>
+	</div>
+</div>
+
 {% endblock %}
+
+{% block additional_js %}
+<script>
+	function showDelete() {
+		$('.ui.modal.delete.class')
+			.modal('show')
+			;
+	}
+</script>
+{% endblock additional_js %}
