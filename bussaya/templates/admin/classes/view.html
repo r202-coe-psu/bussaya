@@ -56,7 +56,7 @@
 		{% for submission in submissions %}
 		<tr>
 			<td>
-				<a href="{{ url_for('submission.view', submission_id=submission.id, class_id=class_.id)}}">
+				<a href="{{ url_for('submissions.view', submission_id=submission.id, class_id=class_.id)}}">
 					{{ submission.get_type_display() }}
 				</a>
 			</td>
@@ -71,11 +71,11 @@
 			</td>
 			<td>
 				<a class="ui primary icon button"
-					href="{{ url_for('submission.edit', submission_id=submission.id, class_id=class_.id) }}">
+					href="{{ url_for('submissions.edit', submission_id=submission.id, class_id=class_.id) }}">
 					<i class="edit icon"></i>
 				</a>
 				<a class="ui red icon button"
-					href="{{ url_for('submission.delete', submission_id=submission.id, class_id=class_.id) }}">
+					href="{{ url_for('submissions.delete', submission_id=submission.id, class_id=class_.id) }}">
 					<i class="trash icon"></i>
 				</a>
 			</td>
@@ -84,7 +84,7 @@
 	</body>
 </table>
 
-<a class="ui primary button" href="{{ url_for('submission.add', class_id=class_.id) }}">
+<a class="ui primary button" href="{{ url_for('submissions.add', class_id=class_.id) }}">
 	Add Submission
 </a>
 <h2 class="ui header">Projects</h2>

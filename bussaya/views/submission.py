@@ -7,7 +7,7 @@ import mongoengine as me
 import datetime
 import socket
 
-module = Blueprint("submission", __name__, url_prefix="/")
+module = Blueprint("submissions", __name__, url_prefix="/submissions")
 
 
 @module.route("/<class_id>/submissions/add", methods=["GET", "POST"])
@@ -34,7 +34,7 @@ def add(class_id):
 
 
 @module.route(
-    "/admin/classes/<class_id>/submissions/<submission_id>", methods=["GET", "POST"]
+    "/classes/<class_id>/submissions/<submission_id>", methods=["GET", "POST"]
 )
 @login_required
 def view(submission_id, class_id):
@@ -91,13 +91,13 @@ def delete(submission_id, class_id):
     methods=["GET", "POST"],
 )
 @login_required
-def form(submission_id, class_id):
+def upload(submission_id, class_id):
     form = forms.submissions.StudentWorkForm()
     submission = models.Submission.objects.get(id=submission_id)
 
     if not form.validate_on_submit():
         return render_template(
-            "/submissions/form.html", form=form, submission=submission
+            "/submissions/upload.html", form=form, submission=submission
         )
 
     student_submission = models.StudentWork()
@@ -110,18 +110,18 @@ def form(submission_id, class_id):
 
     form.populate_obj(student_submission)
 
-    if form.file.data:
+    if form.uploaded_file.data:
         if student_submission.file:
             student_submission.file.replace(
-                form.file.data,
-                filename=form.file.data.filename,
-                content_type=form.file.data.content_type,
+                form.uploaded_file.data,
+                filename=form.uploaded_file.data.filename,
+                content_type=form.uploaded_file.data.content_type,
             )
         else:
             student_submission.file.put(
-                form.file.data,
-                filename=form.file.data.filename,
-                content_type=form.file.data.content_type,
+                form.uploaded_file.data,
+                filename=form.uploaded_file.data.filename,
+                content_type=form.uploaded_file.data.content_type,
             )
 
     student_submission.save()
@@ -135,7 +135,7 @@ def form(submission_id, class_id):
     "/<student_work_id>/<filename>",
 )
 @login_required
-def file(student_work_id, filename):
+def download(student_work_id, filename):
 
     student_work = models.StudentWork.objects.get(id=student_work_id)
 
@@ -146,14 +146,10 @@ def file(student_work_id, filename):
     ):
         return abort(403)
 
-    print(student_work.file)
-
     response = send_file(
         student_work.file,
         attachment_filename=student_work.file.filename,
         mimetype=student_work.file.content_type,
     )
-
-    print(response)
 
     return response

@@ -11,7 +11,7 @@ Add Submission
     <div class="divider"> / </div>
     <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
     <div class="divider"> / </div>
-    <a class="section" href=" {{ url_for('submission.add', class_id=class_.id) }}">Add Submission</a>
+    <a class="section" href=" {{ url_for('submissions.add', class_id=class_.id) }}">Add Submission</a>
 </div>
 {% endblock %}
 

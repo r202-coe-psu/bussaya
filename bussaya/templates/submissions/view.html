@@ -8,7 +8,7 @@
     <a class="section" href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
     <div class="divider"> / </div>
     <div class="section">Submission:
-        <a href="{{ url_for('submission.view', submission_id=submission.id, class_id=class_.id) }}">{{
+        <a href="{{ url_for('submissions.view', submission_id=submission.id, class_id=class_.id) }}">{{
             submission.get_type_display() }}
         </a>
     </div>
@@ -23,7 +23,7 @@
 </div>
 
 <h3 class="ui header">Submission Form: </h3>
-<a href="{{url_for('submission.form', submission_id=submission.id, class_id=class_.id)}}">
+<a href="{{url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
     Form {{submission.get_type_display()}}
 </a>
 
@@ -45,7 +45,7 @@
             <td>{{ loop.index }}</td>
             <td>{{ student_work.owner.first_name + " " + student_work.owner.last_name }}</td>
             <td><a
-                    href="{{ url_for('submission.file', student_work_id=student_work.id, filename=student_work.file.filename) }}">
+                    href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}">
                     {{student_work.file.filename}}
                 </a>
             </td>

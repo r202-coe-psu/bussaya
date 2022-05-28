@@ -17,7 +17,7 @@ Form
         <form method="POST" enctype="multipart/form-data" class="ui form">
             {{ form.csrf_token }}
             {{ renderer.render_field(form.remark) }}
-            {{ renderer.render_fileinput(form.file) }}
+            {{ renderer.render_fileinput(form.uploaded_file) }}
             <button name="create" type="submit" class="ui button primary">Upload</button>
         </form>
     </div>
@@ -27,14 +27,14 @@ Form
 
 {% block additional_js %}
 <script type="text/javascript">
-    $(".attach-file-{{ form.file.name }}").click(function () {
-        $("#{{ form.file.name }}").click();
+    $(".attach-file-{{ form.uploaded_file.name }}").click(function () {
+        $("#{{ form.uploaded_file.name }}").click();
     });
 
-    $('#{{ form.file.name }}')
+    $('#{{ form.uploaded_file.name }}')
         .on('change', function (e) {
             var name = e.target.files[0].name;
-            $('.attach-file-{{ form.file.name }}', $(e.target).parent()).val(name);
+            $('.attach-file-{{ form.uploaded_file.name }}', $(e.target).parent()).val(name);
         });
 </script>
 

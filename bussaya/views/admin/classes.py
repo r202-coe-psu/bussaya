@@ -70,3 +70,12 @@ def view(class_id):
         projects=projects,
         submissions=submissions,
     )
+
+
+@module.route("/<class_id>/delete")
+@acl.roles_required("admin")
+def delete(class_id):
+    class_ = models.Class.objects.get(id=class_id)
+    class_.delete()
+
+    return redirect(url_for("admin.classes.index", class_id=class_id))

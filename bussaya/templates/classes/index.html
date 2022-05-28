@@ -1,43 +1,54 @@
 {% extends '/base/default-dashboard.html' %}
 
+{% block dashboard_title %}
+Classes
+{% endblock %}
+
 {% block breadcrumbs %}
-<a href="{{ url_for('classes.index') }}" class="breadcrumb">Classes</a>
+<div class="ui breadcrumb">
+	<a href="{{ url_for('classes.index') }}" class="section">Classes</a>
+</div>
 {% endblock %}
 
 {% block content %}
 <div class="row">
-  <div class="col s12">
-    <h3>Classes</h3>
-  </div>
-</div>
-
-<div class="row">
 	<div class="col s12">
-
-	{% if enrollments %}
-	 <table>
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Description</th>
-				</tr>
-			</thead>
-			<body>
-{% for enrollment in enrollments %}
-				<tr>
-					<td>
-						<a href="{{ url_for('classes.view', class_id=enrollment.enrolled_class.id) }}">{{ enrollment.enrolled_class.name }}</a>
-					</td>
-					<td>
-						{{ enrollment.enrolled_class.description }}
-					</td>
-				</tr>
-{% endfor %}
-			</body>
-		</table>
-		{% endif %}
-
-  </div>
+		<h3>Opened Classes</h3>
+	</div>
 </div>
+
+
+{% if available_class %}
+<table class="ui celled table">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Description</th>
+			<th>Type</th>
+			<th>Ended Date</th>
+		</tr>
+	</thead>
+
+	<body>
+		{% for class_ in available_class%}
+		<tr>
+			<td>
+				<a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+			</td>
+			<td>
+				{{ class_.description }}
+			</td>
+			<td>
+				{{ class_.get_type_display() }}
+			</td>
+			<td>
+				{{ class_.ended_date }}
+			</td>
+		</tr>
+		{% endfor %}
+	</body>
+</table>
+{% endif %}
+
 
 {% endblock %}
