@@ -23,8 +23,8 @@ Submission Form
     <div class="ui segment">
         <form method="POST" enctype="multipart/form-data" class="ui form">
             {{ form.csrf_token }}
-            {{ renderer.render_field(form.remark) }}
             {{ renderer.render_fileinput(form.uploaded_file) }}
+            {{ renderer.render_field(form.remark) }}
             <button name="create" type="submit" class="ui button primary">Upload</button>
         </form>
     </div>

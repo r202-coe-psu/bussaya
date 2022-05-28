@@ -50,6 +50,8 @@
 		<tr>
 			<th>Type</th>
 			<th>Remark</th>
+			<th>Status</th>
+			<th>Submit</th>
 			<th>Started Date</th>
 			<th>Ended Date</th>
 		</tr>
@@ -59,12 +61,18 @@
 		{% for submission in submissions %}
 		<tr>
 			<td>
-				<a href="{{ url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
-					{{ submission.get_type_display() }}
-				</a>
+				{{ submission.get_type_display() }}
 			</td>
 			<td>
 				{{ submission.remark}}
+			</td>
+			<td>
+				<a href="{{ url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
+					Open
+				</a>
+			</td>
+			<td>
+				Yes
 			</td>
 			<td>
 				{{ submission.started_date }}
@@ -72,8 +80,8 @@
 			<td>
 				{{ submission.ended_date }}
 			</td>
-		</tr>
-		{% endfor %}
+			</div </tr>
+			{% endfor %}
 	</body>
 </table>
 {% else %}

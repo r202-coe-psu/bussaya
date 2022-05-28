@@ -42,5 +42,5 @@ class SubmissionForm(BaseProjectForm):
 
 class StudentWorkForm(BaseProjectForm):
     uploaded_file = fields.FileField(
-        "Upload File: pdf only", validators=[FileAllowed(["pdf"], "PDF only")]
+        "Upload File: PDF only", validators=[FileAllowed(["pdf"], "PDF only")]
     )

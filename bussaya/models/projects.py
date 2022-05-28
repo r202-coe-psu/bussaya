@@ -4,7 +4,6 @@ import datetime
 from bson.objectid import ObjectId
 
 
-
 class ProjectResource(me.EmbeddedDocument):
     id = me.ObjectIdField(required=True, default=ObjectId)
     data = me.FileField()
@@ -70,23 +69,9 @@ class Project(me.Document):
         required=True,
         default="only name",
         choices=[
-            "private",
-            "only name",
-            "abstract",
-            "poster",
             "report",
-            "video",
-            "abstract and poster",
-            "abstract and report",
-            "abstract and video",
-            "abstract and git",
-            "abstract, poster, and video",
-            "abstract, report and poster",
-            "abstract, poster and git",
-            "abstract, video and git",
-            "abstract, poster, video and git",
-            "abstract, report, poster and git",
-            "abstract, report, poster, video and git",
+            "presentation",
+            "report presentation",
         ],
     )
 

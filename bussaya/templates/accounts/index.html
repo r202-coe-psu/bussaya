@@ -1,7 +1,7 @@
 {% if current_user.is_authenticated %}
-  {% extends '/base/default-dashboard.html' %}
+{% extends '/base/default-dashboard.html' %}
 {% else %}
-  {% extends '/base/default-page.html' %}
+{% extends '/base/default-page.html' %}
 {% endif %}
 
 {% block dashboard_title %}
@@ -13,15 +13,16 @@ Profile
 {% endblock %}
 
 {% block title %}
-  {{ user.title }} {{ user.first_name }} {{ user.last_name }}
+{{ user.title }} {{ user.first_name }} {{ user.last_name }}
 {% endblock %}
 
 {% block content %}
-<div class="ui container"> {# start div container #} 
+<div class="ui container"> {# start div container #}
   <div class="ui segment">
     <h2 class="ui header">Profile
       {% if current_user.is_authenticated and current_user.id == user.id %}
-        <a class="btn-floating btn-large waves-effect waves-light" href="{{ url_for('accounts.edit_profile') }}" title='Edit profile.'><i class="edit icon"></i></a>
+      <a class="btn-floating btn-large waves-effect waves-light" href="{{ url_for('accounts.edit_profile') }}"
+        title='Edit profile.'><i class="edit icon"></i></a>
       {% endif %}
     </h2>
     <div class="ui grid">
@@ -38,17 +39,17 @@ Profile
           <h3 class="ui header">{{ user.title_th }} {{ user.first_name_th }} {{ user.last_name_th }}</h3>
           <div class="ui label large">
             <i class="mail icon"></i>
-            {{ user.email }} 
+            {{ user.email }}
           </div>
           <div style="margin-top: .5vh;">
-          {% if current_user.is_authenticated and current_user.id == user.id %}
-            Role: 
+            {% if current_user.is_authenticated and current_user.id == user.id %}
+            Role:
             {% for role in user.roles %}
-              <div class="ui label">
-                {{ role }}
-              </div>
+            <div class="ui label">
+              {{ role }}
+            </div>
             {% endfor %}
-          {% endif %}
+            {% endif %}
           </div>
         </div>
         <div style="margin-top: 2vh;">
@@ -66,62 +67,64 @@ Profile
     <h3>{{ project.name }}</h3>
     <div>
       {% for t in project.tags %}
-        <a class="ui label" href="{{ url_for('tags.view', name=t) }}">{{ t }}</a>
+      <a class="ui label" href="{{ url_for('tags.view', name=t) }}">{{ t }}</a>
       {% endfor %}
     </div>
-    <div class="ui message text large" >
+    <div class="ui message text large">
       <div class="header">Advisor</div>
       <a target="_blank" href="{{ url_for('accounts.profile', user_id=project.advisor.id) }}">
         {{ project.advisor.title }} {{ project.advisor.first_name }} {{ project.advisor.last_name }}
       </a>
     </div>
     {% if 'abstract' in project.public %}
-      <div class="ui message text large">
-        <div class="header">Abstract</div>
-        <p>{{ project.abstract_th }}</p>
-        <p>{{ project.abstract }}</p>
-      </div>
+    <div class="ui message text large">
+      <div class="header">Abstract</div>
+      <p>{{ project.abstract_th }}</p>
+      <p>{{ project.abstract }}</p>
+    </div>
     {% endif %}
 
     {% if project.public not in ['only name', 'private', 'abstract'] %}
     <div class="ui message text large">
       <div class="header">Public</div>
       <p>
-      {%- for type_, icon in [('report', 'pdf file'), ('poster', 'image file'), ('presentation', 'powerpoint file'), ('video', 'video file'), ('git', 'git')] %}
-      {% if type_ in project.public %}
+        {% for type_, icon in [('report', 'pdf file'), ('poster', 'image file'), ('presentation', 'powerpoint file'),
+        ('video', 'video file'), ('git', 'git')] %}
+        {% if type_ in project.public %}
         {% set r = project.get_resource(type_) %}
         {% if r %}
-          <a target="_blank" href="{{ r.link }}"><i class="big {{ icon }} icon link pop" data-content="{{ type_.title() }}"></i></a>
+        <a target="_blank" href="{{ r.link }}"><i class="big {{ icon }} icon link pop"
+            data-content="{{ type_.title() }}"></i></a>
         {% endif %}
-      {% endif %}
-      {%- endfor %}
+        {% endif %}
+        {% endfor %}
       </p>
     </div>
-  {% endif %}
+    {% endif %}
 
-{% endif %}
+    {% endif %}
 
-{%- if 'CoE-lecturer' in user.roles %}
-  <div class="ui segment">
-    <table class="ui table large text">
-      <tbody>
-      {% for project in user.get_advisee_projects() if project.public != 'private' %}
-        <tr>
-          <td data-label="Title">{{ project.name }}<br>{{ project.name_th }}</td>
-          <td data-label="Student">
-            {%- for s in project.students %}
-            <a target="_blank" href="{{ url_for('accounts.profile', user_id=s.id) }}">
-              {{ s.first_name }} {{ s.last_name }}
-            </a>
-            {% if not loop.last %}, {% endif %}
-            {% endfor -%}
-          </td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </div>
-{%- endif %}
+    {% if 'CoE-lecturer' in user.roles %}
+    <div class="ui segment">
+      <table class="ui table large text">
+        <tbody>
+          {% for project in user.get_advisee_projects() if project.public != 'private' %}
+          <tr>
+            <td data-label="Title">{{ project.name }}<br>{{ project.name_th }}</td>
+            <td data-label="Student">
+              {% for s in project.students %}
+              <a target="_blank" href="{{ url_for('accounts.profile', user_id=s.id) }}">
+                {{ s.first_name }} {{ s.last_name }}
+              </a>
+              {% if not loop.last %}, {% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
 
-</div> {# end div container #}
-{% endblock %}
+  </div> {# end div container #}
+  {% endblock %}

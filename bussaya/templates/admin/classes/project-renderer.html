@@ -2,18 +2,18 @@
 
 
 {% macro render_project_section(projects, current_user, advisees, committees) -%}
-  {%- if advisees | count > 0 or committees | count > 0 %}
-  <div class="ui segment row">
+{%- if advisees | count > 0 or committees | count > 0 %}
+<div class="ui segment row">
   {%- if advisees | count > 0 %}
-    <h4>Advisee Project</h4>
-    {{ render_project_table(advisees, current_user) }}
+  <h4>Advisee Project</h4>
+  {{ render_project_table(advisees, current_user) }}
   {%- endif %}
   {%- if committees | count > 0 %}
-    <h4>Examination Project</h4>
-    {{ render_project_table(committees, current_user) }}
+  <h4>Examination Project</h4>
+  {{ render_project_table(committees, current_user) }}
   {%- endif %}
-  </div>
-  {%- endif %}
+</div>
+{%- endif %}
 {% endmacro -%}
 
 {% macro render_project_table(projects, current_user=None) -%}
@@ -48,23 +48,22 @@
         {{ pm_renderer.render_project_material(project) }}
       </td>
       <td class="right aligned collapsing">
-        <a class="ui negative circular icon button" href="{{ url_for('admin.projects.delete', project_id=project.id) }}">
+        <a class="ui negative icon button" href="{{ url_for('admin.projects.delete', project_id=project.id) }}">
           <i class="trash icon"></i>
         </a>
       </td>
     </tr>
-  {% endfor %}
+    {% endfor %}
   </tbody>
 </table>
 
-  <script type="text/javascript">
+<script type="text/javascript">
   $('.icon.link.pop')
-  .popup({
-    delay: {
-    show: 50,
-    hide: 70
-    }
-  });
-  </script>
+    .popup({
+      delay: {
+        show: 50,
+        hide: 70
+      }
+    });
+</script>
 {%- endmacro %}
-

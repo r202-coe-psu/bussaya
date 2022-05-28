@@ -33,7 +33,7 @@ Upload Project Resource
 
 {% block additional_js %}
 <script type="text/javascript">
-  {% - for field in form if field.type == 'FileField' %}
+  {% for field in form if field.type == 'FileField' %}
   $(".attach-file-{{ field.name }}").click(function () {
     $(this).parent().find("#{{ field.name }}").click();
   });
@@ -43,7 +43,7 @@ Upload Project Resource
       var name = e.target.files[0].name;
       $('.attach-file-{{ field.name }}', $(e.target).parent()).val(name);
     });
-  {% - endfor %}
+  {% endfor %}
 </script>
 
 {% endblock additional_js %}
