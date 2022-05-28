@@ -50,6 +50,7 @@
 			<th>Remark</th>
 			<th>Status</th>
 			<th>Time Remaining</th>
+			<th>File</th>
 			<th>Started Date</th>
 			<th>Ended Date</th>
 		</tr>
@@ -75,6 +76,16 @@
 			</td>
 			<td>
 				{{submission.remain_time()}}
+			</td>
+			<td>
+				{% if submission.get_student_file_by_owner(user) %}
+				{% for student_work in submission.get_student_file_by_owner(user) %}
+				{{student_work.file.filename}}
+				{% endfor %}
+				{% else %}
+				You haven't send file.
+				{% endif %}
+			</td>
 			<td>
 				{{ submission.natural_started_date() }}
 			</td>

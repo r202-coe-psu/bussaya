@@ -45,6 +45,11 @@ class Submission(me.Document):
     def natural_ended_date(self):
         return self.ended_date.strftime("%A, %d %B %Y, %I:%M %p")
 
+    def get_student_file_by_owner(self, owner):
+        student_work = StudentWork.objects.all().filter(submission=self, owner=owner)
+            
+        return student_work
+
 
 class StudentWork(me.Document):
     meta = {"collection": "student_works"}

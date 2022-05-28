@@ -18,7 +18,11 @@ def view(class_id):
     submissions = models.Submission.objects.all().filter(
         class_=class_,
     )
-    return render_template("/classes/view.html", class_=class_, submissions=submissions)
+    user = current_user._get_current_object()
+
+    return render_template(
+        "/classes/view.html", user=user, class_=class_, submissions=submissions
+    )
 
 
 @module.route("/<class_id>/enroll")
