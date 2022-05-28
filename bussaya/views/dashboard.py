@@ -46,9 +46,10 @@ def index_student():
 
     classes = models.Class.objects.all()
     available_class = []
+    user = current_user._get_current_object()
 
     for class_ in classes:
-        if class_.in_time():
+        if class_.in_time() and user.username in class_.student_ids:
             available_class.append(class_)
 
     return render_template(

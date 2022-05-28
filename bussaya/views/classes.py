@@ -11,20 +11,6 @@ module = Blueprint(
 )
 
 
-@module.route("/")
-@login_required
-def index():
-    classes = models.Class.objects.all()
-    now = datetime.now().date()
-    available_class = []
-
-    for class_ in classes:
-        if class_.in_time():
-            available_class.append(class_)
-
-    return render_template("/classes/index.html", available_class=available_class)
-
-
 @module.route("/<class_id>")
 @login_required
 def view(class_id):
