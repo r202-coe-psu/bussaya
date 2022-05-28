@@ -7,7 +7,14 @@ Submission Form
 {% endblock %}
 
 {% block breadcrumbs %}
-Form
+<div class="ui breadcrumb">
+    <a href="{{ url_for('dashboard.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    Form:<a href="{{ url_for('submissions.upload', class_id=class_.id, submission_id=submission.id) }}">
+        {{submission.get_type_display()}}</a>
+</div>
 {% endblock %}
 
 {% block content %}

@@ -11,10 +11,6 @@ module = Blueprint(
 )
 
 
-def time_in_range(start, end, current):
-    return start <= current <= end
-
-
 @module.route("/")
 @login_required
 def index():
@@ -23,7 +19,7 @@ def index():
     available_class = []
 
     for class_ in classes:
-        if time_in_range(class_.started_date, class_.ended_date, now):
+        if class_.in_time():
             available_class.append(class_)
 
     return render_template("/classes/index.html", available_class=available_class)

@@ -43,7 +43,19 @@ def index_lecturer():
 
 def index_student():
     projects = models.Project.objects(students=current_user._get_current_object())
-    return render_template("/dashboard/index-student.html", projects=projects)
+
+    classes = models.Class.objects.all()
+    available_class = []
+
+    for class_ in classes:
+        if class_.in_time():
+            available_class.append(class_)
+
+    return render_template(
+        "/dashboard/index-student.html",
+        projects=projects,
+        available_class=available_class,
+    )
 
 
 def index_user():

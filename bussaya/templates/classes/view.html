@@ -3,53 +3,48 @@
 
 {% block breadcrumbs %}
 <div class="ui breadcrumb">
-	<a href="{{ url_for('classes.index') }}" class="section">Classes</a>
+	<a href="{{ url_for('dashboard.index') }}" class="section">Classes</a>
 	<div class="divider"> / </div>
 	<a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-	<div class="col s12">
-		<h3>{{ class_.name }}</h3>
-		<div>
-			{% if enrollment %}
-			You enroll this class
-			{% else %}
-			<a class="btn-floating btn-small waves-effect waves-light red"
-				href="{{ url_for('classes.enroll', class_id=class_.id) }}"><i class="material-icons">add</i></a>
+<h1>{{ class_.name }}</h1>
 
-			{% endif %}
-		</div>
-	</div>
-</div>
+<table class="ui definition table">
+	<tbody>
+		<tr>
+			<td class="two wide column">Description</td>
+			<td>{{ class_.description }}</td>
+		</tr>
+		<tr>
+			<td>Code</td>
+			<td>{{ class_.code }}</td>
+		</tr>
+		<tr>
+			<td>Limited Class</td>
+			<td>{{ class_.limited }}</td>
+		</tr>
+		<tr>
+			<td>Started Date</td>
+			<td>{{ class_.started_date }}</td>
+		</tr>
+		<tr>
+			<td>Ended Date</td>
+			<td>{{ class_.ended_date }}</td>
+		</tr>
+		<tr>
+			<td>Tag</td>
+			<td>{{ class_.tags | join(', ') }}</td>
+		</tr>
+	</tbody>
+</table>
 
-<div class="row">
-	<div class="col s12">
-		<div>
-			<b>Description:</b> {{ class_.description }}
-		</div>
-		<div>
-			<b>Code:</b> {{ class_.code }}
-		</div>
-		<div>
-			<b>Limited Class:</b> {{ class_.limited }}
-		</div>
-		<div>
-			<b>Started Date:</b> {{ class_.started_date }}
-		</div>
-		<div>
-			<b>Ended Date:</b> {{ class_.ended_date }}
-		</div>
-
-		<div>
-			<b>Tag:</b> {{ class_.tags | join(', ') }}
-		</div>
-	</div>
-</div>
+<div class="ui divider"></div>
 
 <h2 class="ui header">Submissions</h2>
+{% if submissions | count > 0 %}
 <table class="ui selectable celled table unstackable">
 	<thead>
 		<tr>
@@ -81,40 +76,10 @@
 		{% endfor %}
 	</body>
 </table>
+{% else %}
+<div class="ui info message">No submission at this time.</div>
+{% endif %}
 
-<h2 class="ui header">Assignments</h2>
-<table>
-	<thead>
-		<tr>
-			<th>Name</th>
-			<th>Challenges</th>
-			<th>Start</th>
-			<th>End</th>
-			<th>Operation</th>
-		</tr>
-	</thead>
-
-	<tbody>
-		{% for ass_time in class_.assignment_schedule %}
-		<tr>
-			<td>
-				<a
-					href="{{ url_for('assignments.practice', assignment_id=ass_time.assignment.id, class_id=class_.id) }}">
-					{{ ass_time.assignment.name }}
-				</a>
-			</td>
-			<td>{{ ass_time.assignment.challenges | count }}</td>
-			<td>{{ ass_time.started_date }}</td>
-			<td>{{ ass_time.ended_date }}</td>
-			<td>
-				<a
-					href="{{ url_for('assignments.practice', assignment_id=ass_time.assignment.id, class_id=class_.id) }}">
-					<i class="material-icons">visibility</i>
-				</a>
-			</td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
+<div class="ui divider"></div>
 
 {% endblock %}

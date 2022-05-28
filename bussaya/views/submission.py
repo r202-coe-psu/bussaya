@@ -87,17 +87,21 @@ def delete(submission_id, class_id):
 
 
 @module.route(
-    "/admin/classes/<class_id>/submissions/form/<submission_id>",
+    "/classes/<class_id>/submission/form/<submission_id>/",
     methods=["GET", "POST"],
 )
 @login_required
 def upload(submission_id, class_id):
     form = forms.submissions.StudentWorkForm()
     submission = models.Submission.objects.get(id=submission_id)
+    class_ = models.Class.objects.get(id=class_id)
 
     if not form.validate_on_submit():
         return render_template(
-            "/submissions/upload.html", form=form, submission=submission
+            "/submissions/upload.html",
+            form=form,
+            submission=submission,
+            class_=class_,
         )
 
     student_submission = models.StudentWork()
