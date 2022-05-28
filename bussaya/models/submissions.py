@@ -1,10 +1,7 @@
-from email.policy import strict
-from ipaddress import ip_address
 import mongoengine as me
-import datetime
-from pkg_resources import require
 
-from requests import request
+import datetime
+import humanize
 
 SUBMISSION_TYPE = [("report", "Report"), ("presentation", "Presentation")]
 
@@ -26,6 +23,27 @@ class Submission(me.Document):
     remark = me.StringField()
 
     file = me.FileField()
+
+    def is_in_time(self):
+        return self.started_date <= datetime.datetime.now() <= self.ended_date
+
+    def remain_time(self):
+        now = datetime.datetime.now()
+        start = self.started_date
+        end = self.ended_date
+
+        if start > now:
+            return f"Opening in {humanize.naturaltime(now - start)}"
+        if now > start:
+            return f"Closing in {humanize.naturaltime(now - end)}"
+        if now > end:
+            return "Out of time"
+
+    def natural_started_date(self):
+        return self.started_date.strftime("%A, %d %B %Y, %I:%M %p")
+
+    def natural_ended_date(self):
+        return self.ended_date.strftime("%A, %d %B %Y, %I:%M %p")
 
 
 class StudentWork(me.Document):

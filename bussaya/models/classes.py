@@ -29,5 +29,5 @@ class Class(me.Document):
 
     owner = me.ReferenceField("User", dbref=True, required=True)
 
-    def in_time(self):
+    def is_in_time(self):
         return self.started_date <= datetime.datetime.now().date() <= self.ended_date

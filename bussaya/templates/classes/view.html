@@ -49,7 +49,7 @@
 			<th>Type</th>
 			<th>Remark</th>
 			<th>Status</th>
-			<th>Submit</th>
+			<th>Time Remaining</th>
 			<th>Started Date</th>
 			<th>Ended Date</th>
 		</tr>
@@ -65,21 +65,24 @@
 				{{ submission.remark}}
 			</td>
 			<td>
+				{% if submission.is_in_time() %}
 				<a href="{{ url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
 					Open
 				</a>
+				{% else %}
+				Close
+				{% endif %}
 			</td>
 			<td>
-				Yes
+				{{submission.remain_time()}}
+			<td>
+				{{ submission.natural_started_date() }}
 			</td>
 			<td>
-				{{ submission.started_date }}
+				{{ submission.natural_ended_date() }}
 			</td>
-			<td>
-				{{ submission.ended_date }}
-			</td>
-			</div </tr>
-			{% endfor %}
+		</tr>
+		{% endfor %}
 	</body>
 </table>
 {% else %}
