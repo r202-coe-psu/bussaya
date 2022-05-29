@@ -100,7 +100,7 @@ def upload(submission_id, class_id):
 
     if not form.validate_on_submit():
         return render_template(
-            "/submissions/upload.html",
+            "/submissions/upload-edit.html",
             form=form,
             submission=submission,
             class_=class_,
@@ -130,6 +130,53 @@ def upload(submission_id, class_id):
             )
 
     student_submission.save()
+
+    return redirect(url_for("classes.view", submission=submission, class_id=class_id))
+
+
+@module.route(
+    "/classes/<class_id>/submission/form/<submission_id>/edit",
+    methods=["GET", "POST"],
+)
+@login_required
+def edit_student_work(submission_id, class_id):
+
+    class_ = models.Class.objects.get(id=class_id)
+    submission = models.Submission.objects.get(id=submission_id)
+    student_work = models.StudentWork.objects.get(class_=class_, submission=submission)
+    form = forms.submissions.StudentWorkForm(obj=student_work)
+
+    if not form.validate_on_submit():
+        return render_template(
+            "/submissions/upload-edit.html",
+            form=form,
+            class_=class_,
+            submission=submission,
+            student_work=student_work,
+        )
+
+    student_work.owner = current_user._get_current_object()
+    student_work.ip_address = request.remote_addr
+
+    student_work.class_ = models.Class.objects.get(id=class_id)
+    student_work.submission = models.Submission.objects.get(id=submission_id)
+
+    form.populate_obj(student_work)
+    if form.uploaded_file.data:
+        if not student_work.file:
+            student_work.file.put(
+                form.uploaded_file.data,
+                filename=form.uploaded_file.data.filename,
+                content_type="application/pdf",
+            )
+        else:
+            student_work.file.replace(
+                form.uploaded_file.data,
+                filename=form.uploaded_file.data.filename,
+                content_type="application/pdf",
+            )
+
+    student_work.save()
 
     return redirect(url_for("classes.view", submission=submission, class_id=class_id))
 

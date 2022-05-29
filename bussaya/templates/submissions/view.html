@@ -18,15 +18,38 @@
 
 {% block content %}
 
-<div class="ui info message">
-    Submission Information
-</div>
 
-<h3 class="ui header">Submission Form: </h3>
-<a href="{{url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
-    Form {{submission.get_type_display()}}
+<table class="ui definition table">
+    <tbody>
+        <tr>
+            <td class="two wide column">Type</td>
+            <td>{{ submission.get_type_display() }}</td>
+        </tr>
+        <tr>
+            <td>Remark</td>
+            <td>{{ submission.remark }}</td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+            <td>Started Date</td>
+            <td>{{ submission.started_date }}</td>
+        </tr>
+        <tr>
+            <td>Ended Date</td>
+            <td>{{ submission.ended_date }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<a class="ui very small primary icon button" style="margin-top:0.5em"
+    href="{{ url_for('submissions.edit', submission_id=submission.id, class_id=class_.id) }}">
+    <i class="edit icon"></i> Edit
 </a>
-
+<a class="ui very small negative icon button" style="margin-top:0.5em"
+    href="{{ url_for('submissions.delete', submission_id=submission.id, class_id=class_.id) }}">
+    <i class="trash icon"></i> Delete
+</a>
 
 <h4>Submission: {{submission.get_type_display()}}</h4>
 <table class="ui celled table">

@@ -58,49 +58,67 @@
 
 	<body>
 		{% for submission in submissions %}
-		<tr>
-			<td>
-				{{ submission.get_type_display() }}
-			</td>
-			<td>
-				{{ submission.remark}}
-			</td>
-			<td>
-				{% if submission.is_in_time() %}
-				<a href="{{ url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
-					Open
-				</a>
-				{% else %}
-				Close
-				{% endif %}
-			</td>
-			<td>
-				{{submission.remain_time()}}
-			</td>
-			<td>
-				{% if submission.get_student_file_by_owner(user) %}
-				{% for student_work in submission.get_student_file_by_owner(user) %}
-				<a
-					href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}">
-					{{student_work.file.filename}}
-				</a>
-				{% endfor %}
-				{% else %}
-				-
-				{% endif %}
-			</td>
-			<td>
-				{{ submission.natural_started_date() }}
-			</td>
-			<td>
-				{{ submission.natural_ended_date() }}
-			</td>
-		</tr>
+			{% set student_work = submission.get_student_work_by_owner(user) %}
+			<tr>
+				<td>
+					{{ submission.get_type_display() }}
+				</td>
+				<td class="three wide">
+					<div style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 18em;">
+						{{ submission.remark}}
+					</div>
+				</td>
+				<td>
+					{% if submission.is_in_time() and submission.is_in_time() != "Upcoming" %}
+						{% if student_work %}
+							Sent /
+							<a
+								href="{{ url_for('submissions.edit_student_work', submission_id=submission.id, class_id=class_.id, student_work_id=student_work.id)}}">
+								Edit
+							</a>
+						{% else %}
+							Opened /
+							<a href="{{ url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
+								Upload
+							</a>
+						{% endif %}
+
+					{% else %}
+						{% if submission.is_in_time() == "Upcoming" %}
+							Upcoming
+						{% else %}
+							Closed
+						{% endif %}
+
+					{% endif %}
+				</td>
+				<td>
+					{{submission.remain_time()}}
+				</td>
+				<td>
+					{% if student_work %}
+						<div style="display:flex">
+							<a style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 15em;"
+								href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}">
+								{{student_work.file.filename}}
+							</a>
+						</div>
+					{% else %}
+						-
+					{% endif %}
+				</td>
+				<td>
+					{{ submission.natural_started_date() }}
+				</td>
+				<td>
+					{{ submission.natural_ended_date() }}
+				</td>
+			</tr>
 		{% endfor %}
 	</body>
 </table>
 {% else %}
-<div class="ui info message">No submission at this time.</div>
+	<div class="ui info message">No submission at this time.</div>
 {% endif %}
 
 <div class="ui divider"></div>

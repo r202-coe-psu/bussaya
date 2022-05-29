@@ -25,7 +25,15 @@ class Submission(me.Document):
     file = me.FileField()
 
     def is_in_time(self):
-        return self.started_date <= datetime.datetime.now() <= self.ended_date
+        if self.started_date <= datetime.datetime.now() <= self.ended_date:
+            return True
+
+        if self.started_date > datetime.datetime.now():
+            return "Upcoming"
+
+        else:
+            return False
+
 
     def remain_time(self):
         now = datetime.datetime.now()
@@ -33,11 +41,14 @@ class Submission(me.Document):
         end = self.ended_date
 
         if start > now:
-            return f"Opening in {humanize.naturaltime(now - start)}"
-        if now > start:
-            return f"Closing in {humanize.naturaltime(now - end)}"
-        if now > end:
+            return f"Opening in {humanize.naturaltime(now - start).removesuffix('from now')}"
+        elif now > end:
             return "Out of time"
+        else:
+            return (
+                f"Closing in {humanize.naturaltime(now - end).removesuffix('from now')}"
+            )
+
 
     def natural_started_date(self):
         return self.started_date.strftime("%A, %d %B %Y, %I:%M %p")
@@ -45,10 +56,11 @@ class Submission(me.Document):
     def natural_ended_date(self):
         return self.ended_date.strftime("%A, %d %B %Y, %I:%M %p")
 
-    def get_student_file_by_owner(self, owner):
-        student_work = StudentWork.objects.all().filter(submission=self, owner=owner)
-            
-        return student_work
+
+    def get_student_work_by_owner(self, owner):
+        student_works = StudentWork.objects.all().filter(submission=self, owner=owner)
+        for student_work in student_works:
+            return student_work
 
 
 class StudentWork(me.Document):
