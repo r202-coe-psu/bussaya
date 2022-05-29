@@ -19,16 +19,14 @@ Submission Form
 
 {% block content %}
 
-<div class="row">
+<form method="POST" class="ui form" enctype="multipart/form-data">
     <div class="ui segment">
-        <form method="POST" enctype="multipart/form-data" class="ui form">
-            {{ form.csrf_token }}
-            {{ renderer.render_fileinput(form.uploaded_file) }}
-            {{ renderer.render_field(form.remark) }}
-            <button name="create" type="submit" class="ui button primary">Upload</button>
-        </form>
+        {{ form.csrf_token }}
+        {{ renderer.render_fileinput(form.uploaded_file) }}
+        {{ renderer.render_field(form.remark) }}
+        <button type="submit" class="ui button primary">Upload</button>
     </div>
-</div>
+</form>
 
 {% endblock content %}
 
@@ -44,5 +42,4 @@ Submission Form
             $('.attach-file-{{ form.uploaded_file.name }}', $(e.target).parent()).val(name);
         });
 </script>
-
 {% endblock additional_js %}

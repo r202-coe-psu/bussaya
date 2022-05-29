@@ -80,10 +80,13 @@
 			<td>
 				{% if submission.get_student_file_by_owner(user) %}
 				{% for student_work in submission.get_student_file_by_owner(user) %}
-				{{student_work.file.filename}}
+				<a
+					href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}">
+					{{student_work.file.filename}}
+				</a>
 				{% endfor %}
 				{% else %}
-				You haven't send file.
+				-
 				{% endif %}
 			</td>
 			<td>

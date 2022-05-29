@@ -15,3 +15,4 @@ markdown
 python-markdown-math 
 
 qrcode
+humanize

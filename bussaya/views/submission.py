@@ -93,6 +93,7 @@ def delete(submission_id, class_id):
 )
 @login_required
 def upload(submission_id, class_id):
+
     form = forms.submissions.StudentWorkForm()
     submission = models.Submission.objects.get(id=submission_id)
     class_ = models.Class.objects.get(id=class_id)
@@ -114,26 +115,23 @@ def upload(submission_id, class_id):
     student_submission.submission = models.Submission.objects.get(id=submission_id)
 
     form.populate_obj(student_submission)
-
     if form.uploaded_file.data:
-        if student_submission.file:
-            student_submission.file.replace(
-                form.uploaded_file.data,
-                filename=form.uploaded_file.data.filename,
-                content_type=form.uploaded_file.data.content_type,
-            )
-        else:
+        if not student_submission.file:
             student_submission.file.put(
                 form.uploaded_file.data,
                 filename=form.uploaded_file.data.filename,
-                content_type=form.uploaded_file.data.content_type,
+                content_type="application/pdf",
+            )
+        else:
+            student_submission.file.replace(
+                form.uploaded_file.data,
+                filename=form.uploaded_file.data.filename,
+                content_type="application/pdf",
             )
 
     student_submission.save()
 
-    return redirect(
-        url_for("admin.classes.view", submission=submission, class_id=class_id)
-    )
+    return redirect(url_for("classes.view", submission=submission, class_id=class_id))
 
 
 @module.route(
