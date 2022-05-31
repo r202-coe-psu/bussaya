@@ -24,16 +24,15 @@ def view(class_id):
         "/classes/view.html", user=user, class_=class_, submissions=submissions
     )
 
+def get_student_name(student_id):
+    student = models.User.objects.get()
 
-@module.route("/<class_id>/enroll")
+@module.route("/<class_id>/student_ids")
 @login_required
-def enroll(class_id):
+def view_students(class_id):
     class_ = models.Class.objects.get(id=class_id)
-    student = current_user._get_current_object()
+    student_ids = class_.student_ids
 
-    print(class_.student_ids)
-    if student.username not in class_.student_ids:
-        class_.student_ids.append(student.username)
-
-    class_.save()
-    return redirect(url_for("classes.view", class_id=class_.id))
+    return render_template(
+        "/classes/view-students.html", class_=class_, student_ids=student_ids
+    )

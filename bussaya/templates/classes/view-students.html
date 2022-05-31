@@ -1,0 +1,77 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/error-handler.html' as eh %}
+{% import '/admin/classes/project-renderer.html' as renderer %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('classes.view_students', class_id=class_.id) }}">View Students</a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<h1 class="ui horizontal divider header">
+    {{ class_.name }}
+</h1>
+
+<div class="ui huge compact menu" style="margin: auto">
+    <a class="item" onclick="showDelete()">
+        <i class="star icon"></i>
+        Grading
+    </a>
+    <a class="active item" href="{{ url_for('classes.view_students', class_id=class_.id) }}">
+        <i class="users icon"></i>
+        View Students
+    </a>
+    <div class="item ui floating labeled dropdown">
+        <i class="setting icon"></i>
+        <span class="text">Settings</span>
+        <div class="menu">
+            <a class="item" href="">
+                Manage Group
+            </a>
+            <a class="item" href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">
+                Edit Class
+            </a>
+            <a class="item" onclick="showDelete()">
+                Delete Class
+            </a>
+        </div>
+    </div>
+</div>
+
+<table class="ui celled table">
+    <thead>
+        <th>No. </th>
+        <th>Student Name</th>
+        <th>ID</th>
+        <th>Group</th>
+    </thead>
+    <tbody>
+        {% for student in student_ids %}
+        <tr>
+            <td>
+                {{ loop.index }}
+            </td>
+            <td>
+                {{ student }}
+            </td>
+            <td>
+                {{ student }}
+            </td>
+            <td>
+                A
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+{% endblock %}

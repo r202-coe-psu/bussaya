@@ -13,25 +13,77 @@
 
 {% block content %}
 
-<div class="ui segment">
-	<h2 class="ui header">{{ class_.name }}</h2>
-	<div><b>Owner: </b>{{ class_.owner.first_name }} {{ class_.owner.last_name }}</div>
-	<div><b>Code:</b> {{ class_.code }}</div>
-	<div><b>Description:</b> {{ class_.description }}</div>
-	<div><b>Student IDs:</b> {{ class_.student_ids | join(', ') }}</div>
-	<div><b>Tag:</b> {{ class_.tags | join(', ') }}</div>
-	<div><b>Type:</b> {{ class_.get_type_display() }}</div>
-	<div><b>Started Date:</b> {{ class_.started_date }}</div>
-	<div><b>Ended Date:</b> {{ class_.ended_date }}</div>
-	<a class="ui very small primary icon button" style="margin-top:0.5em"
-		href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">
-		<i class="edit icon"></i> Edit
+<h1 class="ui horizontal divider header">
+	{{ class_.name }}
+</h1>
+
+<div class="ui huge compact menu" style="margin: auto">
+	<a class="item" onclick="showDelete()">
+		<i class="star icon"></i>
+		Grading
 	</a>
-	<button class="ui very small negative icon button" onclick="showDelete()">
-		<i class="trash icon"></i> Delete Class
-	</button>
+	<a class="item" href="{{ url_for('classes.view_students', class_id=class_.id) }}">
+		<i class="users icon"></i>
+		View Students
+	</a>
+	<div class="item ui floating labeled dropdown">
+		<i class="setting icon"></i>
+		<span class="text">Settings</span>
+		<div class="menu">
+			<a class="item" href="">
+				Manage Group
+			</a>
+			<a class="item" href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">
+				Edit Class
+			</a>
+			<a class="item" onclick="showDelete()">
+				Delete Class
+			</a>
+		</div>
+	</div>
 </div>
 
+<table class="ui single line table">
+	<tbody>
+		<tr>
+			<td>
+				<div style="color: grey">NAME </div>{{ class_.name }}
+			</td>
+			<td>
+				<div style="color: grey">DESCRIPTION</div> {{ class_.description }}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div style="color: grey">OWNER </div>{{ class_.owner.first_name }} {{ class_.owner.last_name }}
+			</td>
+			<td>
+				<div style="color: grey">CODE </div>{{ class_.code }}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div style="color: grey">TYPE</div> {{ class_.get_type_display() }}
+			</td>
+			<td>
+				<div style="color: grey">TAG</div> {{ class_.tags | join(', ') }}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div style="color: grey">STARTED DATE</div> {{ class_.started_date }}
+			</td>
+			<td>
+				<div style="color: grey">ENDED DATE</div> {{ class_.ended_date }}
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<div class="ui segment">
+	<h2 class="ui header">Projects</h2>
+	{{ renderer.render_project_table(projects) }}
+</div>
 
 <div class="ui segment">
 	<h2 class="ui header">Submissions</h2>
@@ -81,11 +133,6 @@
 	<a class="ui primary button" href="{{ url_for('submissions.add', class_id=class_.id) }}">
 		Add Submission
 	</a>
-</div>
-
-<div class="ui segment">
-	<h2 class="ui header">Projects</h2>
-	{{ renderer.render_project_table(projects) }}
 </div>
 
 <div class="ui modal delete class">
