@@ -22,6 +22,10 @@
 		<i class="chalkboard icon"></i>
 		Class
 	</a>
+	<a class="item" href="{{ url_for('classes.view_students', class_id=class_.id) }}">
+		<i class="users icon"></i>
+		View Students
+	</a>
 	<div class="item ui floating labeled dropdown">
 		<i class="star icon"></i>
 		<span class="text">Grading</span>
@@ -34,10 +38,6 @@
 			</a>
 		</div>
 	</div>
-	<a class="item" href="{{ url_for('classes.view_students', class_id=class_.id) }}">
-		<i class="users icon"></i>
-		View Students
-	</a>
 	<div class="item ui floating labeled dropdown">
 		<i class="setting icon"></i>
 		<span class="text">Settings</span>

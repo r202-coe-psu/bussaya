@@ -33,11 +33,13 @@ def view(class_id, grade_type):
         midterm = models.Grade()
         midterm.type = "midterm"
         midterm.class_ = class_
+        midterm.teacher = current_user._get_current_object()
+        midterm.save()
 
         final = models.Grade()
         final.type = "final"
         final.class_ = class_
-        midterm.save()
+        final.teacher = current_user._get_current_object()
         final.save()
 
         for id in class_.student_ids:
@@ -72,8 +74,6 @@ def view(class_id, grade_type):
 
     grade = models.Grade.objects.get(type=grade_type, class_=class_)
     # Student grade != Student  (Student was added or removed)
-    student_amount = len(class_.student_ids)
-    grade_amount = len(grade.student_grades)
 
     midterm = models.Grade.objects.get(type="midterm", class_=class_)
     final = models.Grade.objects.get(type="final", class_=class_)
@@ -155,5 +155,29 @@ def grading(class_id, grade_type):
             result = request.form.get(str(student_grade.id))
             student_grade.result = result
             student_grade.save()
+
+        return redirect(
+            url_for("grades.view", class_id=class_.id, grade_type=grade_type)
+        )
+
+    return render_template("/grades/view.html", class_=class_, grade=grade)
+
+
+@module.route("/<class_id>/<grade_type>/total")
+@login_required
+def total(class_id, grade_type):
+    class_ = models.Class.objects.get(id=class_id)
+    grade = models.Grade.objects.all().filter(class_=class_)
+    student_grades = models.StudentGrade.objects.all().filter(grade=grade)
+
+    if request.method == "POST":
+        for student_grade in student_grades:
+            result = request.form.get(str(student_grade.id))
+            student_grade.result = result
+            student_grade.save()
+
+        return redirect(
+            url_for("grades.view", class_id=class_.id, grade_type=grade_type)
+        )
 
     return render_template("/grades/view.html", class_=class_, grade=grade)

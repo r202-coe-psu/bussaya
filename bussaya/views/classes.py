@@ -26,8 +26,11 @@ def view(class_id):
 
 
 def get_student_name(student_id):
-    student = models.User.objects.get(username=student_id)
-    return f"{student.first_name} {student.last_name}"
+    try:
+        student = models.User.objects.get(username=student_id)
+        return f"{student.first_name} {student.last_name}"
+    except:
+        return ""
 
 
 @module.route("/<class_id>/student_ids")

@@ -24,22 +24,22 @@
         <i class="chalkboard icon"></i>
         Class
     </a>
-    <div class="item ui floating labeled dropdown">
-        <i class="star icon"></i>
-        <span class="text">Grading</span>
-        <div class="menu">
-            <a class="item" href="{{ url_for('grades.index', class_id=class_.id) }}">
-                Midterm
-            </a>
-            <a class="item" href="{{ url_for('grades.index', class_id=class_.id) }}">
-                Final
-            </a>
-        </div>
-    </div>
     <a class="active item" href="{{ url_for('classes.view_students', class_id=class_.id) }}">
         <i class="users icon"></i>
         View Students
     </a>
+    <div class="item ui floating labeled dropdown">
+        <i class="star icon"></i>
+        <span class="text">Grading</span>
+        <div class="menu">
+            <a class="item" href="{{ url_for('grades.view', class_id=class_.id, grade_type='midterm') }}">
+                Midterm
+            </a>
+            <a class="item" href="{{ url_for('grades.view', class_id=class_.id, grade_type='final') }}">
+                Final
+            </a>
+        </div>
+    </div>
     <div class="item ui floating labeled dropdown">
         <i class="setting icon"></i>
         <span class="text">Settings</span>

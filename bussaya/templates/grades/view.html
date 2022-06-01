@@ -27,6 +27,10 @@
         <i class="chalkboard icon"></i>
         Class
     </a>
+    <a class="item" href="{{ url_for('classes.view_students', class_id=class_.id) }}">
+        <i class="users icon"></i>
+        View Students
+    </a>
     <div class="item ui floating labeled dropdown">
         <i class="star icon"></i>
         <span class="text">
@@ -41,10 +45,6 @@
             </a>
         </div>
     </div>
-    <a class="item" href="{{ url_for('classes.view_students', class_id=class_.id) }}">
-        <i class="users icon"></i>
-        View Students
-    </a>
     <div class="item ui floating labeled dropdown">
         <i class="setting icon"></i>
         <span class="text">Settings</span>
@@ -65,22 +65,33 @@
 <h2 class="ui header">{{ grade.get_type_display() }} Grade</h2>
 <div class="ui divider"></div>
 <div class="ui segment">
-    <h3 class="ui header" style="width: fit-content">Grade student in class on {{ grade.get_type_display() }}</h3>
+    <div class="ui left aligned icon header">
+        <span class=" ui darkgrey text" style="margin-right: 0.5em">
+            {{ grade.teacher.title }}
+            {{ grade.teacher.first_name }}
+            {{ grade.teacher.last_name }}
+        </span>
+    </div>
+</div>
+
+<div class="ui segment">
     {% if 'grading' in request.path %}
-    <a class="ui green icon button" href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">
+    <a class="ui primary labeled icon button"
+        href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">
         <i class="eye icon"></i>
         View
     </a>
     {% else %}
-    <a class="ui green icon button" href="{{ url_for('grades.grading', class_id=class_.id, grade_type=grade.type) }}">
+    <a class="ui primary labeled icon button"
+        href="{{ url_for('grades.grading', class_id=class_.id, grade_type=grade.type) }}">
         <i class="edit icon"></i>
         Grading
     </a>
     {% endif %}
+    <a class="ui yellow labeled icon button"><i class="clipboard check icon"></i>Total</a>
 </div>
-
-<div class="ui segment">
-    <form method="POST">
+<form method="POST" id="form-grades">
+    <div class="ui attached segment">
         <table class="ui very compact celled table">
             <thead>
                 <tr>
@@ -107,10 +118,20 @@
                 {% endfor %}
             </tbody>
         </table>
-        {% if 'grading' in request.path %}
-        <button class="ui primary icon button" type="submit"><i class="save icon"></i> Save</button>
-        {% endif %}
-    </form>
-</div>
+    </div>
+    {% if 'grading' in request.path %}
+    <div class="ui bottom attached large primary icon button" id="submit-button"><i class="save icon"></i> Save</div>
+    {% endif %}
+</form>
 
 {% endblock %}
+
+{% block additional_js %}
+<script>
+    var form = document.getElementById("form-grades");
+
+    document.getElementById("submit-button").addEventListener("click", function () {
+        form.submit();
+    });
+</script>
+{% endblock additional_js %}

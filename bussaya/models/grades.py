@@ -14,6 +14,8 @@ class Grade(me.Document):
     student_ids = me.ListField()
     student_grades = me.ListField()
 
+    teacher = me.ReferenceField("User", dbref=True, required=True)
+
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
     updated_date = me.DateTimeField(
         required=True, default=datetime.datetime.now, auto_now=True
