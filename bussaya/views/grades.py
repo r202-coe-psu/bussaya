@@ -10,22 +10,7 @@ module = Blueprint("grades", __name__, url_prefix="/grades")
 @acl.roles_required("admin", "lecturer")
 def index(class_id):
     class_ = models.Class.objects.get(id=class_id)
-    grades = models.Grade.objects().filter(class_=class_)
-    if not grades:
-        midterm = models.Grade()
-        midterm.type = "midterm"
-        midterm.class_ = class_
-        midterm.student_ids = class_.student_ids
-        midterm.save()
-
-        final = models.Grade()
-        final.type = "final"
-        final.class_ = class_
-        final.student_ids = class_.student_ids
-        final.save()
-        return render_template("/grades/index.html", class_=class_, grades=grades)
-
-    return render_template("/grades/index.html", class_=class_, grades=grades)
+    return render_template("/grades/index.html", class_=class_)
 
 
 def get_user_by_username(username):
@@ -54,39 +39,38 @@ def view(class_id, grade_type):
         midterm = models.Grade()
         midterm.type = "midterm"
         midterm.class_ = class_
-        midterm.student_ids = class_.student_ids
-        midterm.save()
 
         final = models.Grade()
         final.type = "final"
         final.class_ = class_
-        final.student_ids = class_.student_ids
+        midterm.save()
         final.save()
 
         for id in class_.student_ids:
             student = get_user_by_username(id)
 
-            student_grade_midterm = models.StudentGrade()
-            student_grade_midterm.grade = midterm
-            student_grade_midterm.student = student
-            student_grade_midterm.save()
+            midterm_Grade = models.StudentGrade()
+            midterm_Grade.grade = midterm
+            midterm_Grade.student = student
+            midterm_Grade.save()
+            midterm.student_grades.append(midterm_Grade)
 
-            student_grade_final = models.StudentGrade()
-            student_grade_final.grade = final
-            student_grade_final.student = student
-            student_grade_final.save()
+            final_Grade = models.StudentGrade()
+            final_Grade.grade = final
+            final_Grade.student = student
+            final_Grade.save()
+            final.student_grades.append(final_Grade)
 
-        return render_template(
-            "/grades/view.html", class_=class_, grade_type=grade_type
-        )
+        midterm.save()
+        final.save()
 
     grade = models.Grade.objects.get(type=grade_type)
-    student_grade = models.StudentGrade.objects.all().filter(grade=grade)
 
     return render_template(
         "/grades/view.html",
         class_=class_,
         grade=grade,
+        grade_type=grade_type,
         get_user_by_username=get_user_by_username,
         get_student_grade=get_student_grade,
     )
