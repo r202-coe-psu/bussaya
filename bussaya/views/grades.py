@@ -12,12 +12,8 @@ def index(class_id):
     return render_template("/grades/index.html", class_=class_)
 
 
-def get_user_by_username(username):
-    user = models.User.objects.get(username=username)
-    return user
-
-
 def get_student_grade(username, grade):
+
     user = models.User.objects.get(username=username)
     student_grade = models.StudentGrade.objects.get(
         grade=grade,
@@ -45,7 +41,17 @@ def view(class_id, grade_type):
         final.save()
 
         for id in class_.student_ids:
-            student = get_user_by_username(id)
+            try:
+                student = models.User.objects.get(username=id)
+
+            except:
+                # Create Dummy for Student that have no account
+                student = models.User()
+                student.username = id
+                student.email = f"{id}@FakeEmail.com"
+                student.first_name = ""
+                student.last_name = ""
+                student.save()
 
             midterm_Grade = models.StudentGrade()
             midterm_Grade.grade = midterm
@@ -64,8 +70,7 @@ def view(class_id, grade_type):
         midterm.save()
         final.save()
 
-    grade = models.Grade.objects.get(type=grade_type)
-
+    grade = models.Grade.objects.get(type=grade_type, class_=class_)
     # Student grade != Student  (Student was added or removed)
     student_amount = len(class_.student_ids)
     grade_amount = len(grade.student_grades)
@@ -76,7 +81,17 @@ def view(class_id, grade_type):
     for student in class_.student_ids:
         # Student Has been 'ADDED' or 'CHANGED'
         if student not in midterm.student_ids:
-            user = get_user_by_username(student)
+            try:
+                user = models.User.objects.get(username=student)
+
+            except:
+                # Create Dummy for Student that have no account
+                user = models.User()
+                user.username = student
+                user.email = f"{student}@FakeEmail.com"
+                user.first_name = ""
+                user.last_name = ""
+                user.save()
 
             midterm_Grade = models.StudentGrade()
             midterm_Grade.grade = midterm
@@ -95,7 +110,7 @@ def view(class_id, grade_type):
     for student in midterm.student_ids:
         # Sudent Has been 'REMOVED'
         if student not in class_.student_ids:
-            old_student = get_user_by_username(student)
+            old_student = models.User.objects.get(student)
             old_midterm_Grade = models.StudentGrade.objects.get(
                 student=old_student, grade=midterm
             )
@@ -117,14 +132,13 @@ def view(class_id, grade_type):
     midterm.save()
     final.save()
 
-    grade = models.Grade.objects.get(type=grade_type)
+    grade = models.Grade.objects.get(type=grade_type, class_=class_)
 
     return render_template(
         "/grades/view.html",
         class_=class_,
         grade=grade,
         grade_type=grade_type,
-        get_user_by_username=get_user_by_username,
         get_student_grade=get_student_grade,
     )
 
