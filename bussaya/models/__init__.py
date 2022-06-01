@@ -1,6 +1,7 @@
 from .users import User
 from .oauth2 import OAuth2Token
-from .classes import Class, Group
+from .classes import Class
+from .groups import Group
 from .projects import Project, ProjectResource, ProjectApproval
 from .votings import Voting, Election
 from .submissions import Submission, StudentWork
