@@ -8,6 +8,6 @@ class Group(me.Document):
 
     class_ = me.ReferenceField("Class", dbref=True, required=True)
     teacher = me.ReferenceField("User", dbref=True, required=True)
-    stuidents = me.ListField(me.ReferenceField("User", dbref=True))
+    students = me.ListField(me.ReferenceField("User", dbref=True))
     
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
