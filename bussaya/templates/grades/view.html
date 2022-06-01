@@ -9,6 +9,9 @@
     <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
     <div class="divider"> / </div>
     <a href="{{ url_for('grades.index', class_id=class_.id) }}">Grading</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">{{ grade.get_type_display()
+        }}</a>
 </div>
 {% endblock %}
 
@@ -27,7 +30,7 @@
     <div class="item ui floating labeled dropdown">
         <i class="star icon"></i>
         <span class="text">
-            Grading
+            {{ 'Midterm' if 'midterm' in request.path else 'Final' }}
         </span>
         <div class="menu">
             <a class="item" href="{{ url_for('grades.view', class_id=class_.id, grade_type='midterm') }}">
@@ -58,5 +61,31 @@
         </div>
     </div>
 </div>
+
+<div class="ui segment">
+    <h2 class="ui header">{{ grade.get_type_display() }} Grade</h2>
+</div>
+<table class="ui very compact table">
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>ID</th>
+            <th>Student Name</th>
+            <th>Grade</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for id in grade.student_ids %}
+        {% set user = get_user_by_username(id) %}
+        {% set grade = get_student_grade(id, grade) %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ id }}</td>
+            <td>{{ user.first_name }} {{ user.last_name }}</td>
+            <td>{{ grade.result }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 {% endblock %}

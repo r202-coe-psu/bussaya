@@ -37,7 +37,7 @@ def view_students(class_id):
     student_ids = class_.student_ids
 
     return render_template(
-        "/classes/view-students.html",
+        "/classes/students.html",
         class_=class_,
         student_ids=student_ids,
         get_student_name=get_student_name,

@@ -17,11 +17,23 @@
 	{{ class_.name }}
 </h1>
 
-<div class="ui huge compact menu" style="margin: auto">
-	<a class="item" href="{{ url_for('grades.index', class_id=class_.id) }}">
-		<i class="star icon"></i>
-		Grading
+<div class="ui big compact menu" style="margin: auto">
+	<a class="active item" href="{{ url_for('admin.classes.view', class_id=class_.id )}}">
+		<i class="chalkboard icon"></i>
+		Class
 	</a>
+	<div class="item ui floating labeled dropdown">
+		<i class="star icon"></i>
+		<span class="text">Grading</span>
+		<div class="menu">
+			<a class="item" href="{{ url_for('grades.view', class_id=class_.id, grade_type='midterm') }}">
+				Midterm
+			</a>
+			<a class="item" href="{{ url_for('grades.view', class_id=class_.id, grade_type='final') }}">
+				Final
+			</a>
+		</div>
+	</div>
 	<a class="item" href="{{ url_for('classes.view_students', class_id=class_.id) }}">
 		<i class="users icon"></i>
 		View Students
