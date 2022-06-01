@@ -18,7 +18,7 @@
 </h1>
 
 <div class="ui huge compact menu" style="margin: auto">
-	<a class="item" onclick="showDelete()">
+	<a class="item" href="{{ url_for('grades.index', class_id=class_.id) }}">
 		<i class="star icon"></i>
 		Grading
 	</a>
