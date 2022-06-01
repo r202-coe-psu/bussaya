@@ -7,7 +7,6 @@ module = Blueprint("grades", __name__, url_prefix="/grades")
 
 @module.route("/<class_id>")
 @login_required
-@acl.roles_required("admin", "lecturer")
 def index(class_id):
     class_ = models.Class.objects.get(id=class_id)
     return render_template("/grades/index.html", class_=class_)
@@ -27,9 +26,8 @@ def get_student_grade(username, grade):
     return student_grade
 
 
-@module.route("/<class_id>/<grade_type>")
+@module.route("/<class_id>/<grade_type>/view")
 @login_required
-@acl.roles_required("admin", "lecturer")
 def view(class_id, grade_type):
     class_ = models.Class.objects.get(id=class_id)
     grades = models.Grade.objects.all().filter(class_=class_)
@@ -129,3 +127,19 @@ def view(class_id, grade_type):
         get_user_by_username=get_user_by_username,
         get_student_grade=get_student_grade,
     )
+
+
+@module.route("/<class_id>/<grade_type>/grading", methods=["GET", "POST"])
+@login_required
+def grading(class_id, grade_type):
+    class_ = models.Class.objects.get(id=class_id)
+    grade = models.Grade.objects.get(type=grade_type, class_=class_)
+    student_grades = models.StudentGrade.objects.all().filter(grade=grade)
+
+    if request.method == "POST":
+        for student_grade in student_grades:
+            result = request.form.get(str(student_grade.id))
+            student_grade.result = result
+            student_grade.save()
+
+    return render_template("/grades/view.html", class_=class_, grade=grade)

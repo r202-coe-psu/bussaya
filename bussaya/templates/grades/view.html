@@ -66,31 +66,51 @@
 <div class="ui divider"></div>
 <div class="ui segment">
     <h3 class="ui header" style="width: fit-content">Grade student in class on {{ grade.get_type_display() }}</h3>
-    <div class="ui big green icon button">
+    {% if 'grading' in request.path %}
+    <a class="ui green icon button" href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">
+        <i class="eye icon"></i>
+        View
+    </a>
+    {% else %}
+    <a class="ui green icon button" href="{{ url_for('grades.grading', class_id=class_.id, grade_type=grade.type) }}">
         <i class="edit icon"></i>
         Grading
-    </div>
-
+    </a>
+    {% endif %}
 </div>
-<table class="ui very compact celled table">
-    <thead>
-        <tr>
-            <th>No.</th>
-            <th>ID</th>
-            <th>Student Name</th>
-            <th>Grade</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for student_grade in grade.student_grades %}
-        <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ student_grade.student.username }}</td>
-            <td>{{ student_grade.student.first_name }} {{ student_grade.student.last_name }}</td>
-            <td>{{ student_grade.result }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+
+<div class="ui segment">
+    <form method="POST">
+        <table class="ui very compact celled table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>ID</th>
+                    <th>Student Name</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student_grade in grade.student_grades %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ student_grade.student.username }}</td>
+                    <td>{{ student_grade.student.first_name }} {{ student_grade.student.last_name }}</td>
+                    <td>
+                        {% if 'grading' in request.path %}
+                        <input type="text" name="{{student_grade.id}}" value="{{student_grade.result}}">
+                        {% else %}
+                        {{ student_grade.result }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if 'grading' in request.path %}
+        <button class="ui primary icon button" type="submit"><i class="save icon"></i> Save</button>
+        {% endif %}
+    </form>
+</div>
 
 {% endblock %}
