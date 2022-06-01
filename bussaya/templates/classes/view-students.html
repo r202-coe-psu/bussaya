@@ -53,16 +53,16 @@
         <th>Group</th>
     </thead>
     <tbody>
-        {% for student in student_ids %}
+        {% for student_id in student_ids %}
         <tr>
             <td>
                 {{ loop.index }}
             </td>
             <td>
-                {{ student }}
+                {{ get_student_name(student_id) }}
             </td>
             <td>
-                {{ student }}
+                {{ student_id }}
             </td>
             <td>
                 A

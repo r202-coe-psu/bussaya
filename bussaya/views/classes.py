@@ -24,8 +24,11 @@ def view(class_id):
         "/classes/view.html", user=user, class_=class_, submissions=submissions
     )
 
+
 def get_student_name(student_id):
-    student = models.User.objects.get()
+    student = models.User.objects.get(username=student_id)
+    return f"{student.first_name} {student.last_name}"
+
 
 @module.route("/<class_id>/student_ids")
 @login_required
@@ -34,5 +37,8 @@ def view_students(class_id):
     student_ids = class_.student_ids
 
     return render_template(
-        "/classes/view-students.html", class_=class_, student_ids=student_ids
+        "/classes/view-students.html",
+        class_=class_,
+        student_ids=student_ids,
+        get_student_name=get_student_name,
     )
