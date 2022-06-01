@@ -62,8 +62,15 @@
     </div>
 </div>
 
+<h2 class="ui header">{{ grade.get_type_display() }} Grade</h2>
+<div class="ui divider"></div>
 <div class="ui segment">
-    <h2 class="ui header">{{ grade.get_type_display() }} Grade</h2>
+    <h3 class="ui header" style="width: fit-content">Grade student in class on {{ grade.get_type_display() }}</h3>
+    <div class="ui big green icon button">
+        <i class="edit icon"></i>
+        Grading
+    </div>
+
 </div>
 <table class="ui very compact celled table">
     <thead>
