@@ -14,8 +14,6 @@ class Grade(me.Document):
     student_ids = me.ListField()
     student_grades = me.ListField()
 
-    teacher = me.ReferenceField("User", dbref=True, required=True)
-
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
     updated_date = me.DateTimeField(
         required=True, default=datetime.datetime.now, auto_now=True
@@ -25,6 +23,10 @@ class Grade(me.Document):
 class StudentGrade(me.Document):
     meta = {"collection": "student_grades"}
 
-    result = me.StringField(default="-")
+    result = me.StringField(default="")
+    project = me.ReferenceField("Project", dbref=True)
     grade = me.ReferenceField("Grade", dbref=True, required=True)
+
+    class_ = me.ReferenceField("Class", dbref=True, required=True)
+    teacher = me.ReferenceField("User", dbref=True, required=True)
     student = me.ReferenceField("User", dbref=True, required=True)

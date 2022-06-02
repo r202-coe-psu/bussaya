@@ -73,7 +73,6 @@ BaseProfileForm = model_form(
         "last_login_date",
         "picture",
         "status",
-        "username",
         "resources",
     ],
     field_args={
@@ -93,4 +92,8 @@ class ProfileForm(BaseProfileForm):
     pic = fields.FileField(
         "Picture", validators=[FileAllowed(["png", "jpg"], "allow png and jpg")]
     )
-    roles = TextListField("Roles")
+
+
+class AdminForm(BaseProfileForm):
+    roles = TextListField("Roles", render_kw={"style": "height: 1ch"})
+    username = fields.StringField("Username")

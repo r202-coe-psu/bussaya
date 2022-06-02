@@ -19,7 +19,7 @@ def index():
 # @acl.roles_required("admin")
 def view(user_id):
     user = models.User.objects.get(id=user_id)
-    form = forms.accounts.ProfileForm(
+    form = forms.accounts.AdminForm(
         obj=user,
     )
     if not form.validate_on_submit():

@@ -20,6 +20,9 @@ Edit User
         <h2>Profile</h2>
         <form method="POST" class="ui form" enctype="multipart/form-data">
             {{ form.csrf_token }}
+
+            {{ renderer.render_field(form.username)}}
+
             <div class="three fields">
                 {{ renderer.render_field(form.title) }}
                 {{ renderer.render_field(form.first_name) }}
@@ -32,7 +35,6 @@ Edit User
             </div>
             <div class="three fields">
                 {{ renderer.render_field(form.email) }}
-                {{ renderer.render_fileinput(form.pic) }}
             </div>
             {{ renderer.render_field(form.roles) }}
             <button name="create" type="submit" class="ui primary button">Change</button>
