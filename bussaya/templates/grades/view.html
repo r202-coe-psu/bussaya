@@ -80,19 +80,17 @@
         <i class="edit icon"></i>
         Grading
     </a>
-    <a class="ui yellow labeled icon button"
-        href="{{ url_for('grades.view_total_grades', class_id=class_.id, grade_type=grade.type) }}"><i
-            class="clipboard check icon"></i>Total</a>
 </div>
 <form method="POST" id="form-grade">
     <div class="ui attached segment">
-        <table class="ui very compact celled table">
+        <table class="ui fixed celled table">
             <thead>
                 <tr>
-                    <th>No.</th>
-                    <th>ID</th>
-                    <th>Student Name</th>
-                    <th>Grade</th>
+                    <th class="one wide">No.</th>
+                    <th class="two wide">ID</th>
+                    <th class="four wide">Student Name</th>
+                    <th class="two wide">Grade</th>
+                    <th>Total Grade</th>
                 </tr>
             </thead>
             <tbody>
@@ -103,11 +101,50 @@
                     <td>{{ student_grade.student.username }}</td>
                     <td>{{ student_grade.student.first_name }} {{ student_grade.student.last_name }}</td>
                     <td>
-                        {% if 'grading' in request.path %}
-                        <input type="text" name="{{student_grade.id}}" value="{{student_grade.result}}">
-                        {% else %}
+                        {% if 'grading' not in request.path %}
                         {{ student_grade.result }}
+                        {% else %}
+                        <input type="text" name="{{student_grade.id}}" value="{{student_grade.result}}">
                         {% endif %}
+                    </td>
+                    <td>
+                        <div class="ui accordion">
+                            <div class="title">
+                                <a id="{{student_grade.id}}" onclick="accordion_show_hide('{{student_grade.id}}')">
+                                    Show</a>
+                            </div>
+                            <div class="content">
+                                <p class="transition hidden">
+                                <table class="ui very compact celled table">
+                                    <thead>
+                                        <th>No.</th>
+                                        <th>Lecturer Name</th>
+                                        <th>Grade</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for student_grade in get_total_student_grades(student_grade.student, class_,
+                                        grade) %}
+                                        <tr>
+                                            <td>
+                                                {{ loop.index }}.
+                                            </td>
+                                            <td>
+                                                {% if student_grade.teacher == user %}
+                                                (You)
+                                                {% endif %}
+                                                {{ student_grade.teacher.first_name }}
+                                                {{ student_grade.teacher.last_name }}
+                                            </td>
+                                            <td>
+                                                {{ student_grade.result }}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                </p>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 {% endif %}
@@ -123,11 +160,24 @@
 {% endblock %}
 
 {% block additional_js %}
-<script>
+<script type="text/javascript">
     var form = document.getElementById("form-grade");
+    if ('{{ request.path }}'.includes('grading')) {
+        document.getElementById("submit-button").addEventListener("click", function () {
+            form.submit();
+        });
+    }
 
-    document.getElementById("submit-button").addEventListener("click", function () {
-        form.submit();
-    });
+    function accordion_show_hide(show_hide_id) {
+        $('.ui.accordion').accordion({
+            onOpening: function () {
+                document.getElementById(show_hide_id).innerHTML = "Hide"
+            },
+            onClosing: function () {
+                document.getElementById(show_hide_id).innerHTML = "Show"
+            }
+        },
+        );
+    }
 </script>
 {% endblock additional_js %}

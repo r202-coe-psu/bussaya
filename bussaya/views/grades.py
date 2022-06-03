@@ -42,6 +42,13 @@ def create_student_grade(class_, grade, student, teacher):
     return student_grade
 
 
+def get_total_student_grades(student, class_, grade):
+    student_grades = models.StudentGrade.objects.all().filter(
+        student=student, class_=class_, grade=grade
+    )
+    return student_grades
+
+
 @module.route("/<class_id>/<grade_type>/view")
 @login_required
 def view(class_id, grade_type):
@@ -127,6 +134,7 @@ def view(class_id, grade_type):
         grade_type=grade_type,
         get_student_grade=get_student_grade,
         student_grades=student_grades,
+        get_total_student_grades=get_total_student_grades,
     )
 
 
@@ -154,6 +162,7 @@ def grading(class_id, grade_type):
         grade=grade,
         user=user,
         student_grades=student_grades,
+        get_total_student_grades=get_total_student_grades,
     )
 
 

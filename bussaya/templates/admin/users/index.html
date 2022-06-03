@@ -19,6 +19,7 @@ Users
             <tr>
                 <th>Name</th>
                 <th>ID</th>
+                <th>Edit</th>
             </tr>
         </thead>
 
@@ -32,6 +33,11 @@ Users
                 </td>
                 <td>
                     {{ user.username }}
+                </td>
+                <td>
+                    <a href="{{ url_for('admin.users.view', user_id=user.id) }}">
+                        Edit
+                    </a>
                 </td>
             </tr>
             {% endfor %}
