@@ -1,6 +1,6 @@
 {% extends '/base/default-dashboard.html' %}
 {% import '/base/html-renderer.html' as renderer %}
-
+{% import '/navbar/class-navbar.html' as renderer_navbar %}
 
 {% block dashboard_title %}
 {{ 'Create' if 'create' in request.path else 'Edit' }} Classes
@@ -22,7 +22,12 @@
 {% endif %}
 {% endblock %}
 
+
 {% block content %}
+{% if class_ %}
+{{ renderer_navbar.render_class_navbar(class_) }}
+{% endif %}
+
 <div class="row">
   <div class="ui segment">
     <form method="POST" class="ui form">
