@@ -1,6 +1,7 @@
 {% extends '/admin/classes/index.html' %}
 {% import '/base/error-handler.html' as eh %}
 {% import '/admin/classes/project-renderer.html' as renderer %}
+{% import '/navbar/class-navbar.html' as renderer_navbar %}
 
 {% block breadcrumbs %}
 <div class="ui breadcrumb">
@@ -22,45 +23,7 @@
     {{ class_.name }}
 </h1>
 
-<div class="ui big compact menu">
-    <a class="item" href="{{ url_for('admin.classes.view', class_id=class_.id )}}">
-        <i class="chalkboard icon"></i>
-        Class
-    </a>
-    <a class="item" href="{{ url_for('classes.view_students', class_id=class_.id) }}">
-        <i class="users icon"></i>
-        View Students
-    </a>
-    <div class="item ui floating labeled dropdown">
-        <i class="star icon"></i>
-        <span class="text">
-            {{ 'Midterm' if 'midterm' in request.path else 'Final' }}
-        </span>
-        <div class="menu">
-            <a class="item" href="{{ url_for('grades.view', class_id=class_.id, grade_type='midterm') }}">
-                Midterm
-            </a>
-            <a class="item" href="{{ url_for('grades.view', class_id=class_.id, grade_type='final') }}">
-                Final
-            </a>
-        </div>
-    </div>
-    <div class="item ui floating labeled dropdown">
-        <i class="setting icon"></i>
-        <span class="text">Settings</span>
-        <div class="menu">
-            <a class="item" href="">
-                Manage Group
-            </a>
-            <a class="item" href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">
-                Edit Class
-            </a>
-            <a class="item" onclick="showDelete()">
-                Delete Class
-            </a>
-        </div>
-    </div>
-</div>
+{{ renderer_navbar.render_class_navbar(class_) }}
 
 <h2 class="ui header">
     {{ "View" if 'view' in request.path }}
@@ -81,6 +44,7 @@
         Grading
     </a>
 </div>
+
 <form method="POST" id="form-grade">
     <div class="ui attached segment">
         <table class="ui fixed celled table">

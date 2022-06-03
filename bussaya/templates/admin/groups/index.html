@@ -1,0 +1,21 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/admin/classes/project-renderer.html' as renderer %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('groups.index', class_id=class_.id) }}">Group</a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<h1 class="ui horizontal divider header">
+    {{ class_.name }}
+</h1>
+
+{% endblock %}
