@@ -42,7 +42,7 @@
                 {{ student_id }}
             </td>
             <td>
-                A
+                {{ get_student_group(student_id, class_.id) }}
             </td>
         </tr>
         {% endfor %}

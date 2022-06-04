@@ -1,0 +1,44 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+{% import 'navbar/class-navbar.html' as navbar_renderer %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.groups.index', class_id=class_.id) }}">Group</a>
+    <div class="divider"> / </div>
+    <div class="section">Edit</div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<h1 class="ui horizontal divider header">
+    {{ class_.name }}
+</h1>
+
+{{ navbar_renderer.render_class_navbar(class_) }}
+
+<h2 class="ui header">Edit Groups</h2>
+<div class="ui divider"></div>
+
+<div class="ui segment">
+    <form method="POST" class="ui form">
+        <div class="two field">
+            {{ form.csrf_token }}
+            {{ renderer.render_field(form.name) }}
+            {{ renderer.render_select(form.lecturer) }}
+            {{ renderer.render_field(form.students) }}
+        </div>
+        <button name="edit" type="submit" class="ui small primary button">
+            Submit
+        </button>
+    </form>
+</div>
+</p>
+
+{% endblock %}

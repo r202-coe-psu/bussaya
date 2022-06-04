@@ -1,0 +1,101 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+{% import 'navbar/class-navbar.html' as navbar_renderer %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.groups.index', class_id=class_.id) }}">Group</a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<h1 class="ui horizontal divider header">
+    {{ class_.name }}
+</h1>
+
+{{ navbar_renderer.render_class_navbar(class_) }}
+
+<h2 class="ui header">Manage Groups</h2>
+<div class="ui divider"></div>
+
+<div class="ui segment">
+    <div class="ui accordion">
+        <div class="title">
+            <div class="ui primary button">Create Group</div>
+        </div>
+        <div class="content">
+            <p class="transition hidden">
+            <div class="ui segment">
+                <form method="POST" class="ui form">
+                    <div class="two field">
+                        {{ form.csrf_token }}
+                        {{ renderer.render_field(form.name) }}
+                        {{ renderer.render_select(form.lecturer) }}
+                    </div>
+                    <button name="create" type="submit" class="ui small primary button">
+                        Create
+                    </button>
+                </form>
+            </div>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="ui segment">
+    <a class="ui green button" href="{{url_for('admin.groups.set_group_student_ids', class_id=class_.id)}}">
+        Set Student Group from project</a>
+    <table class="ui celled table">
+        <thead>
+            <th>No.</th>
+            <th>Group Name</th>
+            <th>Lecturer</th>
+            <th>Student IDS </th>
+            <th>Edit/Delete</th>
+        </thead>
+        <tbody>
+            {% for group in groups %}
+            <tr>
+                <td>
+                    {{ loop.index }}
+                </td>
+                <td>
+                    {{ group.name }}
+                </td>
+                <td>
+                    {{ group.lecturer.first_name }} {{ group.lecturer.last_name }}
+                </td>
+                <td>
+                    {{ get_student_ids(group) }}
+                </td>
+                <td>
+                    <a class="ui primary icon button"
+                        href="{{url_for('admin.groups.edit', group_id=group.id, class_id=class_.id)}}">
+                        <i class="edit icon"></i>
+                    </a>
+                    <a class="ui red icon button"
+                        href="{{url_for('admin.groups.delete', group_id=group.id, class_id=class_.id)}}">
+                        <i class="trash icon"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}
+
+{% block additional_js %}
+<script type="text/javascript">
+    $(".ui.accordion").accordion()
+
+</script>
+{% endblock additional_js %}

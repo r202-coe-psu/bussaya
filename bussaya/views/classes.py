@@ -26,11 +26,20 @@ def view(class_id):
 
 
 def get_student_name(student_id):
-    try:
-        student = models.User.objects.get(username=student_id)
-        return f"{student.first_name} {student.last_name}"
-    except:
-        return ""
+    student = models.User.objects.get(username=student_id)
+    return f"{student.first_name} {student.last_name}"
+
+
+def get_student_group(student_id, class_id):
+    student = models.User.objects.get(username=student_id)
+    class_ = models.Class.objects.get(id=class_id)
+
+    groups = models.Group.objects.all().filter(class_=class_)
+    for group in groups:
+        if student in group.students:
+            return group.name
+
+    return ""
 
 
 @module.route("/<class_id>/student_ids")
@@ -44,4 +53,5 @@ def view_students(class_id):
         class_=class_,
         student_ids=student_ids,
         get_student_name=get_student_name,
+        get_student_group=get_student_group,
     )

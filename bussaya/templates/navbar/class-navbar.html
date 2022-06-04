@@ -24,7 +24,7 @@
     <i class="setting icon"></i>
     <span class="text">Settings</span>
     <div class="menu">
-      <a class="item" href="">
+      <a class="item" href="{{ url_for('admin.groups.manage', class_id=class_.id) }}">
         Manage Group
       </a>
       <a class="item" href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">
