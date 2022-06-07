@@ -98,25 +98,20 @@ def view(class_id, grade_type):
             create_student_grade(class_, final, user, teacher)
 
     for student_id in midterm.student_ids:
-        # Sudent Has been 'REMOVED'
+        # Student Has been 'REMOVED'
         if student_id not in class_.student_ids:
-            old_student = models.User.objects.get(student_id)
+            old_student = models.User.objects.get(username=student_id)
             old_midterm_Grade = models.StudentGrade.objects.get(
-                student=old_student, grade=midterm
+                student=old_student, grade=midterm, class_=class_
             )
             old_final_Grade = models.StudentGrade.objects.get(
-                student=old_student, grade=final
+                student=old_student, grade=final, class_=class_
             )
 
             old_midterm_Grade.delete()
             old_final_Grade.delete()
 
-            index_mid = midterm.student_grades.index(old_midterm_Grade)
-            midterm.student_grades.pop(index_mid)
             midterm.student_ids.remove(student_id)
-
-            index_fin = final.student_grades.index(old_final_Grade)
-            final.student_grades.pop(index_fin)
             final.student_ids.remove(student_id)
 
     midterm.save()
