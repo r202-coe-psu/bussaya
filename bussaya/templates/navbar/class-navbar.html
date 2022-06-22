@@ -37,3 +37,13 @@
   </div>
 </div>
 {% endmacro %}
+
+{% block additional_js %}
+<script>
+  function showDelete() {
+    $('.ui.modal.delete.class')
+      .modal('show')
+      ;
+  }
+</script>
+{% endblock additional_js %}

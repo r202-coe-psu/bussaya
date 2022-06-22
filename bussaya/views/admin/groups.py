@@ -43,14 +43,16 @@ def set_group_student_ids(class_id):
     groups = models.Group.objects.all().filter(
         class_=models.Class.objects.get(id=class_id)
     )
+    class_ = models.Class.objects.get(id=class_id)
     for group in groups:
         group.students = []
 
         projects = models.Project.objects.all().filter(advisor=group.lecturer)
         for project in projects:
             for student in project.students:
-                if student not in group.students:
-                    group.students.append(student)
+                if student.username in class_.student_ids:
+                    if student not in group.students:
+                        group.students.append(student)
         group.save()
 
     return redirect(url_for("admin.groups.manage", class_id=class_id))
