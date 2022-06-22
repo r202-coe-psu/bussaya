@@ -43,14 +43,15 @@
 
 <h2 class="ui header">Submissions</h2>
 {% if submissions | count > 0 %}
-<table class="ui selectable celled table unstackable">
+<table class="ui celled table unstackable">
 	<thead>
 		<tr>
 			<th>Type</th>
-			<th>Remark</th>
+			<th>Description</th>
 			<th>Status</th>
 			<th>Time Remaining</th>
 			<th>File</th>
+			<th>Action</th>
 			<th>Started Date</th>
 			<th>Ended Date</th>
 		</tr>
@@ -68,30 +69,21 @@
 					{{ submission.remark}}
 				</div>
 			</td>
+
+			{# Status #}
 			{% if submission.is_in_time() and submission.is_in_time() != "Upcoming" %}
 			{% if student_work %}
 			<td class="green">
-				Sent /
-				<b>
-					<a
-						href="{{ url_for('submissions.edit_student_work', submission_id=submission.id, class_id=class_.id, student_work_id=student_work.id)}}">
-						Edit
-					</a>
-				</b>
+				Submitted
 			</td>
 			{% else %}
-			<td>
-				Opened /
-				<b>
-					<a href="{{ url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
-						Upload
-					</a>
-				</b>
+			<td class="blue">
+				Opened
 			</td>
 			{% endif %}
 			{% else %}
 			{% if submission.is_in_time() == "Upcoming" %}
-			<td class="orange">
+			<td>
 				Upcoming
 			</td>
 			{% else %}
@@ -100,13 +92,21 @@
 			</td>
 			{% endif %}
 			{% endif %}
-			<td>
-				{{submission.remain_time()}}
+
+
+			{% set time_delta, time_remain = submission.set_remain_time() %}
+			<td class="
+				{{ 'orange' if time_delta == 1 and not student_work }} 
+				{{ 'red' if time_delta == 0 and not student_work }} 
+				{{ 'grey' if time_remain == 'Out of time'}}
+				">
+				{{ time_remain }}
 			</td>
+
 			<td>
 				{% if student_work %}
-				<div style="display:flex">
-					<a style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 15em;"
+				<div style="display: flex">
+					<a style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 15em"
 						href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}">
 						{{student_work.file.filename}}
 					</a>
@@ -115,9 +115,29 @@
 				-
 				{% endif %}
 			</td>
+
+			<td>
+				{% if submission.is_in_time() and submission.is_in_time() != "Upcoming" %}
+				{% if student_work %}
+				<a class="ui fluid icon primary button"
+					href="{{ url_for('submissions.edit_student_work', submission_id=submission.id, class_id=class_.id, student_work_id=student_work.id)}}">
+					<i class="edit icon"></i>
+					Edit
+				</a>
+				{% else %}
+				<a class="ui fluid icon primary button"
+					href="{{ url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
+					<i class="upload icon"></i>
+					Upload
+				</a>
+				{% endif %}
+				{% endif %}
+			</td>
+
 			<td>
 				{{ submission.natural_started_date() }}
 			</td>
+
 			<td>
 				{{ submission.natural_ended_date() }}
 			</td>

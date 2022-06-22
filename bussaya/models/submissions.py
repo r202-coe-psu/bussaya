@@ -34,28 +34,32 @@ class Submission(me.Document):
         else:
             return False
 
-
-    def remain_time(self):
+    def set_remain_time(self):
         now = datetime.datetime.now()
         start = self.started_date
         end = self.ended_date
 
         if start > now:
-            return f"Opening in {humanize.naturaltime(now - start).removesuffix('from now')}"
-        elif now > end:
-            return "Out of time"
-        else:
+            delta = start - now
             return (
-                f"Closing in {humanize.naturaltime(now - end).removesuffix('from now')}"
+                delta.days,
+                f"Opening in {humanize.naturaltime(delta).removesuffix('from now')}",
             )
+        if now > end:
+            return (end - now).days, "Out of time"
 
+        if now > start and end > now:
+            delta = end - now
+            return (
+                delta.days,
+                f"Closing in {humanize.naturaltime(delta).removesuffix('from now')}",
+            )
 
     def natural_started_date(self):
         return self.started_date.strftime("%A, %d %B %Y, %I:%M %p")
 
     def natural_ended_date(self):
         return self.ended_date.strftime("%A, %d %B %Y, %I:%M %p")
-
 
     def get_student_work_by_owner(self, owner):
         student_works = StudentWork.objects.all().filter(submission=self, owner=owner)
