@@ -107,7 +107,8 @@
 				{% if student_work %}
 				<div style="display: flex">
 					<a style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 15em"
-						href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}">
+						href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}"
+						target="_blank">
 						{{student_work.file.filename}}
 					</a>
 				</div>
