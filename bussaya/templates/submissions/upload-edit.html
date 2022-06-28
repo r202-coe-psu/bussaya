@@ -19,12 +19,19 @@ Submission Form
 
 {% block content %}
 
+<div class="ui info message">
+    <div class="ui header">
+        Submission: {{ submission.get_type_display() }}
+    </div>
+    {{ submission.description }}
+</div>
+
 <form method="POST" class="ui form" enctype="multipart/form-data">
     <div class="ui segment">
         {{ form.csrf_token }}
         {{ renderer.render_fileinput(form.uploaded_file) }}
-        {{ renderer.render_field(form.remark) }}
-        <button type="submit" class="ui button primary">Upload</button>
+        {{ renderer.render_field(form.description) }}
+        <button type="submit" class="ui button primary">{{ 'Edit' if 'edit' in request.path else 'Upload' }}</button>
     </div>
 </form>
 

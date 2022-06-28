@@ -21,7 +21,7 @@ Add Submission
         <form method="POST" class="ui form">
             {{ form.csrf_token }}
             {{ renderer.render_field(form.type) }}
-            {{ renderer.render_field(form.remark) }}
+            {{ renderer.render_field(form.description) }}
             <div class="two fields">
                 <div class="field">
                     {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
@@ -30,7 +30,7 @@ Add Submission
                     {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
                 </div>
             </div>
-            <button class="ui primary button" type="submit">Add</button>
+            <button class="ui primary button" type="submit">{{ 'Edit' if 'edit' in request.path else 'Add' }}</button>
         </form>
     </div>
 </div>

@@ -20,7 +20,7 @@ class Submission(me.Document):
 
     class_ = me.ReferenceField("Class", dbref=True, required=True)
     owner = me.ReferenceField("User", dbref=True, required=True)
-    remark = me.StringField()
+    description = me.StringField()
 
     file = me.FileField()
 
@@ -43,7 +43,7 @@ class Submission(me.Document):
             delta = start - now
             return (
                 delta.days,
-                f"Opening in {humanize.naturaltime(delta).removesuffix('from now')}",
+                f"Opening in {humanize.naturaltime(delta).removesuffix(' ago')}",
             )
         if now > end:
             return (end - now).days, "Out of time"
@@ -52,7 +52,7 @@ class Submission(me.Document):
             delta = end - now
             return (
                 delta.days,
-                f"Closing in {humanize.naturaltime(delta).removesuffix('from now')}",
+                f"Closing in {humanize.naturaltime(delta).removesuffix(' ago')}",
             )
 
     def natural_started_date(self):
@@ -70,7 +70,7 @@ class Submission(me.Document):
 class StudentWork(me.Document):
     meta = {"collection": "student_works"}
 
-    remark = me.StringField()
+    description = me.StringField()
     file = me.FileField()
     owner = me.ReferenceField("User", dbref=True, required=True)
 
