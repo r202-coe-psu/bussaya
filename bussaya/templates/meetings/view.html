@@ -1,0 +1,67 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/error-handler.html' as eh %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a class="section" href="{{ url_for('admin.classes.index') }}">Classes</a>
+    <div class="divider"> / </div>
+    <a class="section" href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <div class="section">Submission: {{ meeting.name }}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+
+<table class="ui definition table">
+    <tbody>
+        <tr>
+            <td class="two wide column">Name</td>
+            <td>{{ meeting.name }}</td>
+        </tr>
+        </tr>
+        <tr>
+            <td>Started Date</td>
+            <td>{{ meeting.started_date }}</td>
+        </tr>
+        <tr>
+            <td>Ended Date</td>
+            <td>{{ meeting.ended_date }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<a class="ui very small primary icon button" style="margin-top:0.5em"
+    href="{{url_for('meetings.edit', meeting_id=meeting.id, class_id=class_.id)}}">
+    <i class="edit icon"></i> Edit
+</a>
+<a class="ui very small negative icon button" style="margin-top:0.5em">
+    <i class="trash icon"></i> Delete
+</a>
+
+<h4>Submission: {{meeting.name}}</h4>
+<table class="ui celled table">
+    <thead>
+        <tr>
+            <th>Student IDS</th>
+            <th>Title</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student_work in student_works %}
+        <td>
+            {{student_work.student.username}}
+            {{student_work.name}}
+            {{student_work.description}}
+        </td>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+{% endblock %}>

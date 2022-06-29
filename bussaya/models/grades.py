@@ -23,7 +23,7 @@ class Grade(me.Document):
 class StudentGrade(me.Document):
     meta = {"collection": "student_grades"}
 
-    result = me.StringField(default="")
+    result = me.StringField(default="-")
     project = me.ReferenceField("Project", dbref=True)
     grade = me.ReferenceField("Grade", dbref=True, required=True)
 

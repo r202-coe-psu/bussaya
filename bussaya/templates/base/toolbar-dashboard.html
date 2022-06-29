@@ -1,10 +1,10 @@
 <div class="item">
   <a href="{{ url_for('accounts.index') }}" class="ui image">
-    {%- if current_user.get_picture() %}
+    {% if current_user.get_picture() %}
     <img class="ui avatar image" src="{{ current_user.get_picture() }}">
     {% else %}
     <i class="user icon"></i>
-    {% endif -%}
+    {% endif %}
   </a>
   <a href="{{ url_for('accounts.index') }}"><span class="white-text name">{{ current_user.first_name }} {{
       current_user.last_name }}</span></a><br />

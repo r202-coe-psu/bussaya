@@ -40,7 +40,19 @@ class SubmissionForm(BaseProjectForm):
     )
 
 
+class MeetingForm(BaseProjectForm):
+    name = fields.StringField("Name")
+
+    started_date = fields.DateTimeField(
+        "Started Date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
+    )
+    ended_date = fields.DateTimeField(
+        "Ended date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
+    )
+
+
 class StudentWorkForm(BaseProjectForm):
+    description = fields.StringField("Description")
     uploaded_file = fields.FileField(
         "Upload File: PDF only", validators=[FileAllowed(["pdf"], "PDF only")]
     )

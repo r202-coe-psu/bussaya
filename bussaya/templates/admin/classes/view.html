@@ -2,7 +2,7 @@
 {% import '/base/error-handler.html' as eh %}
 {% import '/admin/classes/project-renderer.html' as renderer_project %}
 {% import '/navbar/class-navbar.html' as renderer_navbar %}
-
+{% import '/base/html-renderer.html' as renderer %}
 
 {% block breadcrumbs %}
 <div class="ui breadcrumb">
@@ -68,6 +68,70 @@
 
 <div class="ui segment">
 	<h2 class="ui header">Submissions</h2>
+	<div class="ui divider"></div>
+	<h3 class="ui header">Meeting</h3>
+	<table class="ui selectable celled table unstackable">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Started Date</th>
+				<th>Ended Date</th>
+				<th>Edit/Delete</th>
+			</tr>
+		</thead>
+
+		<body>
+			{% for meeting in meetings %}
+			<tr>
+				<td>
+					<a href="{{url_for('meetings.view', meeting_id=meeting.id, class_id=class_.id)}}">
+						{{ meeting.name }}
+					</a>
+				</td>
+				<td>
+					{{ meeting.started_date }}
+				</td>
+				<td>
+					{{ meeting.ended_date }}
+				</td>
+				<td>
+					<a class="ui primary icon button">
+						<i class="edit icon"></i>
+					</a>
+					<a class="ui red icon button">
+						<i class="trash icon"></i>
+					</a>
+				</td>
+			</tr>
+			{% endfor %}
+		</body>
+	</table>
+	<div class="ui accordion">
+		<div class="title">
+			<div class="ui primary button">Create Meeting</div>
+		</div>
+		<div class="content">
+			<p class="transition hidden">
+			<div class="ui segment">
+				<form method="POST" class="ui form">
+					{{ form.csrf_token }}
+
+					<div class="field">
+						{{ renderer.render_field(form.name)}}
+					</div>
+					<div class="two fields">
+						{{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
+						{{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
+					</div>
+					<button name="create" type="submit" class="ui small primary button">
+						Create
+					</button>
+				</form>
+			</div>
+			</p>
+		</div>
+		<div class="ui divider"></div>
+	</div>
 	<table class="ui selectable celled table unstackable">
 		<thead>
 			<tr>
@@ -111,8 +175,8 @@
 		</body>
 	</table>
 
-	<a class="ui primary button" href="{{ url_for('submissions.add', class_id=class_.id) }}">
-		Add Submission
+	<a class="ui primary button" href="{{ url_for('submissions.create', class_id=class_.id) }}">
+		Create Submission
 	</a>
 </div>
 
@@ -146,5 +210,30 @@
 			.modal('show')
 			;
 	}
+	$(".ui.accordion").accordion()
+</script>
+<script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
+<script type="text/javascript">
+	datetime_formatter = {
+		datetime: function (datetime, settings) {
+			if (!datetime) return '';
+			var day = datetime.getDate();
+			var month = datetime.getMonth() + 1;
+			var year = datetime.getFullYear();
+			var hour = datetime.getHours();
+			var minute = datetime.getMinutes();
+			return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
+		}
+	};
+	$('#rangestart').calendar({
+		// type: 'date',
+		formatter: datetime_formatter,
+		endCalendar: $('#rangeend')
+	});
+	$('#rangeend').calendar({
+		// type: 'date',
+		formatter: datetime_formatter,
+		startCalendar: $('#rangestart')
+	});
 </script>
 {% endblock additional_js %}

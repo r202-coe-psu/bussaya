@@ -1,16 +1,20 @@
 {% macro render_class_navbar(class_) %}
 <div class="ui big compact menu" style="margin: auto">
-  <a class="active item" href="{{ url_for('admin.classes.view', class_id=class_.id )}}">
+  <a class="{{'active' if 'home' in request.path}} item" href="{{ url_for('admin.classes.view', class_id=class_.id )}}">
     <i class="chalkboard icon"></i>
     Class
   </a>
   <a class="item" href="{{ url_for('classes.view_students', class_id=class_.id) }}">
-    <i class="users icon"></i>
+    <i class="student icon"></i>
     View Students
   </a>
   <div class="item ui floating labeled dropdown">
     <i class="star icon"></i>
-    <span class="text">Grading</span>
+    <span class="text">
+      {{'Midterm' if 'midterm' in request.path}}
+      {{'Final' if 'final' in request.path}}
+      {{'Grading' if 'midterm' not in request.path and 'final' not in request.path}}
+    </span>
     <div class="menu">
       <a class="item" href="{{ url_for('grades.view', class_id=class_.id, grade_type='midterm') }}">
         Midterm
@@ -20,23 +24,43 @@
       </a>
     </div>
   </div>
-  <div class="item ui floating labeled dropdown">
-    <i class="setting icon"></i>
-    <span class="text">Settings</span>
-    <div class="menu">
-      <a class="item" href="{{ url_for('admin.groups.manage', class_id=class_.id) }}">
-        Manage Group
-      </a>
-      <a class="item" href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">
-        Edit Class
-      </a>
-      <a class="item" onclick="showDelete()">
-        Delete Class
-      </a>
+  <a class="{{'active' if 'groups' in request.path}} item"
+    href="{{ url_for('admin.groups.manage', class_id=class_.id) }}">
+    <i class="group icon"></i>
+    Manage Group
+  </a>
+  <a class="{{'active' if 'edit' in request.path and 'classes' in request.path}} item"
+    href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">
+    <i class="edit icon"></i>
+    Edit Class
+  </a>
+  <a class="item" onclick="showDelete()">
+    <i class="trash icon"></i>
+    Delete Class
+  </a>
+</div>
+
+<div class="ui modal delete class">
+  <i class="close icon"></i>
+  <div class="header">
+    Delete Class
+  </div>
+  <div class="image content">
+    <div class="description">
+      <div class="ui small header">Are you sure you want to delete <span class="ui blue text">{{class_.name}}</span>
+        class?</div>
     </div>
   </div>
+  <div class="actions">
+    <div class="ui black deny button">
+      No
+    </div>
+    <a class="ui very small red icon button" style="margin-top:0.5em"
+      href="{{ url_for('admin.classes.delete', class_id=class_.id) }}">
+      <i class="trash icon"></i> Delete
+    </a>
+  </div>
 </div>
-{% endmacro %}
 
 {% block additional_js %}
 <script>
@@ -47,3 +71,5 @@
   }
 </script>
 {% endblock additional_js %}
+
+{% endmacro %}

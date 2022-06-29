@@ -7,5 +7,6 @@ from . import classes
 from . import projects
 from . import submissions
 from . import groups
+from . import meetings
 
-__all__ = [accounts, classes, projects, submissions, groups]
+__all__ = [accounts, classes, projects, submissions, groups, meetings]

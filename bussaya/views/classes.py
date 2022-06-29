@@ -26,12 +26,15 @@ def view(class_id):
 
 
 def get_student_name(student_id):
-    student = models.User.objects.get(username=student_id)
+    student = models.User.objects(username=student_id).first()
+    if not student:
+        return ""
+
     return f"{student.first_name} {student.last_name}"
 
 
 def get_student_group(student_id, class_id):
-    student = models.User.objects.get(username=student_id)
+    student = models.User.objects(username=student_id).first()
     class_ = models.Class.objects.get(id=class_id)
 
     groups = models.Group.objects.all().filter(class_=class_)

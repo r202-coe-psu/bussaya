@@ -49,6 +49,7 @@ def index_student():
     user = current_user._get_current_object()
 
     for class_ in classes:
+        print(class_.is_in_time(), user.username, class_.student_ids)
         if class_.is_in_time() and user.username in class_.student_ids:
             available_class.append(class_)
 

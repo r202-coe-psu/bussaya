@@ -1,0 +1,65 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+{% import 'navbar/class-navbar.html' as navbar_renderer %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <div class="section">Edit</div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<h1 class="ui horizontal divider header">
+    {{ class_.name }}
+</h1>
+
+{{ navbar_renderer.render_class_navbar(class_) }}
+
+<h2 class="ui header">Edit Groups</h2>
+<div class="ui divider"></div>
+
+<div class="ui segment">
+    <form method="POST" class="ui form">
+        <div class="two field">
+            {{ form.csrf_token }}
+            {{ renderer.render_field(form.name) }}
+            {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
+            {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
+        </div>
+        <button name="edit" type="submit" class="ui small primary button">
+            Submit
+        </button>
+    </form>
+</div>
+</p>
+
+{% endblock %}
+
+{% block additional_js %}
+<script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
+<script type="text/javascript">
+    datetime_formatter = {
+        datetime: function (datetime, settings) {
+            if (!datetime) return '';
+            var day = datetime.getDate();
+            var month = datetime.getMonth() + 1;
+            var year = datetime.getFullYear();
+            var hour = datetime.getHours();
+            var minute = datetime.getMinutes();
+            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
+        }
+    };
+    $('#rangestart').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        endCalendar: $('#rangeend')
+    });
+    $('#rangeend').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        startCalendar: $('#rangestart')
+    });
+</script>
+{% endblock additional_js %}

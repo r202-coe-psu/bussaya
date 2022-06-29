@@ -59,18 +59,32 @@ def edit(class_id):
     return redirect(url_for("admin.classes.view", class_id=class_.id))
 
 
-@module.route("/<class_id>")
+@module.route("/<class_id>/home", methods=["GET", "POST"])
 @acl.roles_required("admin")
 def view(class_id):
     class_ = models.Class.objects.get(id=class_id)
     projects = models.Project.objects(class_=class_)
     submissions = models.Submission.objects(class_=class_)
+    meetings = models.Meeting.objects(class_=class_)
+
+    form = forms.meetings.MeetingForm()
+    if form.validate_on_submit():
+        meeting = models.Meeting()
+        form.populate_obj(meeting)
+        meeting.class_ = class_
+        meeting.type = "meeting"
+        meeting.owner = current_user._get_current_object()
+        meeting.save()
+        return redirect(url_for("admin.classes.view", class_id=class_.id))
+
     return render_template(
         "/admin/classes/view.html",
+        form=form,
         class_=class_,
         class_id=class_id,
         projects=projects,
         submissions=submissions,
+        meetings=meetings,
     )
 
 
