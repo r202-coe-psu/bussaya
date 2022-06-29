@@ -10,14 +10,14 @@ import socket
 module = Blueprint("submissions", __name__, url_prefix="/submissions")
 
 
-@module.route("/<class_id>/submissions/add", methods=["GET", "POST"])
+@module.route("/<class_id>/submissions/create", methods=["GET", "POST"])
 @login_required
-def add(class_id):
+def create(class_id):
     form = forms.submissions.SubmissionForm()
     class_ = models.Class.objects.get(id=class_id)
     if not form.validate_on_submit():
         return render_template(
-            "/submissions/add-edit.html",
+            "/submissions/create-edit.html",
             form=form,
             class_=class_,
         )
@@ -61,7 +61,7 @@ def edit(submission_id, class_id):
     form = forms.submissions.SubmissionForm(obj=submission)
     if not form.validate_on_submit():
         return render_template(
-            "/submissions/add-edit.html",
+            "/submissions/create-edit.html",
             form=form,
             class_=class_,
             submission=submission,
@@ -79,7 +79,6 @@ def edit(submission_id, class_id):
 @module.route("/<class_id>/submissions/<submission_id>/delete", methods=["GET", "POST"])
 @login_required
 def delete(submission_id, class_id):
-    print(submission_id)
     submission = models.Submission.objects.get(id=submission_id)
     submission.delete()
     return redirect(
