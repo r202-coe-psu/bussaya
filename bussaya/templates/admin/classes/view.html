@@ -95,10 +95,12 @@
 					{{ meeting.ended_date }}
 				</td>
 				<td>
-					<a class="ui primary icon button">
+					<a class="ui primary icon button"
+						href="{{url_for('meetings.edit', meeting_id=meeting.id, class_id=class_.id)}}">
 						<i class="edit icon"></i>
 					</a>
-					<a class="ui red icon button">
+					<a class="ui red icon button"
+						href="{{url_for('meetings.delete', meeting_id=meeting.id, class_id=class_.id)}}">
 						<i class="trash icon"></i>
 					</a>
 				</td>
@@ -132,6 +134,8 @@
 		</div>
 		<div class="ui divider"></div>
 	</div>
+
+	<h3 class="ui header">Report / Presentation</h3>
 	<table class="ui selectable celled table unstackable">
 		<thead>
 			<tr>

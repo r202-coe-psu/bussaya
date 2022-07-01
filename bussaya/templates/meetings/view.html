@@ -46,6 +46,7 @@
 <table class="ui celled table">
     <thead>
         <tr>
+            <th></th>
             <th>Student IDS</th>
             <th>Title</th>
             <th>Description</th>
@@ -54,8 +55,15 @@
     <tbody>
         {% for student_work in student_works %}
         <td>
-            {{student_work.student.username}}
-            {{student_work.name}}
+            {{ loop.index }}
+        </td>
+        <td>
+            {{student_work.owner.username}}
+        </td>
+        <td>
+            {{student_work.title}}
+        </td>
+        <td>
             {{student_work.description}}
         </td>
         {% endfor %}

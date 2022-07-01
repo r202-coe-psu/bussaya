@@ -1,0 +1,40 @@
+{% extends '/base/default-dashboard.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+
+{% block dashboard_title %}
+Meeting Form
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('dashboard.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    Form:<a href="{{ url_for('meetings.upload', class_id=class_.id, meeting_id=meeting.id) }}">
+        {{meeting.name}}</a>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="ui info message">
+    <div class="ui header">
+        Meeting: {{ meeting.name }}
+    </div>
+</div>
+
+<form method="POST" class="ui form" enctype="multipart/form-data">
+    <div class="ui segment">
+        {{ form.csrf_token }}
+        {{ renderer.render_field(form.title)}}
+        {{ renderer.render_field(form.description)}}
+        <div class="fields">
+            {{ renderer.render_field(form.meeting_date) }}
+        </div>
+        <button type="submit" class="ui button primary">{{ 'Edit' if 'edit' in request.path else 'Upload' }}</button>
+    </div>
+</form>
+
+{% endblock content %}

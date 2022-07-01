@@ -39,118 +39,213 @@
 	</tbody>
 </table>
 
-<div class="ui divider"></div>
+<div class="ui segment">
 
-<h2 class="ui header">Submissions</h2>
-{% if submissions | count > 0 %}
-<table class="ui celled table unstackable">
-	<thead>
-		<tr>
-			<th>Type</th>
-			<th>Description</th>
-			<th>Status</th>
-			<th>Time Remaining</th>
-			<th>File</th>
-			<th>Action</th>
-			<th>Started Date</th>
-			<th>Ended Date</th>
-		</tr>
-	</thead>
+	<h2 class="ui header">Submissions</h2>
+	<div class="ui divider"></div>
 
-	<body>
-		{% for submission in submissions %}
-		{% set student_work = submission.get_student_work_by_owner(user) %}
-		<tr>
-			<td>
-				{{ submission.get_type_display() }}
-			</td>
-			<td class="three wide">
-				<div style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 18em;">
-					{{ submission.description}}
-				</div>
-			</td>
+	<h3 class="ui header">Meetings</h3>
+	{% if meetings | count > 0 %}
+	<table class="ui celled table unstackable">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Status</th>
+				<th>Time Remaining</th>
+				<th>Action</th>
+				<th>Started Date</th>
+				<th>Ended Date</th>
+			</tr>
+		</thead>
 
-			{# Status #}
-			{% if submission.is_in_time() and submission.is_in_time() != "Upcoming" %}
-			{% if student_work %}
-			<td class="green">
-				Submitted
-			</td>
-			{% else %}
-			<td class="blue">
-				<a href="{{ url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
-					Opened
-				</a>
-			</td>
-			{% endif %}
-			{% else %}
-			{% if submission.is_in_time() == "Upcoming" %}
-			<td>
-				Upcoming
-			</td>
-			{% else %}
-			<td class="grey">
-				Closed
-			</td>
-			{% endif %}
-			{% endif %}
+		<body>
+			{% for meeting in meetings %}
+			{% set student_work = meeting.get_student_work_by_owner(user) %}
+			<tr>
+				<td>
+					{{ meeting.name }}
+				</td>
+
+				{# Status #}
+				{% if meeting.is_in_time() and meeting.is_in_time() != "Upcoming" %}
+				{% if student_work %}
+				<td class="green">
+					Submitted
+				</td>
+				{% else %}
+				<td class="blue">
+					<a href="{{ url_for('meetings.upload', meeting_id=meeting.id, class_id=class_.id)}}">
+						Opened
+					</a>
+				</td>
+				{% endif %}
+				{% else %}
+				{% if meeting.is_in_time() == "Upcoming" %}
+				<td>
+					Upcoming
+				</td>
+				{% else %}
+				<td class="grey">
+					Closed
+				</td>
+				{% endif %}
+				{% endif %}
 
 
-			{% set time_delta, time_remain = submission.set_remain_time() %}
-			<td class="
+				{% set time_delta, time_remain = meeting.set_remain_time() %}
+				<td class="
 				{{ 'orange' if time_delta == 1 and not student_work }} 
 				{{ 'red' if time_delta == 0 and not student_work }} 
 				{{ 'grey' if time_remain == 'Out of time'}}
 				">
-				{{ time_remain }}
-			</td>
+					{{ time_remain }}
+				</td>
 
-			<td>
-				{% if student_work %}
-				<div style="display: flex">
-					<a style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 15em"
-						href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}"
-						target="_blank">
-						{{student_work.file.filename}}
+				<td>
+					{% if meeting.is_in_time() and meeting.is_in_time() != "Upcoming" %}
+					{% if student_work %}
+					<a class="ui fluid icon primary button"
+						href="{{ url_for('meetings.edit_student_work', meeting_id=meeting.id, class_id=class_.id, student_work_id=student_work.id)}}">
+						<i class="edit icon"></i>
+						Edit
 					</a>
-				</div>
-				{% else %}
-				-
-				{% endif %}
-			</td>
+					{% else %}
+					<a class="ui fluid icon primary button"
+						href="{{ url_for('meetings.upload', meeting_id=meeting.id, class_id=class_.id)}}">
+						<i class="upload icon"></i>
+						Upload
+					</a>
+					{% endif %}
+					{% endif %}
+				</td>
 
-			<td>
+				<td>
+					{{ meeting.natural_started_date() }}
+				</td>
+
+				<td>
+					{{ meeting.natural_ended_date() }}
+				</td>
+			</tr>
+			{% endfor %}
+		</body>
+	</table>
+	{% else %}
+	<div class="ui info message">No meetings at this time.</div>
+	{% endif %}
+
+	<div class="ui divider"></div>
+	<h3 class="ui header">Report / Presentation</h3>
+	{% if submissions | count > 0 %}
+	<table class="ui celled table unstackable">
+		<thead>
+			<tr>
+				<th>Type</th>
+				<th>Description</th>
+				<th>Status</th>
+				<th>Time Remaining</th>
+				<th>File</th>
+				<th>Action</th>
+				<th>Started Date</th>
+				<th>Ended Date</th>
+			</tr>
+		</thead>
+
+		<body>
+			{% for submission in submissions %}
+			{% set student_work = submission.get_student_work_by_owner(user) %}
+			<tr>
+				<td>
+					{{ submission.get_type_display() }}
+				</td>
+				<td class="three wide">
+					<div style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 18em;">
+						{{ submission.description}}
+					</div>
+				</td>
+
+				{# Status #}
 				{% if submission.is_in_time() and submission.is_in_time() != "Upcoming" %}
 				{% if student_work %}
-				<a class="ui fluid icon primary button"
-					href="{{ url_for('submissions.edit_student_work', submission_id=submission.id, class_id=class_.id, student_work_id=student_work.id)}}">
-					<i class="edit icon"></i>
-					Edit
-				</a>
+				<td class="green">
+					Submitted
+				</td>
 				{% else %}
-				<a class="ui fluid icon primary button"
-					href="{{ url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
-					<i class="upload icon"></i>
-					Upload
-				</a>
+				<td class="blue">
+					<a href="{{ url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
+						Opened
+					</a>
+				</td>
+				{% endif %}
+				{% else %}
+				{% if submission.is_in_time() == "Upcoming" %}
+				<td>
+					Upcoming
+				</td>
+				{% else %}
+				<td class="grey">
+					Closed
+				</td>
 				{% endif %}
 				{% endif %}
-			</td>
 
-			<td>
-				{{ submission.natural_started_date() }}
-			</td>
 
-			<td>
-				{{ submission.natural_ended_date() }}
-			</td>
-		</tr>
-		{% endfor %}
-	</body>
-</table>
-{% else %}
-<div class="ui info message">No submission at this time.</div>
-{% endif %}
+				{% set time_delta, time_remain = submission.set_remain_time() %}
+				<td class="
+				{{ 'orange' if time_delta == 1 and not student_work }} 
+				{{ 'red' if time_delta == 0 and not student_work }} 
+				{{ 'grey' if time_remain == 'Out of time'}}
+				">
+					{{ time_remain }}
+				</td>
+
+				<td>
+					{% if student_work %}
+					<div style="display: flex">
+						<a style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 15em"
+							href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}"
+							target="_blank">
+							{{student_work.file.filename}}
+						</a>
+					</div>
+					{% else %}
+					-
+					{% endif %}
+				</td>
+
+				<td>
+					{% if submission.is_in_time() and submission.is_in_time() != "Upcoming" %}
+					{% if student_work %}
+					<a class="ui fluid icon primary button"
+						href="{{ url_for('submissions.edit_student_work', submission_id=submission.id, class_id=class_.id, student_work_id=student_work.id)}}">
+						<i class="edit icon"></i>
+						Edit
+					</a>
+					{% else %}
+					<a class="ui fluid icon primary button"
+						href="{{ url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
+						<i class="upload icon"></i>
+						Upload
+					</a>
+					{% endif %}
+					{% endif %}
+				</td>
+
+				<td>
+					{{ submission.natural_started_date() }}
+				</td>
+
+				<td>
+					{{ submission.natural_ended_date() }}
+				</td>
+			</tr>
+			{% endfor %}
+		</body>
+	</table>
+	{% else %}
+	<div class="ui info message">No submission at this time.</div>
+	{% endif %}
+</div>
 
 <div class="ui divider"></div>
 

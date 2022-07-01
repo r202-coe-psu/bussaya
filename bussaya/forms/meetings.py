@@ -19,6 +19,7 @@ BaseProjectForm = model_form(
         "class_",
         "started_date",
         "ended_date",
+        "title",
     ],
     field_args={
         "name": {"label": "Name"},
@@ -33,3 +34,9 @@ class MeetingForm(BaseProjectForm):
     ended_date = fields.DateTimeField(
         "Ended date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
     )
+
+
+class StudentWorkMeetingForm(BaseProjectForm):
+    title = fields.StringField("Title")
+    description = fields.StringField("Description")
+    meeting_date = fields.DateField("Meeting Date", format="%Y-%m-%d")

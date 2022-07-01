@@ -18,10 +18,15 @@ def view(class_id):
     submissions = models.Submission.objects.all().filter(
         class_=class_,
     )
+    meetings = models.Meeting.objects.all().filter(class_=class_)
     user = current_user._get_current_object()
 
     return render_template(
-        "/classes/view.html", user=user, class_=class_, submissions=submissions
+        "/classes/view.html",
+        user=user,
+        class_=class_,
+        submissions=submissions,
+        meetings=meetings,
     )
 
 

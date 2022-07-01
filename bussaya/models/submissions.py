@@ -120,11 +120,15 @@ class Meeting(me.Document):
     def natural_ended_date(self):
         return self.ended_date.strftime("%A, %d %B %Y, %I:%M %p")
 
+    def get_student_work_by_owner(self, owner):
+        meetings = StudentWork.objects.all().filter(meeting=self, owner=owner)
+        for student_work in meetings:
+            return student_work
+
 
 class StudentWork(me.Document):
     meta = {"collection": "student_works"}
 
-    name = me.StringField(required=True, max_length=255)
     description = me.StringField()
 
     file = me.FileField()
@@ -133,9 +137,16 @@ class StudentWork(me.Document):
     ip_address = me.StringField(required=True)
 
     submission = me.ReferenceField("Submission", dbref=True)
-    meeting = me.ReferenceField("Meeting", dbref=True)
 
     class_ = me.ReferenceField("Class", dbref=True, required=True)
     project = me.ReferenceField("Projects")
 
+    title = me.StringField()
+    meeting_date = me.DateField(default=datetime.datetime.today)
+    meeting = me.ReferenceField("Meeting", dbref=True)
+
     started_date = me.DateTimeField(required=True, default=datetime.datetime.now)
+    created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
+    updated_date = me.DateTimeField(
+        required=True, default=datetime.datetime.now, auto_now=True
+    )
