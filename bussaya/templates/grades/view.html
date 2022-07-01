@@ -38,7 +38,7 @@
         <i class="eye icon"></i>
         View
     </a>
-    <a class="ui primary labeled icon button"
+    <a class="ui green labeled icon button"
         href="{{ url_for('grades.grading', class_id=class_.id, grade_type=grade.type) }}">
         <i class="edit icon"></i>
         Grading
@@ -47,13 +47,14 @@
 
 <form method="POST" id="form-grade">
     <div class="ui attached segment">
-        <table class="ui celled table">
+        <table class="ui celled single line table">
             <thead>
                 <tr>
                     <th class="one wide">No.</th>
                     <th class="two wide">Student ID</th>
                     <th class="four wide">Student Name</th>
-                    <th class="two wide">Grade</th>
+                    <th class="two wide">Given Grade</th>
+                    <th class="two wide">Average Grade</th>
                     <th>Total Grade</th>
                 </tr>
             </thead>
@@ -82,6 +83,9 @@
                             </select>
                         </div>
                         {% endif %}
+                    </td>
+                    <td>
+
                     </td>
                     <td>
                         <div class="ui accordion">
