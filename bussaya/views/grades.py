@@ -23,6 +23,7 @@ def get_student_grade(username, grade):
 
 
 def create_student_grade(class_, grade, student, teacher):
+    print(f"Create {grade.type} for {student.username} by {teacher.username}")
     student_grade = models.StudentGrade()
     student_grade.class_ = class_
     student_grade.grade = grade
@@ -35,7 +36,8 @@ def create_student_grade(class_, grade, student, teacher):
             student_grade.project = project
 
     student_grade.save()
-    grade.student_ids.append(student.username)
+    if student.username not in grade.student_ids:
+        grade.student_ids.append(student.username)
     grade.student_grades.append(student_grade)
     grade.save()
 
@@ -95,24 +97,30 @@ def view(class_id, grade_type):
             student = models.User.objects(username=id).first()
             if not student:
                 continue
-            create_student_grade(class_, midterm, student, current_teacher)
-            create_student_grade(class_, final, student, current_teacher)
+
+            if "student" in student.roles:
+                create_student_grade(class_, midterm, student, current_teacher)
+                create_student_grade(class_, final, student, current_teacher)
 
     for student_id in class_.student_ids:
         # Student Has been 'ADDED' or 'CHANGED'
         if student_id not in midterm.student_ids:
             user = models.User.objects(username=student_id).first()
             if not user:
-                print("None")
                 continue
 
-            print(user)
             for teacher in teacher_in_class:
-                if not models.StudentGrade.objects.all().filter(
+                teacher_student_ids = []
+                student_grades = models.StudentGrade.objects.all().filter(
                     class_=class_, student=user, teacher=teacher
-                ):
-                    create_student_grade(class_, midterm, user, teacher)
-                    create_student_grade(class_, final, user, teacher)
+                )
+                for student_grade in student_grades:
+                    teacher_student_ids.append(student_grade.student.username)
+
+                if student_id not in teacher_student_ids:
+                    if "student" in user.roles:
+                        create_student_grade(class_, midterm, user, teacher)
+                        create_student_grade(class_, final, user, teacher)
 
     for student_id in midterm.student_ids:
         # Student Has been 'REMOVED'
@@ -121,10 +129,10 @@ def view(class_id, grade_type):
             if not old_student:
                 continue
 
-            old_midterm_Grade = models.StudentGrade.objects.get(
+            old_midterm_Grade = models.StudentGrade.objects(
                 student=old_student, grade=midterm, class_=class_
             )
-            old_final_Grade = models.StudentGrade.objects.get(
+            old_final_Grade = models.StudentGrade.objects(
                 student=old_student, grade=final, class_=class_
             )
 
@@ -133,6 +141,8 @@ def view(class_id, grade_type):
 
             midterm.student_ids.remove(student_id)
             final.student_ids.remove(student_id)
+
+            print("Delete {student_id} for Midterm and Final")
 
     midterm.save()
     final.save()

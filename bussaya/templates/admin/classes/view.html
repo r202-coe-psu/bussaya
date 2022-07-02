@@ -108,32 +108,27 @@
 			{% endfor %}
 		</body>
 	</table>
-	<div class="ui accordion">
-		<div class="title">
-			<div class="ui primary button">Create Meeting</div>
-		</div>
-		<div class="content">
-			<p class="transition hidden">
-			<div class="ui segment">
-				<form method="POST" class="ui form">
-					{{ form.csrf_token }}
+	<div class="ui primary button" onclick="showCreateMeeting()">Create Meeting</div>
+	<p />
+	<div class="create meeting" style="display: none">
+		<div class="ui segment">
+			<form method="POST" class="ui form">
+				{{ form.csrf_token }}
 
-					<div class="field">
-						{{ renderer.render_field(form.name)}}
-					</div>
-					<div class="two fields">
-						{{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
-						{{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
-					</div>
-					<button name="create" type="submit" class="ui small primary button">
-						Create
-					</button>
-				</form>
-			</div>
-			</p>
+				<div class="field">
+					{{ renderer.render_field(form.name)}}
+				</div>
+				<div class="two fields">
+					{{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
+					{{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
+				</div>
+				<button name="create" type="submit" class="ui small primary button">
+					Create
+				</button>
+			</form>
 		</div>
-		<div class="ui divider"></div>
 	</div>
+	<div class="ui divider"></div>
 
 	<h3 class="ui header">Report / Presentation</h3>
 	<table class="ui selectable celled single line table unstackable">
@@ -214,7 +209,11 @@
 			.modal('show')
 			;
 	}
-	$(".ui.accordion").accordion()
+	function showCreateMeeting() {
+		$(".create.meeting").transition('fade down')
+			;
+	}
+
 </script>
 <script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
 <script type="text/javascript">
