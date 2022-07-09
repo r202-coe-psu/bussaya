@@ -12,7 +12,7 @@ Meeting Form
     <div class="divider"> / </div>
     <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
     <div class="divider"> / </div>
-    Form:<a href="{{ url_for('meetings.upload', class_id=class_.id, meeting_id=meeting.id) }}">
+    Form:<a href="{{ url_for('meetings.report', class_id=class_.id, meeting_id=meeting.id) }}">
         {{meeting.name}}</a>
 </div>
 {% endblock %}
@@ -33,7 +33,7 @@ Meeting Form
         <div class="fields">
             {{ renderer.render_field(form.meeting_date) }}
         </div>
-        <button type="submit" class="ui button primary">{{ 'Edit' if 'edit' in request.path else 'Upload' }}</button>
+        <button type="submit" class="ui button primary">{{ 'Edit' if 'edit' in request.path else 'Report' }}</button>
     </div>
 </form>
 

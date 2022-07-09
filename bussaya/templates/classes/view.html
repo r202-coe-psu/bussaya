@@ -67,29 +67,33 @@
 				</td>
 
 				{# Status #}
-				{% if meeting.is_in_time() and meeting.is_in_time() != "Upcoming" %}
 				{% if student_work %}
 				<td class="green">
 					Submitted
 				</td>
 				{% else %}
+
+				{% if meeting.is_in_time() %}
 				<td class="blue">
-					<a href="{{ url_for('meetings.upload', meeting_id=meeting.id, class_id=class_.id)}}">
+					<a href="{{ url_for('meetings.report', meeting_id=meeting.id, class_id=class_.id)}}">
 						Opened
 					</a>
 				</td>
-				{% endif %}
 				{% else %}
+				<td class="red">
+					Not Submitted
+				</td>
+				{% endif %}
+
+				{% endif %}
+
 				{% if meeting.is_in_time() == "Upcoming" %}
 				<td>
 					Upcoming
 				</td>
-				{% else %}
-				<td class="grey">
-					Closed
-				</td>
 				{% endif %}
-				{% endif %}
+
+
 
 
 				{% set time_delta, time_remain = meeting.set_remain_time() %}
@@ -111,9 +115,9 @@
 					</a>
 					{% else %}
 					<a class="ui fluid icon primary button"
-						href="{{ url_for('meetings.upload', meeting_id=meeting.id, class_id=class_.id)}}">
-						<i class="upload icon"></i>
-						Upload
+						href="{{ url_for('meetings.report', meeting_id=meeting.id, class_id=class_.id)}}">
+						<i class="file alternate outline icon"></i>
+						Report
 					</a>
 					{% endif %}
 					{% endif %}

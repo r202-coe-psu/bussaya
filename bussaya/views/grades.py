@@ -199,19 +199,3 @@ def get_entire_student_grade(grade, student):
         grade=grade, student=student
     )
     return [grade.result for grade in student_grades]
-
-
-@module.route("/<class_id>/<grade_type>/total")
-@login_required
-def view_total_grades(class_id, grade_type):
-    class_ = models.Class.objects.get(id=class_id)
-    grade = models.Grade.objects.get(type=grade_type, class_=class_)
-    grades = models.Grade.objects.all().filter(class_=class_)
-    student_grades = models.StudentGrade.objects.all().filter(grade=grades)
-
-    return render_template(
-        "/grades/view-total-grades.html",
-        class_=class_,
-        grade=grade,
-        user=current_user._get_current_object(),
-    )

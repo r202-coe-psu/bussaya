@@ -40,3 +40,7 @@ class StudentWorkMeetingForm(BaseProjectForm):
     title = fields.StringField("Title")
     description = fields.StringField("Description")
     meeting_date = fields.DateField("Meeting Date", format="%Y-%m-%d")
+
+
+class DisapproveForm(BaseProjectForm):
+    remark = fields.StringField("Disapprove Remark")

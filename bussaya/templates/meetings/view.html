@@ -1,5 +1,6 @@
 {% extends '/admin/classes/index.html' %}
 {% import '/base/error-handler.html' as eh %}
+{% import '/base/html-renderer.html' as renderer %}
 
 {% block breadcrumbs %}
 <div class="ui breadcrumb">
@@ -50,6 +51,10 @@
             <th>Student IDS</th>
             <th>Title</th>
             <th>Description</th>
+            <th>Meeting Date</th>
+            <th>Status</th>
+            <th>Remark</th>
+            <th>Approval</th>
         </tr>
     </thead>
     <tbody>
@@ -66,10 +71,47 @@
         <td>
             {{student_work.description}}
         </td>
+        <td>
+            {{student_work.meeting_date}}
+        </td>
+        <td class="{{'green' if student_work.status == 'approved'}} {{'red' if student_work.status == 'disapproved'}}">
+            {{student_work.get_status_display()}}
+        </td>
+        <td>
+            {{student_work.remark if student_work.remark else '-' }}
+        </td>
+        <td>
+            <a class="ui primary button" href="{{url_for('meetings.approval', meeting_id=meeting.id, student_work_id=student_work.id, 
+                action='approved')}}">
+                Approve
+            </a>
+            <button class="ui red button" onclick="showDisapproveRemark()">
+                Disapprove
+            </button>
+
+            <div class="disapprove remark" style="margin-top: 0.5em; display: none">
+                <div class="ui segment">
+                    <form method="post" class="ui form">
+                        {{renderer.render_field(form.remark)}}
+                        <input type="hidden" name="student_work_id" value="{{student_work.id}}">
+                        <button type="submit" class="ui primary button" style="margin-top: 0.5em">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </td>
         {% endfor %}
     </tbody>
 </table>
 
+{% endblock %}
 
-
-{% endblock %}>
+{% block additional_js %}
+<script>
+    function showDisapproveRemark() {
+        $(".disapprove.remark").transition('fade down')
+            ;
+    }
+</script>
+{% endblock additional_js%}

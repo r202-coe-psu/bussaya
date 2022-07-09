@@ -84,7 +84,7 @@
 			{% for meeting in meetings %}
 			<tr>
 				<td>
-					<a href="{{url_for('meetings.view', meeting_id=meeting.id, class_id=class_.id)}}">
+					<a href="{{url_for('meetings.view', meeting_id=meeting.id)}}">
 						{{ meeting.name }}
 					</a>
 				</td>

@@ -12,21 +12,51 @@ import socket
 module = Blueprint("meetings", __name__, url_prefix="/meetings")
 
 
-@module.route("/classes/<class_id>/<meeting_id>/view", methods=["GET", "POST"])
+@module.route("/<meeting_id>/view", methods=["GET", "POST"])
 @login_required
-def view(meeting_id, class_id):
+def view(meeting_id):
     meeting = models.Meeting.objects.get(id=meeting_id)
-    class_ = models.Class.objects.get(id=class_id)
     student_works = models.StudentWork.objects.all().filter(
-        class_=class_, meeting=meeting
+        class_=meeting.class_, meeting=meeting
     )
+
+    form = forms.meetings.DisapproveForm()
+
+    if request.method == "POST":
+        student_work = models.StudentWork.objects.get(
+            id=request.form.get("student_work_id")
+        )
+        student_work.remark = form.remark.data
+        student_work.save()
+
+        approval(
+            meeting_id=meeting.id, student_work_id=student_work.id, action="disapproved"
+        )
 
     return render_template(
         "/meetings/view.html",
         meeting=meeting,
-        class_=class_,
+        class_=meeting.class_,
         student_works=student_works,
+        form=form,
     )
+
+
+@module.route(
+    "/<meeting_id>/students/<student_work_id>/approval/<action>",
+    methods=["GET", "POST"],
+)
+@login_required
+def approval(meeting_id, student_work_id, action):
+
+    student_work = models.StudentWork.objects.get(id=student_work_id)
+    student_work.status = action
+    if action == "approved":
+        student_work.remark = None
+
+    student_work.save()
+
+    return redirect(url_for("meetings.view", meeting_id=meeting_id))
 
 
 @module.route("/<class_id>/<meeting_id>/edit", methods=["GET", "POST"])
@@ -59,7 +89,7 @@ def delete(class_id, meeting_id):
 
 @module.route("/classes/<class_id>/<meeting_id>/upload", methods=["GET", "POST"])
 @login_required
-def upload(meeting_id, class_id):
+def report(meeting_id, class_id):
     meeting = models.Meeting.objects.get(id=meeting_id)
     class_ = models.Class.objects.get(id=class_id)
 
@@ -74,7 +104,7 @@ def upload(meeting_id, class_id):
 
     if not form.validate_on_submit():
         return render_template(
-            "/meetings/upload-edit.html", meeting=meeting, class_=class_, form=form
+            "/meetings/report-edit.html", meeting=meeting, class_=class_, form=form
         )
 
     form.populate_obj(student_work)
@@ -94,7 +124,7 @@ def edit_student_work(meeting_id, class_id):
 
     if not form.validate_on_submit():
         return render_template(
-            "/meetings/upload-edit.html",
+            "/meetings/report-edit.html",
             meeting=meeting,
             class_=class_,
             form=form,

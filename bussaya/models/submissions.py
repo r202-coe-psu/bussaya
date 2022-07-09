@@ -1,9 +1,12 @@
+from telnetlib import STATUS
 import mongoengine as me
 
 import datetime
 import humanize
 
 SUBMISSION_TYPE = [("report", "Report"), ("presentation", "Presentation")]
+
+APPROVAL_STATUS = [("approved", "Approved"), ("disapproved", "Disapproved")]
 
 
 class Submission(me.Document):
@@ -144,6 +147,9 @@ class StudentWork(me.Document):
     title = me.StringField()
     meeting_date = me.DateField(default=datetime.datetime.today)
     meeting = me.ReferenceField("Meeting", dbref=True)
+
+    status = me.StringField(choices=APPROVAL_STATUS)
+    remark = me.StringField()
 
     started_date = me.DateTimeField(required=True, default=datetime.datetime.now)
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
