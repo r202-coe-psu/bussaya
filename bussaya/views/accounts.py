@@ -14,7 +14,6 @@ from flask import (
     abort,
 )
 from flask_login import login_user, logout_user, login_required, current_user
-from flask_principal import Identity, identity_changed
 
 from .. import models
 from .. import oauth2
@@ -165,9 +164,6 @@ def authorized_engpsu():
     user.save()
 
     login_user(user)
-    identity_changed.send(
-        current_app._get_current_object(), identity=Identity(str(user.id))
-    )
 
     oauth2token = models.OAuth2Token(
         name=client.engpsu.name,
@@ -185,6 +181,43 @@ def authorized_engpsu():
         return redirect(next_uri)
 
     return redirect(url_for("dashboard.index"))
+
+
+@module.route("/login/<name>")
+def login_oauth(name):
+    client = oauth2.oauth2_client
+    redirect_uri = url_for("accounts.authorized_oauth", name=name, _external=True)
+    response = None
+    if name == "google":
+        response = client.google.authorize_redirect(redirect_uri)
+    elif name == "facebook":
+        response = client.facebook.authorize_redirect(redirect_uri)
+    elif name == "line":
+        response = client.line.authorize_redirect(redirect_uri)
+
+    return response
+
+
+@module.route("/auth/<name>")
+def authorized_oauth(name):
+    client = oauth2.oauth2_client
+    remote = None
+    try:
+
+        if name == "google":
+            remote = client.google
+        elif name == "facebook":
+            remote = client.facebook
+        elif name == "line":
+            remote = client.line
+
+        token = remote.authorize_access_token()
+
+    except Exception as e:
+        print("autorize access error =>", e)
+        return redirect(url_for("accounts.login"))
+
+    return oauth2.handle_authorized_oauth2(remote, token)
 
 
 @module.route("/logout")
