@@ -1,3 +1,4 @@
+werkzeug==2.1.2
 flask
 requests
 flask-mongoengine
@@ -5,10 +6,9 @@ pillow
 flask-login
 flask-allows
 flask-wtf
-flask-principal
 flask-caching
 email_validator
-authlib==0.15.3
+authlib
 loginpass
 pygments
 markdown

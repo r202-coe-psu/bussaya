@@ -25,7 +25,9 @@ class Submission(me.Document):
     owner = me.ReferenceField("User", dbref=True, required=True)
     description = me.StringField()
 
-    file = me.FileField()
+    file = me.FileField(
+        collection_name="progress_fs",
+    )
 
     def is_in_time(self):
         if self.started_date <= datetime.datetime.now() <= self.ended_date:
@@ -134,7 +136,9 @@ class StudentWork(me.Document):
 
     description = me.StringField()
 
-    file = me.FileField()
+    file = me.FileField(
+        collection_name="meeting_fs",
+    )
     owner = me.ReferenceField("User", dbref=True, required=True)
 
     ip_address = me.StringField(required=True)

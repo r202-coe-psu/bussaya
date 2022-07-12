@@ -31,13 +31,15 @@ def get_current_class():
     return data
 
 
+@module.route("/admin")
+@login_required
 def index_admin():
     data = get_current_class()
     return render_template("/dashboard/index-admin.html", **data)
 
 
 def index_lecturer():
-    class_, advisees, committees = get_current_class()
+    data = get_current_class()
     return render_template("/dashboard/index-lecturer.html", **data)
 
 
@@ -72,7 +74,7 @@ def index():
     if dev == "test":
         return index_student()
     if "admin" in user.roles:
-        return index_admin()
+        return index_lecturer()
     elif "CoE-lecturer" in user.roles:
         return index_lecturer()
     elif "student" in user.roles:
