@@ -96,7 +96,7 @@
                     </div>
                     <div class="content">
                         <p class="transition hidden">
-                        <div class="disapprove remark" style="margin-top: 0.5em; display: none">
+                        <div class="disapprove remark">
                             <div class="ui segment">
                                 <form method="post" class="ui form">
                                     {{renderer.render_field(form.remark)}}
@@ -120,10 +120,11 @@
 {% endblock %}
 
 {% block additional_js %}
-<script>
+<script type="text/javascript">
     function showDisapproveRemark() {
         $(".disapprove.remark").transition('fade down')
             ;
     }
+    $(".ui.accordion").accordion()
 </script>
 {% endblock additional_js%}

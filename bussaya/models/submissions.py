@@ -134,19 +134,20 @@ class Meeting(me.Document):
 class StudentWork(me.Document):
     meta = {"collection": "student_works"}
 
-    description = me.StringField()
+    owner = me.ReferenceField("User", dbref=True, required=True)
+    ip_address = me.StringField(required=True)
+    class_ = me.ReferenceField("Class", dbref=True, required=True)
+    project = me.ReferenceField("Projects")
 
+    type = me.StringField(
+        choices=[("submission", "Submission"), ("meeting", "Meeting")]
+    )
+
+    submission = me.ReferenceField("Submission", dbref=True)
+    description = me.StringField()
     file = me.FileField(
         collection_name="meeting_fs",
     )
-    owner = me.ReferenceField("User", dbref=True, required=True)
-
-    ip_address = me.StringField(required=True)
-
-    submission = me.ReferenceField("Submission", dbref=True)
-
-    class_ = me.ReferenceField("Class", dbref=True, required=True)
-    project = me.ReferenceField("Projects")
 
     title = me.StringField()
     meeting_date = me.DateField(default=datetime.datetime.today)

@@ -105,30 +105,31 @@ def upload(submission_id, class_id):
             class_=class_,
         )
 
-    student_submission = models.StudentWork()
+    student_work = models.StudentWork()
 
-    student_submission.owner = current_user._get_current_object()
-    student_submission.ip_address = request.remote_addr
+    student_work.type = "submission"
+    student_work.owner = current_user._get_current_object()
+    student_work.ip_address = request.remote_addr
 
-    student_submission.class_ = models.Class.objects.get(id=class_id)
-    student_submission.submission = models.Submission.objects.get(id=submission_id)
+    student_work.class_ = models.Class.objects.get(id=class_id)
+    student_work.submission = models.Submission.objects.get(id=submission_id)
 
-    form.populate_obj(student_submission)
+    form.populate_obj(student_work)
     if form.uploaded_file.data:
-        if not student_submission.file:
-            student_submission.file.put(
+        if not student_work.file:
+            student_work.file.put(
                 form.uploaded_file.data,
                 filename=form.uploaded_file.data.filename,
                 content_type="application/pdf",
             )
         else:
-            student_submission.file.replace(
+            student_work.file.replace(
                 form.uploaded_file.data,
                 filename=form.uploaded_file.data.filename,
                 content_type="application/pdf",
             )
 
-    student_submission.save()
+    student_work.save()
 
     return redirect(url_for("classes.view", submission=submission, class_id=class_id))
 

@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, send_file, request
 from flask_login import login_required, current_user
+
+from bussaya.models.submissions import StudentWork
 from .. import forms
 from .. import models
 import mongoengine as me
@@ -94,6 +96,7 @@ def report(meeting_id, class_id):
     class_ = models.Class.objects.get(id=class_id)
 
     student_work = models.StudentWork()
+    student_work.type = "meeting"
     student_work.owner = current_user._get_current_object()
     student_work.ip_address = request.remote_addr
 

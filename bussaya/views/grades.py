@@ -1,3 +1,4 @@
+from types import NoneType
 from flask import Blueprint, render_template, redirect, url_for, send_file, request
 from flask_login import login_required, current_user
 from bussaya import forms, models, acl
@@ -174,12 +175,17 @@ def grading(class_id, grade_type):
     if request.method == "POST":
         for student_grade in student_grades:
             result = request.form.get(str(student_grade.id))
-            print(result)
             student_grade.result = result
+            if result != "-":
+                meetings = models.StudentWork.objects(
+                    class_=class_, owner=student_grade.student, type="meeting"
+                )
+                for meeting in meetings:
+                    meeting.status = "approved"
+                    meeting.save()
+            print(student_grade.student.username, result)
             student_grade.save()
 
-        test = request.form.get("test")
-        print(test)
         return redirect(
             url_for("grades.view", class_id=class_.id, grade_type=grade_type)
         )
