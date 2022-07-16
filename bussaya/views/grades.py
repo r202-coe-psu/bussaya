@@ -158,10 +158,20 @@ def view(class_id, grade_type):
         class_=class_,
         grade=grade,
         grade_type=grade_type,
-        get_student_grade=get_student_grade,
         student_grades=student_grades,
+        get_student_grade=get_student_grade,
         get_total_student_grades=get_total_student_grades,
+        get_student_submissions=get_student_submissions,
     )
+
+
+def get_student_submissions(username, class_id):
+    class_ = models.Class.objects.get(id=class_id)
+    owner = models.User.objects.get(username=username)
+    student_works = models.StudentWork.objects(
+        type="submission", class_=class_, owner=owner
+    )
+    return student_works
 
 
 @module.route("/<class_id>/<grade_type>/grading", methods=["GET", "POST"])
@@ -197,6 +207,7 @@ def grading(class_id, grade_type):
         user=user,
         student_grades=student_grades,
         get_total_student_grades=get_total_student_grades,
+        get_student_submissions=get_student_submissions,
     )
 
 

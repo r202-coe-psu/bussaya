@@ -67,7 +67,8 @@
         <tr>
             <td>{{ loop.index }}</td>
             <td>{{ student_work.owner.first_name + " " + student_work.owner.last_name }}</td>
-            <td><a href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}"
+            <td>
+                <a href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}"
                     target="_blank">
                     {{student_work.file.filename}}
                 </a>

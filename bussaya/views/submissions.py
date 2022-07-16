@@ -81,6 +81,10 @@ def edit(submission_id, class_id):
 def delete(submission_id, class_id):
     submission = models.Submission.objects.get(id=submission_id)
     submission.delete()
+
+    student_works = models.StudentWork.objects(submission=submission)
+    [student_work.delete for student_work in student_works]
+
     return redirect(
         url_for("admin.classes.view", submission=submission, class_id=class_id)
     )
@@ -107,7 +111,6 @@ def upload(submission_id, class_id):
 
     student_work = models.StudentWork()
 
-    student_work.type = "submission"
     student_work.owner = current_user._get_current_object()
     student_work.ip_address = request.remote_addr
 
@@ -129,6 +132,7 @@ def upload(submission_id, class_id):
                 content_type="application/pdf",
             )
 
+    student_work.type = "submission"
     student_work.save()
 
     return redirect(url_for("classes.view", submission=submission, class_id=class_id))
@@ -176,7 +180,9 @@ def edit_student_work(submission_id, class_id):
                 content_type="application/pdf",
             )
 
+    student_work.type = "submission"
     student_work.save()
+    print([x.type for x in models.StudentWork.objects()])
 
     return redirect(url_for("classes.view", submission=submission, class_id=class_id))
 

@@ -56,6 +56,7 @@
                     <th class="two wide">Given Grade</th>
                     <th class="two wide">Average Grade</th>
                     <th>Total Grade</th>
+                    <th>Submissions</th>
                 </tr>
             </thead>
             <tbody>
@@ -71,15 +72,31 @@
                         {% else %}
                         <div class="ui input">
                             <select class="ui selection dropdown" name="{{student_grade.id}}">
-                                <option value="{{student_grade.result}}">{{student_grade.result}}</option>
-                                <option value="A">A</option>
-                                <option value="B+">B+</option>
-                                <option value="B">B</option>
-                                <option value="C+">C+</option>
-                                <option value="C">C</option>
-                                <option value="D+">D+</option>
-                                <option value="D">D</option>
-                                <option value="E">E</option>
+                                <option>-</option>
+                                <option {% if student_grade.result=='A' %} selected="selected" {% endif %} value="A">
+                                    A
+                                </option>
+                                <option {% if student_grade.result=='B+' %} selected="selected" {% endif %} value="B+">
+                                    B+
+                                </option>
+                                <option {% if student_grade.result=='B' %} selected="selected" {% endif %} value="B">
+                                    B
+                                </option>
+                                <option {% if student_grade.result=='C+' %} selected="selected" {% endif %} value="C+">
+                                    C+
+                                </option>
+                                <option {% if student_grade.result=='C' %} selected="selected" {% endif %} value="C">
+                                    C
+                                </option>
+                                <option {% if student_grade.result=='D+' %} selected="selected" {% endif %} value="D+">
+                                    D+
+                                </option>
+                                <option {% if student_grade.result=='D' %} selected="selected" {% endif %} value="D">
+                                    D
+                                </option>
+                                <option {% if student_grade.result=='E' %} selected="selected" {% endif %} value="E">
+                                    E
+                                </option>
                             </select>
                         </div>
                         {% endif %}
@@ -88,64 +105,46 @@
 
                     </td>
                     <td>
-                        <div class="ui accordion">
-                            <div class="title">
-                                <a id="{{student_grade.id}}" onclick="accordion_show_hide('{{student_grade.id}}')">
-                                    See More
-                                </a>
-                            </div>
-                            <div class="content">
-                                <p class="transition hidden">
-                                    {% for student_grade in get_total_student_grades(student_grade.student, class_,
-                                    grade) %}
-                                <div class="ui relaxed divided list">
-                                    <div class="item">
-                                        {% if student_grade.teacher.get_picture() %}
-                                        <img class="ui avatar image" src="{{ student_grade.teacher.get_picture() }}">
-                                        {% else %}
-                                        <i class="user icon"></i>
-                                        {% endif %}
-                                        <div class="content">
-                                            <a class="header">
-                                                {{ student_grade.teacher.first_name }} {{
-                                                student_grade.teacher.last_name }}</a>
-                                            <div class="description">{{ student_grade.result }}</div>
-                                        </div>
+                        <div class="title">
+                            <a id="{{student_grade.id}}" style="cursor: pointer"
+                                onclick="accordion_show_hide('{{student_grade.id}}')">
+                                See More
+                            </a>
+                        </div>
+                        <div id="{{student_grade.id}} content" class="content" style="display: none">
+                            <p />
+                            {% for student_grade in get_total_student_grades(student_grade.student, class_,
+                            grade) %}
+                            <div class="ui relaxed divided list">
+                                <div class="item">
+                                    {% if student_grade.teacher.get_picture() %}
+                                    <img class="ui avatar image" src="{{ student_grade.teacher.get_picture() }}">
+                                    {% else %}
+                                    <i class="user icon"></i>
+                                    {% endif %}
+                                    <div class="content">
+                                        <a class="header">
+                                            {{ student_grade.teacher.first_name }} {{
+                                            student_grade.teacher.last_name }}
+                                        </a>
+                                        <div class="description">{{ student_grade.result }}</div>
                                     </div>
                                 </div>
-                                {% endfor %}
-                                {#
-                                <table class="ui very compact celled table">
-                                    <thead>
-                                        <th></th>
-                                        <th>Lecturer Name</th>
-                                        <th>Grade</th>
-                                    </thead>
-                                    <tbody>
-                                        {% for student_grade in get_total_student_grades(student_grade.student, class_,
-                                        grade) %}
-                                        <tr>
-                                            <td>
-                                                {{ loop.index }}.
-                                            </td>
-                                            <td>
-                                                {% if student_grade.teacher == user %}
-                                                (You)
-                                                {% endif %}
-                                                {{ student_grade.teacher.first_name }}
-                                                {{ student_grade.teacher.last_name }}
-                                            </td>
-                                            <td>
-                                                {{ student_grade.result }}
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                                #}
-                                </p>
                             </div>
+                            {% endfor %}
                         </div>
+                    </td>
+                    <td>
+                        {% set student_works = get_student_submissions(student_grade.student.username, class_.id) %}
+                        {% for student_work in student_works %}
+                        {{student_work.submission.get_type_display()}}:
+                        <br>
+                        <a href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}"
+                            target="_blank">
+                            {{student_work.file.filename}} <br>
+                        </a>
+
+                        {% endfor %}
                     </td>
                 </tr>
                 {% endif %}
@@ -170,15 +169,13 @@
     }
 
     function accordion_show_hide(show_hide_id) {
-        $('.ui.accordion').accordion({
-            onOpening: function () {
-                document.getElementById(show_hide_id).innerHTML = "Hide"
-            },
-            onClosing: function () {
-                document.getElementById(show_hide_id).innerHTML = "See More"
-            }
-        },
-        );
+        $(document.getElementById(show_hide_id + " content")).transition('fade down')
+
+        if (document.getElementById(show_hide_id).textContent == "Hide") {
+            document.getElementById(show_hide_id).innerHTML = "See More"
+        } else {
+            document.getElementById(show_hide_id).innerHTML = "Hide"
+        }
     }
 </script>
 {% endblock additional_js %}

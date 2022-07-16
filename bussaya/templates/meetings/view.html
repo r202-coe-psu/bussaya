@@ -83,34 +83,37 @@
             <td>
                 {{student_work.remark if student_work.remark else '-' }}
             </td>
-            <td>
-                <a class="ui primary button" href="{{url_for('meetings.approval', meeting_id=meeting.id, student_work_id=student_work.id, 
-                action='approved')}}">
-                    Approve
-                </a>
-                <div class="ui accordion">
-                    <div class="title">
-                        <button class="ui red button">
-                            Disapprove
-                        </button>
-                    </div>
-                    <div class="content">
-                        <p class="transition hidden">
-                        <div class="disapprove remark">
-                            <div class="ui segment">
-                                <form method="post" class="ui form">
-                                    {{renderer.render_field(form.remark)}}
-                                    <input type="hidden" name="student_work_id" value="{{student_work.id}}">
-                                    <button type="submit" class="ui primary button" style="margin-top: 0.5em">
-                                        Submit
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                        </p>
-                    </div>
-                </div>
+            <td class="four wide">
+                <div style="display: flex">
 
+                    <a class="ui primary button" href="{{url_for('meetings.approval', meeting_id=meeting.id, student_work_id=student_work.id, 
+                    action='approved')}}" style="height: fit-content; margin-top: 0.5em">
+                        Approve
+                    </a>
+                    <div class="ui accordion" style="width: fit-content; height: fit-content">
+                        <div class=" title">
+                            <button class="ui red button">
+                                Disapprove
+                            </button>
+                        </div>
+                        <div class="content">
+                            <p class="transition hidden">
+                            <div class="disapprove remark">
+                                <div class="ui segment">
+                                    <form method="post" class="ui form">
+                                        {{renderer.render_field(form.remark)}}
+                                        <input type="hidden" name="student_work_id" value="{{student_work.id}}">
+                                        <button type="submit" class="ui primary button" style="margin-top: 0.5em">
+                                            Submit
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
             </td>
         </tr>
         {% endfor %}
