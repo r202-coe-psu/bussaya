@@ -1,5 +1,5 @@
 werkzeug==2.1.2
-flask
+flask==2.1.2
 requests
 flask-mongoengine
 pillow
@@ -9,7 +9,6 @@ flask-wtf
 flask-caching
 email_validator
 authlib
-loginpass
 pygments
 markdown
 python-markdown-math 
