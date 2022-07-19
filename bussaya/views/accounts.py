@@ -155,7 +155,6 @@ def login_oauth(name):
     client = oauth2.oauth2_client
     redirect_uri = url_for("accounts.authorized_oauth", name=name, _external=True)
     response = None
-    print(redirect_uri)
     if name == "google":
         response = client.google.authorize_redirect(redirect_uri)
     elif name == "facebook":
