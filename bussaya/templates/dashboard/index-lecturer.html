@@ -1,11 +1,50 @@
 {%extends '/base/default-dashboard.html' %}
 {% import '/dashboard/project-renderer.html' as renderer %}
 
-{% block content %}
-  <div>    
-    <h3>Hello, {{ current_user.first_name }} {{ current_user.last_name }} </h3>
-  </div>
+{% block dashboard_title %}
+Classes
+{% endblock %}
 
-  {{ renderer.render_project_section(alumni_projects, current_user, advisees, committees) }}
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+  <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<h2 class="ui header horizontal divider">All Classes</h2>
+
+<div class="row">
+
+  {% if classes %}
+  <table class="ui celled table unstackable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+
+    <body>
+      {% for class_ in classes %}
+      <tr>
+        <td>
+          <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+        </td>
+        <td>
+          {{ class_.description }}
+        </td>
+      </tr>
+      {% endfor %}
+    </body>
+  </table>
+  {% endif %}
+
+</div>
+
+
+{{ renderer.render_project_section(alumni_projects, current_user, advisees, committees) }}
 
 {% endblock %}

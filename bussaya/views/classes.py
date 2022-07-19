@@ -4,6 +4,8 @@ from flask_login import current_user, login_required
 from .. import models
 from datetime import datetime
 
+from bussaya import acl
+
 module = Blueprint(
     "classes",
     __name__,
@@ -12,8 +14,36 @@ module = Blueprint(
 
 
 @module.route("/<class_id>")
-@login_required
 def view(class_id):
+    user = current_user
+
+    if "CoE-lecturer" in user.roles:
+        return view_lecturer(class_id)
+    elif "student" in user.roles:
+        return view_student(class_id)
+
+
+@module.route("/lecturer/<class_id>/hey")
+@acl.roles_required("CoE-lecturer")
+def view_lecturer(class_id):
+    class_ = models.Class.objects.get(id=class_id)
+    projects = models.Project.objects(class_=class_)
+    submissions = models.Submission.objects(class_=class_)
+    meetings = models.Meeting.objects(class_=class_)
+
+    return render_template(
+        "/classes/view-lecturer.html",
+        class_=class_,
+        class_id=class_id,
+        projects=projects,
+        submissions=submissions,
+        meetings=meetings,
+    )
+
+
+@module.route("/student/<class_id>")
+@login_required
+def view_student(class_id):
     class_ = models.Class.objects.get(id=class_id)
     submissions = models.Submission.objects.all().filter(
         class_=class_,
@@ -22,7 +52,7 @@ def view(class_id):
     user = current_user._get_current_object()
 
     return render_template(
-        "/classes/view.html",
+        "/classes/view-student.html",
         user=user,
         class_=class_,
         submissions=submissions,

@@ -13,16 +13,6 @@ def index(class_id):
     return render_template("/grades/index.html", class_=class_)
 
 
-def get_student_grade(username, grade):
-
-    user = models.User.objects.get(username=username)
-    student_grade = models.StudentGrade.objects.get(
-        grade=grade,
-        student=user,
-    )
-    return student_grade
-
-
 def create_student_grade(class_, grade, student, teacher):
     print(f"Create {grade.type} for {student.username} by {teacher.username}")
     student_grade = models.StudentGrade()
@@ -45,11 +35,49 @@ def create_student_grade(class_, grade, student, teacher):
     return student_grade
 
 
-def get_total_student_grades(student, class_, grade):
+def get_total_student_grades(student, grade):
     student_grades = models.StudentGrade.objects.all().filter(
-        student=student, class_=class_, grade=grade
+        student=student, class_=grade.class_, grade=grade
     )
     return student_grades
+
+
+def get_average_student_grade(student, grade):
+    student_grades = models.StudentGrade.objects.all().filter(
+        student=student, class_=grade.class_, grade=grade
+    )
+    total_grade_result = []
+    [
+        total_grade_result.append(student_grade.result)
+        for student_grade in student_grades
+        if student_grade.result != "-"
+    ]
+
+    return total_grade_result
+
+
+def get_student_report(username, class_id):
+    class_ = models.Class.objects.get(id=class_id)
+    owner = models.User.objects.get(username=username)
+    student_works = models.StudentWork.objects(
+        type="submission", class_=class_, owner=owner
+    )
+    for student_work in student_works:
+        if student_work.submission.type == "report":
+            return student_work
+    return False
+
+
+def get_student_presentation(username, class_id):
+    class_ = models.Class.objects.get(id=class_id)
+    owner = models.User.objects.get(username=username)
+    student_works = models.StudentWork.objects(
+        type="submission", class_=class_, owner=owner
+    )
+    for student_work in student_works:
+        if student_work.submission.type == "presentation":
+            return student_work
+    return False
 
 
 @module.route("/<class_id>/<grade_type>/view")
@@ -159,19 +187,11 @@ def view(class_id, grade_type):
         grade=grade,
         grade_type=grade_type,
         student_grades=student_grades,
-        get_student_grade=get_student_grade,
         get_total_student_grades=get_total_student_grades,
-        get_student_submissions=get_student_submissions,
+        get_average_student_grade=get_average_student_grade,
+        get_student_report=get_student_report,
+        get_student_presentation=get_student_presentation,
     )
-
-
-def get_student_submissions(username, class_id):
-    class_ = models.Class.objects.get(id=class_id)
-    owner = models.User.objects.get(username=username)
-    student_works = models.StudentWork.objects(
-        type="submission", class_=class_, owner=owner
-    )
-    return student_works
 
 
 @module.route("/<class_id>/<grade_type>/grading", methods=["GET", "POST"])
@@ -207,7 +227,9 @@ def grading(class_id, grade_type):
         user=user,
         student_grades=student_grades,
         get_total_student_grades=get_total_student_grades,
-        get_student_submissions=get_student_submissions,
+        get_average_student_grade=get_average_student_grade,
+        get_student_report=get_student_report,
+        get_student_presentation=get_student_presentation,
     )
 
 
