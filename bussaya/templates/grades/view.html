@@ -47,16 +47,20 @@
 
 <form method="POST" id="form-grade">
     <div class="ui attached segment">
-        <table class="ui celled single line table">
+        <table class="ui celled structured single line table">
             <thead>
                 <tr>
-                    <th class="one wide">No.</th>
-                    <th class="two wide">Student ID</th>
-                    <th class="four wide">Student Name</th>
-                    <th class="two wide">Given Grade</th>
-                    <th class="two wide">Average Grade</th>
-                    <th>Total Grade</th>
-                    <th>Submissions</th>
+                    <th class="one wide" rowspan="2">No.</th>
+                    <th class="two wide" rowspan="2">Student ID</th>
+                    <th class="three wide" rowspan="2">Student Name</th>
+                    <th class="one wide" rowspan="2">Given Grade</th>
+                    <th class="one wide" rowspan="2">Average Grade</th>
+                    <th rowspan="2">Total Grade</th>
+                    <th class="five wide" colspan="2">Submissions</th>
+                </tr>
+                <tr>
+                    <th>Report</th>
+                    <th>Presentation</th>
                 </tr>
             </thead>
             <tbody>
@@ -102,7 +106,8 @@
                         {% endif %}
                     </td>
                     <td>
-
+                        {{get_average_student_grade(student_grade.student, grade)}}
+                        คิดเกรดเฉลี่ยไม่เป็น ;-;
                     </td>
                     <td>
                         <div class="title">
@@ -113,8 +118,7 @@
                         </div>
                         <div id="{{student_grade.id}} content" class="content" style="display: none">
                             <p />
-                            {% for student_grade in get_total_student_grades(student_grade.student, class_,
-                            grade) %}
+                            {% for student_grade in get_total_student_grades(student_grade.student, grade) %}
                             <div class="ui relaxed divided list">
                                 <div class="item">
                                     {% if student_grade.teacher.get_picture() %}
@@ -124,8 +128,8 @@
                                     {% endif %}
                                     <div class="content">
                                         <a class="header">
-                                            {{ student_grade.teacher.first_name }} {{
-                                            student_grade.teacher.last_name }}
+                                            {{ student_grade.teacher.first_name }}
+                                            {{ student_grade.teacher.last_name }}
                                         </a>
                                         <div class="description">{{ student_grade.result }}</div>
                                     </div>
@@ -134,18 +138,27 @@
                             {% endfor %}
                         </div>
                     </td>
-                    <td>
-                        {% set student_works = get_student_submissions(student_grade.student.username, class_.id) %}
-                        {% for student_work in student_works %}
-                        {{student_work.submission.get_type_display()}}:
-                        <br>
-                        <a href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}"
-                            target="_blank">
-                            {{student_work.file.filename}} <br>
-                        </a>
 
-                        {% endfor %}
+                    {% set student_report = get_student_report(student_grade.student.username, class_.id) %}
+                    <td>
+                        {% if student_report %}
+                        <a href="{{ url_for('submissions.download', student_work_id=student_report.id, filename=student_report.file.filename) }}"
+                            target="_blank">
+                            {{student_report.file.filename}}
+                        </a>
+                        {% endif %}
                     </td>
+
+                    {% set student_presentation = get_student_presentation(student_grade.student.username,class_.id) %}
+                    <td>
+                        {% if student_presentation %}
+                        <a href="{{ url_for('submissions.download', student_work_id=student_presentation.id, filename=student_presentation.file.filename) }}"
+                            target="_blank">
+                            {{student_presentation.file.filename}}
+                        </a>
+                        {% endif %}
+                    </td>
+
                 </tr>
                 {% endif %}
                 {% endfor %}
