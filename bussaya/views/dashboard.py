@@ -39,8 +39,9 @@ def index_admin():
 
 
 def index_lecturer():
-    data = get_current_class()
-    return render_template("/dashboard/index-lecturer.html", **data)
+    classes = models.Class.objects.all()
+
+    return render_template("/dashboard/index-lecturer.html", classes=classes)
 
 
 def index_student():

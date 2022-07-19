@@ -1,0 +1,166 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/error-handler.html' as eh %}
+{% import '/admin/classes/project-renderer.html' as renderer_project %}
+{% import '/navbar/class-navbar.html' as renderer_navbar %}
+{% import '/base/html-renderer.html' as renderer %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<h1 class="ui horizontal divider header">
+    {{ class_.name }}
+</h1>
+
+{{ renderer_navbar.render_class_navbar(class_) }}
+
+<h2 class="ui header">Class</h2>
+<div class="ui divider"></div>
+
+<table class="ui single line table">
+    <tbody>
+        <tr>
+            <td>
+                <div style="color: grey">NAME </div>{{ class_.name }}
+            </td>
+            <td>
+                <div style="color: grey">DESCRIPTION</div> {{ class_.description }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="color: grey">OWNER </div>{{ class_.owner.first_name }} {{ class_.owner.last_name }}
+            </td>
+            <td>
+                <div style="color: grey">CODE </div>{{ class_.code }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="color: grey">TYPE</div> {{ class_.get_type_display() }}
+            </td>
+            <td>
+                <div style="color: grey">TAG</div> {{ class_.tags | join(', ') }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="color: grey">STARTED DATE</div> {{ class_.started_date }}
+            </td>
+            <td>
+                <div style="color: grey">ENDED DATE</div> {{ class_.ended_date }}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="ui segment">
+    <h2 class="ui header">Projects</h2>
+    {{ renderer_project.render_project_table(projects) }}
+</div>
+
+<div class="ui segment">
+    <h2 class="ui header">Submissions</h2>
+    <div class="ui divider"></div>
+    <h3 class="ui header">Meeting</h3>
+    <table class="ui selectable celled single line table unstackable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Started Date</th>
+                <th>Ended Date</th>
+            </tr>
+        </thead>
+
+        <body>
+            {% for meeting in meetings %}
+            <tr>
+                <td>
+                    <a href="{{url_for('meetings.view', meeting_id=meeting.id)}}">
+                        {{ meeting.name }}
+                    </a>
+                </td>
+                <td>
+                    {{ meeting.started_date }}
+                </td>
+                <td>
+                    {{ meeting.ended_date }}
+                </td>
+            </tr>
+            {% endfor %}
+        </body>
+    </table>
+    <p />
+
+    <div class="ui divider"></div>
+
+    <h3 class="ui header">Report / Presentation</h3>
+    <table class="ui selectable celled single line table unstackable">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Started Date</th>
+                <th>Ended Date</th>
+            </tr>
+        </thead>
+
+        <body>
+            {% for submission in submissions %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('submissions.view', submission_id=submission.id, class_id=class_.id)}}">
+                        {{ submission.get_type_display() }}
+                    </a>
+                </td>
+                <td>
+                    {{ submission.description}}
+                </td>
+                <td>
+                    {{ submission.started_date }}
+                </td>
+                <td>
+                    {{ submission.ended_date }}
+                </td>
+            </tr>
+            {% endfor %}
+        </body>
+    </table>
+
+</div>
+
+{% endblock %}
+
+{% block additional_js %}
+<script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
+<script type="text/javascript">
+    datetime_formatter = {
+        datetime: function (datetime, settings) {
+            if (!datetime) return '';
+            var day = datetime.getDate();
+            var month = datetime.getMonth() + 1;
+            var year = datetime.getFullYear();
+            var hour = datetime.getHours();
+            var minute = datetime.getMinutes();
+            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
+        }
+    };
+    $('#rangestart').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        endCalendar: $('#rangeend')
+    });
+    $('#rangeend').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        startCalendar: $('#rangestart')
+    });
+</script>
+{% endblock additional_js %}
