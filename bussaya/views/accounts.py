@@ -61,45 +61,12 @@ def login():
     return render_template("/accounts/login.html")
 
 
-@module.route("/login-principal")
-def login_principal():
-    client = oauth2.oauth2_client
-    redirect_uri = url_for("accounts.authorized_principal", _external=True)
-    response = client.principal.authorize_redirect(redirect_uri)
-
-    return response
-
-
 @module.route("/login-engpsu")
 def login_engpsu():
     client = oauth2.oauth2_client
     redirect_uri = url_for("accounts.authorized_engpsu", _external=True)
     response = client.engpsu.authorize_redirect(redirect_uri)
     return response
-
-
-@module.route("/authorized-principal")
-def authorized_principal():
-    client = oauth2.oauth2_client
-
-    try:
-        token = client.principal.authorize_access_token()
-    except Exception as e:
-        print(e)
-        return redirect(url_for("accounts.login"))
-
-    get_user_and_remember()
-    oauth2token = models.OAuth2Token(
-        name=client.principal.name,
-        user=current_user._get_current_object(),
-        access_token=token.get("access_token"),
-        token_type=token.get("token_type"),
-        refresh_token=token.get("refresh_token", None),
-        expires=datetime.datetime.utcfromtimestamp(token.get("expires_at")),
-    )
-    oauth2token.save()
-
-    return redirect(url_for("dashboard.index"))
 
 
 @module.route("/authorized-engpsu")
@@ -188,6 +155,7 @@ def login_oauth(name):
     client = oauth2.oauth2_client
     redirect_uri = url_for("accounts.authorized_oauth", name=name, _external=True)
     response = None
+    print(redirect_uri)
     if name == "google":
         response = client.google.authorize_redirect(redirect_uri)
     elif name == "facebook":

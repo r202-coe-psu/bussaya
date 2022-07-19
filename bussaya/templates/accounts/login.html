@@ -34,19 +34,19 @@
           </a>
         </div>
         {% if 'GOOGLE' in config.LOGIN_PROVIDER %}
-          {#
+          
         <div class="row" style="padding: 10px;">
           <div class="column header" style="text-align: left;">
             <h3>For Participant</h3>
           </div>
         </div>
         <div class="row" style="padding-top: 5px;">
-          <a class="ui  labeled icon red button huge" href="{{ url_for('loginpass.login', name='google') }}">
+          <a class="ui  labeled icon red button huge" href="{{ url_for('accounts.login_oauth', name='google') }}">
             <i class="google icon"></i>
             Google
           </a>
         </div>
-          #}
+          
         {% endif %}
       </div>
     </div>
