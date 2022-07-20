@@ -9,10 +9,10 @@
     <div class="divider"> / </div>
     <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
     <div class="divider"> / </div>
-    <a href="{{ url_for('grades.index', class_id=class_.id) }}">Grading</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">{{ grade.get_type_display()
-        }}</a>
+    Grading:
+    <a href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">
+        {{ grade.get_type_display() }}
+    </a>
 </div>
 {% endblock %}
 
@@ -23,7 +23,7 @@
     {{ class_.name }}
 </h1>
 
-{{ renderer_navbar.render_class_navbar(class_) }}
+{{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
 <h2 class="ui header">
     {{ "View" if 'view' in request.path }}
@@ -34,12 +34,11 @@
 
 <div class="ui segment">
     <a class="ui primary labeled icon button"
-        href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">
+        href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.id) }}">
         <i class="eye icon"></i>
         View
     </a>
-    <a class="ui green labeled icon button"
-        href="{{ url_for('grades.grading', class_id=class_.id, grade_type=grade.type) }}">
+    <a class="ui green labeled icon button" href="{{ url_for('grades.grading', grade_id=grade.id) }}">
         <i class="edit icon"></i>
         Grading
     </a>
@@ -56,7 +55,7 @@
                     <th class="one wide" rowspan="2">Given Grade</th>
                     <th class="one wide" rowspan="2">Average Grade</th>
                     <th rowspan="2">Total Grade</th>
-                    <th class="five wide" colspan="2">Submissions</th>
+                    <th class="four wide" colspan="2">Submissions</th>
                 </tr>
                 <tr>
                     <th>Report</th>
@@ -107,7 +106,6 @@
                     </td>
                     <td>
                         {{get_average_student_grade(student_grade.student, grade)}}
-                        คิดเกรดเฉลี่ยไม่เป็น ;-;
                     </td>
                     <td>
                         <div class="title">
@@ -142,7 +140,7 @@
                     {% set student_report = get_student_report(student_grade.student.username, class_.id) %}
                     <td>
                         {% if student_report %}
-                        <a href="{{ url_for('submissions.download', student_work_id=student_report.id, filename=student_report.file.filename) }}"
+                        <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
                             target="_blank">
                             {{student_report.file.filename}}
                         </a>
@@ -152,7 +150,7 @@
                     {% set student_presentation = get_student_presentation(student_grade.student.username,class_.id) %}
                     <td>
                         {% if student_presentation %}
-                        <a href="{{ url_for('submissions.download', student_work_id=student_presentation.id, filename=student_presentation.file.filename) }}"
+                        <a href="{{ url_for('submissions.download', progress_report_id=student_presentation.id, filename=student_presentation.file.filename) }}"
                             target="_blank">
                             {{student_presentation.file.filename}}
                         </a>

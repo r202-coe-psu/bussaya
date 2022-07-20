@@ -4,7 +4,7 @@ from .classes import Class
 from .groups import Group
 from .projects import Project, ProjectResource, ProjectApproval
 from .votings import Voting, Election
-from .submissions import Submission, StudentWork, Meeting
+from .submissions import Submission, ProgressReport, Meeting, MeetingReport
 from .grades import Grade, StudentGrade
 
 from flask_mongoengine import MongoEngine
@@ -22,8 +22,9 @@ __all__ = [
     Voting,
     Election,
     Submission,
-    StudentWork,
+    ProgressReport,
     Meeting,
+    MeetingReport,
     Grade,
     StudentGrade,
 ]

@@ -34,13 +34,12 @@ def get_current_class():
 @module.route("/admin")
 @login_required
 def index_admin():
-    data = get_current_class()
-    return render_template("/dashboard/index-admin.html", **data)
+    classes = models.Class.objects.all()
+    return render_template("/dashboard/index-admin.html", classes=classes)
 
 
 def index_lecturer():
     classes = models.Class.objects.all()
-
     return render_template("/dashboard/index-lecturer.html", classes=classes)
 
 
@@ -75,7 +74,7 @@ def index():
     if dev == "test":
         return index_student()
     if "admin" in user.roles:
-        return index_lecturer()
+        return index_admin()
     elif "CoE-lecturer" in user.roles:
         return index_lecturer()
     elif "student" in user.roles:

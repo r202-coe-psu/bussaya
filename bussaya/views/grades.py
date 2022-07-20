@@ -59,24 +59,22 @@ def get_average_student_grade(student, grade):
 def get_student_report(username, class_id):
     class_ = models.Class.objects.get(id=class_id)
     owner = models.User.objects.get(username=username)
-    student_works = models.StudentWork.objects(
-        type="submission", class_=class_, owner=owner
-    )
-    for student_work in student_works:
-        if student_work.submission.type == "report":
-            return student_work
+    progress_reports = models.ProgressReport.objects(class_=class_, owner=owner)
+
+    for progress_report in progress_reports:
+        if progress_report.submission.type == "report":
+            return progress_report
     return False
 
 
 def get_student_presentation(username, class_id):
     class_ = models.Class.objects.get(id=class_id)
     owner = models.User.objects.get(username=username)
-    student_works = models.StudentWork.objects(
-        type="submission", class_=class_, owner=owner
-    )
-    for student_work in student_works:
-        if student_work.submission.type == "presentation":
-            return student_work
+    progress_reports = models.ProgressReport.objects(class_=class_, owner=owner)
+
+    for progress_report in progress_reports:
+        if progress_report.submission.type == "presentation":
+            return progress_report
     return False
 
 
@@ -177,6 +175,7 @@ def view(class_id, grade_type):
     final.save()
 
     grade = models.Grade.objects.get(type=grade_type, class_=class_)
+
     student_grades = models.StudentGrade.objects.all().filter(
         grade=grade, teacher=current_teacher
     )
@@ -194,11 +193,11 @@ def view(class_id, grade_type):
     )
 
 
-@module.route("/<class_id>/<grade_type>/grading", methods=["GET", "POST"])
+@module.route("/<grade_id>/grading", methods=["GET", "POST"])
 @login_required
-def grading(class_id, grade_type):
-    class_ = models.Class.objects.get(id=class_id)
-    grade = models.Grade.objects.get(type=grade_type, class_=class_)
+def grading(grade_id):
+    grade = models.Grade.objects.get(id=grade_id)
+    class_ = grade.class_
     user = current_user._get_current_object()
     student_grades = models.StudentGrade.objects.all().filter(grade=grade, teacher=user)
 
@@ -207,9 +206,10 @@ def grading(class_id, grade_type):
             result = request.form.get(str(student_grade.id))
             student_grade.result = result
             if result != "-":
-                meetings = models.StudentWork.objects(
-                    class_=class_, owner=student_grade.student, type="meeting"
+                meetings = models.MeetingReport.objects(
+                    class_=class_, owner=student_grade.student
                 )
+
                 for meeting in meetings:
                     meeting.status = "approved"
                     meeting.save()
@@ -217,7 +217,7 @@ def grading(class_id, grade_type):
             student_grade.save()
 
         return redirect(
-            url_for("grades.view", class_id=class_.id, grade_type=grade_type)
+            url_for("grades.view", class_id=class_.id, grade_type=grade.type)
         )
 
     return render_template(

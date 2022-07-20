@@ -60,14 +60,14 @@
 
 		<body>
 			{% for meeting in meetings %}
-			{% set student_work = meeting.get_student_work_by_owner(user) %}
+			{% set meeting_report = meeting.get_meeting_report_by_owner(user) %}
 			<tr>
 				<td>
 					{{ meeting.name }}
 				</td>
 
 				{# Status #}
-				{% if student_work %}
+				{% if meeting_report %}
 				<td class="green">
 					Submitted
 				</td>
@@ -75,7 +75,7 @@
 
 				{% if meeting.is_in_time() %}
 				<td class="blue">
-					<a href="{{ url_for('meetings.report', meeting_id=meeting.id, class_id=class_.id)}}">
+					<a href="{{ url_for('meetings.report', meeting_id=meeting.id)}}">
 						Opened
 					</a>
 				</td>
@@ -98,8 +98,8 @@
 
 				{% set time_delta, time_remain = meeting.set_remain_time() %}
 				<td class="
-				{{ 'orange' if time_delta == 1 and not student_work }} 
-				{{ 'red' if time_delta == 0 and not student_work }} 
+				{{ 'orange' if not meeting_report and time_delta == 1 }} 
+				{{ 'red' if not meeting_report and time_delta == 0 }} 
 				{{ 'grey' if time_remain == 'Out of time'}}
 				">
 					{{ time_remain }}
@@ -107,15 +107,15 @@
 
 				<td>
 					{% if meeting.is_in_time() and meeting.is_in_time() != "Upcoming" %}
-					{% if student_work %}
+					{% if meeting_report %}
 					<a class="ui fluid icon primary button"
-						href="{{ url_for('meetings.edit_student_work', meeting_id=meeting.id, class_id=class_.id, student_work_id=student_work.id)}}">
+						href="{{ url_for('meetings.edit_meeting_report', meeting_report_id=meeting_report.id)}}">
 						<i class="edit icon"></i>
 						Edit
 					</a>
 					{% else %}
 					<a class="ui fluid icon primary button"
-						href="{{ url_for('meetings.report', meeting_id=meeting.id, class_id=class_.id)}}">
+						href="{{ url_for('meetings.report', meeting_id=meeting.id)}}">
 						<i class="file alternate outline icon"></i>
 						Report
 					</a>
@@ -157,26 +157,26 @@
 
 		<body>
 			{% for submission in submissions %}
-			{% set student_work = submission.get_student_work_by_owner(user) %}
+			{% set progress_report = submission.get_progress_report_by_owner(user) %}
 			<tr>
 				<td>
 					{{ submission.get_type_display() }}
 				</td>
 				<td class="three wide">
 					<div style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 18em;">
-						{{ student_work.description}}
+						{{ progress_report.description}}
 					</div>
 				</td>
 
 				{# Status #}
 				{% if submission.is_in_time() and submission.is_in_time() != "Upcoming" %}
-				{% if student_work %}
+				{% if progress_report %}
 				<td class="green">
 					Submitted
 				</td>
 				{% else %}
 				<td class="blue">
-					<a href="{{ url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
+					<a href="{{ url_for('submissions.upload_progress_report', submission_id=submission.id)}}">
 						Opened
 					</a>
 				</td>
@@ -196,20 +196,20 @@
 
 				{% set time_delta, time_remain = submission.set_remain_time() %}
 				<td class="
-				{{ 'orange' if time_delta == 1 and not student_work }} 
-				{{ 'red' if time_delta == 0 and not student_work }} 
+				{{ 'orange' if time_delta == 1 and not progress_report }} 
+				{{ 'red' if time_delta == 0 and not progress_report }} 
 				{{ 'grey' if time_remain == 'Out of time'}}
 				">
 					{{ time_remain }}
 				</td>
 
 				<td>
-					{% if student_work %}
+					{% if progress_report %}
 					<div style="display: flex">
 						<a style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 15em"
-							href="{{ url_for('submissions.download', student_work_id=student_work.id, filename=student_work.file.filename) }}"
+							href="{{ url_for('submissions.download', progress_report_id=progress_report.id, filename=progress_report.file.filename) }}"
 							target="_blank">
-							{{student_work.file.filename}}
+							{{progress_report.file.filename}}
 						</a>
 					</div>
 					{% else %}
@@ -219,15 +219,15 @@
 
 				<td>
 					{% if submission.is_in_time() and submission.is_in_time() != "Upcoming" %}
-					{% if student_work %}
+					{% if progress_report %}
 					<a class="ui fluid icon primary button"
-						href="{{ url_for('submissions.edit_student_work', submission_id=submission.id, class_id=class_.id, student_work_id=student_work.id)}}">
+						href="{{ url_for('submissions.edit_progress_report', progress_report_id=progress_report.id)}}">
 						<i class="edit icon"></i>
 						Edit
 					</a>
 					{% else %}
 					<a class="ui fluid icon primary button"
-						href="{{ url_for('submissions.upload', submission_id=submission.id, class_id=class_.id)}}">
+						href="{{ url_for('submissions.upload_progress_report', submission_id=submission.id)}}">
 						<i class="upload icon"></i>
 						Upload
 					</a>

@@ -1,3 +1,4 @@
+from os import abort
 from flask import Blueprint, render_template, redirect, url_for, send_file, request
 from flask_login import login_required, current_user
 from .. import forms
@@ -10,7 +11,7 @@ import socket
 module = Blueprint("submissions", __name__, url_prefix="/submissions")
 
 
-@module.route("/<class_id>/submissions/create", methods=["GET", "POST"])
+@module.route("/<class_id>/submission/create", methods=["GET", "POST"])
 @login_required
 def create(class_id):
     form = forms.submissions.SubmissionForm()
@@ -33,15 +34,13 @@ def create(class_id):
     )
 
 
-@module.route(
-    "/classes/<class_id>/submissions/<submission_id>", methods=["GET", "POST"]
-)
+@module.route("/<submission_id>/view", methods=["GET", "POST"])
 @login_required
-def view(submission_id, class_id):
+def view(submission_id):
     form = forms.submissions.SubmissionForm()
     submission = models.Submission.objects.get(id=submission_id)
-    class_ = models.Class.objects.get(id=class_id)
-    student_works = models.StudentWork.objects.all().filter(
+    class_ = submission.class_
+    progress_report = models.ProgressReport.objects.all().filter(
         class_=class_, submission=submission
     )
 
@@ -49,15 +48,16 @@ def view(submission_id, class_id):
         "/submissions/view.html",
         submission=submission,
         class_=class_,
-        student_works=student_works,
+        progress_report=progress_report,
     )
 
 
-@module.route("<class_id>/submissions/<submission_id>/edit", methods=["GET", "POST"])
+@module.route("/<submission_id>/edit", methods=["GET", "POST"])
 @login_required
-def edit(submission_id, class_id):
-    class_ = models.Class.objects.get(id=class_id)
+def edit(submission_id):
     submission = models.Submission.objects.get(id=submission_id)
+    class_ = submission.class_
+
     form = forms.submissions.SubmissionForm(obj=submission)
     if not form.validate_on_submit():
         return render_template(
@@ -72,34 +72,36 @@ def edit(submission_id, class_id):
 
     submissions = models.Submission()
     return redirect(
-        url_for("admin.classes.view", class_id=class_id, submissions=submissions)
+        url_for("admin.classes.view", class_id=class_.id, submissions=submissions)
     )
 
 
-@module.route("/<class_id>/submissions/<submission_id>/delete", methods=["GET", "POST"])
+@module.route("/<submission_id>/delete", methods=["GET", "POST"])
 @login_required
-def delete(submission_id, class_id):
+def delete(submission_id):
     submission = models.Submission.objects.get(id=submission_id)
     submission.delete()
 
-    student_works = models.StudentWork.objects(submission=submission)
-    [student_work.delete for student_work in student_works]
+    progress_reports = models.ProgressReport.objects(submission=submission)
+    [progress_report.delete for progress_report in progress_reports]
 
     return redirect(
-        url_for("admin.classes.view", submission=submission, class_id=class_id)
+        url_for(
+            "admin.classes.view", submission=submission, class_id=submission.class_.id
+        )
     )
 
 
 @module.route(
-    "/classes/<class_id>/submission/form/<submission_id>/",
+    "/<submission_id>/form",
     methods=["GET", "POST"],
 )
 @login_required
-def upload(submission_id, class_id):
+def upload_progress_report(submission_id):
 
     form = forms.submissions.StudentWorkForm()
     submission = models.Submission.objects.get(id=submission_id)
-    class_ = models.Class.objects.get(id=class_id)
+    class_ = submission.class_
 
     if not form.validate_on_submit():
         return render_template(
@@ -109,46 +111,48 @@ def upload(submission_id, class_id):
             class_=class_,
         )
 
-    student_work = models.StudentWork()
+    progress_report = models.ProgressReport()
 
-    student_work.owner = current_user._get_current_object()
-    student_work.ip_address = request.remote_addr
+    progress_report.owner = current_user._get_current_object()
+    progress_report.ip_address = request.remote_addr
 
-    student_work.class_ = models.Class.objects.get(id=class_id)
-    student_work.submission = models.Submission.objects.get(id=submission_id)
+    progress_report.class_ = models.Class.objects.get(id=class_.id)
+    progress_report.submission = models.Submission.objects.get(id=submission_id)
 
-    form.populate_obj(student_work)
+    form.populate_obj(progress_report)
     if form.uploaded_file.data:
-        if not student_work.file:
-            student_work.file.put(
+        if not progress_report.file:
+            progress_report.file.put(
                 form.uploaded_file.data,
                 filename=form.uploaded_file.data.filename,
                 content_type="application/pdf",
             )
         else:
-            student_work.file.replace(
+            progress_report.file.replace(
                 form.uploaded_file.data,
                 filename=form.uploaded_file.data.filename,
                 content_type="application/pdf",
             )
 
-    student_work.type = "submission"
-    student_work.save()
+    progress_report.type = "submission"
+    progress_report.save()
 
-    return redirect(url_for("classes.view", submission=submission, class_id=class_id))
+    return redirect(url_for("classes.view", submission=submission, class_id=class_.id))
 
 
 @module.route(
-    "/classes/<class_id>/submission/form/<submission_id>/edit",
+    "/<progress_report_id>/form/edit",
     methods=["GET", "POST"],
 )
 @login_required
-def edit_student_work(submission_id, class_id):
+def edit_progress_report(progress_report_id):
 
-    class_ = models.Class.objects.get(id=class_id)
-    submission = models.Submission.objects.get(id=submission_id)
-    student_work = models.StudentWork.objects.get(class_=class_, submission=submission)
-    form = forms.submissions.StudentWorkForm(obj=student_work)
+    progress_report = models.ProgressReport.objects.get(id=progress_report_id)
+
+    submission = progress_report.submission
+    class_ = progress_report.class_
+
+    form = forms.submissions.StudentWorkForm(obj=progress_report)
 
     if not form.validate_on_submit():
         return render_template(
@@ -156,56 +160,56 @@ def edit_student_work(submission_id, class_id):
             form=form,
             class_=class_,
             submission=submission,
-            student_work=student_work,
+            progress_report=progress_report,
         )
 
-    student_work.owner = current_user._get_current_object()
-    student_work.ip_address = request.remote_addr
+    progress_report.owner = current_user._get_current_object()
+    progress_report.ip_address = request.remote_addr
 
-    student_work.class_ = models.Class.objects.get(id=class_id)
-    student_work.submission = models.Submission.objects.get(id=submission_id)
+    progress_report.submission = submission
+    progress_report.class_ = class_
 
-    form.populate_obj(student_work)
+    form.populate_obj(progress_report)
     if form.uploaded_file.data:
-        if not student_work.file:
-            student_work.file.put(
+        if not progress_report.file:
+            progress_report.file.put(
                 form.uploaded_file.data,
                 filename=form.uploaded_file.data.filename,
                 content_type="application/pdf",
             )
         else:
-            student_work.file.replace(
+            progress_report.file.replace(
                 form.uploaded_file.data,
                 filename=form.uploaded_file.data.filename,
                 content_type="application/pdf",
             )
 
-    student_work.type = "submission"
-    student_work.save()
-    print([x.type for x in models.StudentWork.objects()])
+    progress_report.type = "submission"
+    progress_report.save()
+    print([x.type for x in models.ProgressReport.objects()])
 
-    return redirect(url_for("classes.view", submission=submission, class_id=class_id))
+    return redirect(url_for("classes.view", submission=submission, class_id=class_.id))
 
 
 @module.route(
-    "/<student_work_id>/<filename>",
+    "/<progress_report_id>/<filename>",
 )
 @login_required
-def download(student_work_id, filename):
+def download(progress_report_id, filename):
 
-    student_work = models.StudentWork.objects.get(id=student_work_id)
+    progress_report = models.ProgressReport.objects.get(id=progress_report_id)
 
     if (
-        not student_work
-        or not student_work.file
-        or student_work.file.filename != filename
+        not progress_report
+        or not progress_report.file
+        or progress_report.file.filename != filename
     ):
         return abort(403)
 
     response = send_file(
-        student_work.file,
-        attachment_filename=student_work.file.filename,
-        mimetype=student_work.file.content_type,
+        progress_report.file,
+        attachment_filename=progress_report.file.filename,
+        mimetype=progress_report.file.content_type,
     )
 
     return response

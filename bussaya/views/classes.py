@@ -13,17 +13,20 @@ module = Blueprint(
 )
 
 
+@module.route("")
+def index():
+    return redirect(url_for("dashboard.index"))
+
+
 @module.route("/<class_id>")
 def view(class_id):
-    user = current_user
 
-    if "CoE-lecturer" in user.roles:
+    if "CoE-lecturer" in current_user.roles:
         return view_lecturer(class_id)
-    elif "student" in user.roles:
+    elif "student" in current_user.roles:
         return view_student(class_id)
 
-
-@module.route("/lecturer/<class_id>/hey")
+@module.route("/lecturer/<class_id>/view")
 @acl.roles_required("CoE-lecturer")
 def view_lecturer(class_id):
     class_ = models.Class.objects.get(id=class_id)
@@ -41,7 +44,7 @@ def view_lecturer(class_id):
     )
 
 
-@module.route("/student/<class_id>")
+@module.route("/student/<class_id>/view")
 @login_required
 def view_student(class_id):
     class_ = models.Class.objects.get(id=class_id)

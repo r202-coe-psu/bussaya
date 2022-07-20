@@ -25,10 +25,6 @@ class Submission(me.Document):
     owner = me.ReferenceField("User", dbref=True, required=True)
     description = me.StringField()
 
-    file = me.FileField(
-        collection_name="progress_fs",
-    )
-
     def is_in_time(self):
         if self.started_date <= datetime.datetime.now() <= self.ended_date:
             return True
@@ -66,10 +62,12 @@ class Submission(me.Document):
     def natural_ended_date(self):
         return self.ended_date.strftime("%A, %d %B %Y, %I:%M %p")
 
-    def get_student_work_by_owner(self, owner):
-        student_works = StudentWork.objects.all().filter(submission=self, owner=owner)
-        for student_work in student_works:
-            return student_work
+    def get_progress_report_by_owner(self, owner):
+        progress_reports = ProgressReport.objects.all().filter(
+            submission=self, owner=owner
+        )
+        for progress_report in progress_reports:
+            return progress_report
 
 
 class Meeting(me.Document):
@@ -125,33 +123,50 @@ class Meeting(me.Document):
     def natural_ended_date(self):
         return self.ended_date.strftime("%A, %d %B %Y, %I:%M %p")
 
-    def get_student_work_by_owner(self, owner):
-        meetings = StudentWork.objects.all().filter(meeting=self, owner=owner)
-        for student_work in meetings:
-            return student_work
+    def get_meeting_report_by_owner(self, owner):
+        meeting_reports = MeetingReport.objects.all().filter(meeting=self, owner=owner)
+        for meeting_report in meeting_reports:
+            return meeting_report
 
 
-class StudentWork(me.Document):
-    meta = {"collection": "student_works"}
-
-    owner = me.ReferenceField("User", dbref=True, required=True)
-    ip_address = me.StringField(required=True)
-    class_ = me.ReferenceField("Class", dbref=True, required=True)
-    project = me.ReferenceField("Projects")
-
-    type = me.StringField(
-        choices=[("submission", "Submission"), ("meeting", "Meeting")]
-    )
+class ProgressReport(me.Document):
+    meta = {"collection": "progress_reports"}
 
     submission = me.ReferenceField("Submission", dbref=True)
-    description = me.StringField()
+
+    owner = me.ReferenceField("User", dbref=True, required=True)
+    class_ = me.ReferenceField("Class", dbref=True, required=True)
+    project = me.ReferenceField("Projects")
+    ip_address = me.StringField(required=True)
+
+    description = me.StringField(required=True)
     file = me.FileField(
-        collection_name="meeting_fs",
+        collection_name="progress_report_fs",
     )
 
-    title = me.StringField()
-    meeting_date = me.DateField(default=datetime.datetime.today)
+    started_date = me.DateTimeField(required=True, default=datetime.datetime.now)
+    created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
+    updated_date = me.DateTimeField(
+        required=True, default=datetime.datetime.now, auto_now=True
+    )
+
+
+class MeetingReport(me.Document):
+    meta = {"collection": "meeting_reports"}
+
     meeting = me.ReferenceField("Meeting", dbref=True)
+
+    owner = me.ReferenceField("User", dbref=True, required=True)
+    class_ = me.ReferenceField("Class", dbref=True, required=True)
+    project = me.ReferenceField("Projects")
+    ip_address = me.StringField(required=True)
+
+    title = me.StringField()
+    description = me.StringField(required=True)
+    meeting_date = me.DateField(default=datetime.datetime.today)
+    file = me.FileField(
+        collection_name="meeting_report_fs",
+    )
 
     status = me.StringField(choices=APPROVAL_STATUS)
     remark = me.StringField()

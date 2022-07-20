@@ -19,7 +19,7 @@
 	{{ class_.name }}
 </h1>
 
-{{ renderer_navbar.render_class_navbar(class_) }}
+{{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
 <h2 class="ui header">Class</h2>
 <div class="ui divider"></div>
@@ -95,12 +95,10 @@
 					{{ meeting.ended_date }}
 				</td>
 				<td>
-					<a class="ui primary icon button"
-						href="{{url_for('meetings.edit', meeting_id=meeting.id, class_id=class_.id)}}">
+					<a class="ui primary icon button" href="{{url_for('meetings.edit', meeting_id=meeting.id)}}">
 						<i class="edit icon"></i>
 					</a>
-					<a class="ui red icon button"
-						href="{{url_for('meetings.delete', meeting_id=meeting.id, class_id=class_.id)}}">
+					<a class="ui red icon button" href="{{url_for('meetings.delete', meeting_id=meeting.id)}}">
 						<i class="trash icon"></i>
 					</a>
 				</td>
@@ -146,7 +144,7 @@
 			{% for submission in submissions %}
 			<tr>
 				<td>
-					<a href="{{ url_for('submissions.view', submission_id=submission.id, class_id=class_.id)}}">
+					<a href="{{ url_for('submissions.view', submission_id=submission.id)}}">
 						{{ submission.get_type_display() }}
 					</a>
 				</td>
@@ -161,11 +159,11 @@
 				</td>
 				<td>
 					<a class="ui primary icon button"
-						href="{{ url_for('submissions.edit', submission_id=submission.id, class_id=class_.id) }}">
+						href="{{ url_for('submissions.edit', submission_id=submission.id) }}">
 						<i class="edit icon"></i>
 					</a>
 					<a class="ui red icon button"
-						href="{{ url_for('submissions.delete', submission_id=submission.id, class_id=class_.id) }}">
+						href="{{ url_for('submissions.delete', submission_id=submission.id) }}">
 						<i class="trash icon"></i>
 					</a>
 				</td>

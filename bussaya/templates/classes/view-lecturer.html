@@ -1,14 +1,15 @@
-{% extends '/admin/classes/index.html' %}
+{% extends '/classes/index.html' %}
+
 {% import '/base/error-handler.html' as eh %}
-{% import '/admin/classes/project-renderer.html' as renderer_project %}
-{% import '/navbar/class-navbar.html' as renderer_navbar %}
 {% import '/base/html-renderer.html' as renderer %}
+{% import '/navbar/class-navbar.html' as renderer_navbar %}
+{% import '/admin/classes/project-renderer.html' as renderer_project %}
 
 {% block breadcrumbs %}
 <div class="ui breadcrumb">
-    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+    <a href="{{ url_for('classes.index') }}" class="section">Classes</a>
     <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
 </div>
 {% endblock %}
 
@@ -19,7 +20,7 @@
     {{ class_.name }}
 </h1>
 
-{{ renderer_navbar.render_class_navbar(class_) }}
+{{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
 <h2 class="ui header">Class</h2>
 <div class="ui divider"></div>
@@ -116,7 +117,7 @@
             {% for submission in submissions %}
             <tr>
                 <td>
-                    <a href="{{ url_for('submissions.view', submission_id=submission.id, class_id=class_.id)}}">
+                    <a href="{{ url_for('submissions.view', submission_id=submission.id)}}">
                         {{ submission.get_type_display() }}
                     </a>
                 </td>

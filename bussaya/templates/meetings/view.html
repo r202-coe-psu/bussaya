@@ -36,7 +36,7 @@
 </table>
 
 <a class="ui very small primary icon button" style="margin-top:0.5em"
-    href="{{url_for('meetings.edit', meeting_id=meeting.id, class_id=class_.id)}}">
+    href="{{url_for('meetings.edit', meeting_id=meeting.id)}}">
     <i class="edit icon"></i> Edit
 </a>
 <a class="ui very small negative icon button" style="margin-top:0.5em">
@@ -58,35 +58,35 @@
         </tr>
     </thead>
     <tbody>
-        {% for student_work in student_works %}
+        {% for meeting_report in meeting_reports %}
         <tr>
 
             <td>
                 {{ loop.index }}
             </td>
             <td>
-                {{student_work.owner.username}}
+                {{meeting_report.owner.username}}
             </td>
             <td>
-                {{student_work.title}}
+                {{meeting_report.title}}
             </td>
             <td>
-                {{student_work.description}}
+                {{meeting_report.description}}
             </td>
             <td>
-                {{student_work.meeting_date}}
+                {{meeting_report.meeting_date}}
             </td>
             <td
-                class="{{'green' if student_work.status == 'approved'}} {{'red' if student_work.status == 'disapproved'}}">
-                {{student_work.get_status_display() if student_work.status else 'Waiting for approval'}}
+                class="{{'green' if meeting_report.status == 'approved'}} {{'red' if meeting_report.status == 'disapproved'}}">
+                {{meeting_report.get_status_display() if meeting_report.status else 'Waiting for approval'}}
             </td>
             <td>
-                {{student_work.remark if student_work.remark else '-' }}
+                {{meeting_report.remark if meeting_report.remark else '-' }}
             </td>
             <td class="four wide">
                 <div style="display: flex">
 
-                    <a class="ui primary button" href="{{url_for('meetings.approval', meeting_id=meeting.id, student_work_id=student_work.id, 
+                    <a class="ui primary button" href="{{url_for('meetings.approval', meeting_id=meeting.id, student_work_id=meeting_report.id, 
                     action='approved')}}" style="height: fit-content; margin-top: 0.5em">
                         Approve
                     </a>
@@ -102,7 +102,7 @@
                                 <div class="ui segment">
                                     <form method="post" class="ui form">
                                         {{renderer.render_field(form.remark)}}
-                                        <input type="hidden" name="student_work_id" value="{{student_work.id}}">
+                                        <input type="hidden" name="student_work_id" value="{{meeting_report.id}}">
                                         <button type="submit" class="ui primary button" style="margin-top: 0.5em">
                                             Submit
                                         </button>
