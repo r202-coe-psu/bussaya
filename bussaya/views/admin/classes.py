@@ -19,7 +19,7 @@ module = Blueprint(
 @module.route("/")
 @acl.roles_required("admin")
 def index():
-    classes = models.Class.objects()
+    classes = models.Class.objects().order_by("-id")
     return render_template("/admin/classes/index.html", classes=classes)
 
 
