@@ -6,6 +6,7 @@ from flask import url_for
 
 
 from .projects import Project
+from .groups import Group
 
 
 class User(me.Document, UserMixin):
@@ -37,6 +38,9 @@ class User(me.Document, UserMixin):
 
     meta = {"collection": "users", "strict": False}
 
+    def get_fullname(self):
+        return self.first_name + " " + self.last_name
+
     def has_roles(self, *roles):
         for role in roles:
             if role in self.roles:
@@ -59,3 +63,6 @@ class User(me.Document, UserMixin):
     def get_advisee_projects(self):
         projects = Project.objects(advisor=self).order_by("-id")
         return projects
+
+    def get_group(self, class_):
+        return Group.objects(lecturer=self, class_=class_).first()

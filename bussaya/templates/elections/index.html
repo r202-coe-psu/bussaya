@@ -7,33 +7,34 @@
     <h1>Elections</h1>
   </div>
   <div style="padding-top: 20px;">
-<table class="ui celled selectable table">
-  <thead class="center aligned">
-    <th>Class</th>
-    <th>Start</th>
-    <th>End</th>
-    <th>Operations</th>
-  </thead>
-  <tbody>
-    {% for election in elections %}
-    <tr>
-      <td>{{ election.class_.name }}</td>
-      <td>{{ election.started_date }}</td>
-      <td>{{ election.ended_date }}</td>
-      <td>
-        <a href="{{ url_for('elections.edit', election_id=election.id) }}"><i class="edit icon"></i></a>
-        <a href="{{ url_for('elections.generate_qrcode', election_id=election.id) }}"><i class="qrcode icon"></i></a>
+    <table class="ui celled selectable table">
+      <thead class="center aligned">
+        <th>Class</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Operations</th>
+      </thead>
+      <tbody>
+        {% for election in elections %}
+        <tr>
+          <td>{{ election.class_.name }}</td>
+          <td>{{ election.started_date }}</td>
+          <td>{{ election.ended_date }}</td>
+          <td>
+            <a href="{{ url_for('elections.edit', election_id=election.id) }}"><i class="edit icon"></i></a>
+            <a href="{{ url_for('elections.generate_qrcode', election_id=election.id) }}"><i
+                class="qrcode icon"></i></a>
 
-      </td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
-
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
+  <p></p>
   <div class="padding: 10px;">
     <a class="ui primary button" href="{{ url_for('elections.create') }}">Create</a>
   </div>
-<div>
+  <div>
 
-{% endblock %}
+    {% endblock %}

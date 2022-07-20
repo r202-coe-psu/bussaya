@@ -26,7 +26,9 @@
       <th>Advisor</th>
       <th>Public</th>
       <th>Document</th>
+      {% if current_user.has_roles("admin") %}
       <th>Action</th>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
@@ -47,11 +49,13 @@
       <td class="right aligned collapsing">
         {{ pm_renderer.render_project_material(project) }}
       </td>
+      {% if current_user.has_roles("admin") %}
       <td class="right aligned collapsing">
         <a class="ui negative icon button" href="{{ url_for('admin.projects.delete', project_id=project.id) }}">
           <i class="trash icon"></i>
         </a>
       </td>
+      {% endif %}
     </tr>
     {% endfor %}
   </tbody>

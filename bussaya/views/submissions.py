@@ -3,6 +3,9 @@ from flask import Blueprint, render_template, redirect, url_for, send_file, requ
 from flask_login import login_required, current_user
 from .. import forms
 from .. import models
+
+from bussaya import acl
+
 import mongoengine as me
 
 import datetime
@@ -18,7 +21,7 @@ def create(class_id):
     class_ = models.Class.objects.get(id=class_id)
     if not form.validate_on_submit():
         return render_template(
-            "/submissions/create-edit.html",
+            "/admin/submissions/create-edit.html",
             form=form,
             class_=class_,
         )
@@ -34,21 +37,44 @@ def create(class_id):
     )
 
 
-@module.route("/<submission_id>/view", methods=["GET", "POST"])
+@module.route("/<submission_id>")
 @login_required
 def view(submission_id):
-    form = forms.submissions.SubmissionForm()
+    if current_user.has_roles("admin"):
+        return view_admin(submission_id)
+    else:
+        return view_lecturer(submission_id)
+
+
+@module.route("/<submission_id>/view")
+@login_required
+def view_lecturer(submission_id):
     submission = models.Submission.objects.get(id=submission_id)
     class_ = submission.class_
-    progress_report = models.ProgressReport.objects.all().filter(
+    progress_reports = models.ProgressReport.objects.all().filter(
         class_=class_, submission=submission
     )
-
     return render_template(
         "/submissions/view.html",
         submission=submission,
         class_=class_,
-        progress_report=progress_report,
+        progress_reports=progress_reports,
+    )
+
+
+@module.route("/<submission_id>/admin/view")
+@acl.roles_required("admin")
+def view_admin(submission_id):
+    submission = models.Submission.objects.get(id=submission_id)
+    class_ = submission.class_
+    progress_reports = models.ProgressReport.objects.all().filter(
+        class_=class_, submission=submission
+    )
+    return render_template(
+        "/admin/submissions/view.html",
+        submission=submission,
+        class_=class_,
+        progress_reports=progress_reports,
     )
 
 
@@ -61,7 +87,7 @@ def edit(submission_id):
     form = forms.submissions.SubmissionForm(obj=submission)
     if not form.validate_on_submit():
         return render_template(
-            "/submissions/create-edit.html",
+            "/admin/submissions/create-edit.html",
             form=form,
             class_=class_,
             submission=submission,
@@ -97,7 +123,7 @@ def delete(submission_id):
     methods=["GET", "POST"],
 )
 @login_required
-def upload_progress_report(submission_id):
+def upload(submission_id):
 
     form = forms.submissions.StudentWorkForm()
     submission = models.Submission.objects.get(id=submission_id)

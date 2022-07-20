@@ -2,23 +2,23 @@
 
 
 {% macro render_project_section(projects, current_user, advisees, committees) -%}
-  {%- if advisees | count > 0 or committees | count > 0 %}
-  <div class="ui segment row">
+{%- if advisees | count > 0 or committees | count > 0 %}
+<div class="ui segment row">
   {%- if advisees | count > 0 %}
-    <h4>Advisee Project</h4>
-    {{ render_project_table(advisees, current_user) }}
+  <h4>Advisee Project</h4>
+  {{ render_project_table(advisees, current_user) }}
   {%- endif %}
   {%- if committees | count > 0 %}
-    <h4>Examination Project</h4>
-    {{ render_project_table(committees, current_user) }}
+  <h4>Examination Project</h4>
+  {{ render_project_table(committees, current_user) }}
   {%- endif %}
   {%- if projects | count > 0 %}
-    <h4>Alumni Project</h4>
-    {{ render_project_table(projects, current_user) }}
+  <h4>Alumni Project</h4>
+  {{ render_project_table(projects, current_user) }}
   {%- endif %}
 
-  </div>
-  {%- endif %}
+</div>
+{%- endif %}
 {% endmacro -%}
 
 {% macro render_project_table(projects, current_user=None) -%}
@@ -30,7 +30,9 @@
       <th>Advisor</th>
       <th>Public</th>
       <th>Document</th>
+      {% if current_user.has_roles("admin") %}
       <th>Action</th>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
@@ -53,28 +55,27 @@
       <td class="right aligned collapsing">
         {#
         {% if current_user and project.is_approval(current_user) %}
-          <i class="large blue check icon"></i>
-          <a class="ui disabled button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
+        <i class="large blue check icon"></i>
+        <a class="ui disabled button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
         {% elif current_user %}
-          <i class="large check icon disabled"></i>
-          <a class="ui primary button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
+        <i class="large check icon disabled"></i>
+        <a class="ui primary button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
         {% else %}
         {% endif %}
         #}
       </td>
     </tr>
-  {% endfor %}
+    {% endfor %}
   </tbody>
 </table>
 
-  <script type="text/javascript">
+<script type="text/javascript">
   $('.icon.link.pop')
-  .popup({
-    delay: {
-    show: 50,
-    hide: 70
-    }
-  });
-  </script>
+    .popup({
+      delay: {
+        show: 50,
+        hide: 70
+      }
+    });
+</script>
 {%- endmacro %}
-

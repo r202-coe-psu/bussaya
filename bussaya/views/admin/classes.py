@@ -69,13 +69,15 @@ def view(class_id):
 
     form = forms.meetings.MeetingForm()
     if form.validate_on_submit():
-        meeting = models.Meeting()
-        form.populate_obj(meeting)
-        meeting.class_ = class_
-        meeting.type = "meeting"
-        meeting.owner = current_user._get_current_object()
-        meeting.save()
-        return redirect(url_for("admin.classes.view", class_id=class_.id))
+        return redirect(
+            url_for(
+                "meetings.create",
+                class_id=class_.id,
+                name=form.name.data,
+                start=form.started_date.data,
+                end=form.ended_date.data,
+            )
+        )
 
     return render_template(
         "/admin/classes/view.html",

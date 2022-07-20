@@ -15,9 +15,6 @@
 
 {% block content %}
 
-<h1 class="ui horizontal divider header">
-    {{ class_.name }}
-</h1>
 
 {{ navbar_renderer.render_class_navbar(class_, current_user) }}
 
@@ -37,7 +34,7 @@
                     <div class="two field">
                         {{ form.csrf_token }}
                         {{ renderer.render_field(form.name) }}
-                        {{ renderer.render_select(form.lecturer) }}
+                        {{ renderer.render_multiple_select(form.teachers) }}
                     </div>
                     <button name="create" type="submit" class="ui small primary button">
                         Create

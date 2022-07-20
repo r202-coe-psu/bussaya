@@ -19,10 +19,6 @@
 
 {% block content %}
 
-<h1 class="ui horizontal divider header">
-    {{ class_.name }}
-</h1>
-
 {{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
 <h2 class="ui header">
@@ -42,6 +38,19 @@
         <i class="edit icon"></i>
         Grading
     </a>
+    <a class="ui orange labeled icon button" onclick="showSetTimeOff()">
+        <i class="clock icon"></i>
+        Set Time Off Grading System
+    </a>
+    <p />
+    <div class="ui time-off" style="display: none">
+        <div class="ui segment">
+            HEY GRADING TIME
+        </div>
+    </div>
+    <div class="ui big info message">
+        Grading System will be closed on <b>27 Sep 2022</b>
+    </div>
 </div>
 
 <form method="POST" id="form-grade">
@@ -187,6 +196,10 @@
         } else {
             document.getElementById(show_hide_id).innerHTML = "Hide"
         }
+    }
+
+    function showSetTimeOff() {
+        $('.ui.time-off').transition('fade down')
     }
 </script>
 {% endblock additional_js %}

@@ -16,10 +16,6 @@
 
 {% block content %}
 
-<h1 class="ui horizontal divider header">
-    {{ class_.name }}
-</h1>
-
 {{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
 <h2 class="ui header">Class</h2>
@@ -64,7 +60,7 @@
 
 <div class="ui segment">
     <h2 class="ui header">Projects</h2>
-    {{ renderer_project.render_project_table(projects) }}
+    {{ renderer_project.render_project_table(projects, current_user) }}
 </div>
 
 <div class="ui segment">

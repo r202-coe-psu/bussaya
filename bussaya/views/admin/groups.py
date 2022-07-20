@@ -30,10 +30,11 @@ def get_group_form(group=None):
     if group:
         students = group.students
         form.students.data = [student.username for student in students]
+        form.teachers.data = [str(lec.id) for lec in group.teachers]
 
     lecturers = models.User.objects(roles="lecturer").order_by("first_name")
     lec_choices = [(str(l.id), f"{l.first_name} {l.last_name}") for l in lecturers]
-    form.lecturer.choices = lec_choices
+    form.teachers.choices = lec_choices
     return form
 
 
@@ -74,7 +75,7 @@ def manage(class_id):
         group = models.Group()
         form.populate_obj(group)
         group.class_ = class_
-        group.lecturer = models.User.objects.get(id=form.lecturer.data)
+        group.teachers = [models.User.objects.get(id=uid) for uid in form.teachers.data]
         group.save()
 
         return redirect(url_for("admin.groups.manage", class_id=class_.id))
@@ -102,7 +103,7 @@ def edit(class_id, group_id):
         return render_template("/admin/groups/edit.html", class_=class_, form=form)
 
     form.populate_obj(group)
-    group.lecturer = models.User.objects.get(id=form.lecturer.data)
+    group.teachers = models.User.objects.get(id=form.teachers.data)
     group.students = [
         models.User.objects.get(username=student_id)
         for student_id in form.students.data

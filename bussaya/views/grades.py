@@ -96,6 +96,10 @@ def view(class_id, grade_type):
         final.class_ = class_
         final.save()
 
+        teacher_project = []
+        for project in models.Project.objects.all().filter(class_=class_):
+            teacher_project.append(project.advisorฆ)
+
         for id in class_.student_ids:
             user = models.User.objects(username=id).first()
             if not user:

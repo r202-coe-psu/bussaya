@@ -66,16 +66,13 @@
     </thead>
     <tbody>
 
-        {% set index = namespace(value=1) %}
         {% for progress_report in progress_reports %}
 
         {% set group = current_user.get_group(class_= class_) %}
         {% set project = progress_report.owner.get_project() %}
 
-        {% if progress_report.owner in group.students %}
         <tr>
-            <td>{{index.value}}</td>
-            {% set index.value = index.value + 1 %}
+            <td>{{loop.index}}</td>
             <td>{{project.name}}</td>
             <td class="right aligned collapsing">
                 {% if not project %}
@@ -100,7 +97,6 @@
             </td>
             <td>{{ progress_report.description }}</td>
         </tr>
-        {% endif %}
 
         {% endfor %}
     </tbody>

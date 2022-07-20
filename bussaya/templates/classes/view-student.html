@@ -109,7 +109,7 @@
 					{% if meeting.is_in_time() and meeting.is_in_time() != "Upcoming" %}
 					{% if meeting_report %}
 					<a class="ui fluid icon primary button"
-						href="{{ url_for('meetings.edit_meeting_report', meeting_report_id=meeting_report.id)}}">
+						href="{{ url_for('meetings.edit_report', meeting_report_id=meeting_report.id)}}">
 						<i class="edit icon"></i>
 						Edit
 					</a>
@@ -176,7 +176,7 @@
 				</td>
 				{% else %}
 				<td class="blue">
-					<a href="{{ url_for('submissions.upload_progress_report', submission_id=submission.id)}}">
+					<a href="{{ url_for('submissions.upload', submission_id=submission.id)}}">
 						Opened
 					</a>
 				</td>
@@ -227,7 +227,7 @@
 					</a>
 					{% else %}
 					<a class="ui fluid icon primary button"
-						href="{{ url_for('submissions.upload_progress_report', submission_id=submission.id)}}">
+						href="{{ url_for('submissions.upload', submission_id=submission.id)}}">
 						<i class="upload icon"></i>
 						Upload
 					</a>

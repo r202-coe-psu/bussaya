@@ -4,6 +4,7 @@ import mongoengine as me
 import datetime
 
 SEMESTER_TYPE = [("midterm", "Midterm"), ("final", "Final")]
+# GRADE_SYSTEM_STATUS = [("opended", "Opended"), ("closed", "Closed")]
 
 
 class Grade(me.Document):
@@ -13,6 +14,9 @@ class Grade(me.Document):
     class_ = me.ReferenceField("Class", dbref=True, required=True)
     student_ids = me.ListField()
     student_grades = me.ListField()
+
+    started_date = me.DateTimeField(required=True, default=datetime.datetime.now)
+    ended_date = me.DateTimeField(required=True, default=datetime.datetime.now)
 
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
     updated_date = me.DateTimeField(

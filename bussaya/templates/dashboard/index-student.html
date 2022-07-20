@@ -67,7 +67,9 @@ Dashboard
           <div class="right floated content single line">
             {{ pm_renderer.render_project_material(project) }}
 
-            <a class="ui primary button" href="{{ url_for('projects.upload', project_id=project.id) }}">Upload</a>
+            {#
+            <a class="ui primary button" href="{{ url_for('projects.upload', project_id=project.id) }}">Upload</a>}
+            #}
             <a class="ui primary button" href="{{ url_for('projects.edit', project_id=project.id) }}">Edit</a>
           </div>
           <i class="laptop large icon avatar"></i>
