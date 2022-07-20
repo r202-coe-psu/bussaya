@@ -1,4 +1,3 @@
-from types import NoneType
 from flask import Blueprint, render_template, redirect, url_for, send_file, request
 from flask_login import login_required, current_user
 from bussaya import forms, models, acl
