@@ -21,7 +21,7 @@
     <div class="ui segment">
         <form method="POST" class="ui form">
             {{ form.csrf_token }}
-            {{ renderer.render_field(form.type) }}
+            {{ renderer.render_select(form.type) }}
             {{ renderer.render_field(form.description) }}
             <div class="two fields">
                 <div class="field">

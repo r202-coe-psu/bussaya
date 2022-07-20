@@ -13,7 +13,7 @@ from bussaya import models
 BaseProjectForm = model_form(
     models.Group,
     FlaskForm,
-    exclude=["created_date", "class_", "teachers", "students"],
+    exclude=["created_date", "class_", "committees", "students"],
     field_args={
         "name": {"label": "Name"},
     },
@@ -21,7 +21,7 @@ BaseProjectForm = model_form(
 
 
 class GroupForm(BaseProjectForm):
-    teachers = fields.SelectMultipleField(
+    committees = fields.SelectMultipleField(
         "Committees",
         validators=[validators.InputRequired(), validators.length(max=5, min=1)],
     )

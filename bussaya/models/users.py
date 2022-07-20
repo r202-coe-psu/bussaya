@@ -65,4 +65,6 @@ class User(me.Document, UserMixin):
         return projects
 
     def get_group(self, class_):
-        return Group.objects(lecturer=self, class_=class_).first()
+        for group in Group.objects(class_=class_):
+            if self in group.committees:
+                return group

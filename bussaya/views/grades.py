@@ -183,18 +183,35 @@ def view(class_id, grade_type):
     student_grades = models.StudentGrade.objects.all().filter(
         grade=grade, teacher=current_teacher
     )
-    return render_template(
-        "/grades/view.html",
-        user=current_teacher,
-        class_=class_,
-        grade=grade,
-        grade_type=grade_type,
-        student_grades=student_grades,
-        get_total_student_grades=get_total_student_grades,
-        get_average_student_grade=get_average_student_grade,
-        get_student_report=get_student_report,
-        get_student_presentation=get_student_presentation,
-    )
+    student_grades = sorted(student_grades, key=lambda s: s.student.username)
+
+    if current_user.has_roles("admin"):
+        return render_template(
+            "admin/grades/view.html",
+            user=current_teacher,
+            class_=class_,
+            grade=grade,
+            grade_type=grade_type,
+            student_grades=student_grades,
+            get_total_student_grades=get_total_student_grades,
+            get_average_student_grade=get_average_student_grade,
+            get_student_report=get_student_report,
+            get_student_presentation=get_student_presentation,
+        )
+
+    else:
+        return render_template(
+            "/grades/view.html",
+            user=current_teacher,
+            class_=class_,
+            grade=grade,
+            grade_type=grade_type,
+            student_grades=student_grades,
+            get_total_student_grades=get_total_student_grades,
+            get_average_student_grade=get_average_student_grade,
+            get_student_report=get_student_report,
+            get_student_presentation=get_student_presentation,
+        )
 
 
 @module.route("/<grade_id>/grading", methods=["GET", "POST"])

@@ -34,7 +34,7 @@
                     <div class="two field">
                         {{ form.csrf_token }}
                         {{ renderer.render_field(form.name) }}
-                        {{ renderer.render_multiple_select(form.teachers) }}
+                        {{ renderer.render_multiple_select(form.committees) }}
                     </div>
                     <button name="create" type="submit" class="ui small primary button">
                         Create
@@ -67,7 +67,9 @@
                     {{ group.name }}
                 </td>
                 <td>
-                    {{ group.lecturer.first_name }} {{ group.lecturer.last_name }}
+                    {% for lec in group.committees %}
+                    {{ lec.get_fullname() }} {% if not loop.last %} <br> {% endif %}
+                    {% endfor %}
                 </td>
                 <td>
                     {{ get_student_ids(group) }}

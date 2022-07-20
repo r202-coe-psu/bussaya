@@ -30,7 +30,7 @@
 
 <div class="ui segment">
     <a class="ui primary labeled icon button"
-        href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">
+        href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.id) }}">
         <i class="eye icon"></i>
         View
     </a>
@@ -78,7 +78,6 @@
                 {% set group = current_user.get_group(class_= class_) %}
 
                 {% if student_grade.teacher == user %}
-                {% if student_grade.student in group.students %}
                 <tr>
                     <td>{{index.value}}</td>
                     {% set index.value = index.value + 1 %}
@@ -173,7 +172,6 @@
                     </td>
 
                 </tr>
-                {% endif %}
                 {% endif %}
                 {% endfor %}
             </tbody>
