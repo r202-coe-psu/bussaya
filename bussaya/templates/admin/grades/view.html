@@ -1,6 +1,6 @@
 {% extends '/admin/classes/index.html' %}
 {% import '/base/error-handler.html' as eh %}
-{% import '/admin/classes/project-renderer.html' as renderer %}
+{% import '/base/html-renderer.html' as renderer %}
 {% import '/navbar/class-navbar.html' as renderer_navbar %}
 
 {% block breadcrumbs %}
@@ -30,7 +30,7 @@
 
 <div class="ui segment">
     <a class="ui primary labeled icon button"
-        href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.id) }}">
+        href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">
         <i class="eye icon"></i>
         View
     </a>
@@ -38,18 +38,12 @@
         <i class="edit icon"></i>
         Grading
     </a>
-    <a class="ui orange labeled icon button" onclick="showSetTimeOff()">
+    <a class="ui orange labeled icon button" href="{{ url_for('grades.set_time', grade_id=grade.id) }}">
         <i class="clock icon"></i>
         Set Time Off Grading System
     </a>
-    <p />
-    <div class="ui time-off" style="display: none">
-        <div class="ui segment">
-            HEY GRADING TIME
-        </div>
-    </div>
     <div class="ui big info message">
-        Grading System will be closed on <b>27 Sep 2022</b>
+        Grading System will be closed on <b>{{ grade.natural_ended_date() }}</b> ({{grade.remain_time()[1]}})
     </div>
 </div>
 
@@ -206,5 +200,28 @@
     function showSetTimeOff() {
         $('.ui.time-off').transition('fade down')
     }
+</script>
+<script type="text/javascript">
+    datetime_formatter = {
+        datetime: function (datetime, settings) {
+            if (!datetime) return '';
+            var day = datetime.getDate();
+            var month = datetime.getMonth() + 1;
+            var year = datetime.getFullYear();
+            var hour = datetime.getHours();
+            var minute = datetime.getMinutes();
+            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
+        }
+    };
+    $('#rangestart').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        endCalendar: $('#rangeend')
+    });
+    $('#rangeend').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        startCalendar: $('#rangestart')
+    });
 </script>
 {% endblock additional_js %}

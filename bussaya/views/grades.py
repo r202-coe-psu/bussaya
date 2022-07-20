@@ -97,15 +97,17 @@ def view(class_id, grade_type):
 
         teacher_project = []
         for project in models.Project.objects.all().filter(class_=class_):
-            teacher_project.append(project.advisorฆ)
+            if project.advisor not in teacher_project:
+                teacher_project.append(project.advisor)
 
-        for id in class_.student_ids:
-            user = models.User.objects(username=id).first()
-            if not user:
-                continue
-            if "student" in user.roles:
-                create_student_grade(class_, midterm, user, current_teacher)
-                create_student_grade(class_, final, user, current_teacher)
+        for teacher in teacher_project:
+            for id in class_.student_ids:
+                user = models.User.objects(username=id).first()
+                if not user:
+                    continue
+                if "student" in user.roles:
+                    create_student_grade(class_, midterm, user, teacher)
+                    create_student_grade(class_, final, user, teacher)
 
         midterm.save()
         final.save()
@@ -258,3 +260,26 @@ def get_entire_student_grade(grade, student):
         grade=grade, student=student
     )
     return [grade.result for grade in student_grades]
+
+
+@module.route("/<grade_id>/set_time", methods=["GET", "POST"])
+@acl.roles_required("admin")
+def set_time(grade_id):
+    grade = models.Grade.objects.get(id=grade_id)
+    grade_type = grade.type
+    class_ = grade.class_
+    form = forms.grades.GradeForm(obj=grade)
+    if request.method == "POST":
+        form.populate_obj(grade)
+        grade.save()
+        return redirect(
+            url_for("grades.view", grade_type=grade.type, class_id=class_.id)
+        )
+
+    return render_template(
+        "admin/grades/set-time.html",
+        form=form,
+        class_=class_,
+        grade=grade,
+        grade_type=grade.type,
+    )

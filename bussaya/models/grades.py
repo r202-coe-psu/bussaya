@@ -2,6 +2,7 @@ from email.policy import default
 from random import choices
 import mongoengine as me
 import datetime
+import humanize
 
 SEMESTER_TYPE = [("midterm", "Midterm"), ("final", "Final")]
 # GRADE_SYSTEM_STATUS = [("opended", "Opended"), ("closed", "Closed")]
@@ -22,6 +23,33 @@ class Grade(me.Document):
     updated_date = me.DateTimeField(
         required=True, default=datetime.datetime.now, auto_now=True
     )
+
+    def remain_time(self):
+        now = datetime.datetime.now()
+        start = self.started_date
+        end = self.ended_date
+
+        if start > now:
+            delta = start - now
+            return (
+                delta.days,
+                f"Opening in {humanize.naturaltime(delta).removesuffix(' ago')}",
+            )
+        if now > end:
+            return (end - now).days, "Out of time"
+
+        if now > start and end > now:
+            delta = end - now
+            return (
+                delta.days,
+                f"Closing in {humanize.naturaltime(delta).removesuffix(' ago')}",
+            )
+
+    def natural_started_date(self):
+        return self.started_date.strftime("%A, %d %B %Y, %I:%M %p")
+
+    def natural_ended_date(self):
+        return self.ended_date.strftime("%A, %d %B %Y, %I:%M %p")
 
 
 class StudentGrade(me.Document):

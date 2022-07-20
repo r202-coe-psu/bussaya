@@ -1,0 +1,61 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+{% import 'navbar/class-navbar.html' as navbar_renderer %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('classes.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('groups.view', class_id=class_.id) }}">Group</a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+
+{{ navbar_renderer.render_class_navbar(class_, current_user) }}
+
+<h2 class="ui header">Groups</h2>
+<div class="ui divider"></div>
+
+<table class="ui celled table">
+    <thead>
+        <th>No.</th>
+        <th>Group Name</th>
+        <th>Lecturer</th>
+        <th>Student IDS </th>
+    </thead>
+    <tbody>
+        {% for group in groups %}
+        <tr>
+            <td>
+                {{ loop.index }}
+            </td>
+            <td>
+                {{ group.name }}
+            </td>
+            <td>
+                {% for lec in group.committees %}
+                {{ lec.get_fullname() }} {% if not loop.last %} <br> {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {{ get_student_ids(group) }}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}
+
+{% block additional_js %}
+<script type="text/javascript">
+    $(".ui.accordion").accordion()
+
+</script>
+{% endblock additional_js %}

@@ -40,7 +40,18 @@ def index_admin():
 
 def index_lecturer():
     classes = models.Class.objects.all()
-    return render_template("/dashboard/index-lecturer.html", classes=classes)
+    opened_classes = []
+    user = current_user._get_current_object()
+
+    for class_ in classes:
+        if class_.is_in_time():
+            opened_classes.append(class_)
+
+    return render_template(
+        "/dashboard/index-lecturer.html",
+        classes=classes,
+        opened_classes=opened_classes,
+    )
 
 
 def index_student():
@@ -51,7 +62,6 @@ def index_student():
     user = current_user._get_current_object()
 
     for class_ in classes:
-        print(class_.is_in_time(), user.username, class_.student_ids)
         if class_.is_in_time() and user.username in class_.student_ids:
             available_class.append(class_)
 

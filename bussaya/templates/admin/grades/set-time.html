@@ -1,0 +1,81 @@
+{% extends '/base/default-dashboard.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+{% block dashboard_title %}
+{{ 'Edit' if 'edit' in request.path else 'Set Time' }} {{ grade.get_type_display() }}
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    Grading:
+    <a href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">
+        {{ grade.get_type_display() }}
+    </a>
+    <div class="divider"> / </div>
+    Set Time
+</div>
+{% endblock %}
+
+{% block content %}
+<h3 class="ui header horizontal divider">
+    {{ 'Edit' if 'edit' in request.path else 'Set Time' }}
+    {{ grade.get_type_display() }}
+</h3>
+<div class="row">
+    <form method="POST" class="ui form" id="form-grade">
+        <div class="ui segment">
+            {{ form.csrf_token }}
+            <div class="two fields">
+                <div class="field">
+                    {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
+                </div>
+                <div class="field">
+                    {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
+                </div>
+            </div>
+            <div class="ui bottom attached large primary icon button" id="submit-button">
+                <i class="clock icon"></i>
+                {{ 'Edit' if 'edit' in request.path else 'Set Time' }}
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+{% block additional_js %}
+<script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
+<script type="text/javascript">
+    var form = document.getElementById("form-grade");
+    document.getElementById("submit-button").addEventListener("click", function () {
+        form.submit();
+    });
+</script>
+<script type="text/javascript">
+    datetime_formatter = {
+        datetime: function (datetime, settings) {
+            if (!datetime) return '';
+            var day = datetime.getDate();
+            var month = datetime.getMonth() + 1;
+            var year = datetime.getFullYear();
+            var hour = datetime.getHours();
+            var minute = datetime.getMinutes();
+            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
+        }
+    };
+    $('#rangestart').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        endCalendar: $('#rangeend')
+    });
+    $('#rangeend').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        startCalendar: $('#rangestart')
+    });
+</script>
+{% endblock %}

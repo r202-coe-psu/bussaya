@@ -2,48 +2,51 @@
 {% import '/dashboard/project-renderer.html' as renderer %}
 
 {% block dashboard_title %}
-Classes
+Dashboard
 {% endblock %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-  <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
-</div>
 {% endblock %}
 
 
 {% block content %}
 
-<h2 class="ui header horizontal divider">All Classes</h2>
+<h2 class="ui header horizontal divider">Classes</h2>
+{% if opened_classes %}
+<table class="ui celled table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Type</th>
+      <th>Ended Date</th>
+    </tr>
+  </thead>
 
-<div class="row">
-
-  {% if classes %}
-  <table class="ui celled table unstackable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-
-    <body>
-      {% for class_ in classes %}
-      <tr>
-        <td>
-          <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-        </td>
-        <td>
-          {{ class_.description }}
-        </td>
-      </tr>
-      {% endfor %}
-    </body>
-  </table>
-  {% endif %}
-
+  <body>
+    {% for class_ in opened_classes %}
+    <tr>
+      <td>
+        <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+      </td>
+      <td>
+        {{ class_.description }}
+      </td>
+      <td>
+        {{ class_.get_type_display() }}
+      </td>
+      <td>
+        {{ class_.ended_date }}
+      </td>
+    </tr>
+    {% endfor %}
+  </body>
+</table>
+{% else %}
+<div class="ui info message">
+  No opened classes to display
 </div>
-
+{% endif %}
 
 {{ renderer.render_project_section(alumni_projects, current_user, advisees, committees) }}
 

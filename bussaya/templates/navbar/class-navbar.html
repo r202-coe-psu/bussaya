@@ -12,11 +12,6 @@
   </a>
   {% endif %}
 
-  <a class="{{'active' if 'student_ids' in request.path}} item"
-    href="{{ url_for('classes.view_students', class_id=class_.id) }}">
-    <i class="student icon"></i>
-    View Students
-  </a>
   <div class="item ui floating labeled dropdown">
     <i class="star icon"></i>
     <span class="text">
@@ -33,13 +28,27 @@
       </a>
     </div>
   </div>
+  <a class="{{'active' if 'student_ids' in request.path}} item"
+    href="{{ url_for('classes.view_students', class_id=class_.id) }}">
+    <i class="student icon"></i>
+    View Students
+  </a>
 
-  {% if current_user.has_roles("admin") %}
+  {% if current_user.has_roles('admin', 'lecturer') %}
+  {% if 'admin' in current_user.roles %}
   <a class="{{'active' if 'groups' in request.path}} item"
     href="{{ url_for('admin.groups.manage', class_id=class_.id) }}">
     <i class="group icon"></i>
     Manage Group
   </a>
+  {% else %}
+  <a class="{{'active' if 'groups' in request.path}} item" href="{{ url_for('groups.view', class_id=class_.id) }}">
+    <i class="group icon"></i>
+    Group
+  </a>
+  {% endif %}
+  {% endif %}
+  {% if current_user.has_roles("admin") %}
   <a class="{{'active' if 'edit' in request.path and 'classes' in request.path}} item"
     href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">
     <i class="edit icon"></i>

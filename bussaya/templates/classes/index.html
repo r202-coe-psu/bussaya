@@ -10,46 +10,35 @@ Classes
 </div>
 {% endblock %}
 
-{#
+
 {% block content %}
+<h2 class="ui header horizontal divider">All Classes</h2>
 
 <div class="row">
-	<div class="col s12">
-		<h3>Opened Classes</h3>
-	</div>
+
+	{% if classes %}
+	<table class="ui celled table unstackable">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+
+		<body>
+			{% for class_ in classes %}
+			<tr>
+				<td>
+					<a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+				</td>
+				<td>
+					{{ class_.description }}
+				</td>
+			</tr>
+			{% endfor %}
+		</body>
+	</table>
+	{% endif %}
+
 </div>
-
-{% if available_class %}
-<table class="ui celled table">
-	<thead>
-		<tr>
-			<th>Name</th>
-			<th>Description</th>
-			<th>Type</th>
-			<th>Ended Date</th>
-		</tr>
-	</thead>
-
-	<body>
-		{% for class_ in available_class%}
-		<tr>
-			<td>
-				<a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-			</td>
-			<td>
-				{{ class_.description }}
-			</td>
-			<td>
-				{{ class_.get_type_display() }}
-			</td>
-			<td>
-				{{ class_.ended_date }}
-			</td>
-		</tr>
-		{% endfor %}
-	</body>
-</table>
-{% endif %}
 {% endblock %}
-
-#}
