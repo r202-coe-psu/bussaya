@@ -24,6 +24,16 @@ class Grade(me.Document):
         required=True, default=datetime.datetime.now, auto_now=True
     )
 
+    def is_in_time(self):
+        if self.started_date <= datetime.datetime.now() <= self.ended_date:
+            return True
+
+        if self.started_date > datetime.datetime.now():
+            return "Upcoming"
+
+        else:
+            return False
+
     def remain_time(self):
         now = datetime.datetime.now()
         start = self.started_date
@@ -46,10 +56,10 @@ class Grade(me.Document):
             )
 
     def natural_started_date(self):
-        return self.started_date.strftime("%A, %d %B %Y, %I:%M %p")
+        return self.started_date.strftime("%d %B %Y, %I:%M %p")
 
     def natural_ended_date(self):
-        return self.ended_date.strftime("%A, %d %B %Y, %I:%M %p")
+        return self.ended_date.strftime("%d %B %Y, %I:%M %p")
 
 
 class StudentGrade(me.Document):

@@ -16,7 +16,7 @@ module = Blueprint(
 @module.route("")
 @acl.roles_required("lecturer")
 def index():
-    classes = models.Class.objects.all()
+    classes = models.Class.objects().order_by("-id")
     return render_template("/classes/index.html", classes=classes)
 
 

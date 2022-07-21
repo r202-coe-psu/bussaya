@@ -34,22 +34,13 @@
         <i class="eye icon"></i>
         View
     </a>
-    <a class="ui green labeled icon button" href="{{ url_for('grades.grading', grade_id=grade.id) }}">
+    <a class="ui {{'green' if grade.is_in_time() else 'disabled'}} labeled icon button"
+        href="{{ url_for('grades.grading', grade_id=grade.id) }}">
         <i class="edit icon"></i>
         Grading
     </a>
-    <a class="ui orange labeled icon button" onclick="showSetTimeOff()">
-        <i class="clock icon"></i>
-        Set Time Off Grading System
-    </a>
-    <p />
-    <div class="ui time-off" style="display: none">
-        <div class="ui segment">
-            HEY GRADING TIME
-        </div>
-    </div>
-    <div class="ui big info message">
-        Grading System will be closed on <b>{{grade.ended_date}}</b> ({{grade.remain_time()[1]}})
+    <div class="ui big warning message">
+        Grading System will be closed on <b>{{ grade.natural_ended_date() }}</b> ({{grade.remain_time()[1]}})
     </div>
 </div>
 
