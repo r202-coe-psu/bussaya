@@ -124,18 +124,22 @@ def delete(submission_id):
 )
 @login_required
 def upload(submission_id):
-
     form = forms.submissions.StudentWorkForm()
     submission = models.Submission.objects.get(id=submission_id)
     class_ = submission.class_
 
-    if not form.validate_on_submit():
+    if submission.get_status() == "closed":
+        return redirect(url_for("classes.view", class_id=class_.id))
+
+    if request.method == "GET":
         return render_template(
             "/submissions/upload-edit.html",
             form=form,
             submission=submission,
             class_=class_,
         )
+
+    print("uploading...")
 
     progress_report = models.ProgressReport()
 
@@ -160,10 +164,9 @@ def upload(submission_id):
                 content_type="application/pdf",
             )
 
-    progress_report.type = "submission"
     progress_report.save()
 
-    return redirect(url_for("classes.view", submission=submission, class_id=class_.id))
+    return redirect(url_for("classes.view", class_id=class_.id))
 
 
 @module.route(
@@ -174,13 +177,15 @@ def upload(submission_id):
 def edit_progress_report(progress_report_id):
 
     progress_report = models.ProgressReport.objects.get(id=progress_report_id)
-
     submission = progress_report.submission
     class_ = progress_report.class_
 
     form = forms.submissions.StudentWorkForm(obj=progress_report)
 
-    if not form.validate_on_submit():
+    if submission.get_status() == "closed":
+        return redirect(url_for("classes.view", class_id=class_.id))
+
+    if request.method == "GET":
         return render_template(
             "/submissions/upload-edit.html",
             form=form,
@@ -210,11 +215,9 @@ def edit_progress_report(progress_report_id):
                 content_type="application/pdf",
             )
 
-    progress_report.type = "submission"
     progress_report.save()
-    print([x.type for x in models.ProgressReport.objects()])
 
-    return redirect(url_for("classes.view", submission=submission, class_id=class_.id))
+    return redirect(url_for("classes.view", class_id=class_.id))
 
 
 @module.route(

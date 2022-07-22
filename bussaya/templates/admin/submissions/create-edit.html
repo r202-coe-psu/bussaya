@@ -23,12 +23,15 @@
             {{ form.csrf_token }}
             {{ renderer.render_select(form.type) }}
             {{ renderer.render_field(form.description) }}
-            <div class="two fields">
+            <div class="three fields">
                 <div class="field">
                     {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
                 </div>
                 <div class="field">
                     {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
+                </div>
+                <div class="field">
+                    {{ renderer.render_calendar(form.extended_date, calendar_id="rangeextend") }}
                 </div>
             </div>
             <button class="ui primary button" type="submit">{{ 'Edit' if 'edit' in request.path else 'Create'
@@ -53,15 +56,20 @@
             return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
         }
     };
+    $('#rangeend').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        startCalendar: $('#rangestart')
+    });
     $('#rangestart').calendar({
         // type: 'date',
         formatter: datetime_formatter,
         endCalendar: $('#rangeend')
     });
-    $('#rangeend').calendar({
+    $('#rangeextend').calendar({
         // type: 'date',
         formatter: datetime_formatter,
-        startCalendar: $('#rangestart')
+        startCalendar: $('#rangeend')
     });
 </script>
 {% endblock %}

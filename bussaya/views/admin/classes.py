@@ -74,6 +74,7 @@ def view(class_id):
                 "meetings.create",
                 class_id=class_.id,
                 name=form.name.data,
+                grade=form.grade.data,
                 start=form.started_date.data,
                 end=form.ended_date.data,
             )

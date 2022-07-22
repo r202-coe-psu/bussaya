@@ -33,11 +33,15 @@
         </tr>
         <tr>
             <td>Started Date</td>
-            <td>{{ submission.started_date }}</td>
+            <td>{{ submission.natural_started_date() }}</td>
         </tr>
         <tr>
             <td>Ended Date</td>
-            <td>{{ submission.ended_date }}</td>
+            <td>{{ submission.natural_ended_date() }}</td>
+        </tr>
+        <tr>
+            <td>Extended Date</td>
+            <td>{{ submission.natural_extended_date() }}</td>
         </tr>
     </tbody>
 </table>
@@ -92,7 +96,7 @@
             <td>
                 <a href="{{ url_for('submissions.download', progress_report_id=progress_report.id, filename=progress_report.file.filename) }}"
                     target="_blank">
-                    {{progress_report.file.filename}}
+                    {{ progress_report.file.filename }}
                 </a>
             </td>
             <td>{{ progress_report.description }}</td>

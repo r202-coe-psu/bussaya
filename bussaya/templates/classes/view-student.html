@@ -73,7 +73,7 @@
 				</td>
 				{% else %}
 
-				{% if meeting.is_in_time() %}
+				{% if meeting.get_status() == "opened" %}
 				<td class="blue">
 					<a href="{{ url_for('meetings.report', meeting_id=meeting.id)}}">
 						Opened
@@ -87,7 +87,7 @@
 
 				{% endif %}
 
-				{% if meeting.is_in_time() == "Upcoming" %}
+				{% if meeting.get_status() == "upcoming" %}
 				<td>
 					Upcoming
 				</td>
@@ -96,7 +96,7 @@
 
 
 
-				{% set time_delta, time_remain = meeting.set_remain_time() %}
+				{% set time_delta, time_remain = meeting.get_remain_time() %}
 				<td class="
 				{{ 'orange' if not meeting_report and time_delta == 1 }} 
 				{{ 'red' if not meeting_report and time_delta == 0 }} 
@@ -106,7 +106,7 @@
 				</td>
 
 				<td>
-					{% if meeting.is_in_time() and meeting.is_in_time() != "Upcoming" %}
+					{% if meeting.get_status() == "opened" or meeting.get_status() == "lated" %}
 					{% if meeting_report %}
 					<a class="ui fluid icon primary button"
 						href="{{ url_for('meetings.edit_report', meeting_report_id=meeting_report.id)}}">
@@ -141,7 +141,7 @@
 	<div class="ui divider"></div>
 	<h3 class="ui header">Report / Presentation</h3>
 	{% if submissions | count > 0 %}
-	<table class="ui celled table unstackable">
+	<table class="ui celled single line table unstackable">
 		<thead>
 			<tr>
 				<th>Type</th>
@@ -152,6 +152,7 @@
 				<th>Action</th>
 				<th>Started Date</th>
 				<th>Ended Date</th>
+				<th>Extended Date</th>
 			</tr>
 		</thead>
 
@@ -164,37 +165,41 @@
 				</td>
 				<td class="three wide">
 					<div style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 18em;">
-						{{ progress_report.description}}
+						{{ submission.description }}
 					</div>
 				</td>
 
 				{# Status #}
-				{% if submission.is_in_time() and submission.is_in_time() != "Upcoming" %}
 				{% if progress_report %}
 				<td class="green">
 					Submitted
 				</td>
 				{% else %}
+				{% if submission.get_status() == "opened" %}
 				<td class="blue">
 					<a href="{{ url_for('submissions.upload', submission_id=submission.id)}}">
 						Opened
 					</a>
 				</td>
-				{% endif %}
-				{% else %}
-				{% if submission.is_in_time() == "Upcoming" %}
+				{% elif submission.get_status() == "lated" %}
+				<td class="yellow">
+					<a href="{{ url_for('submissions.upload', submission_id=submission.id)}}" style="color: orange">
+						Lated
+					</a>
+				</td>
+				{% elif submission.get_status() == "closed" %}
+				<td class="red">
+					Not Submitted
+				</td>
+				{% elif submission.get_status() == "upcoming" %}
 				<td>
 					Upcoming
 				</td>
-				{% else %}
-				<td class="grey">
-					Closed
-				</td>
 				{% endif %}
 				{% endif %}
 
 
-				{% set time_delta, time_remain = submission.set_remain_time() %}
+				{% set time_delta, time_remain = submission.get_remain_time() %}
 				<td class="
 				{{ 'orange' if time_delta == 1 and not progress_report }} 
 				{{ 'red' if time_delta == 0 and not progress_report }} 
@@ -218,7 +223,7 @@
 				</td>
 
 				<td>
-					{% if submission.is_in_time() and submission.is_in_time() != "Upcoming" %}
+					{% if submission.get_status() == "opened" or submission.get_status() == "lated" %}
 					{% if progress_report %}
 					<a class="ui fluid icon primary button"
 						href="{{ url_for('submissions.edit_progress_report', progress_report_id=progress_report.id)}}">
@@ -238,9 +243,11 @@
 				<td>
 					{{ submission.natural_started_date() }}
 				</td>
-
 				<td>
 					{{ submission.natural_ended_date() }}
+				</td>
+				<td>
+					{{ submission.natural_extended_date() }}
 				</td>
 			</tr>
 			{% endfor %}

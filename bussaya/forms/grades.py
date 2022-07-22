@@ -22,9 +22,10 @@ BaseProjectForm = model_form(
         "ended_date",
         "created_date",
         "updated_date",
+        "grade",
     ],
     field_args={
-        "type": {"label": "Type"},
+        "grade": {"label": "Grade"},
         "description": {"label": "Description"},
     },
 )

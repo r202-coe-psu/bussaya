@@ -194,6 +194,7 @@ def grading(grade_id):
     class_ = grade.class_
     user = current_user._get_current_object()
     student_grades = models.StudentGrade.objects.all().filter(grade=grade, teacher=user)
+    student_grades = sorted(student_grades, key=lambda s: s.student.username)
 
     if current_user.has_roles("admin"):
         grade_html = "/admin/grades/view.html"

@@ -106,6 +106,7 @@
                 <th>Description</th>
                 <th>Started Date</th>
                 <th>Ended Date</th>
+                <th>Extended Date</th>
             </tr>
         </thead>
 
@@ -121,10 +122,13 @@
                     {{ submission.description}}
                 </td>
                 <td>
-                    {{ submission.started_date }}
+                    {{ submission.natural_started_date() }}
                 </td>
                 <td>
-                    {{ submission.ended_date }}
+                    {{ submission.natural_ended_date() }}
+                </td>
+                <td>
+                    {{ submission.natural_extended_date() }}
                 </td>
             </tr>
             {% endfor %}

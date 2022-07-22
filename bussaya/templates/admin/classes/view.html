@@ -73,6 +73,7 @@
 		<thead>
 			<tr>
 				<th>Name</th>
+				<th>Grade</th>
 				<th>Started Date</th>
 				<th>Ended Date</th>
 				<th>Edit/Delete</th>
@@ -86,6 +87,9 @@
 					<a href="{{url_for('meetings.view', meeting_id=meeting.id)}}">
 						{{ meeting.name }}
 					</a>
+				</td>
+				<td>
+					{{ meeting.get_grade_display() }}
 				</td>
 				<td>
 					{{ meeting.started_date }}
@@ -115,6 +119,9 @@
 				<div class="field">
 					{{ renderer.render_field(form.name)}}
 				</div>
+				<div class="field">
+					{{ renderer.render_select(form.grade) }}
+				</div>
 				<div class="two fields">
 					{{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
 					{{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
@@ -135,6 +142,7 @@
 				<th>Description</th>
 				<th>Started Date</th>
 				<th>Ended Date</th>
+				<th>Extended Date</th>
 				<th>Edit / Delete</th>
 			</tr>
 		</thead>
@@ -147,15 +155,10 @@
 						{{ submission.get_type_display() }}
 					</a>
 				</td>
-				<td>
-					{{ submission.description}}
-				</td>
-				<td>
-					{{ submission.started_date }}
-				</td>
-				<td>
-					{{ submission.ended_date }}
-				</td>
+				<td>{{ submission.description}}</td>
+				<td>{{ submission.natural_started_date() }}</td>
+				<td>{{ submission.natural_ended_date() }}</td>
+				<td>{{ submission.natural_extended_date() }}</td>
 				<td>
 					<a class="ui primary icon button"
 						href="{{ url_for('submissions.edit', submission_id=submission.id) }}">

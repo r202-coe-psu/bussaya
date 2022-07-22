@@ -104,13 +104,16 @@ def approval(meeting_id, meeting_report_id, action):
     return redirect(url_for("meetings.view", meeting_id=meeting_id))
 
 
-@module.route("/create/<class_id>/<name>/<start>/<end>", methods=["GET", "POST"])
+@module.route(
+    "/create/<class_id>/<name>/<grade>/<start>/<end>", methods=["GET", "POST"]
+)
 @acl.roles_required("admin")
-def create(class_id, name, start, end):
+def create(class_id, name, grade, start, end):
     class_ = models.Class.objects.get(id=class_id)
 
     meeting = models.Meeting()
     meeting.name = name
+    meeting.grade = grade
     meeting.started_date = start
     meeting.ended_date = end
     meeting.class_ = class_
@@ -121,6 +124,7 @@ def create(class_id, name, start, end):
 
 
 @module.route("/<meeting_id>/edit", methods=["GET", "POST"])
+@acl.roles_required("admin")
 def edit(meeting_id):
     meeting = models.Meeting.objects.get(id=meeting_id)
     class_ = meeting.class_
@@ -138,12 +142,15 @@ def edit(meeting_id):
 
 
 @module.route("/<meeting_id>/delete", methods=["GET", "POST"])
-@login_required
+@acl.roles_required("admin")
 def delete(meeting_id):
     meeting = models.Meeting.objects.get(id=meeting_id)
-    class_ = meeting.class_
+    student_meeting_report = models.MeetingReport.objects(meeting=meeting)
 
+    student_meeting_report.delete()
     meeting.delete()
+
+    class_ = meeting.class_
     return redirect(url_for("admin.classes.view", class_id=class_.id))
 
 
@@ -153,20 +160,22 @@ def report(meeting_id):
     meeting = models.Meeting.objects.get(id=meeting_id)
     class_ = meeting.class_
 
-    meeting_report = models.MeetingReport()
-    meeting_report.type = "meeting"
-    meeting_report.owner = current_user._get_current_object()
-    meeting_report.ip_address = request.remote_addr
-
-    meeting_report.class_ = models.Class.objects.get(id=class_.id)
-    meeting_report.meeting = models.Meeting.objects.get(id=meeting_id)
-
     form = forms.meetings.StudentWorkMeetingForm()
+
+    if meeting.get_status() == "closed":
+        return redirect(url_for("classes.view", class_id=class_.id))
 
     if not form.validate_on_submit():
         return render_template(
             "/meetings/report-edit.html", meeting=meeting, class_=class_, form=form
         )
+
+    meeting_report = models.MeetingReport()
+    meeting_report.owner = current_user._get_current_object()
+    meeting_report.ip_address = request.remote_addr
+
+    meeting_report.class_ = models.Class.objects.get(id=class_.id)
+    meeting_report.meeting = models.Meeting.objects.get(id=meeting_id)
 
     form.populate_obj(meeting_report)
     meeting_report.save()
@@ -179,13 +188,19 @@ def report(meeting_id):
 def edit_report(meeting_report_id):
 
     meeting_report = models.MeetingReport.objects.get(id=meeting_report_id)
+    meeting = meeting_report.meeting
+    class_ = meeting_report.class_
+
+    if meeting.get_status() == "closed":
+        return redirect(url_for("classes.view", class_id=class_.id))
+
     form = forms.meetings.StudentWorkMeetingForm(obj=meeting_report)
 
     if not form.validate_on_submit():
         return render_template(
             "/meetings/report-edit.html",
-            meeting=meeting_report.meeting,
-            class_=meeting_report.class_,
+            meeting=meeting,
+            class_=class_,
             form=form,
             meeting_report=meeting_report,
         )
@@ -196,4 +211,4 @@ def edit_report(meeting_report_id):
     form.populate_obj(meeting_report)
     meeting_report.save()
 
-    return redirect(url_for("classes.view", class_id=meeting_report.class_.id))
+    return redirect(url_for("classes.view", class_id=class_.id))

@@ -38,6 +38,9 @@ class SubmissionForm(BaseProjectForm):
     ended_date = fields.DateTimeField(
         "Ended date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
     )
+    extended_date = fields.DateTimeField(
+        "Extended date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
+    )
 
 
 class StudentWorkForm(BaseProjectForm):
