@@ -25,17 +25,21 @@
 <div class="ui segment">
     <div class="ui accordion">
         <div class="title">
-            <div class="ui primary button">Create Group</div>
+            <div class="ui primary labeled icon button">
+                <i class="plus icon"></i>
+                Create Group
+            </div>
         </div>
         <div class="content">
             <p class="transition hidden">
             <div class="ui segment">
+                <div class="ui left aligned horizontal divider">
+                    Group Form
+                </div>
                 <form method="POST" class="ui form">
-                    <div class="two field">
-                        {{ form.csrf_token }}
-                        {{ renderer.render_field(form.name) }}
-                        {{ renderer.render_multiple_select(form.committees) }}
-                    </div>
+                    {{ form.csrf_token }}
+                    {{ renderer.render_field(form.name) }}
+                    {{ renderer.render_multiple_select(form.committees) }}
                     <button name="create" type="submit" class="ui small primary button">
                         Create
                     </button>
@@ -47,8 +51,14 @@
 </div>
 
 <div class="ui segment">
-    <a class="ui green button" href="{{url_for('admin.groups.set_group_student_ids', class_id=class_.id)}}">
-        Set Student Group from project</a>
+    <a class="ui labeled icon green button"
+        href="{{url_for('admin.groups.set_group_student_ids', class_id=class_.id)}}">
+        <i class="users icon"></i>
+        Auto Set Student IDS from Project Advisor
+    </a>
+    <div class="ui info message">
+        This will automatic set the Student IDS in the Group from the Project
+        that the lecturer is an Advisor.</div>
     <table class="ui celled table">
         <thead>
             <th>No.</th>

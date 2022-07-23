@@ -109,26 +109,31 @@
 			{% endfor %}
 		</body>
 	</table>
-	<div class="ui primary button" onclick="showCreateMeeting()">Create Meeting</div>
+	<div class="ui primary labeled icon button" onclick="showCreateMeeting()">
+		<i class="plus icon"></i>
+		Create Meeting
+	</div>
 	<p />
-	<div class="create meeting" style="display: none">
-		<div class="ui segment">
+	<div class="create meeting" style="display: none;">
+		<div class="ui segment" style="width: fit-content;">
+			<div class="ui left aligned horizontal divider">
+				Meeting Form
+			</div>
+			<br>
 			<form method="POST" class="ui form">
 				{{ form.csrf_token }}
 
-				<div class="field">
-					{{ renderer.render_field(form.name)}}
-				</div>
-				<div class="field">
+				<div class="fields">
+					{{ renderer.render_field(form.name) }}
 					{{ renderer.render_select(form.grade) }}
-				</div>
-				<div class="two fields">
 					{{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
 					{{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
 				</div>
-				<button name="create" type="submit" class="ui small primary button">
-					Create
-				</button>
+				<div class="ui horizontal right aligned divider">
+					<button name="create" type="submit" class="ui small primary right floated button">
+						Create
+					</button>
+				</div>
 			</form>
 		</div>
 	</div>
@@ -174,7 +179,8 @@
 		</body>
 	</table>
 
-	<a class="ui primary button" href="{{ url_for('submissions.create', class_id=class_.id) }}">
+	<a class="ui primary labeled icon button" href="{{ url_for('submissions.create', class_id=class_.id) }}">
+		<i class="plus icon"></i>
 		Create Submission
 	</a>
 </div>

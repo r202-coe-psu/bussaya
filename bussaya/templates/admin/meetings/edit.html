@@ -26,13 +26,15 @@
 
 <div class="ui segment">
     <form method="POST" class="ui form">
-        <div class="two field">
-            {{ form.csrf_token }}
+        {{ form.csrf_token }}
+        <div class="fields">
             {{ renderer.render_field(form.name) }}
+            {{ renderer.render_select(form.grade) }}
             {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
             {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
         </div>
-        <button name="edit" type="submit" class="ui small primary button">
+        <button name="edit" type="submit" class="ui small primary labeled icon button">
+            <i class="edit icon"></i>
             Edit
         </button>
     </form>

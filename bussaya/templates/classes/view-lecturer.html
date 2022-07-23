@@ -85,10 +85,10 @@
                     </a>
                 </td>
                 <td>
-                    {{ meeting.started_date }}
+                    {{ meeting.natural_started_date() }}
                 </td>
                 <td>
-                    {{ meeting.ended_date }}
+                    {{ meeting.natural_ended_date() }}
                 </td>
             </tr>
             {% endfor %}

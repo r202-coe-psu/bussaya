@@ -22,7 +22,8 @@ BaseProjectForm = model_form(
         "title",
     ],
     field_args={
-        "name": {"label": "Name"},
+        "name": {"label": "Meeting Name"},
+        "grade": {"label": "Grade"},
     },
 )
 

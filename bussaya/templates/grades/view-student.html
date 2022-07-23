@@ -1,0 +1,95 @@
+{% extends '/classes/view-student.html' %}
+{% import '/base/error-handler.html' as eh %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('dashboard.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('grades.view_student_grades', class_id=class_.id) }}">View Grades</a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="ui segment">
+    <h2 class="ui header">
+        <i class="user graduate icon"></i>
+        <div class="content">
+            Student
+            <div class="sub header">{{student.username}}: {{student.get_fullname()}}</div>
+        </div>
+    </h2>
+</div>
+
+<div class="ui segment">
+    <h3 class="ui header">Project</h3>
+    <table class="ui definition table">
+        <tbody>
+            <tr>
+                <td class="two wide column">Name</td>
+                <td>{{ project.name }}</td>
+            </tr>
+            <tr>
+                <td>Abstract</td>
+                <td>{{ project.abstract }}</td>
+            </tr>
+            <tr>
+                <td>Advisor</td>
+                <td>{{ project.advisor.get_fullname() }}</td>
+            </tr>
+            <tr>
+                <td>Committees</td>
+                <td>
+                    {% for committee in project.committees %}
+                    {{committee.title}} {{ committee.get_fullname() }} {{', ' if not loop.last }}
+                    {% endfor %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="ui divider"></div>
+<div class="ui segment">
+    <h3 class="ui header">
+        Grade
+    </h3>
+</div>
+
+<div class="ui segment">
+    <div class="ui left aligned horizontal divider">Midterm Grade</div>
+    <table class="ui definition table">
+        <tbody>
+            <tr>
+                <td class="two wide column">Average Grade Point</td>
+                <td>
+                    {% for student_grade in student_grades %}
+                    {{ student_grade.result if student_grade.result !='-' and student_grade.grade.type == "midterm" }}
+                    {% endfor %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<div class="ui segment">
+    <div class="ui left aligned horizontal divider">Final Grade</div>
+    <table class="ui definition table">
+        <tbody>
+            <tr>
+                <td class="two wide column">Average Grade Point</td>
+                <td>
+                    {% for student_grade in student_grades %}
+                    {{ student_grade.result if student_grade.result !='-' and student_grade.grade.type == "final" }}
+                    {% endfor %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

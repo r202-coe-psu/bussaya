@@ -36,10 +36,15 @@
   <div class="ui segment">
     <form method="POST" class="ui form">
       {{ form.csrf_token }}
-      {{ renderer.render_field(form.name) }}
-      {{ renderer.render_field(form.code) }}
+      <div class="two fields">
+        {{ renderer.render_field(form.name) }}
+        <div class="fields">
+          {{ renderer.render_field(form.code) }}
+        </div>
+      </div>
       {{ renderer.render_field(form.description) }}
       {{ renderer.render_field(form.student_ids) }}
+
       {{ renderer.render_field(form.tags) }}
       {{ renderer.render_field(form.type) }}
       <div class="fields">

@@ -268,3 +268,23 @@ def set_time(grade_id):
         grade=grade,
         grade_type=grade.type,
     )
+
+
+@module.route("/<class_id>/grades/view-total-grade")
+@acl.roles_required("student")
+def view_student_grades(class_id):
+    student = current_user._get_current_object()
+    class_ = models.Class.objects.get(id=class_id)
+
+    project = student.get_project()
+    student_grades = models.StudentGrade.objects.all().filter(
+        class_=class_, student=student
+    )
+
+    return render_template(
+        "/grades/view-student.html",
+        student=student,
+        class_=class_,
+        project=project,
+        student_grades=student_grades,
+    )
