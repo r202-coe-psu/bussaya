@@ -7,6 +7,7 @@ from flask import url_for
 
 from .projects import Project
 from .groups import Group
+from .grades import StudentGrade
 
 
 class User(me.Document, UserMixin):

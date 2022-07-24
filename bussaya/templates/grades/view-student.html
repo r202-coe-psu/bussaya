@@ -56,37 +56,22 @@
     Grade
 </h3>
 
+{% for grade in grades %}
 <div class="ui segment">
-    <h4>Midterm Grade</h4>
+    <h4>{{ grade.get_type_display() }}</h4>
     <table class="ui definition table">
         <tbody>
             <tr>
-                <td class="two wide column">Average Grade Point</td>
+                <td class="three wide column">Average Grade Point</td>
                 <td>
-                    {% for student_grade in student_grades %}
-                    {{ student_grade.result if student_grade.result !='-' and student_grade.grade.type == "midterm" }}
-                    {% endfor %}
+                    {{ get_average_grade(student, grade) if grade.release_status == "released" else "-" }}
+
+
                 </td>
             </tr>
         </tbody>
     </table>
 </div>
-
-
-<div class="ui segment">
-    <h4>Final Grade</h4>
-    <table class="ui definition table">
-        <tbody>
-            <tr>
-                <td class="two wide column">Average Grade Point</td>
-                <td>
-                    {% for student_grade in student_grades %}
-                    {{ student_grade.result if student_grade.result !='-' and student_grade.grade.type == "final" }}
-                    {% endfor %}
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+{% endfor %}
 
 {% endblock %}

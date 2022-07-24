@@ -19,18 +19,59 @@ def get_total_student_grades(student, grade):
     return student_grades
 
 
-def get_average_student_grade(student, grade):
+def get_average_grade(student, grade):
     student_grades = models.StudentGrade.objects.all().filter(
         student=student, class_=grade.class_, grade=grade
     )
-    total_grade_result = []
-    [
-        total_grade_result.append(student_grade.result)
-        for student_grade in student_grades
-        if student_grade.result != "-"
-    ]
 
-    return total_grade_result
+    total_student_grade = []
+    for student_grade in student_grades:
+        if student_grade.result != "-":
+            total_student_grade.append(student_grade)
+
+    if len(total_student_grade) < 2:
+        return "Inconclusive"
+
+    average_point = 0
+    committees_grade_point = 0
+
+    project = student.get_project()
+
+    if len(project.committees) > 1:
+        advisor_grade_ratio = 0.5
+        committee_grade_ratio = 0.5
+    else:
+        advisor_grade_ratio = 0.6
+        committee_grade_ratio = 0.4
+
+    for grade in total_student_grade:
+        grade_point = grade.get_grade_point()
+        if grade.lecturer in project.committees:
+            committees_grade_point += grade_point
+
+        else:
+            average_point += advisor_grade_ratio * grade_point
+
+    average_point += committee_grade_ratio * committees_grade_point
+
+    if average_point < 80:
+        average_grade = "A"
+    if 79 >= average_point >= 75:
+        average_grade = "B+"
+    if 74 >= average_point >= 70:
+        average_grade = "B"
+    if 69 >= average_point >= 65:
+        average_grade = "C+"
+    if 64 >= average_point >= 60:
+        average_grade = "C"
+    if 59 >= average_point >= 55:
+        average_grade = "D+"
+    if 54 >= average_point >= 50:
+        average_grade = "D"
+    if average_point < 50:
+        average_grade = "E"
+
+    return average_grade
 
 
 def get_student_report(username, class_id):
@@ -55,7 +96,7 @@ def get_student_presentation(username, class_id):
     return False
 
 
-def get_lecturers_of_student(username):
+def get_lecturers_project_of_student(username):
     student = models.User.objects.get(username=username)
     project = student.get_project()
     if project:
@@ -63,17 +104,17 @@ def get_lecturers_of_student(username):
             lecturers = project.committees
             lecturers.append(project.advisor)
         else:
-            lecturers = project.advisor
+            lecturers = [project.advisor]
 
     return lecturers
 
 
-def create_student_grade(class_, grade, student, teacher):
+def create_student_grade(class_, grade, student, lecturer):
     student_grade = models.StudentGrade()
     student_grade.class_ = class_
     student_grade.grade = grade
     student_grade.student = student
-    student_grade.teacher = teacher
+    student_grade.lecturer = lecturer
 
     student_projects = models.Project.objects(class_=class_)
     for project in student_projects:
@@ -93,7 +134,7 @@ def create_student_grade(class_, grade, student, teacher):
 def view(class_id, grade_type):
     class_ = models.Class.objects.get(id=class_id)
     grades = models.Grade.objects.all().filter(class_=class_)
-    current_teacher = current_user._get_current_object()
+    current_lecturer = current_user._get_current_object()
     # Create Midterm and Final Grade
     if not grades:
         midterm = models.Grade()
@@ -108,17 +149,14 @@ def view(class_id, grade_type):
 
         project_lecturers = []
 
-        for project in (
-            models.Project.objects.all().filter(class_=class_).order_by("-id")
-        ):
-            for student in project.students:
-                if (
-                    student.username in class_.student_ids
-                    and student.username not in midterm.student_ids
-                ):
-                    for lecturer in get_lecturers_of_student(student.username):
-                        create_student_grade(class_, midterm, student, lecturer)
-                        create_student_grade(class_, final, student, lecturer)
+        for id in class_.student_ids:
+            student = models.User.objects(username=id).first()
+            if not student or not student.has_roles("student"):
+                continue
+
+            for lecturer in get_lecturers_project_of_student(student.username):
+                create_student_grade(class_, midterm, student, lecturer)
+                create_student_grade(class_, final, student, lecturer)
 
         midterm.save()
         final.save()
@@ -127,15 +165,18 @@ def view(class_id, grade_type):
     final = models.Grade.objects.get(type="final", class_=class_)
 
     # Project create after grade has been created.
-    for project in models.Project.objects.all().filter(class_=class_):
-        for student in project.students:
-            if student.username in class_.student_ids and student.has_roles("student"):
-                if not models.StudentGrade.objects(class_=class_, student=student):
-                    print(f"{student.first_name} not have grade yet.")
-                    print(f"Starting create student grade...")
-                    for lecturer in get_lecturers_of_student(student.username):
-                        create_student_grade(class_, midterm, student, lecturer)
-                        create_student_grade(class_, final, student, lecturer)
+    for id in class_.student_ids:
+        student = models.User.objects(username=id).first()
+        if not student or not student.has_roles("student"):
+            continue
+
+        for lecturer in get_lecturers_project_of_student(student.username):
+            if not models.StudentGrade.objects(
+                class_=class_, student=student, lecturer=lecturer
+            ):
+                print("Create Grade {student.frsit_name} for {lecturer.first_name}")
+                create_student_grade(class_, midterm, student, lecturer)
+                create_student_grade(class_, final, student, lecturer)
 
     for student_id in midterm.student_ids:
         # Student Has been 'REMOVED'
@@ -164,7 +205,7 @@ def view(class_id, grade_type):
 
     grade = models.Grade.objects.get(type=grade_type, class_=class_)
     student_grades = models.StudentGrade.objects.all().filter(
-        grade=grade, teacher=current_teacher
+        grade=grade, lecturer=current_lecturer
     )
     student_grades = sorted(student_grades, key=lambda s: s.student.username)
 
@@ -175,13 +216,13 @@ def view(class_id, grade_type):
 
     return render_template(
         grade_html,
-        user=current_teacher,
+        user=current_lecturer,
         class_=class_,
         grade=grade,
         grade_type=grade_type,
         student_grades=student_grades,
         get_total_student_grades=get_total_student_grades,
-        get_average_student_grade=get_average_student_grade,
+        get_average_grade=get_average_grade,
         get_student_report=get_student_report,
         get_student_presentation=get_student_presentation,
     )
@@ -193,7 +234,9 @@ def grading(grade_id):
     grade = models.Grade.objects.get(id=grade_id)
     class_ = grade.class_
     user = current_user._get_current_object()
-    student_grades = models.StudentGrade.objects.all().filter(grade=grade, teacher=user)
+    student_grades = models.StudentGrade.objects.all().filter(
+        grade=grade, lecturer=user
+    )
     student_grades = sorted(student_grades, key=lambda s: s.student.username)
 
     if current_user.has_roles("admin"):
@@ -212,7 +255,7 @@ def grading(grade_id):
                 result = request.form.get(str(student_grade.id))
                 student_grade.result = result
 
-                get_lecturers_of_student(student_grade.student.username)
+                get_lecturers_project_of_student(student_grade.student.username)
 
                 if result != "-":
                     meetings = models.MeetingReport.objects(
@@ -234,7 +277,7 @@ def grading(grade_id):
         user=user,
         student_grades=student_grades,
         get_total_student_grades=get_total_student_grades,
-        get_average_student_grade=get_average_student_grade,
+        get_average_grade=get_average_grade,
         get_student_report=get_student_report,
         get_student_presentation=get_student_presentation,
     )
@@ -270,6 +313,20 @@ def set_time(grade_id):
     )
 
 
+@module.route("/<grade_id>/release", methods=["GET", "POST"])
+@acl.roles_required("admin")
+def release(grade_id):
+    grade = models.Grade.objects.get(id=grade_id)
+    grade.release_status = "released"
+    grade.save()
+
+    print(grade.release_status)
+
+    return redirect(
+        url_for("grades.view", grade_type=grade.type, class_id=grade.class_.id)
+    )
+
+
 @module.route("/<class_id>/grades/view-total-grade")
 @acl.roles_required("student")
 def view_student_grades(class_id):
@@ -277,14 +334,13 @@ def view_student_grades(class_id):
     class_ = models.Class.objects.get(id=class_id)
 
     project = student.get_project()
-    student_grades = models.StudentGrade.objects.all().filter(
-        class_=class_, student=student
-    )
+    grades = models.Grade.objects.all().filter(class_=class_)
 
     return render_template(
         "/grades/view-student.html",
         student=student,
         class_=class_,
         project=project,
-        student_grades=student_grades,
+        grades=grades,
+        get_average_grade=get_average_grade,
     )

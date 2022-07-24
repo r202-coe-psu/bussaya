@@ -5,7 +5,7 @@ import datetime
 import humanize
 
 SEMESTER_TYPE = [("midterm", "Midterm"), ("final", "Final")]
-# GRADE_SYSTEM_STATUS = [("opended", "Opended"), ("closed", "Closed")]
+RELEASE_STATUS = [("unreleased", "Unreleased"), ("released", "Released")]
 
 
 class Grade(me.Document):
@@ -16,6 +16,7 @@ class Grade(me.Document):
     student_ids = me.ListField()
     student_grades = me.ListField()
 
+    release_status = me.StringField(choices=RELEASE_STATUS, default="unreleased")
     started_date = me.DateTimeField(required=True, default=datetime.datetime.now)
     ended_date = me.DateTimeField(required=True, default=datetime.datetime.now)
 
@@ -70,5 +71,23 @@ class StudentGrade(me.Document):
     grade = me.ReferenceField("Grade", dbref=True, required=True)
 
     class_ = me.ReferenceField("Class", dbref=True, required=True)
-    teacher = me.ReferenceField("User", dbref=True, required=True)
+    lecturer = me.ReferenceField("User", dbref=True, required=True)
     student = me.ReferenceField("User", dbref=True, required=True)
+
+    def get_grade_point(self):
+        if self.result == "A":
+            return 80
+        if self.result == "B+":
+            return 75
+        if self.result == "B":
+            return 70
+        if self.result == "C+":
+            return 65
+        if self.result == "C":
+            return 60
+        if self.result == "D+":
+            return 55
+        if self.result == "D":
+            return 50
+        if self.result == "E":
+            return 0

@@ -44,7 +44,7 @@ class ProjectForm(BaseProjectForm):
 
     committees = fields.SelectMultipleField(
         "Committees",
-        validators=[validators.InputRequired(), validators.length(max=5, min=1)],
+        validators=[validators.length(max=5, min=0)],
     )
 
 

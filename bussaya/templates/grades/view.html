@@ -39,8 +39,10 @@
         <i class="edit icon"></i>
         Grading
     </a>
-    <div class="ui big warning message">
-        Grading System will be closed on <b>{{ grade.natural_ended_date() }}</b> ({{grade.remain_time()[1]}})
+    <div class="ui large info message">
+        <b>Time off date:</b> {{ grade.natural_ended_date() }} <br>
+        <b>Remaining Time:</b> {{grade.remain_time()[1]}} <br>
+        <b>Release Status:</b> {{ grade.get_release_status_display() }} <br>
     </div>
 </div>
 
@@ -49,17 +51,15 @@
         <table class="ui celled structured single line table">
             <thead>
                 <tr>
-                    <th class="one wide" rowspan="2"></th>
-                    <th class="two wide" rowspan="2">Student ID</th>
-                    <th class="three wide" rowspan="2">Student Name</th>
-                    <th class="one wide" rowspan="2">Given Grade</th>
-                    <th class="one wide" rowspan="2">Average Grade</th>
-                    <th rowspan="2">Total Grade</th>
-                    <th class="four wide" colspan="2">Submissions</th>
-                </tr>
-                <tr>
-                    <th>Report</th>
-                    <th>Presentation</th>
+                    <th class="one wide"></th>
+                    <th class="two wide">Student ID</th>
+                    <th class="three wide">Student Name</th>
+                    <th class="one wide">Given Grade</th>
+                    {% if not "grading" in request.path %}
+                    <th class="one wide">Average Grade</th>
+                    {% endif %}
+                    <th>Total Grade</th>
+                    <th class="one wide">Submissions</th>
                 </tr>
             </thead>
             <tbody>
@@ -68,7 +68,7 @@
 
                 {% set group = current_user.get_group(class_= class_) %}
 
-                {% if student_grade.teacher == user %}
+                {% if student_grade.lecturer == user %}
                 {% if student_grade.student in group.students %}
                 <tr>
                     <td>{{index.value}}</td>
@@ -110,9 +110,11 @@
                         </div>
                         {% endif %}
                     </td>
+                    {% if not "grading" in request.path %}
                     <td>
-                        {{get_average_student_grade(student_grade.student, grade)}}
+                        {{ get_average_grade(student_grade.student, student_grade.grade) }}
                     </td>
+                    {% endif %}
                     <td>
                         <div class="title">
                             <a id="{{student_grade.id}}" style="cursor: pointer"
@@ -125,15 +127,15 @@
                             {% for student_grade in get_total_student_grades(student_grade.student, grade) %}
                             <div class="ui relaxed divided list">
                                 <div class="item">
-                                    {% if student_grade.teacher.get_picture() %}
-                                    <img class="ui avatar image" src="{{ student_grade.teacher.get_picture() }}">
+                                    {% if student_grade.lecturer.get_picture() %}
+                                    <img class="ui avatar image" src="{{ student_grade.lecturer.get_picture() }}">
                                     {% else %}
                                     <i class="user icon"></i>
                                     {% endif %}
                                     <div class="content">
                                         <a class="header">
-                                            {{ student_grade.teacher.first_name }}
-                                            {{ student_grade.teacher.last_name }}
+                                            {{ student_grade.lecturer.first_name }}
+                                            {{ student_grade.lecturer.last_name }}
                                         </a>
                                         <div class="description">{{ student_grade.result }}</div>
                                     </div>
@@ -144,22 +146,23 @@
                     </td>
 
                     {% set student_report = get_student_report(student_grade.student.username, class_.id) %}
+                    {% set student_presentation = get_student_presentation(student_grade.student.username,class_.id) %}
                     <td>
                         {% if student_report %}
                         <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
                             target="_blank">
-                            {{student_report.file.filename}}
+                            <i class="large pdf file icon link pop" data-content="Report"></i>
                         </a>
+                        {% else %}
+                        <i class="grey large pdf file icon disable"></i>
                         {% endif %}
-                    </td>
-
-                    {% set student_presentation = get_student_presentation(student_grade.student.username,class_.id) %}
-                    <td>
                         {% if student_presentation %}
                         <a href="{{ url_for('submissions.download', progress_report_id=student_presentation.id, filename=student_presentation.file.filename) }}"
                             target="_blank">
-                            {{student_presentation.file.filename}}
+                            <i class="large file powerpoint icon link pop" data-content="Presentation"></i>
                         </a>
+                        {% else %}
+                        <i class="grey large file powerpoint icon disable"></i>
                         {% endif %}
                     </td>
 
@@ -199,5 +202,14 @@
     function showSetTimeOff() {
         $('.ui.time-off').transition('fade down')
     }
+</script>
+<script type="text/javascript">
+    $('.icon.link.pop')
+        .popup({
+            delay: {
+                show: 50,
+                hide: 70
+            }
+        });
 </script>
 {% endblock additional_js %}
