@@ -63,10 +63,23 @@ class Grade(me.Document):
         return self.ended_date.strftime("%d %B %Y, %I:%M %p")
 
 
+STUDENT_GRADE_CHOICES = [
+    ("-", "-"),
+    ("a", "A"),
+    ("b+", "B+"),
+    ("b", "B"),
+    ("c+", "C+"),
+    ("c", "C"),
+    ("d+", "D+"),
+    ("d", "D+"),
+    ("e", "E"),
+]
+
+
 class StudentGrade(me.Document):
     meta = {"collection": "student_grades"}
 
-    result = me.StringField(default="-")
+    result = me.StringField(choices=STUDENT_GRADE_CHOICES, default="-")
     project = me.ReferenceField("Project", dbref=True)
     grade = me.ReferenceField("Grade", dbref=True, required=True)
 
@@ -74,20 +87,23 @@ class StudentGrade(me.Document):
     lecturer = me.ReferenceField("User", dbref=True, required=True)
     student = me.ReferenceField("User", dbref=True, required=True)
 
+    def get_result_choice(self):
+        return StudentGrade.result.choices
+
     def get_grade_point(self):
-        if self.result == "A":
+        if self.result == "a":
             return 4
-        if self.result == "B+":
+        if self.result == "b+":
             return 3.5
-        if self.result == "B":
+        if self.result == "b":
             return 3
-        if self.result == "C+":
+        if self.result == "c+":
             return 2.5
-        if self.result == "C":
+        if self.result == "c":
             return 2
-        if self.result == "D+":
+        if self.result == "d+":
             return 1.5
-        if self.result == "D":
+        if self.result == "d":
             return 1
-        if self.result == "E":
+        if self.result == "e":
             return 0

@@ -11,16 +11,18 @@
     <div class="divider"> / </div>
     <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
     <div class="divider"> / </div>
-    Grading:
     <a href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">
         {{ grade.get_type_display() }}
     </a>
     <div class="divider"> / </div>
-    Set Time
+    <a href="{{ url_for('admin.grades.set_time', grade_id=grade.id) }}">Set Time</a>
 </div>
 {% endblock %}
 
+
 {% block content %}
+
+
 <h3 class="ui header horizontal divider">
     {{ 'Edit' if 'edit' in request.path else 'Set Time' }}
     {{ grade.get_type_display() }}

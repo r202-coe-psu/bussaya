@@ -66,53 +66,35 @@
                 {% set index = namespace(value=1) %}
                 {% for student_grade in student_grades %}
 
+                {% set student = student_grade.student %}
                 {% set group = current_user.get_group(class_= class_) %}
 
                 {% if student_grade.lecturer == current_user %}
-                {% if student_grade.student in group.students %}
+                {% if student in group.students %}
                 <tr>
                     <td>{{index.value}}</td>
                     {% set index.value = index.value + 1 %}
-                    <td>{{ student_grade.student.username }}</td>
-                    <td>{{ student_grade.student.first_name }} {{ student_grade.student.last_name }}</td>
+                    <td>{{ student.username }}</td>
+                    <td>{{ student.first_name }} {{ student.last_name }}</td>
                     <td>
                         {% if 'grading' not in request.path %}
-                        {{ student_grade.result }}
+                        {{ student_grade.get_result_display() }}
                         {% else %}
                         <div class="ui input">
                             <select class="ui selection dropdown" name="{{student_grade.id}}">
-                                <option>-</option>
-                                <option {% if student_grade.result=='A' %} selected="selected" {% endif %} value="A">
-                                    A
+                                {% for choice in student_grade.get_result_choice() %}
+                                <option {% if student_grade.result==choice[0] %} selected="selected" {% endif %}
+                                    value={{choice[0]}}>
+                                    {{ choice[1] }}
                                 </option>
-                                <option {% if student_grade.result=='B+' %} selected="selected" {% endif %} value="B+">
-                                    B+
-                                </option>
-                                <option {% if student_grade.result=='B' %} selected="selected" {% endif %} value="B">
-                                    B
-                                </option>
-                                <option {% if student_grade.result=='C+' %} selected="selected" {% endif %} value="C+">
-                                    C+
-                                </option>
-                                <option {% if student_grade.result=='C' %} selected="selected" {% endif %} value="C">
-                                    C
-                                </option>
-                                <option {% if student_grade.result=='D+' %} selected="selected" {% endif %} value="D+">
-                                    D+
-                                </option>
-                                <option {% if student_grade.result=='D' %} selected="selected" {% endif %} value="D">
-                                    D
-                                </option>
-                                <option {% if student_grade.result=='E' %} selected="selected" {% endif %} value="E">
-                                    E
-                                </option>
+                                {% endfor %}
                             </select>
                         </div>
                         {% endif %}
                     </td>
                     {% if not "grading" in request.path %}
                     <td>
-                        {{ get_average_grade(student_grade.student, student_grade.grade) }}
+                        {{ student.get_average_grade(student_grade.grade) }}
                     </td>
                     {% endif %}
                     <td>
@@ -124,7 +106,7 @@
                         </div>
                         <div id="{{student_grade.id}} content" class="content" style="display: none">
                             <p />
-                            {% for student_grade in get_total_student_grades(student_grade.student, grade) %}
+                            {% for student_grade in student.get_total_student_grades(grade) %}
                             <div class="ui relaxed divided list">
                                 <div class="item">
                                     {% if student_grade.lecturer.get_picture() %}
@@ -138,10 +120,10 @@
                                             {{ student_grade.lecturer.last_name }}
                                             {{
                                             '(Advisor)'
-                                            if student_grade.lecturer == student_grade.student.get_project().advisor
+                                            if student_grade.lecturer == student.get_project().advisor
                                             }}
                                         </a>
-                                        <div class="description">{{ student_grade.result }}</div>
+                                        <div class="description">{{ student_grade.get_result_display() }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -149,8 +131,8 @@
                         </div>
                     </td>
 
-                    {% set student_report = get_student_report(student_grade.student.username, class_.id) %}
-                    {% set student_presentation = get_student_presentation(student_grade.student.username,class_.id) %}
+                    {% set student_report = student.get_report(class_.id) %}
+                    {% set student_presentation = student.get_presentation(class_.id) %}
                     <td>
                         {% if student_report %}
                         <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
