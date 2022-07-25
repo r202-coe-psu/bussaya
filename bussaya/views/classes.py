@@ -90,12 +90,12 @@ def get_student_group(student_id, class_id):
 @login_required
 def view_students(class_id):
     class_ = models.Class.objects.get(id=class_id)
-    student_ids = class_.student_ids
 
-    return render_template(
-        "/classes/students.html",
-        class_=class_,
-        student_ids=student_ids,
-        get_student_name=get_student_name,
-        get_student_group=get_student_group,
-    )
+    students = []
+    for id in class_.student_ids:
+        student = models.User.objects(username=id).first()
+        if not student or "student" not in student.roles:
+            continue
+        students.append(student)
+
+    return render_template("/classes/students.html", class_=class_, students=students)

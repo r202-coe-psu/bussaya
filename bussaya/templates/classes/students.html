@@ -26,24 +26,24 @@
 <table class="ui celled table">
     <thead>
         <th>No. </th>
-        <th>Student Name</th>
         <th>ID</th>
+        <th>Student Name</th>
         <th>Group</th>
     </thead>
     <tbody>
-        {% for student_id in student_ids %}
+        {% for student in students %}
         <tr>
             <td>
                 {{ loop.index }}
             </td>
             <td>
-                {{ get_student_name(student_id) }}
+                {{ student.username }}
             </td>
             <td>
-                {{ student_id }}
+                {{ student.get_fullname() }}
             </td>
             <td>
-                {{ get_student_group(student_id, class_.id) }}
+                {{ student.get_group(class_).name }}
             </td>
         </tr>
         {% endfor %}

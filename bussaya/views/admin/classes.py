@@ -35,6 +35,9 @@ def create():
     class_.owner = current_user._get_current_object()
     class_.save()
 
+    class_.student_ids = sorted(class_.student_ids)
+    class_.save()
+
     return redirect(url_for("admin.classes.view", class_id=class_.id))
 
 
@@ -54,6 +57,9 @@ def edit(class_id):
 
     form.populate_obj(class_)
     class_.owner = current_user._get_current_object()
+    class_.save()
+
+    class_.student_ids = sorted(class_.student_ids)
     class_.save()
 
     return redirect(url_for("admin.classes.view", class_id=class_.id))

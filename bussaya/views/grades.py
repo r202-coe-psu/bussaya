@@ -196,5 +196,4 @@ def view_student_grades(class_id):
         class_=class_,
         project=project,
         grades=grades,
-        get_average_grade=get_average_grade,
     )
