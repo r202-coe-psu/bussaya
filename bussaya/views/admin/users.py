@@ -9,14 +9,14 @@ module = Blueprint("users", __name__, url_prefix="/users")
 
 
 @module.route("/")
-# @acl.roles_required("admin")
+@acl.roles_required("admin")
 def index():
     users = models.User.objects.all().order_by("-username")
     return render_template("/admin/users/index.html", users=users)
 
 
 @module.route("/<user_id>", methods=["GET", "POST"])
-# @acl.roles_required("admin")
+@acl.roles_required("admin")
 def view(user_id):
     user = models.User.objects.get(id=user_id)
     form = forms.accounts.AdminForm(

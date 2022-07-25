@@ -46,7 +46,7 @@
     </a>
     <a aria-disabled="true" class="ui teal labeled icon button" onclick="showRelease()">
         <i class="share alternate icon"></i>
-        Release {{ grade.get_type_display() }} Grade
+        {{'Release' if grade.release_status == 'unreleased' else "Unrelease"}} {{ grade.get_type_display() }} Grade
     </a>
     <div class="ui large info message">
         <b>Time off date:</b> {{ grade.natural_ended_date() }} <br>
@@ -58,21 +58,22 @@
 <div class="ui modal release grade">
     <i class="close icon"></i>
     <div class="header">
-        Release {{ grade.get_type_display() }} Grade
+        {{'Release' if grade.release_status == 'unreleased' else "Unrelease"}} {{ grade.get_type_display() }} Grade
     </div>
     <div class="image content">
         <div class="description">
             <div class="ui small header">Are you sure you want to
-                <span class="ui blue text">Release {{ grade.get_type_display() }} Grade</span>
+                <span class="ui blue text">{{'Release' if grade.release_status == 'unreleased' else "Unrelease"}} {{
+                    grade.get_type_display() }} Grade</span>
                 class {{ grade.class_.name }} ?
             </div>
         </div>
     </div>
     <div class="actions">
         <a aria-disabled="true" class="ui teal labeled icon button"
-            href="{{ url_for('grades.release', grade_id=grade.id) }}">
+            href="{{ url_for('grades.change_release_status', grade_id=grade.id) }}">
             <i class="share alternate icon"></i>
-            Release
+            {{'Release' if grade.release_status == 'unreleased' else "Unrelease"}}
         </a>
         <div class="ui black deny button">
             No
@@ -85,19 +86,15 @@
         <table class="ui celled structured single line table">
             <thead>
                 <tr>
-                    <th class="one wide" rowspan="2"></th>
-                    <th class="two wide" rowspan="2">Student ID</th>
-                    <th class="three wide" rowspan="2">Student Name</th>
-                    <th class="one wide" rowspan="2">Given Grade</th>
+                    <th class="one wide"></th>
+                    <th class="two wide">Student ID</th>
+                    <th class="four wide">Student Name</th>
+                    <th class="one wide">Given Grade</th>
                     {% if not "grading" in request.path %}
-                    <th class="one wide" rowspan="2">Average Grade</th>
+                    <th class="one wide">Average Grade</th>
                     {% endif %}
-                    <th rowspan="2">Total Grade</th>
-                    <th class="one wide" colspan="2">Submissions</th>
-                </tr>
-                <tr>
-                    <th>Report</th>
-                    <th>Presentation</th>
+                    <th>Total Grade</th>
+                    <th class="two wide">Submissions</th>
                 </tr>
             </thead>
             <tbody>
@@ -173,6 +170,10 @@
                                         <a class="header">
                                             {{ student_grade.lecturer.first_name }}
                                             {{ student_grade.lecturer.last_name }}
+                                            {{
+                                            '(Advisor)'
+                                            if student_grade.lecturer == student_grade.student.get_project().advisor
+                                            }}
                                         </a>
                                         <div class="description">{{ student_grade.result }}</div>
                                     </div>
@@ -269,5 +270,14 @@
         formatter: datetime_formatter,
         startCalendar: $('#rangestart')
     });
+</script>
+<script type="text/javascript">
+    $('.icon.link.pop')
+        .popup({
+            delay: {
+                show: 50,
+                hide: 70
+            }
+        });
 </script>
 {% endblock additional_js %}

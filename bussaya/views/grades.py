@@ -30,7 +30,7 @@ def get_average_grade(student, grade):
             total_student_grade.append(student_grade)
 
     if len(total_student_grade) < 2:
-        return "Inconclusive"
+        return "Incomplete"
 
     average_point = 0
     committees_grade_point = 0
@@ -46,6 +46,7 @@ def get_average_grade(student, grade):
 
     for grade in total_student_grade:
         grade_point = grade.get_grade_point()
+
         if grade.lecturer in project.committees:
             committees_grade_point += grade_point
 
@@ -53,22 +54,23 @@ def get_average_grade(student, grade):
             average_point += advisor_grade_ratio * grade_point
 
     average_point += committee_grade_ratio * committees_grade_point
+    print(average_point)
 
-    if average_point < 80:
+    if average_point > 3.75:
         average_grade = "A"
-    if 79 >= average_point >= 75:
+    elif average_point >= 3.25:
         average_grade = "B+"
-    if 74 >= average_point >= 70:
+    elif average_point >= 2.75:
         average_grade = "B"
-    if 69 >= average_point >= 65:
+    elif average_point >= 2.25:
         average_grade = "C+"
-    if 64 >= average_point >= 60:
+    elif average_point >= 1.75:
         average_grade = "C"
-    if 59 >= average_point >= 55:
+    elif average_point >= 1.25:
         average_grade = "D+"
-    if 54 >= average_point >= 50:
+    elif average_point >= 0.75:
         average_grade = "D"
-    if average_point < 50:
+    elif average_point < 0.5:
         average_grade = "E"
 
     return average_grade
@@ -115,7 +117,6 @@ def create_student_grade(class_, grade, student, lecturer):
     student_grade.grade = grade
     student_grade.student = student
     student_grade.lecturer = lecturer
-
     student_projects = models.Project.objects(class_=class_)
     for project in student_projects:
         if student in project.students:
@@ -147,17 +148,6 @@ def view(class_id, grade_type):
         final.class_ = class_
         final.save()
 
-        project_lecturers = []
-
-        for id in class_.student_ids:
-            student = models.User.objects(username=id).first()
-            if not student or not student.has_roles("student"):
-                continue
-
-            for lecturer in get_lecturers_project_of_student(student.username):
-                create_student_grade(class_, midterm, student, lecturer)
-                create_student_grade(class_, final, student, lecturer)
-
         midterm.save()
         final.save()
 
@@ -174,7 +164,6 @@ def view(class_id, grade_type):
             if not models.StudentGrade.objects(
                 class_=class_, student=student, lecturer=lecturer
             ):
-                print("Create Grade {student.frsit_name} for {lecturer.first_name}")
                 create_student_grade(class_, midterm, student, lecturer)
                 create_student_grade(class_, final, student, lecturer)
 
@@ -198,14 +187,12 @@ def view(class_id, grade_type):
             midterm.student_ids.remove(student_id)
             final.student_ids.remove(student_id)
 
-            print("Delete {student_id} for Midterm and Final")
-
     midterm.save()
     final.save()
 
     grade = models.Grade.objects.get(type=grade_type, class_=class_)
-    student_grades = models.StudentGrade.objects.all().filter(
-        grade=grade, lecturer=current_lecturer
+    student_grades = models.StudentGrade.objects(
+        class_=class_, lecturer=current_lecturer, grade=grade
     )
     student_grades = sorted(student_grades, key=lambda s: s.student.username)
 
@@ -315,12 +302,13 @@ def set_time(grade_id):
 
 @module.route("/<grade_id>/release", methods=["GET", "POST"])
 @acl.roles_required("admin")
-def release(grade_id):
+def change_release_status(grade_id):
     grade = models.Grade.objects.get(id=grade_id)
-    grade.release_status = "released"
-    grade.save()
+    grade.release_status = (
+        "released" if grade.release_status == "unreleased" else "unreleased"
+    )
 
-    print(grade.release_status)
+    grade.save()
 
     return redirect(
         url_for("grades.view", grade_type=grade.type, class_id=grade.class_.id)

@@ -76,18 +76,18 @@ class StudentGrade(me.Document):
 
     def get_grade_point(self):
         if self.result == "A":
-            return 80
+            return 4
         if self.result == "B+":
-            return 75
+            return 3.5
         if self.result == "B":
-            return 70
+            return 3
         if self.result == "C+":
-            return 65
+            return 2.5
         if self.result == "C":
-            return 60
+            return 2
         if self.result == "D+":
-            return 55
+            return 1.5
         if self.result == "D":
-            return 50
+            return 1
         if self.result == "E":
             return 0

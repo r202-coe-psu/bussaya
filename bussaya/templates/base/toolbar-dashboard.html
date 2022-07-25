@@ -22,9 +22,9 @@
 
 {% if current_user.has_roles('admin') %}
 <a class="item" href="{{ url_for('admin.index') }}"><i class="icon users"></i>Admin</a>
+<a class="item" href="{{ url_for('admin.users.index') }}"><i class="icon award"></i>Users</a>
 <a class="item" href="{{ url_for('elections.index') }}"><i class="icon vote yea"></i>Manage Election</a>
 {% endif %}
-<a class="item" href="{{ url_for('admin.users.index') }}"><i class="icon award"></i>Users</a>
 
 {% if current_user.has_roles('lecturer', 'admin') %}
 <a class="item" href="{{ url_for('votings.index') }}"><i class="icon award"></i>View Vote</a>

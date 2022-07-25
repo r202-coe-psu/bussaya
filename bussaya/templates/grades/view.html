@@ -53,13 +53,13 @@
                 <tr>
                     <th class="one wide"></th>
                     <th class="two wide">Student ID</th>
-                    <th class="three wide">Student Name</th>
+                    <th class="four wide">Student Name</th>
                     <th class="one wide">Given Grade</th>
                     {% if not "grading" in request.path %}
                     <th class="one wide">Average Grade</th>
                     {% endif %}
                     <th>Total Grade</th>
-                    <th class="one wide">Submissions</th>
+                    <th class="two wide">Submissions</th>
                 </tr>
             </thead>
             <tbody>
@@ -68,7 +68,7 @@
 
                 {% set group = current_user.get_group(class_= class_) %}
 
-                {% if student_grade.lecturer == user %}
+                {% if student_grade.lecturer == current_user %}
                 {% if student_grade.student in group.students %}
                 <tr>
                     <td>{{index.value}}</td>
@@ -136,6 +136,10 @@
                                         <a class="header">
                                             {{ student_grade.lecturer.first_name }}
                                             {{ student_grade.lecturer.last_name }}
+                                            {{
+                                            '(Advisor)'
+                                            if student_grade.lecturer == student_grade.student.get_project().advisor
+                                            }}
                                         </a>
                                         <div class="description">{{ student_grade.result }}</div>
                                     </div>
