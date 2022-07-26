@@ -83,12 +83,12 @@ def index():
     dev = request.args.get("dev")
     if dev == "test":
         return index_student()
-    if "admin" in user.roles:
-        return index_admin()
     elif "CoE-lecturer" in user.roles:
         return index_lecturer()
     elif "student" in user.roles:
         return index_student()
+    elif "admin" in user.roles:
+        return index_lecturer()
 
     return index_user()
 
