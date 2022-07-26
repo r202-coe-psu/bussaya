@@ -14,6 +14,9 @@ class Submission(me.Document):
 
     type = me.StringField(choices=SUBMISSION_TYPE)
     description = me.StringField()
+    round = me.StringField(
+        choices=[("midterm", "Midterm"), ("final", "Final")], required=True
+    )
 
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
     updated_date = me.DateTimeField(
@@ -91,7 +94,9 @@ class Meeting(me.Document):
     meta = {"collection": "meetings"}
 
     name = me.StringField(max_length=255)
-    grade = me.StringField(choices=[("midterm", "Midterm"), ("final", "Final")])
+    round = me.StringField(
+        choices=[("midterm", "Midterm"), ("final", "Final")], required=True
+    )
 
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
     updated_date = me.DateTimeField(

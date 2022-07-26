@@ -67,10 +67,11 @@
     <h2 class="ui header">Submissions</h2>
     <div class="ui divider"></div>
     <h3 class="ui header">Meeting</h3>
-    <table class="ui selectable celled single line table unstackable">
+    <table class="ui selectable celled table">
         <thead>
             <tr>
                 <th>Name</th>
+                <th>Round</th>
                 <th>Started Date</th>
                 <th>Ended Date</th>
             </tr>
@@ -83,6 +84,9 @@
                     <a href="{{url_for('meetings.view', meeting_id=meeting.id)}}">
                         {{ meeting.name }}
                     </a>
+                </td>
+                <td>
+                    {{ meeting.get_round_display() }}
                 </td>
                 <td>
                     {{ meeting.natural_started_date() }}
@@ -99,10 +103,11 @@
     <div class="ui divider"></div>
 
     <h3 class="ui header">Report / Presentation</h3>
-    <table class="ui selectable celled single line table unstackable">
+    <table class="ui selectable celled table">
         <thead>
             <tr>
                 <th>Type</th>
+                <th>Round</th>
                 <th>Description</th>
                 <th>Started Date</th>
                 <th>Ended Date</th>
@@ -117,6 +122,9 @@
                     <a href="{{ url_for('submissions.view', submission_id=submission.id)}}">
                         {{ submission.get_type_display() }}
                     </a>
+                </td>
+                <td>
+                    {{ submission.get_round_display() }}
                 </td>
                 <td>
                     {{ submission.description}}

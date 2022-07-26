@@ -194,6 +194,9 @@ def edit_progress_report(progress_report_id):
             progress_report=progress_report,
         )
 
+    print(progress_report.updated_date)
+    progress_report.updated_date = datetime.datetime.now()
+
     progress_report.owner = current_user._get_current_object()
     progress_report.ip_address = request.remote_addr
 

@@ -23,9 +23,11 @@ def index():
 @module.route("/<class_id>")
 @login_required
 def view(class_id):
+    if "admin" in current_user.roles:
+        return redirect(url_for("admin.classes.view", class_id=class_id))
     if "CoE-lecturer" in current_user.roles:
         return view_lecturer(class_id)
-    elif "student" in current_user.roles:
+    if "student" in current_user.roles:
         return view_student(class_id)
 
 
@@ -57,12 +59,20 @@ def view_student(class_id):
     meetings = models.Meeting.objects.all().filter(class_=class_)
     user = current_user._get_current_object()
 
+    grades = models.Grade.objects(class_=class_)
+
+    grade_released = False
+    for grade in grades:
+        if grade.release_status == "released":
+            grade_released = True
+
     return render_template(
         "/classes/view-student.html",
         user=user,
         class_=class_,
         submissions=submissions,
         meetings=meetings,
+        grade_released=grade_released,
     )
 
 

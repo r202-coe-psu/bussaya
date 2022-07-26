@@ -66,6 +66,7 @@
             <th>Student</th>
             <th>File</th>
             <th>Description</th>
+            <th>Submitted time</th>
         </tr>
     </thead>
     <tbody>
@@ -100,6 +101,12 @@
                 </a>
             </td>
             <td>{{ progress_report.description }}</td>
+            <td>
+                {% if progress_report.updated_date > submission.ended_date %}
+                <span class='ui orange text'>(Late)</span>
+                {% endif %}
+                {{ progress_report.get_uploaded_date() }}
+            </td>
         </tr>
 
         {% endfor %}

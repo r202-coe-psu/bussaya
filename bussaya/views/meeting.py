@@ -105,15 +105,15 @@ def approval(meeting_id, meeting_report_id, action):
 
 
 @module.route(
-    "/create/<class_id>/<name>/<grade>/<start>/<end>", methods=["GET", "POST"]
+    "/create/<class_id>/<name>/<round>/<start>/<end>", methods=["GET", "POST"]
 )
 @acl.roles_required("admin")
-def create(class_id, name, grade, start, end):
+def create(class_id, name, round, start, end):
     class_ = models.Class.objects.get(id=class_id)
 
     meeting = models.Meeting()
     meeting.name = name
-    meeting.grade = grade
+    meeting.round = round
     meeting.started_date = start
     meeting.ended_date = end
     meeting.class_ = class_
@@ -129,11 +129,9 @@ def edit(meeting_id):
     meeting = models.Meeting.objects.get(id=meeting_id)
     class_ = meeting.class_
 
-    form = forms.meetings.MeetingForm()
-    if request.method == "GET":
-        form = forms.meetings.MeetingForm(obj=meeting)
+    form = forms.meetings.MeetingForm(obj=meeting)
 
-    if not form.validate_on_submit():
+    if request.method != "POST":
         return render_template("/admin/meetings/edit.html", class_=class_, form=form)
 
     form.populate_obj(meeting)
@@ -165,7 +163,7 @@ def report(meeting_id):
     if meeting.get_status() == "closed":
         return redirect(url_for("classes.view", class_id=class_.id))
 
-    if not form.validate_on_submit():
+    if request.method != "POST":
         return render_template(
             "/meetings/report-edit.html", meeting=meeting, class_=class_, form=form
         )
@@ -196,7 +194,7 @@ def edit_report(meeting_report_id):
 
     form = forms.meetings.MeetingReportForm(obj=meeting_report)
 
-    if not form.validate_on_submit():
+    if request.method != "POST":
         return render_template(
             "/meetings/report-edit.html",
             meeting=meeting,
@@ -205,6 +203,7 @@ def edit_report(meeting_report_id):
             meeting_report=meeting_report,
         )
 
+    meeting_report.updated_date = datetime.datetime.now()
     meeting_report.owner = current_user._get_current_object()
     meeting_report.ip_address = request.remote_addr
 

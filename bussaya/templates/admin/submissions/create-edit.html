@@ -22,6 +22,7 @@
         <form method="POST" class="ui form">
             {{ form.csrf_token }}
             {{ renderer.render_select(form.type) }}
+            {{ renderer.render_select(form.round) }}
             {{ renderer.render_field(form.description) }}
             <div class="three fields">
                 <div class="field">

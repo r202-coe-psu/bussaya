@@ -63,8 +63,7 @@ class User(me.Document, UserMixin):
         progress_reports = models.ProgressReport.objects(class_=class_, owner=self)
 
         for progress_report in progress_reports:
-            if progress_report.submission.type == "report":
-                return progress_report
+            return progress_report
         return False
 
     def get_presentation(self, class_id):
@@ -72,8 +71,7 @@ class User(me.Document, UserMixin):
         progress_reports = models.ProgressReport.objects(class_=class_, owner=self)
 
         for progress_report in progress_reports:
-            if progress_report.submission.type == "presentation":
-                return progress_report
+            return progress_report
         return False
 
     def get_advisee_projects(self):
@@ -145,3 +143,16 @@ class User(me.Document, UserMixin):
             average_grade = "E"
 
         return average_grade
+
+    def get_permission_to_upload(self, submission):
+        meeting_reports = models.MeetingReport.objects(
+            class_=submission.class_, owner=self
+        )
+        count_report = 0
+        for report in meeting_reports:
+            if submission.round == report.meeting.round:
+                count_report += 1
+
+        if count_report > 2:
+            return True
+        return False

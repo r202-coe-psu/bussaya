@@ -26,6 +26,7 @@ BaseProjectForm = model_form(
     ],
     field_args={
         "type": {"label": "Type"},
+        "round": {"label": "Round"},
         "description": {"label": "Description"},
     },
 )

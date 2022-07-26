@@ -64,7 +64,7 @@
             <tr>
                 <td class="three wide column">Average Grade Point</td>
                 <td>
-                    {{ get_average_grade(student, grade) if grade.release_status == "released" else "-" }}
+                    {{ student.get_average_grade(grade) if grade.release_status == "released" else "-" }}
 
 
                 </td>
