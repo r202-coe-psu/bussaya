@@ -190,10 +190,58 @@ def view_student_grades(class_id):
     project = student.get_project()
     grades = models.Grade.objects.all().filter(class_=class_)
 
+    total_grade = 0
+    for grade in grades:
+        average_grade = student.get_average_grade(grade).lower()
+        if grade.type == "midterm":
+            grade_ratio = 0.4
+        if grade.type == "final":
+            grade_ratio = 0.6
+
+        if average_grade == "incomplete":
+            average_total_grade = "Incomplete"
+            break
+
+        if average_grade == "a":
+            total_grade += grade_ratio * 4
+        if average_grade == "b+":
+            total_grade += grade_ratio * 3.5
+        if average_grade == "b":
+            total_grade += grade_ratio * 3
+        if average_grade == "c+":
+            total_grade += grade_ratio * 2.5
+        if average_grade == "c":
+            total_grade += grade_ratio * 2
+        if average_grade == "d+":
+            total_grade += grade_ratio * 1.5
+        if average_grade == "d":
+            total_grade += grade_ratio * 1
+        if average_grade == "e":
+            total_grade += grade_ratio * 0
+
+    if average_total_grade != "Incomplete":
+        if total_grade > 3.75:
+            average_total_grade = "A"
+        elif total_grade >= 3.25:
+            average_total_grade = "B+"
+        elif total_grade >= 2.75:
+            average_total_grade = "B"
+        elif total_grade >= 2.25:
+            average_total_grade = "C+"
+        elif total_grade >= 1.75:
+            average_total_grade = "C"
+        elif total_grade >= 1.25:
+            average_total_grade = "D+"
+        elif total_grade >= 0.75:
+            average_total_grade = "D"
+        elif total_grade < 0.5:
+            average_total_grade = "E"
+
     return render_template(
         "/grades/view-student.html",
         student=student,
         class_=class_,
         project=project,
         grades=grades,
+        average_total_grade=average_total_grade,
     )

@@ -65,13 +65,25 @@
                 <td class="three wide column">Average Grade Point</td>
                 <td>
                     {{ student.get_average_grade(grade) if grade.release_status == "released" else "-" }}
-
-
                 </td>
             </tr>
         </tbody>
     </table>
 </div>
 {% endfor %}
+
+<div class="ui segment">
+    <h4>Overall Average Grade</h4>
+    <table class="ui definition table">
+        <tbody>
+            <tr>
+                <td class="three wide column">Average Grade Point</td>
+                <td>
+                    {{average_total_grade}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}
