@@ -37,9 +37,9 @@ class MeetingForm(BaseProjectForm):
     )
 
 
-class StudentWorkMeetingForm(BaseProjectForm):
+class MeetingReportForm(BaseProjectForm):
     title = fields.StringField("Title")
-    description = fields.StringField("Description")
+    description = fields.TextAreaField("Description")
     meeting_date = fields.DateField("Meeting Date", format="%Y-%m-%d")
 
 

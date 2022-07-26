@@ -160,7 +160,7 @@ def report(meeting_id):
     meeting = models.Meeting.objects.get(id=meeting_id)
     class_ = meeting.class_
 
-    form = forms.meetings.StudentWorkMeetingForm()
+    form = forms.meetings.MeetingReportForm()
 
     if meeting.get_status() == "closed":
         return redirect(url_for("classes.view", class_id=class_.id))
@@ -194,7 +194,7 @@ def edit_report(meeting_report_id):
     if meeting.get_status() == "closed":
         return redirect(url_for("classes.view", class_id=class_.id))
 
-    form = forms.meetings.StudentWorkMeetingForm(obj=meeting_report)
+    form = forms.meetings.MeetingReportForm(obj=meeting_report)
 
     if not form.validate_on_submit():
         return render_template(
