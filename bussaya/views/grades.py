@@ -191,6 +191,7 @@ def view_student_grades(class_id):
     grades = models.Grade.objects.all().filter(class_=class_)
 
     total_grade = 0
+    average_total_grade = 0
     for grade in grades:
         average_grade = student.get_average_grade(grade).lower()
         if grade.type == "midterm":
@@ -198,7 +199,7 @@ def view_student_grades(class_id):
         if grade.type == "final":
             grade_ratio = 0.6
 
-        if average_grade == "incomplete":
+        if average_grade == "incomplete" or grade.release_status == "unreleased":
             average_total_grade = "Incomplete"
             break
 
