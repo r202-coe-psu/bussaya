@@ -88,6 +88,12 @@
 						Opened
 					</a>
 				</td>
+
+				{% elif meeting.get_status() == "upcoming" %}
+				<td>
+					Upcoming
+				</td>
+
 				{% else %}
 				<td class="red">
 					Not Submitted
@@ -96,11 +102,7 @@
 
 				{% endif %}
 
-				{% if meeting.get_status() == "upcoming" %}
-				<td>
-					Upcoming
-				</td>
-				{% endif %}
+
 
 
 
