@@ -38,22 +38,27 @@ def view(class_id):
 @acl.roles_required("CoE-lecturer")
 def view_lecturer(class_id):
     class_ = models.Class.objects.get(id=class_id)
+    students = models.User.objects(username__in=class_.student_ids)
     projects = models.Project.objects(
-        class_=class_, advisor=current_user._get_current_object()
+        advisor=current_user._get_current_object(), students__in=students
     )
     submissions = models.Submission.objects(class_=class_)
     meetings = models.Meeting.objects(class_=class_)
 
-    meeting_reports = models.MeetingReport.objects(class_=class_)
+    meeting_reports = models.MeetingReport.objects(
+        class_=class_, project__in=projects
+    ).order_by("-updated_date")
+    progress_reports = models.ProgressReport.objects(
+        class_=class_, project__in=projects
+    )
 
     return render_template(
         "/classes/view-lecturer.html",
         class_=class_,
         class_id=class_id,
         projects=projects,
-        submissions=submissions,
-        meetings=meetings,
         meeting_reports=meeting_reports,
+        progress_reports=progress_reports,
     )
 
 

@@ -73,66 +73,43 @@
           <th>ID</th>
           <th>Student</th>
           <th>Round</th>
+          <th>Meeting</th>
+          <th>Title / Description</th>
           <th>Summited Date</th>
         </tr>
       </thead>
 
       <tbody>
-        {% for meeting in meetings %}
+        {% for report in meeting_reports %}
           <tr>
             <td>
-              {{ meeting.owner.username }}
+              {{ report.owner.username }}
             </td>
             <td>
-              {{ meeting.owner.first_name }} {{ meeting.owner.last_name }}
+              {{ report.owner.first_name }} {{ report.owner.last_name }}
             </td>
             <td>
-              {{ meeting.get_round_display() }}
+              {{ report.meeting.get_round_display() }}
             </td>
             <td>
-              {{ meeting.updated_date }}
+              <a href="{{ url_for('meetings.view', meeting_id=report.meeting.id) }}">
+                {{ report.meeting.name }}
+              </a>
+            </td>
+            <td>
+              <div><b>{{ report.title }}</b></div>
+              <div>
+                {{ report.description }}
+              </div>
+            </td>
+            <td>
+              {{ report.updated_date }}
             </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
 
-
-
-
-    {#
-    <table class="ui selectable celled table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Round</th>
-          <th>Started Date</th>
-          <th>Ended Date</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for meeting in meetings %}
-        <tr>
-          <td>
-            <a href="{{url_for('meetings.view', meeting_id=meeting.id)}}">
-                {{ meeting.name }}
-            </a>
-          </td>
-          <td>
-              {{ meeting.get_round_display() }}
-          </td>
-          <td>
-              {{ meeting.natural_started_date() }}
-          </td>
-          <td>
-              {{ meeting.natural_ended_date() }}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    #}
     <div class="ui divider"></div>
 
     <h3 class="ui header">Report / Presentation</h3>
@@ -149,7 +126,7 @@
         </thead>
 
         <body>
-            {% for submission in submissions %}
+            {% for report in progress_reports %}
             <tr>
                 <td>
                     <a href="{{ url_for('submissions.view', submission_id=submission.id)}}">

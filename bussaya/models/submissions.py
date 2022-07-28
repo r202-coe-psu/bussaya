@@ -159,7 +159,7 @@ class ProgressReport(me.Document):
 
     owner = me.ReferenceField("User", dbref=True, required=True)
     class_ = me.ReferenceField("Class", dbref=True, required=True)
-    project = me.ReferenceField("Projects")
+    project = me.ReferenceField("Project", dbref=True, required=True)
     ip_address = me.StringField(required=True)
 
     description = me.StringField(required=True)

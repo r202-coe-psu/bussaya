@@ -20,33 +20,48 @@ BaseProjectForm = model_form(
         "owner",
         "approvals",
         "resources",
-        "students",
-        "advisor",
-        "committees",
         "class_",
+        "public",
     ],
     field_args={
-        "name": {"label": "Name", "widget": widgets.TextInput()},
-        "name_th": {"label": "Thai Name", "widget": widgets.TextInput()},
-        "abstract": {"label": "Abstract"},
+        "name": {"label": "English Name"},
+        "name_th": {"label": "Thai Name"},
+        "abstract": {"label": "English Abstract"},
         "abstract_th": {"label": "Thai Abstract"},
-        "public": {"label": "Public"},
+        "advisor": {
+            "label": "Advisor",
+            "label_modifier": lambda a: f"{a.first_name} {a.last_name}",
+        },
+        "committees": {
+            "label": "Committees",
+            "allow_blank": True,
+            "blank_text": "There are no committees",
+            "label_modifier": lambda a: f"{a.first_name} {a.last_name}",
+        },
+        "students": {
+            "label": "Contributors",
+            "allow_blank": True,
+            "blank_text": "There are no contributors",
+            "label_modifier": lambda a: f"{a.first_name} {a.last_name}",
+        },
     },
 )
 
 
 class ProjectForm(BaseProjectForm):
-    tags = TagListField("Tags")
+    tags = TagListField(
+        "Tags: divied by comma (,)", validators=[validators.length(min=3)]
+    )
     # class_ = fields.SelectField("Class", validators=[validators.InputRequired()])
-    contributors = fields.SelectField(
-        "Contributors", default=None, choices=[("", "If your project has contributor")]
-    )
-    advisor = fields.SelectField("Advisor", validators=[validators.InputRequired()])
+    # contributors = fields.SelectField(
+    #     "Contributors", default=None, choices=[("", "If your project has contributor")]
+    # )
+    # advisor = fields.SelectField("Advisor", validators=[validators.InputRequired()])
 
-    committees = fields.SelectMultipleField(
-        "Committees",
-        validators=[validators.length(max=5, min=0)],
-    )
+    # committees = fields.SelectMultipleField(
+    #     "Committees",
+    #     validators=[validators.length(max=5, min=0)],
+    # )
 
 
 class ProjectResourceUploadForm(FlaskForm):

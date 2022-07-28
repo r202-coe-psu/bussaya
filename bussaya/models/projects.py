@@ -42,13 +42,13 @@ class Project(me.Document):
         "strict": False,
     }
 
-    name = me.StringField(required=True)
-    name_th = me.StringField(required=True)
+    name = me.StringField(required=True, max_length=255)
+    name_th = me.StringField(required=True, max_length=255)
 
     abstract = me.StringField(required=True)
     abstract_th = me.StringField(required=True)
 
-    class_ = me.ReferenceField("Class", dbref=True, required=True)
+    class_ = me.ReferenceField("Class", dbref=True)
     tags = me.ListField(me.StringField())
 
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
@@ -69,11 +69,15 @@ class Project(me.Document):
         required=True,
         default="only name",
         choices=[
-            "report",
-            "presentation",
-            "report presentation",
+            ("only name", "Only Name"),
+            ("report", "Report"),
+            ("presentation", "Presentation"),
+            ("report presentation", "Report Presentation"),
         ],
     )
+
+    committees_label_modifier = lambda c: f"{c.first_name} {c.last_name}"
+    students_label_modifier = lambda s: f"{s.username} - {s.first_name} {s.last_name}"
 
     def get_resource(self, type_):
         resources = reversed(self.resources)

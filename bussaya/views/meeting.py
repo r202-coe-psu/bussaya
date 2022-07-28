@@ -59,10 +59,19 @@ def view_admin(meeting_id):
 @login_required
 def view_lecturer(meeting_id):
     meeting = models.Meeting.objects.get(id=meeting_id)
-    meeting_reports = models.MeetingReport.objects.all().filter(
-        class_=meeting.class_, meeting=meeting
+    students = models.User.objects(username__in=meeting.class_.student_ids)
+    projects = models.Project.objects(
+        me.Q(advisor=current_user._get_current_object())
+        & (me.Q(creator__in=students) | me.Q(students__in=students))
+    )
+    meeting_reports = models.MeetingReport.objects(
+        class_=meeting.class_, meeting=meeting, project__in=projects
     )
 
+    # print("meeting", meeting)
+    # print("students", students)
+    # print("projects", projects)
+    # print("meeting_reports", meeting_reports)
     form = forms.meetings.DisapproveForm()
 
     if request.method == "POST":

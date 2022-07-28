@@ -42,8 +42,7 @@
             <th></th>
             <th>Project</th>
             <th>Student</th>
-            <th>Title</th>
-            <th>Description</th>
+            <th>Title / Description</th>
             <th>Meeting Date</th>
             <th>Status</th>
             <th>Remark</th>
@@ -51,34 +50,30 @@
         </tr>
     </thead>
     <tbody>
-        {% set index = namespace(value=1) %}
-
         {% for meeting_report in meeting_reports %}
-        {% if meeting_report.owner in current_user.get_group(class_=class_).students %}
-
-        {% set project = meeting_report.owner.get_project() %}
-        <tr>
-            <td>{{index.value}}</td>
-            {% set index.value = index.value + 1 %}
-            <td>{{project.name}}</td>
+        <tr class="top aligned">
+            <td>{{ loop.index }}</td>
+            <td>{{ meeting_report.project.name }}</td>
             <td class="right aligned collapsing">
-                {% if not project %}
+              {% if not project %}
                 <a target="_blank" href="{{ url_for('accounts.profile', user_id=meeting_report.owner.id) }}">
                     {{ meeting_report.owner.get_fullname() }} ({{meeting_report.owner.username}})
                 </a>
-                {% else %}
+              {% else %}
 
                 {% for student in project.students %}
-                <a target="_blank" href="{{ url_for('accounts.profile', user_id=student.id) }}">
-                    {{ student.get_fullname() }} ({{ student.username }}) </a>
-                {% if not loop.last %}<br>{% endif %}
+                  <a target="_blank" href="{{ url_for('accounts.profile', user_id=student.id) }}">
+                    {{ student.get_fullname() }} ({{ student.username }}) 
+                  </a>
                 {% endfor %}
 
-                {% endif %}
+              {% endif %}
             </td>
-            <td>{{meeting_report.title}}</td>
-            <td>{{meeting_report.description}}</td>
-            <td>{{meeting_report.meeting_date}}</td>
+            <td>
+              <div><b>{{ meeting_report.title }}</b></div>
+              <div>{{ meeting_report.description }}</div>
+            </td>
+            <td>{{ meeting_report.meeting_date }}</td>
             <td
                 class="{{'green' if meeting_report.status == 'approved'}} {{'red' if meeting_report.status == 'disapproved'}}">
                 {{meeting_report.get_status_display() if meeting_report.status else 'Waiting for approval'}}
@@ -86,11 +81,9 @@
             <td>
                 {{meeting_report.remark if meeting_report.remark else '-' }}
             </td>
-            <td class="four wide">
-                <div style="display: flex">
-
-                    <a class="ui primary button" href="{{url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, 
-                    action='approved')}}" style="height: fit-content; margin-top: 0.5em">
+            <td>
+                <div>
+                    <a class="ui primary button" href="{{ url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, action='approved')}}">
                         Approve
                     </a>
                     <div class="ui accordion" style="width: fit-content; height: fit-content">
@@ -119,7 +112,6 @@
                 </div>
             </td>
         </tr>
-        {% endif %}
         {% endfor %}
     </tbody>
 </table>

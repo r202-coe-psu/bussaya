@@ -26,19 +26,21 @@ def index():
 
 def populate_obj(form, project):
     form.populate_obj(project)
-    project.class_ = models.Class.objects.get(id=form.class_.data)
-    project.advisor = models.User.objects.get(id=form.advisor.data)
-    project.committees = [
-        models.User.objects.get(id=uid) for uid in form.committees.data
-    ]
+    # project.class_ = models.Class.objects.get(id=form.class_.data)
+    # project.advisor = models.User.objects.get(id=form.advisor.data)
+    # project.committees = [
+    # models.User.objects.get(id=uid) for uid in form.committees.data
+    # ]
     if project.advisor in project.committees:
         project.committees.remove(project.advisor)
     project.creator = current_user._get_current_object()
-    project.students = [current_user._get_current_object()]
-    if form.contributors.data and len(form.contributors.data) > 0:
-        contributor = models.User.objects.get(id=form.contributors.data)
-        if contributor not in project.students:
-            project.students.append(contributor)
+    if current_user._get_current_object() not in project.students:
+        project.students.append(current_user._get_current_object())
+    # project.students = [current_user._get_current_object()]
+    # if form.contributors.data and len(form.contributors.data) > 0:
+    #     contributor = models.User.objects.get(id=form.contributors.data)
+    #     if contributor not in project.students:
+    #         project.students.append(contributor)
 
 
 def get_project_form(project=None):
@@ -47,32 +49,22 @@ def get_project_form(project=None):
     if project:
         form = forms.projects.ProjectForm(obj=project)
 
-    lecturers = models.User.objects(roles="lecturer").order_by("first_name")
-    lec_choices = [(str(l.id), f"{l.first_name} {l.last_name}") for l in lecturers]
-    form.advisor.choices = lec_choices
-    form.committees.choices = lec_choices
-    form.public.choices = [(d, d.title()) for d in form.public.choices]
+    lecturers = models.User.objects(roles="CoE-lecturer").order_by("first_name")
+    form.advisor.queryset = lecturers
+    form.committees.queryset = lecturers
 
     classes = models.Class.objects(student_ids=current_user.username).order_by("-id")
-    form.class_.choices = [(str(c.id), c.name) for c in classes]
 
-    student_ids = []
-    for c in classes:
-        student_ids.extend(c.student_ids)
+    students = models.User.objects(username__regex="^[0-9]*$").order_by("-username")
+    form.students.queryset = students
 
-    form.contributors.choices = form.contributors.choices + [
-        (str(s.id), f"{s.first_name} {s.last_name}")
-        for s in models.User.objects(username__in=student_ids)
-    ]
-
-    if project and request.method == "GET":
-        form.advisor.data = str(project.advisor.id)
-        form.committees.data = [str(c.id) for c in project.committees]
-        form.class_.data = str(project.class_.id)
-        contributors = project.students
-        contributors.remove(current_user._get_current_object())
-        if len(contributors) > 0:
-            form.contributors.data = str(contributors[0].id)
+    # if project and request.method == "GET":
+    #     form.advisor.data = str(project.advisor.id)
+    #     form.committees.data = [str(c.id) for c in project.committees]
+    #     contributors = project.students
+    #     contributors.remove(current_user._get_current_object())
+    #     if len(contributors) > 0:
+    #         form.contributors.data = str(contributors[0].id)
 
     return form
 
