@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, url_for, redirect
 from flask_login import current_user, login_required
+import mongoengine as me
+from datetime import datetime
+from bussaya import acl
 
 from .. import models
-from datetime import datetime
 
-from bussaya import acl
 
 module = Blueprint(
     "classes",
@@ -23,21 +24,27 @@ def index():
 @module.route("/<class_id>")
 @login_required
 def view(class_id):
-    if "admin" in current_user.roles:
-        return redirect(url_for("admin.classes.view", class_id=class_id))
+    # if "admin" in current_user.roles:
+    #     return redirect(url_for("admin.classes.view", class_id=class_id))
     if "CoE-lecturer" in current_user.roles:
         return view_lecturer(class_id)
     if "student" in current_user.roles:
         return view_student(class_id)
+
+    return redirect(url_for("dashboard.index"))
 
 
 @module.route("/lecturer/<class_id>/view")
 @acl.roles_required("CoE-lecturer")
 def view_lecturer(class_id):
     class_ = models.Class.objects.get(id=class_id)
-    projects = models.Project.objects(class_=class_)
+    projects = models.Project.objects(
+        class_=class_, advisor=current_user._get_current_object()
+    )
     submissions = models.Submission.objects(class_=class_)
     meetings = models.Meeting.objects(class_=class_)
+
+    meeting_reports = models.MeetingReport.objects(class_=class_)
 
     return render_template(
         "/classes/view-lecturer.html",
@@ -46,6 +53,7 @@ def view_lecturer(class_id):
         projects=projects,
         submissions=submissions,
         meetings=meetings,
+        meeting_reports=meeting_reports,
     )
 
 
@@ -100,6 +108,12 @@ def get_student_group(student_id, class_id):
 @login_required
 def view_students(class_id):
     class_ = models.Class.objects.get(id=class_id)
+    projects = models.Project.objects(
+        me.Or(
+            creators=current_user._get_current_object(),
+            students=current_user._get_current_object(),
+        )
+    )
 
     students = []
     for id in class_.student_ids:

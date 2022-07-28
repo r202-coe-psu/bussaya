@@ -35,17 +35,31 @@ def get_current_class():
 @login_required
 def index_admin():
     classes = models.Class.objects.all()
-    return render_template("/dashboard/index-admin.html", classes=classes)
-
-
-def index_lecturer():
-    classes = models.Class.objects.all()
     opened_classes = []
     user = current_user._get_current_object()
 
     for class_ in classes:
         if class_.is_in_time():
             opened_classes.append(class_)
+
+    return render_template(
+        "/dashboard/index-admin.html",
+        classes=classes,
+        opened_classes=opened_classes,
+    )
+
+
+def index_lecturer():
+    now = datetime.date.today()
+    opened_classes = models.Class.objects(
+        started_date__lte=now, ended_date__gte=now
+    ).order_by("-id")
+    classes = models.Class.objects.all()
+    user = current_user._get_current_object()
+
+    # for class_ in classes:
+    #     if class_.is_in_time():
+    #         opened_classes.append(class_)
 
     return render_template(
         "/dashboard/index-lecturer.html",

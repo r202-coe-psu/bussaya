@@ -22,40 +22,40 @@
 <div class="ui divider"></div>
 
 <table class="ui single line table">
-    <tbody>
-        <tr>
-            <td>
-                <div style="color: grey">NAME </div>{{ class_.name }}
-            </td>
-            <td>
-                <div style="color: grey">DESCRIPTION</div> {{ class_.description }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div style="color: grey">OWNER </div>{{ class_.owner.first_name }} {{ class_.owner.last_name }}
-            </td>
-            <td>
-                <div style="color: grey">CODE </div>{{ class_.code }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div style="color: grey">TYPE</div> {{ class_.get_type_display() }}
-            </td>
-            <td>
-                <div style="color: grey">TAG</div> {{ class_.tags | join(', ') }}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div style="color: grey">STARTED DATE</div> {{ class_.started_date }}
-            </td>
-            <td>
-                <div style="color: grey">ENDED DATE</div> {{ class_.ended_date }}
-            </td>
-        </tr>
-    </tbody>
+  <tbody>
+    <tr>
+      <td>
+        <div style="color: grey">NAME </div>{{ class_.name }}
+      </td>
+      <td>
+        <div style="color: grey">DESCRIPTION</div> {{ class_.description }}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div style="color: grey">OWNER </div>{{ class_.owner.first_name }} {{ class_.owner.last_name }}
+      </td>
+      <td>
+        <div style="color: grey">CODE </div>{{ class_.code }}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div style="color: grey">TYPE</div> {{ class_.get_type_display() }}
+      </td>
+      <td>
+        <div style="color: grey">TAG</div> {{ class_.tags | join(', ') }}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div style="color: grey">STARTED DATE</div> {{ class_.started_date }}
+      </td>
+      <td>
+        <div style="color: grey">ENDED DATE</div> {{ class_.ended_date }}
+      </td>
+    </tr>
+  </tbody>
 </table>
 
 <div class="ui segment">
@@ -68,38 +68,71 @@
     <div class="ui divider"></div>
     <h3 class="ui header">Meeting</h3>
     <table class="ui selectable celled table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Round</th>
-                <th>Started Date</th>
-                <th>Ended Date</th>
-            </tr>
-        </thead>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Student</th>
+          <th>Round</th>
+          <th>Summited Date</th>
+        </tr>
+      </thead>
 
-        <body>
-            {% for meeting in meetings %}
-            <tr>
-                <td>
-                    <a href="{{url_for('meetings.view', meeting_id=meeting.id)}}">
-                        {{ meeting.name }}
-                    </a>
-                </td>
-                <td>
-                    {{ meeting.get_round_display() }}
-                </td>
-                <td>
-                    {{ meeting.natural_started_date() }}
-                </td>
-                <td>
-                    {{ meeting.natural_ended_date() }}
-                </td>
-            </tr>
-            {% endfor %}
-        </body>
+      <tbody>
+        {% for meeting in meetings %}
+          <tr>
+            <td>
+              {{ meeting.owner.username }}
+            </td>
+            <td>
+              {{ meeting.owner.first_name }} {{ meeting.owner.last_name }}
+            </td>
+            <td>
+              {{ meeting.get_round_display() }}
+            </td>
+            <td>
+              {{ meeting.updated_date }}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
     </table>
-    <p />
 
+
+
+
+    {#
+    <table class="ui selectable celled table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Round</th>
+          <th>Started Date</th>
+          <th>Ended Date</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for meeting in meetings %}
+        <tr>
+          <td>
+            <a href="{{url_for('meetings.view', meeting_id=meeting.id)}}">
+                {{ meeting.name }}
+            </a>
+          </td>
+          <td>
+              {{ meeting.get_round_display() }}
+          </td>
+          <td>
+              {{ meeting.natural_started_date() }}
+          </td>
+          <td>
+              {{ meeting.natural_ended_date() }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    #}
     <div class="ui divider"></div>
 
     <h3 class="ui header">Report / Presentation</h3>

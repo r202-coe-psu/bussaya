@@ -1,20 +1,53 @@
-{%extends '/base/default-dashboard.html' %}
+{% extends '/base/default-dashboard.html' %}
 {% import '/dashboard/project-renderer.html' as renderer %}
 
+{% block dashboard_title %}
+Dashboard
+{% endblock %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+
 {% block content %}
-  <div>    
-    <h3>Hello, {{ current_user.first_name }} {{ current_user.last_name }} </h3>
-  </div>
 
-  {% if 'CoE-lecturer' in current_user.roles %}
-    {{ renderer.render_project_section(alumni_projects, current_user, advisees, committees) }}
-  {% endif %}
+<h2 class="ui header horizontal divider">Classes</h2>
+{% if opened_classes %}
+<table class="ui celled table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Type</th>
+      <th>Ended Date</th>
+    </tr>
+  </thead>
 
-  <div>
-    <a class="ui primary button" href="{{ url_for('admin.classes.index') }}">Class</a>
-    {#
-    <a class="ui primary button" href="{{ url_for('votings.index') }}">View Vote</a>
-    <a class="ui primary button" href="{{ url_for('elections.index') }}">Manage Election</a>
-    #}
-  </div>
+  <body>
+    {% for class_ in opened_classes %}
+    <tr>
+      <td>
+        <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+      </td>
+      <td>
+        {{ class_.description }}
+      </td>
+      <td>
+        {{ class_.get_type_display() }}
+      </td>
+      <td>
+        {{ class_.ended_date }}
+      </td>
+    </tr>
+    {% endfor %}
+  </body>
+</table>
+{% else %}
+<div class="ui info message">
+  No opened classes to display
+</div>
+{% endif %}
+
+{{ renderer.render_project_section(alumni_projects, current_user, advisees, committees) }}
+
 {% endblock %}

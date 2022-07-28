@@ -23,6 +23,7 @@ BaseProjectForm = model_form(
         "students",
         "advisor",
         "committees",
+        "class_",
     ],
     field_args={
         "name": {"label": "Name", "widget": widgets.TextInput()},
@@ -36,7 +37,7 @@ BaseProjectForm = model_form(
 
 class ProjectForm(BaseProjectForm):
     tags = TagListField("Tags")
-    class_ = fields.SelectField("Class", validators=[validators.InputRequired()])
+    # class_ = fields.SelectField("Class", validators=[validators.InputRequired()])
     contributors = fields.SelectField(
         "Contributors", default=None, choices=[("", "If your project has contributor")]
     )

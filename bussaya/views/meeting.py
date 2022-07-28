@@ -188,15 +188,21 @@ def edit_report(meeting_report_id):
     meeting_report = models.MeetingReport.objects.get(id=meeting_report_id)
     meeting = meeting_report.meeting
     class_ = meeting_report.class_
+    projects = models.Project.objects(
+        me.Q(creator=current_user._get_current_object())
+        | me.Q(students=current_user._get_current_object())
+    ).order_by("id")
 
     if meeting.get_status() == "closed":
         return redirect(url_for("classes.view", class_id=class_.id))
 
     form = forms.meetings.MeetingReportForm(obj=meeting_report)
+    form.project.queryset = projects
 
-    if request.method != "POST":
+    if not form.validate_on_submit():
         return render_template(
             "/meetings/report-edit.html",
+            projects=projects,
             meeting=meeting,
             class_=class_,
             form=form,
@@ -205,7 +211,9 @@ def edit_report(meeting_report_id):
 
     meeting_report.updated_date = datetime.datetime.now()
     meeting_report.owner = current_user._get_current_object()
-    meeting_report.ip_address = request.remote_addr
+    meeting_report.ip_address = request.headers.get(
+        "X-Forwarded-For", request.remote_addr
+    )
 
     form.populate_obj(meeting_report)
     meeting_report.save()
