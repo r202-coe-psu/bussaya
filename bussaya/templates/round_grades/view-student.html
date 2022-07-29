@@ -56,15 +56,15 @@
     Grade
 </h3>
 
-{% for grade in round_grades %}
+{% for round_grade in round_grades %}
 <div class="ui segment">
-    <h4>{{ grade.get_type_display() }}</h4>
+    <h4>{{ round_grade.get_type_display() }}</h4>
     <table class="ui definition table">
         <tbody>
             <tr>
                 <td class="three wide column">Average Grade Point</td>
                 <td>
-                    {{ student.get_average_grade(grade) if grade.release_status == "released" else "-" }}
+                    {{ student.get_average_grade(round_grade) if round_grade.release_status == "released" else "-" }}
                 </td>
             </tr>
         </tbody>

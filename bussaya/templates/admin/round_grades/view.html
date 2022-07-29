@@ -37,12 +37,11 @@
             </tr>
         </thead>
         <tbody>
-            {% set index = namespace(value=1) %}
             {% for student_grade in student_grades %}
             {% set student = student_grade.student %}
             <tr>
-                <td>{{index.value}}</td>
-                {% set index.value = index.value + 1 %}
+                <td>{{ loop.index }}</td>
+
                 <td>{{ student.username }}</td>
                 <td>{{ student.first_name }} {{ student.last_name }}</td>
                 <td>{{ student_grade.get_result_display() }}</td>
@@ -112,13 +111,6 @@
 
 
 {% block additional_js %}
-<script type="text/javascript">
-    function showRelease() {
-        $('.ui.modal.release.grade')
-            .modal('show')
-            ;
-    }
-</script>
 <script type="text/javascript">
     function accordion_show_hide(show_hide_id) {
         $(document.getElementById(show_hide_id + " content")).transition('fade down')

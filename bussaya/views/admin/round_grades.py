@@ -36,10 +36,8 @@ def create_student_grade(class_, round_grade, student, lecturer):
     student_grade.round_grade = round_grade
     student_grade.student = student
     student_grade.lecturer = lecturer
-    student_projects = models.Project.objects(class_=class_)
-    for project in student_projects:
-        if student in project.students:
-            student_grade.project = project
+    if student.get_project():
+        student_grade.project
 
     student_grade.save()
     if student.username not in round_grade.student_ids:
@@ -175,8 +173,6 @@ def grading(round_grade_id):
             {"student_id": str(s.student.id), "result": s.result}
         )
 
-    print(form.data)
-
     return render_template(
         "/admin/round_grades/grading.html",
         form=form,
@@ -219,7 +215,11 @@ def submit_grade(round_grade_id):
         student_grade.save()
 
     return redirect(
-        url_for("admin.round_grades.grading", round_grade_id=round_grade.id)
+        url_for(
+            "admin.round_grades.view",
+            class_id=class_.id,
+            round_grade_type=round_grade.type,
+        )
     )
 
 
@@ -263,7 +263,7 @@ def change_release_status(round_grade_id):
 
     return redirect(
         url_for(
-            "round_grades.view",
+            "admin.round_grades.view",
             round_grade_type=round_grade.type,
             class_id=round_grade.class_.id,
         )

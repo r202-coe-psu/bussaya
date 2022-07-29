@@ -37,8 +37,8 @@
     </a>
     <a aria-disabled="true" class="ui teal labeled icon button" onclick="showRelease()">
         <i class="share alternate icon"></i>
-        {{'Release' if round_grade.release_status == 'unreleased' else "Unrelease"}} {{ round_grade.get_type_display()
-        }} Grade
+        {{'Release' if round_grade.release_status == 'unreleased' else "Unrelease"}}
+        {{ round_grade.get_type_display() }} Grade
     </a>
     <div class="ui large info message">
         <b>Time off date:</b> {{ round_grade.natural_ended_date() }} <br>
@@ -47,18 +47,19 @@
     </div>
 </div>
 
-<div class="ui modal release round_grade">
+<div class="ui modal release grade">
     <i class="close icon"></i>
     <div class="header">
-        {{'Release' if round_grade.release_status == 'unreleased' else "Unrelease"}} {{ round_grade.get_type_display()
-        }} Grade
+        {{ 'Release' if round_grade.release_status == 'unreleased' else "Unrelease" }}
+        {{ round_grade.get_type_display() }} Grade
     </div>
     <div class="image content">
         <div class="description">
             <div class="ui small header">Are you sure you want to
-                <span class="ui blue text">{{'Release' if round_grade.release_status == 'unreleased' else "Unrelease"}}
-                    {{
-                    round_grade.get_type_display() }} Grade</span>
+                <span class="ui blue text">
+                    {{ 'Release' if round_grade.release_status == 'unreleased' else "Unrelease" }}
+                    {{ round_grade.get_type_display() }} Grade
+                </span>
                 class {{ round_grade.class_.name }} ?
             </div>
         </div>
@@ -67,7 +68,7 @@
         <a aria-disabled="true" class="ui teal labeled icon button"
             href="{{ url_for('admin.round_grades.change_release_status', round_grade_id=round_grade.id) }}">
             <i class="share alternate icon"></i>
-            {{'Release' if round_grade.release_status == 'unreleased' else "Unrelease"}}
+            {{ 'Release' if round_grade.release_status == 'unreleased' else "Unrelease" }}
         </a>
         <div class="ui black deny button">
             No
@@ -84,6 +85,11 @@
                 hide: 70
             }
         });
+    function showRelease() {
+        $('.ui.modal.release.grade')
+            .modal('show')
+            ;
+    }
 </script>
 {% endblock additional_js %}
 

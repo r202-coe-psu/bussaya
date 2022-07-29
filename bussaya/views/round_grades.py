@@ -36,10 +36,8 @@ def create_student_grade(class_, round_grade, student, lecturer):
     student_grade.round_grade = round_grade
     student_grade.student = student
     student_grade.lecturer = lecturer
-    student_projects = models.Project.objects(class_=class_)
-    for project in student_projects:
-        if student in project.students:
-            student_grade.project = project
+    if student.get_project():
+        student_grade.project
 
     student_grade.save()
     if student.username not in round_grade.student_ids:
@@ -143,8 +141,6 @@ def grading(round_grade_id):
             {"student_id": str(s.student.id), "result": s.result}
         )
 
-    print(form.data)
-
     return render_template(
         "round_grades/grading.html",
         form=form,
@@ -161,9 +157,9 @@ def submit_grade(round_grade_id):
     round_grade = models.RoundGrade.objects.get(id=round_grade_id)
     class_ = round_grade.class_
     user = current_user._get_current_object()
-    # student_grades = models.StudentGrade.objects(round_grade=round_grade, lecturer=user)
 
     form = forms.round_grades.GroupGradingForm()
+
     if not form.validate_on_submit():
         return redirect(url_for("round_grades.grading", round_grade_id=round_grade_id))
 
@@ -184,7 +180,13 @@ def submit_grade(round_grade_id):
             meeting.save()
         student_grade.save()
 
-    return redirect(url_for("round_grades.grading", round_grade_id=round_grade.id))
+    return redirect(
+        url_for(
+            "round_grades.view",
+            class_id=class_.id,
+            round_grade_type=round_grade.type,
+        )
+    )
 
 
 @module.route("/<class_id>/round_grades/view-total-round_grade")

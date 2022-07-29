@@ -26,21 +26,26 @@
 <table class="ui celled table">
     <thead>
         <th>No. </th>
-        <th>ID</th>
+        <th>Project</th>
         <th>Student Name</th>
+        <th>Student ID</th>
         <th>Group</th>
     </thead>
     <tbody>
         {% for student in students %}
+        {% set project = student.get_project() %}
         <tr>
             <td>
                 {{ loop.index }}
             </td>
             <td>
-                {{ student.username }}
+                {{ project.name }}
             </td>
             <td>
                 {{ student.get_fullname() }}
+            </td>
+            <td>
+                {{ student.username }}
             </td>
             <td>
                 {{ student.get_group(class_).name }}

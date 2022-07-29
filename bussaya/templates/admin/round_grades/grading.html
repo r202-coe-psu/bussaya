@@ -46,18 +46,11 @@
                 {% set student = student_grade.student %}
 
                 <tr>
-                    <td>{{loop.index}}</td>
+                    <td>{{ loop.index }}</td>
                     <td>{{ student.username }}</td>
                     <td>{{ student.first_name }} {{ student.last_name }}</td>
                     <td>{{ student_grade.get_result_display() }}</td>
                     <td>
-                        {#
-                        {{ renderer.render_select(form.result) }}
-                        <a class="ui green button"
-                            href="{{ url_for('admin.round_grades.grading', round_grade_id=round_grade.id, student_id=student_grade.student.id) }}">
-                            Grading
-                        </a>
-                        #}
                         {% set grading = form.gradings[loop.index - 1] %}
                         <div id="{{grading.id}}">
                             {{ grading.student_id }}
@@ -125,10 +118,12 @@
             </tbody>
         </table>
     </div>
-    <button type="submit" style="margin-top: 1em; padding: 0.7em 2.5em 0.7em 2.5em"
-        class="ui right floated large primary icon button" id="submit-button">
-        <i class="save icon"></i> Save
-    </button>
+    <div style="margin-bottom: 5em">
+        <button type="submit" style="margin-top: 1em; padding: 0.7em 2.5em 0.7em 2.5em"
+            class="ui right floated large primary icon button" id="submit-button">
+            <i class="save icon"></i> Save
+        </button>
+    </div>
 </form>
 
 {% endblock %}
@@ -136,20 +131,6 @@
 
 {% block additional_js %}
 <script type="text/javascript">
-    function showRelease() {
-        $('.ui.modal.release.round_grade')
-            .modal('show')
-            ;
-    }
-</script>
-<script type="text/javascript">
-    var form = document.getElementById("form-round_grade");
-    if ('{{ request.path }}'.includes('grading')) {
-        document.getElementById("submit-button").addEventListener("click", function () {
-            form.submit();
-        });
-    }
-
     function accordion_show_hide(show_hide_id) {
         $(document.getElementById(show_hide_id + " content")).transition('fade down')
 

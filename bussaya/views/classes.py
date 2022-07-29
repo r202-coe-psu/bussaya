@@ -72,10 +72,10 @@ def view_student(class_id):
     meetings = models.Meeting.objects.all().filter(class_=class_)
     user = current_user._get_current_object()
 
-    grades = models.Grade.objects(class_=class_)
+    round_grades = models.RoundGrade.objects(class_=class_)
 
     grade_released = False
-    for grade in grades:
+    for grade in round_grades:
         if grade.release_status == "released":
             grade_released = True
 

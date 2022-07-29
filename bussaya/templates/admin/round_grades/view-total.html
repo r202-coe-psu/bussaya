@@ -126,13 +126,6 @@
     }
 </script>
 <script type="text/javascript">
-    var form = document.getElementById("form-round_grade");
-    if ('{{ request.path }}'.includes('grading')) {
-        document.getElementById("submit-button").addEventListener("click", function () {
-            form.submit();
-        });
-    }
-
     function accordion_show_hide(show_hide_id) {
         $(document.getElementById(show_hide_id + " content")).transition('fade down')
 

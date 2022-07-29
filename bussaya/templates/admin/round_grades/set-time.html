@@ -24,25 +24,19 @@
 
 
 <h3 class="ui header horizontal divider">
-    {{ 'Edit' if 'edit' in request.path else 'Set Time' }}
+    Set Time
     {{ round_grade.get_type_display() }}
 </h3>
 <div class="row">
-    <form method="POST" class="ui form" id="form-round_grade">
+    <form method="POST" class="ui form">
         <div class="ui segment">
             {{ form.csrf_token }}
-            <div class="two fields">
-                <div class="field">
-                    {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
-                </div>
-                <div class="field">
-                    {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
-                </div>
-            </div>
-            <div class="ui bottom attached large primary icon button" id="submit-button">
+            {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
+            {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
+            <button type="submit" class="ui large primary icon button" id="submit-button">
                 <i class="clock icon"></i>
-                {{ 'Edit' if 'edit' in request.path else 'Set Time' }}
-            </div>
+                Set Time
+            </button>
         </div>
     </form>
 </div>
@@ -51,12 +45,6 @@
 
 {% block additional_js %}
 <script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
-<script type="text/javascript">
-    var form = document.getElementById("form-round_grade");
-    document.getElementById("submit-button").addEventListener("click", function () {
-        form.submit();
-    });
-</script>
 <script type="text/javascript">
     datetime_formatter = {
         datetime: function (datetime, settings) {
