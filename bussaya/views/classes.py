@@ -52,6 +52,17 @@ def view_lecturer(class_id):
         class_=class_, project__in=projects
     )
 
+    student_ids = class_.student_ids
+
+    students = models.User.objects(username__in=student_ids)
+
+    advisee_projects = models.Project.objects(
+        advisor=current_user._get_current_object(), students__in=students
+    )
+    committee_projects = models.Project.objects(
+        committees=current_user._get_current_object(), students__in=students
+    )
+
     return render_template(
         "/classes/view-lecturer.html",
         class_=class_,
@@ -59,6 +70,8 @@ def view_lecturer(class_id):
         projects=projects,
         meeting_reports=meeting_reports,
         progress_reports=progress_reports,
+        advisee_projects=advisee_projects,
+        committee_projects=committee_projects,
     )
 
 

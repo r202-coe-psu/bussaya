@@ -3,7 +3,7 @@
 {% import '/base/error-handler.html' as eh %}
 {% import '/base/html-renderer.html' as renderer %}
 {% import '/navbar/class-navbar.html' as renderer_navbar %}
-{% import '/admin/classes/project-renderer.html' as renderer_project %}
+{% import '/dashboard/project-renderer.html' as renderer_project %}
 
 {% block breadcrumbs %}
 <div class="ui breadcrumb">
@@ -113,48 +113,8 @@
     <div class="ui divider"></div>
 
     <h3 class="ui header">Report / Presentation</h3>
-    <table class="ui selectable celled table">
-        <thead>
-            <tr>
-                <th>Type</th>
-                <th>Round</th>
-                <th>Description</th>
-                <th>Started Date</th>
-                <th>Ended Date</th>
-                <th>Extended Date</th>
-            </tr>
-        </thead>
-
-        <body>
-            {% for report in progress_reports %}
-            <tr>
-                <td>
-                    <a href="{{ url_for('submissions.view', submission_id=submission.id)}}">
-                        {{ submission.get_type_display() }}
-                    </a>
-                </td>
-                <td>
-                    {{ submission.get_round_display() }}
-                </td>
-                <td>
-                    {{ submission.description}}
-                </td>
-                <td>
-                    {{ submission.natural_started_date() }}
-                </td>
-                <td>
-                    {{ submission.natural_ended_date() }}
-                </td>
-                <td>
-                    {{ submission.natural_extended_date() }}
-                </td>
-            </tr>
-            {% endfor %}
-        </body>
-    </table>
-
+    {{ renderer_project.render_project_section([], current_user, advisee_projects, committee_projects) }}
 </div>
-
 {% endblock %}
 
 {% block additional_js %}
