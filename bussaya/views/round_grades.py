@@ -2,14 +2,14 @@ from flask import Blueprint, render_template, redirect, url_for, send_file, requ
 from flask_login import login_required, current_user
 from bussaya import forms, models, acl
 
-module = Blueprint("grades", __name__, url_prefix="/grades")
+module = Blueprint("round_grades", __name__, url_prefix="/round_grades")
 
 
 @module.route("/<class_id>")
 @login_required
 def index(class_id):
     class_ = models.Class.objects.get(id=class_id)
-    return render_template("/grades/index.html", class_=class_)
+    return render_template("/round_grades/index.html", class_=class_)
 
 
 def get_lecturers_project_of_student(username):
@@ -21,47 +21,46 @@ def get_lecturers_project_of_student(username):
     project = student.get_project()
     if project:
         if project.committees:
-            lecturers = project.committees
             lecturers.append(project.advisor)
+            for committee in project.committees:
+                lecturers.append(committee)
         else:
             lecturers = [project.advisor]
 
     return lecturers
 
 
-def create_student_grade(class_, grade, student, lecturer):
+def create_student_grade(class_, round_grade, student, lecturer):
     student_grade = models.StudentGrade()
     student_grade.class_ = class_
-    student_grade.grade = grade
+    student_grade.round_grade = round_grade
     student_grade.student = student
     student_grade.lecturer = lecturer
-    student_projects = models.Project.objects(class_=class_)
-    for project in student_projects:
-        if student in project.students:
-            student_grade.project = project
+    if student.get_project():
+        student_grade.project
 
     student_grade.save()
-    if student.username not in grade.student_ids:
-        grade.student_ids.append(student.username)
+    if student.username not in round_grade.student_ids:
+        round_grade.student_ids.append(student.username)
 
-    grade.student_grades.append(student_grade)
-    grade.save()
+    round_grade.student_grades.append(student_grade)
+    round_grade.save()
 
 
-@module.route("/<class_id>/<grade_type>/view")
-@login_required
-def view(class_id, grade_type):
+@module.route("/<class_id>/<round_grade_type>/view")
+@acl.roles_required("lecturer")
+def view(class_id, round_grade_type):
     class_ = models.Class.objects.get(id=class_id)
-    grades = models.Grade.objects.all().filter(class_=class_)
+    round_grades = models.RoundGrade.objects.all().filter(class_=class_)
     user = current_user._get_current_object()
     # Create Midterm and Final Grade
-    if not grades:
-        midterm = models.Grade()
+    if not round_grades:
+        midterm = models.RoundGrade()
         midterm.type = "midterm"
         midterm.class_ = class_
         midterm.save()
 
-        final = models.Grade()
+        final = models.RoundGrade()
         final.type = "final"
         final.class_ = class_
         final.save()
@@ -69,10 +68,10 @@ def view(class_id, grade_type):
         midterm.save()
         final.save()
 
-    midterm = models.Grade.objects.get(type="midterm", class_=class_)
-    final = models.Grade.objects.get(type="final", class_=class_)
+    midterm = models.RoundGrade.objects.get(type="midterm", class_=class_)
+    final = models.RoundGrade.objects.get(type="final", class_=class_)
 
-    # Project create after grade has been created.
+    # Project create after round_grade has been created.
     for id in class_.student_ids:
         student = models.User.objects(username=id).first()
         if not student or not student.has_roles("student"):
@@ -93,10 +92,10 @@ def view(class_id, grade_type):
                 continue
 
             old_midterm_Grade = models.StudentGrade.objects(
-                student=student, grade=midterm, class_=class_
+                student=student, round_grade=midterm, class_=class_
             )
             old_final_Grade = models.StudentGrade.objects(
-                student=student, grade=final, class_=class_
+                student=student, round_grade=final, class_=class_
             )
 
             old_midterm_Grade.delete()
@@ -108,98 +107,107 @@ def view(class_id, grade_type):
     midterm.save()
     final.save()
 
-    grade = models.Grade.objects.get(type=grade_type, class_=class_)
+    round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
     student_grades = models.StudentGrade.objects(
-        class_=class_, lecturer=user, grade=grade
+        class_=class_, lecturer=user, round_grade=round_grade
     )
 
     student_grades = sorted(student_grades, key=lambda s: s.student.username)
 
-    if current_user.has_roles("admin"):
-        grade_html = "/admin/grades/view.html"
-    else:
-        grade_html = "/grades/view.html"
-
     return render_template(
-        grade_html,
+        "/round_grades/view.html",
         user=user,
         class_=class_,
-        grade=grade,
-        grade_type=grade_type,
+        round_grade=round_grade,
+        round_grade_type=round_grade_type,
         student_grades=student_grades,
     )
 
 
-@module.route("/<grade_id>/grading", methods=["GET", "POST"])
-@login_required
-def grading(grade_id):
-    grade = models.Grade.objects.get(id=grade_id)
-    class_ = grade.class_
+@module.route("/<round_grade_id>/grading", methods=["GET", "POST"])
+@acl.roles_required("lecturer")
+def grading(round_grade_id):
+    round_grade = models.RoundGrade.objects.get(id=round_grade_id)
+    class_ = round_grade.class_
     user = current_user._get_current_object()
     student_grades = models.StudentGrade.objects.all().filter(
-        grade=grade, lecturer=user
+        round_grade=round_grade, lecturer=user
     )
     student_grades = sorted(student_grades, key=lambda s: s.student.username)
 
-    if current_user.has_roles("admin"):
-        grade_html = "/admin/grades/view.html"
-    else:
-        grade_html = "/grades/view.html"
-
-    if request.method == "POST":
-        if not grade.is_in_time():
-            return redirect(
-                url_for(grade_html, class_id=class_.id, grade_type=grade.type)
-            )
-
-        else:
-            for student_grade in student_grades:
-                result = request.form.get(str(student_grade.id))
-                student_grade.result = result
-
-                get_lecturers_project_of_student(student_grade.student.username)
-
-                if result != "-":
-                    meetings = models.MeetingReport.objects(
-                        class_=class_, owner=student_grade.student
-                    )
-                    for meeting in meetings:
-                        meeting.status = "approved"
-                        meeting.save()
-                student_grade.save()
-
-        return redirect(
-            url_for("grades.view", class_id=class_.id, grade_type=grade.type)
+    form = forms.round_grades.GroupGradingForm()
+    for s in student_grades:
+        form.gradings.append_entry(
+            {"student_id": str(s.student.id), "result": s.result}
         )
 
     return render_template(
-        grade_html,
+        "round_grades/grading.html",
+        form=form,
         class_=class_,
-        grade=grade,
+        round_grade=round_grade,
         user=user,
         student_grades=student_grades,
     )
 
 
-@module.route("/<class_id>/grades/view-total-grade")
+@module.route("/<round_grade_id>/submit_grade", methods=["GET", "POST"])
+@acl.roles_required("lecturer")
+def submit_grade(round_grade_id):
+    round_grade = models.RoundGrade.objects.get(id=round_grade_id)
+    class_ = round_grade.class_
+    user = current_user._get_current_object()
+
+    form = forms.round_grades.GroupGradingForm()
+
+    if not form.validate_on_submit():
+        return redirect(url_for("round_grades.grading", round_grade_id=round_grade_id))
+
+    for grading in form.gradings.data:
+        print("grading", grading)
+        student = models.User.objects.get(id=grading["student_id"])
+        student_grade = models.StudentGrade.objects(
+            student=student, class_=class_, round_grade=round_grade, lecturer=user
+        ).first()
+
+        student_grade.result = grading["result"]
+
+        meetings = models.MeetingReport.objects(
+            class_=class_, owner=student_grade.student
+        )
+        for meeting in meetings:
+            meeting.status = "approved"
+            meeting.save()
+        student_grade.save()
+
+    return redirect(
+        url_for(
+            "round_grades.view",
+            class_id=class_.id,
+            round_grade_type=round_grade.type,
+        )
+    )
+
+
+@module.route("/<class_id>/round_grades/view-total-round_grade")
 @acl.roles_required("student")
 def view_student_grades(class_id):
     student = current_user._get_current_object()
     class_ = models.Class.objects.get(id=class_id)
 
     project = student.get_project()
-    grades = models.Grade.objects.all().filter(class_=class_)
+    round_grades = models.RoundGrade.objects.all().filter(class_=class_)
 
     total_grade = 0
     average_total_grade = 0
-    for grade in grades:
-        average_grade = student.get_average_grade(grade).lower()
-        if grade.type == "midterm":
+    for round_grade in round_grades:
+        average_grade = student.get_average_grade(round_grade).lower()
+        if round_grade.type == "midterm":
             grade_ratio = 0.4
-        if grade.type == "final":
+        if round_grade.type == "final":
             grade_ratio = 0.6
 
-        if average_grade == "incomplete" or grade.release_status == "unreleased":
+        if average_grade == "incomplete" or round_grade.release_status == "unreleased":
             average_total_grade = "Incomplete"
             break
 
@@ -239,10 +247,10 @@ def view_student_grades(class_id):
             average_total_grade = "E"
 
     return render_template(
-        "/grades/view-student.html",
+        "/round_grades/view-student.html",
         student=student,
         class_=class_,
         project=project,
-        grades=grades,
+        round_grades=round_grades,
         average_total_grade=average_total_grade,
     )

@@ -7,7 +7,7 @@
     <div class="divider"> / </div>
     <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
     <div class="divider"> / </div>
-    <a href="{{ url_for('grades.view_student_grades', class_id=class_.id) }}">View Grades</a>
+    <a href="{{ url_for('round_grades.view_student_grades', class_id=class_.id) }}">View Grades</a>
 </div>
 {% endblock %}
 
@@ -19,7 +19,7 @@
         <i class="user graduate icon"></i>
         <div class="content">
             Student
-            <div class="sub header">{{student.username}}: {{student.get_fullname()}}</div>
+            <div class="sub header">{{ student.username }}: {{ student.get_fullname() }}</div>
         </div>
     </h2>
 </div>
@@ -44,7 +44,7 @@
                 <td>Committees</td>
                 <td>
                     {% for committee in project.committees %}
-                    {{committee.title}} {{ committee.get_fullname() }} {{', ' if not loop.last }}
+                    {{ committee.title }} {{ committee.get_fullname() }} {{', ' if not loop.last }}
                     {% endfor %}
                 </td>
             </tr>
@@ -56,15 +56,15 @@
     Grade
 </h3>
 
-{% for grade in grades %}
+{% for round_grade in round_grades %}
 <div class="ui segment">
-    <h4>{{ grade.get_type_display() }}</h4>
+    <h4>{{ round_grade.get_type_display() }}</h4>
     <table class="ui definition table">
         <tbody>
             <tr>
                 <td class="three wide column">Average Grade Point</td>
                 <td>
-                    {{ student.get_average_grade(grade) if grade.release_status == "released" else "-" }}
+                    {{ student.get_average_grade(round_grade) if round_grade.release_status == "released" else "-" }}
                 </td>
             </tr>
         </tbody>
@@ -79,7 +79,7 @@
             <tr>
                 <td class="three wide column">Average Grade Point</td>
                 <td>
-                    {{average_total_grade}}
+                    {{ average_total_grade }}
                 </td>
             </tr>
         </tbody>

@@ -1,25 +1,26 @@
-{% macro render_admin_grade_menu_toolbars(grade) %}
+{% macro render_admin_grade_menu_toolbars(round_grade) %}
 <h2 class="ui header">
     {{'Total' if 'total' in request.path }}
     {{ 'View' if 'total' not in request.path and 'view' in request.path }}
     {{'Grading' if 'grading' in request.path}}
-    {{ grade.get_type_display() }} Grade
+    {{ round_grade.get_type_display() }} Grade
 </h2>
 <div class="ui divider"></div>
 
 <div class="ui segment">
     <a class="ui primary labeled icon button"
-        href="{{ url_for('grades.view', class_id=grade.class_.id, grade_type=grade.type) }}">
+        href="{{ url_for('admin.round_grades.view', class_id=round_grade.class_.id, round_grade_type=round_grade.type) }}">
         <i class="eye icon"></i>
         View
     </a>
     <a class="ui primary labeled icon button"
-        href="{{ url_for('admin.grades.view_total', class_id=grade.class_.id, grade_type=grade.type) }}">
+        href="{{ url_for('admin.round_grades.view_total', class_id=round_grade.class_.id, round_grade_type=round_grade.type) }}">
         <i class="portrait icon"></i>
         View Total
     </a>
-    {% if grade.is_in_time() %}
-    <a class="ui green labeled icon button" href="{{ url_for('grades.grading', grade_id=grade.id) }}">
+    {% if round_grade.is_in_time() %}
+    <a class="ui green labeled icon button"
+        href="{{ url_for('admin.round_grades.grading', round_grade_id=round_grade.id) }}">
         <i class="edit icon"></i>
         Grading
     </a>
@@ -30,40 +31,44 @@
     </a>
     {% endif %}
     <a aria-disabled="true" class="ui orange labeled icon button"
-        href="{{ url_for('admin.grades.set_time', grade_id=grade.id) }}">
+        href="{{ url_for('admin.round_grades.set_time', round_grade_id=round_grade.id) }}">
         <i class="clock icon"></i>
         Set Time Off Grading System
     </a>
     <a aria-disabled="true" class="ui teal labeled icon button" onclick="showRelease()">
         <i class="share alternate icon"></i>
-        {{'Release' if grade.release_status == 'unreleased' else "Unrelease"}} {{ grade.get_type_display() }} Grade
+        {{'Release' if round_grade.release_status == 'unreleased' else "Unrelease"}}
+        {{ round_grade.get_type_display() }} Grade
     </a>
     <div class="ui large info message">
-        <b>Time off date:</b> {{ grade.natural_ended_date() }} <br>
-        <b>Remaining Time:</b> {{ grade.remain_time()[1] }} <br>
-        <b>Release Status:</b> {{ grade.get_release_status_display() }} <br>
+        <b>Time off date:</b> {{ round_grade.natural_ended_date() }} <br>
+        <b>Remaining Time:</b> {{ round_grade.remain_time()[1] }} <br>
+        <b>Release Status:</b> {{ round_grade.get_release_status_display() }} <br>
     </div>
 </div>
 
 <div class="ui modal release grade">
     <i class="close icon"></i>
     <div class="header">
-        {{'Release' if grade.release_status == 'unreleased' else "Unrelease"}} {{ grade.get_type_display() }} Grade
+        {{ 'Release' if round_grade.release_status == 'unreleased' else "Unrelease" }}
+        {{ round_grade.get_type_display() }} Grade
     </div>
     <div class="image content">
         <div class="description">
             <div class="ui small header">Are you sure you want to
-                <span class="ui blue text">{{'Release' if grade.release_status == 'unreleased' else "Unrelease"}} {{
-                    grade.get_type_display() }} Grade</span>
-                class {{ grade.class_.name }} ?
+                <span class="ui blue text">
+                    {{ 'Release' if round_grade.release_status == 'unreleased' else "Unrelease" }}
+                    {{ round_grade.get_type_display() }} Grade
+                </span>
+                class {{ round_grade.class_.name }} ?
             </div>
         </div>
     </div>
     <div class="actions">
         <a aria-disabled="true" class="ui teal labeled icon button"
-            href="{{ url_for('admin.grades.change_release_status', grade_id=grade.id) }}">
+            href="{{ url_for('admin.round_grades.change_release_status', round_grade_id=round_grade.id) }}">
             <i class="share alternate icon"></i>
-            {{'Release' if grade.release_status == 'unreleased' else "Unrelease"}}
+            {{ 'Release' if round_grade.release_status == 'unreleased' else "Unrelease" }}
         </a>
         <div class="ui black deny button">
             No
@@ -80,6 +85,11 @@
                 hide: 70
             }
         });
+    function showRelease() {
+        $('.ui.modal.release.grade')
+            .modal('show')
+            ;
+    }
 </script>
 {% endblock additional_js %}
 

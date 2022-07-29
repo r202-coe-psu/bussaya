@@ -1,7 +1,8 @@
 {% extends '/admin/classes/index.html' %}
 {% import '/base/error-handler.html' as eh %}
-{% import '/admin/classes/project-renderer.html' as renderer %}
+{% import '/base/html-renderer.html' as renderer %}
 {% import '/navbar/class-navbar.html' as renderer_navbar %}
+{% import '/admin/round_grades/admin-grade-menu-toolbars.html' as render_toolbars %}
 
 {% block breadcrumbs %}
 <div class="ui breadcrumb">
@@ -9,10 +10,13 @@
     <div class="divider"> / </div>
     <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
     <div class="divider"> / </div>
-    Grading:
-    <a href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">
-        {{ grade.get_type_display() }}
+    <a href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
+        {{ round_grade.get_type_display() }}
     </a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.round_grades.view_total', class_id=class_.id, round_grade_type=round_grade.type) }}">View
+        Total
+        Grade</a>
 </div>
 {% endblock %}
 
@@ -21,32 +25,9 @@
 
 {{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
-<h2 class="ui header">
-    {{ "View" if 'view' in request.path }}
-    {{ "Grading" if 'grading' in request.path }}
-    {{ "Total" if 'total' in request.path }}
-    {{ grade.get_type_display() }} Grade</h2>
-<div class="ui divider"></div>
+{{ render_toolbars.render_admin_grade_menu_toolbars(round_grade) }}
 
-<div class="ui segment">
-    <a class="ui primary labeled icon button"
-        href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">
-        <i class="eye icon"></i>
-        View
-    </a>
-    <a class="ui {{'green' if grade.is_in_time() else 'disabled'}} labeled icon button"
-        href="{{ url_for('grades.grading', grade_id=grade.id) }}">
-        <i class="edit icon"></i>
-        Grading
-    </a>
-    <div class="ui large info message">
-        <b>Time off date:</b> {{ grade.natural_ended_date() }} <br>
-        <b>Remaining Time:</b> {{grade.remain_time()[1]}} <br>
-        <b>Release Status:</b> {{ grade.get_release_status_display() }} <br>
-    </div>
-</div>
-
-<form method="POST" id="form-grade">
+<form method="POST" id="form-round_grade">
     <div class="ui attached segment">
         <table class="ui celled structured single line table">
             <thead>
@@ -54,10 +35,7 @@
                     <th class="one wide"></th>
                     <th class="two wide">Student ID</th>
                     <th class="four wide">Student Name</th>
-                    <th class="one wide">Given Grade</th>
-                    {% if not "grading" in request.path %}
                     <th class="one wide">Average Grade</th>
-                    {% endif %}
                     <th>Total Grade</th>
                     <th class="two wide">Submissions</th>
                 </tr>
@@ -65,38 +43,15 @@
             <tbody>
                 {% set index = namespace(value=1) %}
                 {% for student_grade in student_grades %}
-
                 {% set student = student_grade.student %}
-                {% set group = current_user.get_group(class_= class_) %}
-
-                {% if student_grade.lecturer == current_user %}
-                {% if student in group.students %}
                 <tr>
                     <td>{{index.value}}</td>
                     {% set index.value = index.value + 1 %}
                     <td>{{ student.username }}</td>
                     <td>{{ student.first_name }} {{ student.last_name }}</td>
                     <td>
-                        {% if 'grading' not in request.path %}
-                        {{ student_grade.get_result_display() }}
-                        {% else %}
-                        <div class="ui input">
-                            <select class="ui selection dropdown" name="{{student_grade.id}}">
-                                {% for choice in student_grade.get_result_choice() %}
-                                <option {% if student_grade.result==choice[0] %} selected="selected" {% endif %}
-                                    value={{choice[0]}}>
-                                    {{ choice[1] }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        {% endif %}
+                        {{ student.get_average_grade(student_grade.round_grade) }}
                     </td>
-                    {% if not "grading" in request.path %}
-                    <td>
-                        {{ student.get_average_grade(student_grade.grade) }}
-                    </td>
-                    {% endif %}
                     <td>
                         <div class="title">
                             <a id="{{student_grade.id}}" style="cursor: pointer"
@@ -106,7 +61,7 @@
                         </div>
                         <div id="{{student_grade.id}} content" class="content" style="display: none">
                             <p />
-                            {% for student_grade in student.get_total_student_grades(grade) %}
+                            {% for student_grade in student.get_total_student_grades(round_grade) %}
                             <div class="ui relaxed divided list">
                                 <div class="item">
                                     {% if student_grade.lecturer.get_picture() %}
@@ -153,28 +108,24 @@
                     </td>
 
                 </tr>
-                {% endif %}
-                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    {% if 'grading' in request.path %}
-    <div class="ui bottom attached large primary icon button" id="submit-button"><i class="save icon"></i> Save</div>
-    {% endif %}
 </form>
 
 {% endblock %}
 
+
 {% block additional_js %}
 <script type="text/javascript">
-    var form = document.getElementById("form-grade");
-    if ('{{ request.path }}'.includes('grading')) {
-        document.getElementById("submit-button").addEventListener("click", function () {
-            form.submit();
-        });
+    function showRelease() {
+        $('.ui.modal.release.round_grade')
+            .modal('show')
+            ;
     }
-
+</script>
+<script type="text/javascript">
     function accordion_show_hide(show_hide_id) {
         $(document.getElementById(show_hide_id + " content")).transition('fade down')
 
@@ -188,6 +139,29 @@
     function showSetTimeOff() {
         $('.ui.time-off').transition('fade down')
     }
+</script>
+<script type="text/javascript">
+    datetime_formatter = {
+        datetime: function (datetime, settings) {
+            if (!datetime) return '';
+            var day = datetime.getDate();
+            var month = datetime.getMonth() + 1;
+            var year = datetime.getFullYear();
+            var hour = datetime.getHours();
+            var minute = datetime.getMinutes();
+            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
+        }
+    };
+    $('#rangestart').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        endCalendar: $('#rangeend')
+    });
+    $('#rangeend').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        startCalendar: $('#rangestart')
+    });
 </script>
 <script type="text/javascript">
     $('.icon.link.pop')

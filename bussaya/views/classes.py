@@ -72,10 +72,10 @@ def view_student(class_id):
     meetings = models.Meeting.objects.all().filter(class_=class_)
     user = current_user._get_current_object()
 
-    grades = models.Grade.objects(class_=class_)
+    round_grades = models.RoundGrade.objects(class_=class_)
 
     grade_released = False
-    for grade in grades:
+    for grade in round_grades:
         if grade.release_status == "released":
             grade_released = True
 
@@ -109,16 +109,16 @@ def get_student_group(student_id, class_id):
     return ""
 
 
-@module.route("/<class_id>/student_ids")
+@module.route("/<class_id>/students")
 @login_required
 def view_students(class_id):
     class_ = models.Class.objects.get(id=class_id)
-    projects = models.Project.objects(
-        me.Or(
-            creators=current_user._get_current_object(),
-            students=current_user._get_current_object(),
-        )
-    )
+    # projects = models.Project.objects(
+    #     me.Or(
+    #         creators=current_user._get_current_object(),
+    #         students=current_user._get_current_object(),
+    #     )
+    # )
 
     students = []
     for id in class_.student_ids:

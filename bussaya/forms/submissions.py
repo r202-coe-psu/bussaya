@@ -12,7 +12,7 @@ from flask_mongoengine.wtf import model_form
 
 from bussaya import models
 
-BaseProjectForm = model_form(
+BaseSubmissionForm = model_form(
     models.Submission,
     FlaskForm,
     exclude=[
@@ -32,7 +32,7 @@ BaseProjectForm = model_form(
 )
 
 
-class SubmissionForm(BaseProjectForm):
+class SubmissionForm(BaseSubmissionForm):
     started_date = fields.DateTimeField(
         "Started Date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
     )

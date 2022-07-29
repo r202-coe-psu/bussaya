@@ -83,15 +83,15 @@ class User(me.Document, UserMixin):
             if self in group.committees:
                 return group
 
-    def get_total_student_grades(self, grade):
+    def get_total_student_grades(self, round_grade):
         student_grades = models.StudentGrade.objects.all().filter(
-            student=self, class_=grade.class_, grade=grade
+            student=self, class_=round_grade.class_, round_grade=round_grade
         )
         return student_grades
 
-    def get_average_grade(self, grade):
+    def get_average_grade(self, round_grade):
         student_grades = models.StudentGrade.objects.all().filter(
-            student=self, class_=grade.class_, grade=grade
+            student=self, class_=round_grade.class_, round_grade=round_grade
         )
 
         total_student_grade = []
@@ -114,10 +114,10 @@ class User(me.Document, UserMixin):
             advisor_grade_ratio = 0.6
             committee_grade_ratio = 0.4
 
-        for grade in total_student_grade:
-            grade_point = grade.get_grade_point()
+        for round_grade in total_student_grade:
+            grade_point = round_grade.get_grade_point()
 
-            if grade.lecturer in project.committees:
+            if round_grade.lecturer in project.committees:
                 committees_grade_point += grade_point
 
             else:
