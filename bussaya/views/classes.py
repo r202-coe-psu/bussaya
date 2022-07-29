@@ -26,7 +26,7 @@ def index():
 def view(class_id):
     # if "admin" in current_user.roles:
     #     return redirect(url_for("admin.classes.view", class_id=class_id))
-    if "CoE-lecturer" in current_user.roles:
+    if "CoE-lecturer" in current_user.roles or "lecturer" in current_user.roles:
         return view_lecturer(class_id)
     if "student" in current_user.roles:
         return view_student(class_id)

@@ -79,6 +79,29 @@ class Project(me.Document):
     committees_label_modifier = lambda c: f"{c.first_name} {c.last_name}"
     students_label_modifier = lambda s: f"{s.username} - {s.first_name} {s.last_name}"
 
+    def get_opened_class(self):
+        from .classes import Class
+
+        student_ids = []
+        if self.creator:
+            student_ids.append(self.creator.username)
+        for u in self.students:
+            if u.username not in student_ids:
+                student_ids.append(u.username)
+
+        now = datetime.datetime.now()
+        return Class.objects(
+            started_date__lte=now, ended_date__gte=now, student_ids__in=student_ids
+        ).first()
+
+    def get_progress_reports(self):
+        from .submissions import ProgressReport
+
+        class_ = self.get_opened_class()
+        return ProgressReport.objects(
+            class_=class_,
+        )
+
     def get_resource(self, type_):
         resources = reversed(self.resources)
         for r in resources:

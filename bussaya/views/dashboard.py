@@ -9,28 +9,6 @@ import datetime
 module = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
 
-def get_current_class():
-    class_ = models.Class.objects().order_by("-id").first()
-    advisees = models.Project.objects(
-        advisor=current_user._get_current_object(), class_=class_
-    )
-    committees = models.Project.objects(
-        committees=current_user._get_current_object(), class_=class_
-    )
-
-    alumni_projects = models.Project.objects(
-        advisor=current_user._get_current_object(),
-        class___ne=class_,
-    )
-    data = dict(
-        class_=class_,
-        advisees=advisees,
-        committees=committees,
-        alumni_projects=alumni_projects,
-    )
-    return data
-
-
 @module.route("/admin")
 @login_required
 def index_admin():
@@ -57,14 +35,31 @@ def index_lecturer():
     classes = models.Class.objects.all()
     user = current_user._get_current_object()
 
-    # for class_ in classes:
-    #     if class_.is_in_time():
-    #         opened_classes.append(class_)
+    student_ids = []
+    for oc in opened_classes:
+        student_ids.extend(oc.student_ids)
+
+    students = models.User.objects(username__in=student_ids)
+
+    advisee_projects = models.Project.objects(
+        advisor=current_user._get_current_object(), students__in=students
+    )
+    committee_projects = models.Project.objects(
+        committees=current_user._get_current_object(), students__in=students
+    )
+
+    alumni_projects = models.Project.objects(
+        advisor=current_user._get_current_object(),
+        class___nin=opened_classes,
+    ).order_by("-id")
 
     return render_template(
         "/dashboard/index-lecturer.html",
         classes=classes,
         opened_classes=opened_classes,
+        alumni_projects=alumni_projects,
+        advisee_projects=advisee_projects,
+        committee_projects=committee_projects,
     )
 
 

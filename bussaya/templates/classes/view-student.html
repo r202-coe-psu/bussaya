@@ -122,7 +122,7 @@
 					{% if meeting.get_status() == "opened" or meeting.get_status() == "lated" %}
 					{% if meeting_report %}
 					<a class="ui fluid icon primary button"
-						href="{{ url_for('meetings.edit_report', meeting_report_id=meeting_report.id)}}">
+						href="{{ url_for('meetings.report',meeting_id=meeting.id,  meeting_report_id=meeting_report.id)}}">
 						<i class="edit icon"></i>
 						Edit
 					</a>
