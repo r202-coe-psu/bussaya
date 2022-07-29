@@ -1,5 +1,4 @@
-from wtforms import fields
-from wtforms import widgets
+from wtforms import fields, widgets, Form
 
 from bussaya.forms.projects import BaseProjectForm
 
@@ -11,30 +10,44 @@ from flask_mongoengine.wtf import model_form
 
 from bussaya import models
 
-BaseProjectForm = model_form(
-    models.Grade,
+BaseRoundGradeForm = model_form(
+    models.RoundGrade,
     FlaskForm,
     exclude=[
-        "type" "class_",
+        "type",
+        "class_",
         "student_ids",
         "student_grades",
         "started_date",
         "ended_date",
         "created_date",
         "updated_date",
-        "grade",
     ],
-    field_args={
-        "grade": {"label": "Grade"},
-        "description": {"label": "Description"},
-    },
 )
 
 
-class GradeForm(BaseProjectForm):
+class RoundGradeForm(BaseRoundGradeForm):
     started_date = fields.DateTimeField(
         "Started Date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
     )
     ended_date = fields.DateTimeField(
         "Ended date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
     )
+
+
+BaseStudentGradeForm = model_form(
+    models.StudentGrade,
+    Form,
+    only=["result"],
+    field_args={
+        "result": {"label": ""},
+    },
+)
+
+
+class GradingForm(BaseStudentGradeForm):
+    student_id = fields.HiddenField()
+
+
+class GroupGradingForm(FlaskForm):
+    gradings = fields.FieldList(fields.FormField(GradingForm))

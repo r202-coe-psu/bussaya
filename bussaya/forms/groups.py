@@ -10,7 +10,7 @@ from flask_mongoengine.wtf import model_form
 
 from bussaya import models
 
-BaseProjectForm = model_form(
+BaseGroupForm = model_form(
     models.Group,
     FlaskForm,
     exclude=["created_date", "class_", "committees", "students"],
@@ -20,7 +20,7 @@ BaseProjectForm = model_form(
 )
 
 
-class GroupForm(BaseProjectForm):
+class GroupForm(BaseGroupForm):
     committees = fields.SelectMultipleField(
         "Committees",
         validators=[validators.InputRequired(), validators.length(max=5, min=1)],

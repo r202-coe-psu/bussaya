@@ -2,7 +2,7 @@
 {% import '/base/html-renderer.html' as renderer %}
 
 {% block dashboard_title %}
-{{ 'Edit' if 'edit' in request.path else 'Set Time' }} {{ grade.get_type_display() }}
+{{ 'Edit' if 'edit' in request.path else 'Set Time' }} {{ round_grade.get_type_display() }}
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -11,11 +11,11 @@
     <div class="divider"> / </div>
     <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
     <div class="divider"> / </div>
-    <a href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">
-        {{ grade.get_type_display() }}
+    <a href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
+        {{ round_grade.get_type_display() }}
     </a>
     <div class="divider"> / </div>
-    <a href="{{ url_for('admin.grades.set_time', grade_id=grade.id) }}">Set Time</a>
+    <a href="{{ url_for('admin.round_grades.set_time', round_grade_id=round_grade.id) }}">Set Time</a>
 </div>
 {% endblock %}
 
@@ -25,10 +25,10 @@
 
 <h3 class="ui header horizontal divider">
     {{ 'Edit' if 'edit' in request.path else 'Set Time' }}
-    {{ grade.get_type_display() }}
+    {{ round_grade.get_type_display() }}
 </h3>
 <div class="row">
-    <form method="POST" class="ui form" id="form-grade">
+    <form method="POST" class="ui form" id="form-round_grade">
         <div class="ui segment">
             {{ form.csrf_token }}
             <div class="two fields">
@@ -52,7 +52,7 @@
 {% block additional_js %}
 <script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
 <script type="text/javascript">
-    var form = document.getElementById("form-grade");
+    var form = document.getElementById("form-round_grade");
     document.getElementById("submit-button").addEventListener("click", function () {
         form.submit();
     });

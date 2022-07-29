@@ -2,7 +2,7 @@
 {% import '/base/error-handler.html' as eh %}
 {% import '/base/html-renderer.html' as renderer %}
 {% import '/navbar/class-navbar.html' as renderer_navbar %}
-{% import '/admin/grades/admin-grade-menu-toolbars.html' as render_toolbars %}
+{% import '/admin/round_grades/admin-grade-menu-toolbars.html' as render_toolbars %}
 
 {% block breadcrumbs %}
 <div class="ui breadcrumb">
@@ -10,9 +10,11 @@
     <div class="divider"> / </div>
     <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
     <div class="divider"> / </div>
-    <a href="{{ url_for('grades.view', class_id=class_.id, grade_type=grade.type) }}">
-        {{ grade.get_type_display() }}
+    <a href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
+        {{ round_grade.get_type_display() }}
     </a>
+    <div class="divider"> / </div>
+    Grading
 </div>
 {% endblock %}
 
@@ -21,9 +23,11 @@
 
 {{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
-{{ render_toolbars.render_admin_grade_menu_toolbars(grade) }}
+{{ render_toolbars.render_admin_grade_menu_toolbars(round_grade) }}
 
-<form method="POST" id="form-grade">
+<form class="ui form" method="POST" id="form-round_grade"
+    action="{{ url_for('admin.round_grades.submit_grade', round_grade_id=round_grade.id) }}">
+    {{ form.csrf_token }}
     <div class="ui attached segment">
         <table class="ui celled structured single line table">
             <thead>
@@ -32,44 +36,34 @@
                     <th class="two wide">Student ID</th>
                     <th class="four wide">Student Name</th>
                     <th class="one wide">Given Grade</th>
-                    {% if not "grading" in request.path %}
-                    <th class="one wide">Average Grade</th>
-                    {% endif %}
+                    <th class="one wide">Grading</th>
                     <th>Total Grade</th>
                     <th class="two wide">Submissions</th>
                 </tr>
             </thead>
             <tbody>
-                {% set index = namespace(value=1) %}
                 {% for student_grade in student_grades %}
                 {% set student = student_grade.student %}
 
                 <tr>
-                    <td>{{index.value}}</td>
-                    {% set index.value = index.value + 1 %}
+                    <td>{{loop.index}}</td>
                     <td>{{ student.username }}</td>
                     <td>{{ student.first_name }} {{ student.last_name }}</td>
+                    <td>{{ student_grade.get_result_display() }}</td>
                     <td>
-                        {% if 'grading' not in request.path %}
-                        {{ student_grade.get_result_display() }}
-                        {% else %}
-                        <div class="ui input">
-                            <select class="ui selection dropdown" name="{{student_grade.id}}">
-                                {% for choice in student_grade.get_result_choice() %}
-                                <option {% if student_grade.result==choice[0] %} selected="selected" {% endif %}
-                                    value={{choice[0]}}>
-                                    {{ choice[1] }}
-                                </option>
-                                {% endfor %}
-                            </select>
+                        {#
+                        {{ renderer.render_select(form.result) }}
+                        <a class="ui green button"
+                            href="{{ url_for('admin.round_grades.grading', round_grade_id=round_grade.id, student_id=student_grade.student.id) }}">
+                            Grading
+                        </a>
+                        #}
+                        {% set grading = form.gradings[loop.index - 1] %}
+                        <div id="{{grading.id}}">
+                            {{ grading.student_id }}
+                            {{ grading.result(class_="ui dropdown ") }}
                         </div>
-                        {% endif %}
                     </td>
-                    {% if not "grading" in request.path %}
-                    <td>
-                        {{ student.get_average_grade(student_grade.grade) }}
-                    </td>
-                    {% endif %}
                     <td>
                         <div class="title">
                             <a id="{{student_grade.id}}" style="cursor: pointer"
@@ -79,7 +73,7 @@
                         </div>
                         <div id="{{student_grade.id}} content" class="content" style="display: none">
                             <p />
-                            {% for student_grade in student.get_total_student_grades(grade) %}
+                            {% for student_grade in student.get_total_student_grades(round_grade) %}
                             <div class="ui relaxed divided list">
                                 <div class="item">
                                     {% if student_grade.lecturer.get_picture() %}
@@ -126,13 +120,15 @@
                     </td>
 
                 </tr>
+
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    {% if 'grading' in request.path %}
-    <div class="ui bottom attached large primary icon button" id="submit-button"><i class="save icon"></i> Save</div>
-    {% endif %}
+    <button type="submit" style="margin-top: 1em; padding: 0.7em 2.5em 0.7em 2.5em"
+        class="ui right floated large primary icon button" id="submit-button">
+        <i class="save icon"></i> Save
+    </button>
 </form>
 
 {% endblock %}
@@ -141,13 +137,13 @@
 {% block additional_js %}
 <script type="text/javascript">
     function showRelease() {
-        $('.ui.modal.release.grade')
+        $('.ui.modal.release.round_grade')
             .modal('show')
             ;
     }
 </script>
 <script type="text/javascript">
-    var form = document.getElementById("form-grade");
+    var form = document.getElementById("form-round_grade");
     if ('{{ request.path }}'.includes('grading')) {
         document.getElementById("submit-button").addEventListener("click", function () {
             form.submit();

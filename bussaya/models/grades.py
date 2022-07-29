@@ -8,7 +8,7 @@ SEMESTER_TYPE = [("midterm", "Midterm"), ("final", "Final")]
 RELEASE_STATUS = [("unreleased", "Unreleased"), ("released", "Released")]
 
 
-class Grade(me.Document):
+class RoundGrade(me.Document):
     meta = {"collection": "grades"}
 
     type = me.StringField(choices=SEMESTER_TYPE)
@@ -71,7 +71,7 @@ STUDENT_GRADE_CHOICES = [
     ("c+", "C+"),
     ("c", "C"),
     ("d+", "D+"),
-    ("d", "D+"),
+    ("d", "D"),
     ("e", "E"),
 ]
 
@@ -81,7 +81,7 @@ class StudentGrade(me.Document):
 
     result = me.StringField(choices=STUDENT_GRADE_CHOICES, default="-")
     project = me.ReferenceField("Project", dbref=True)
-    grade = me.ReferenceField("Grade", dbref=True, required=True)
+    round_grade = me.ReferenceField("RoundGrade", dbref=True, required=True)
 
     class_ = me.ReferenceField("Class", dbref=True, required=True)
     lecturer = me.ReferenceField("User", dbref=True, required=True)

@@ -20,12 +20,21 @@
       {{'Grading' if 'midterm' not in request.path and 'final' not in request.path}}
     </span>
     <div class="menu">
-      <a class="item" href="{{ url_for('grades.view', class_id=class_.id, grade_type='midterm') }}">
+      {% if 'admin' in current_user.roles %}
+      <a class="item" href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type='midterm') }}">
         Midterm
       </a>
-      <a class="item" href="{{ url_for('grades.view', class_id=class_.id, grade_type='final') }}">
+      <a class="item" href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type='final') }}">
         Final
       </a>
+      {% else %}
+      <a class="item" href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='midterm') }}">
+        Midterm
+      </a>
+      <a class="item" href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='final') }}">
+        Final
+      </a>
+      {% endif %}
     </div>
   </div>
   <a class="{{'active' if 'student_ids' in request.path}} item"
