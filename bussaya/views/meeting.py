@@ -68,10 +68,6 @@ def view_lecturer(meeting_id):
         class_=meeting.class_, meeting=meeting, project__in=projects
     )
 
-    # print("meeting", meeting)
-    # print("students", students)
-    # print("projects", projects)
-    # print("meeting_reports", meeting_reports)
     form = forms.meetings.DisapproveForm()
 
     if request.method == "POST":

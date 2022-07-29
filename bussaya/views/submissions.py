@@ -119,108 +119,115 @@ def delete(submission_id):
 
 
 @module.route(
-    "/<submission_id>/form",
+    "/<submission_id>/upload",
     methods=["GET", "POST"],
 )
 @login_required
 def upload(submission_id):
-    form = forms.submissions.StudentWorkForm()
     submission = models.Submission.objects.get(id=submission_id)
     class_ = submission.class_
-
     if submission.get_status() == "closed":
         return redirect(url_for("classes.view", class_id=class_.id))
 
-    if request.method == "GET":
+    projects = models.Project.objects(
+        me.Q(creator=current_user._get_current_object())
+        | me.Q(students=current_user._get_current_object())
+    )
+
+    form = forms.submissions.ProgressReportForm()
+    form.project.queryset = projects
+
+    if not form.validate_on_submit() or not form.uploaded_file.data:
         return render_template(
-            "/submissions/upload-edit.html",
+            "/submissions/upload.html",
             form=form,
             submission=submission,
             class_=class_,
+            projects=projects,
         )
 
-    print("uploading...")
-
-    progress_report = models.ProgressReport()
+    progress_report = models.ProgressReport.objects(submission=submission).first()
+    if not progress_report:
+        progress_report = models.ProgressReport()
+        progress_report.submission = models.Submission.objects.get(id=submission_id)
+        progress_report.class_ = submission.class_
 
     progress_report.owner = current_user._get_current_object()
-    progress_report.ip_address = request.remote_addr
-
-    progress_report.class_ = models.Class.objects.get(id=class_.id)
-    progress_report.submission = models.Submission.objects.get(id=submission_id)
+    progress_report.ip_address = request.headers.get(
+        "X-Forwarded-For", request.remote_addr
+    )
 
     form.populate_obj(progress_report)
-    if form.uploaded_file.data:
-        if not progress_report.file:
-            progress_report.file.put(
-                form.uploaded_file.data,
-                filename=form.uploaded_file.data.filename,
-                content_type="application/pdf",
-            )
-        else:
-            progress_report.file.replace(
-                form.uploaded_file.data,
-                filename=form.uploaded_file.data.filename,
-                content_type="application/pdf",
-            )
+    if not progress_report.file:
+        progress_report.file.put(
+            form.uploaded_file.data,
+            filename=form.uploaded_file.data.filename,
+            content_type=form.uploaded_file.data.content_type,
+        )
+    else:
+        progress_report.file.replace(
+            form.uploaded_file.data,
+            filename=form.uploaded_file.data.filename,
+            content_type=form.uploaded_file.data.content_type,
+        )
 
     progress_report.save()
 
     return redirect(url_for("classes.view", class_id=class_.id))
 
 
-@module.route(
-    "/<progress_report_id>/form/edit",
-    methods=["GET", "POST"],
-)
-@login_required
-def edit_progress_report(progress_report_id):
+# @module.route(
+#     "/<progress_report_id>/form/edit",
+#     methods=["GET", "POST"],
+# )
+# @login_required
+# def edit_progress_report(progress_report_id):
 
-    progress_report = models.ProgressReport.objects.get(id=progress_report_id)
-    submission = progress_report.submission
-    class_ = progress_report.class_
+#     progress_report = models.ProgressReport.objects.get(id=progress_report_id)
+#     submission = progress_report.submission
+#     class_ = progress_report.class_
 
-    form = forms.submissions.StudentWorkForm(obj=progress_report)
+#     form = forms.submissions.StudentWorkForm(obj=progress_report)
 
-    if submission.get_status() == "closed":
-        return redirect(url_for("classes.view", class_id=class_.id))
+#     if submission.get_status() == "closed":
+#         return redirect(url_for("classes.view", class_id=class_.id))
 
-    if request.method == "GET":
-        return render_template(
-            "/submissions/upload-edit.html",
-            form=form,
-            class_=class_,
-            submission=submission,
-            progress_report=progress_report,
-        )
+#     if request.method == "GET":
+#         return render_template(
+#             "/submissions/upload-edit.html",
+#             form=form,
+#             class_=class_,
+#             submission=submission,
+#             progress_report=progress_report,
+#         )
 
-    print(progress_report.updated_date)
-    progress_report.updated_date = datetime.datetime.now()
+#     print(progress_report.updated_date)
+#     progress_report.updated_date = datetime.datetime.now()
 
-    progress_report.owner = current_user._get_current_object()
-    progress_report.ip_address = request.remote_addr
+#     progress_report.owner = current_user._get_current_object()
+#     progress_report.ip_address = request.remote_addr
 
-    progress_report.submission = submission
-    progress_report.class_ = class_
+#     progress_report.submission = submission
+#     progress_report.class_ = class_
 
-    form.populate_obj(progress_report)
-    if form.uploaded_file.data:
-        if not progress_report.file:
-            progress_report.file.put(
-                form.uploaded_file.data,
-                filename=form.uploaded_file.data.filename,
-                content_type="application/pdf",
-            )
-        else:
-            progress_report.file.replace(
-                form.uploaded_file.data,
-                filename=form.uploaded_file.data.filename,
-                content_type="application/pdf",
-            )
+#     form.populate_obj(progress_report)
+#     if form.uploaded_file.data:
+#         if not progress_report.file:
+#             progress_report.file.put(
+#                 form.uploaded_file.data,
+#                 filename=form.uploaded_file.data.filename,
+#                 content_type="application/pdf",
+#             )
+#         else:
+#             progress_report.file.replace(
+#                 form.uploaded_file.data,
+#                 filename=form.uploaded_file.data.filename,
+#                 content_type="application/pdf",
+#             )
 
-    progress_report.save()
+#     progress_report.save()
 
-    return redirect(url_for("classes.view", class_id=class_.id))
+#     return redirect(url_for("classes.view", class_id=class_.id))
 
 
 @module.route(

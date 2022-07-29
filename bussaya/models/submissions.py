@@ -162,7 +162,7 @@ class ProgressReport(me.Document):
     project = me.ReferenceField("Project", dbref=True, required=True)
     ip_address = me.StringField(required=True)
 
-    description = me.StringField(required=True)
+    description = me.StringField()
     file = me.FileField(
         collection_name="progress_report_fs",
     )

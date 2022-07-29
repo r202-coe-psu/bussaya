@@ -1,9 +1,6 @@
 from wtforms import fields
 from wtforms import validators
 from wtforms import widgets
-
-from bussaya.forms.projects import BaseProjectForm
-
 from .fields import TagListField
 
 from flask_wtf import FlaskForm
@@ -44,8 +41,19 @@ class SubmissionForm(BaseSubmissionForm):
     )
 
 
-class StudentWorkForm(BaseProjectForm):
-    description = fields.StringField("Description")
+BaseProgressReportForm = model_form(
+    models.ProgressReport,
+    FlaskForm,
+    exclude=[],
+    only=["project", "description"],
+    field_args={
+        "project": dict(label="Project", label_modifier=lambda p: p.name),
+        "description": dict(label="Description"),
+    },
+)
+
+
+class ProgressReportForm(BaseProgressReportForm):
     uploaded_file = fields.FileField(
         "Upload File: PDF only", validators=[FileAllowed(["pdf"], "PDF only")]
     )

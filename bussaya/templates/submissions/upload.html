@@ -49,8 +49,9 @@ Submission Form
 <form method="POST" class="ui form" enctype="multipart/form-data">
     <div class="ui segment">
         {{ form.csrf_token }}
-        {{ renderer.render_fileinput(form.uploaded_file) }}
+        {{ renderer.render_select(form.project) }}
         {{ renderer.render_field(form.description) }}
+        {{ renderer.render_fileinput(form.uploaded_file) }}
         <button type="submit" class="ui button primary">
             {{ 'Edit' if 'edit' in request.path else 'Upload' }}
             {{ "Late" if submission.get_status() == "lated" }}

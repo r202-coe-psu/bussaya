@@ -94,13 +94,28 @@ class Project(me.Document):
             started_date__lte=now, ended_date__gte=now, student_ids__in=student_ids
         ).first()
 
-    def get_progress_reports(self):
-        from .submissions import ProgressReport
+    def get_progress_reports(self, round=None, type=None):
+        from .submissions import ProgressReport, Submission
 
         class_ = self.get_opened_class()
-        return ProgressReport.objects(
-            class_=class_,
-        )
+
+        if round and type:
+            submissions = Submission.objects(round=round, type=type, class_=class_)
+            return ProgressReport.objects(
+                class_=class_, submission__in=submissions, project=self
+            )
+        elif round:
+            submissions = Submission.objects(round=round, class_=class_)
+            return ProgressReport.objects(
+                class_=class_, submission__in=submissions, project=self
+            )
+        elif type:
+            submissions = Submission.objects(type=type, class_=class_)
+            return ProgressReport.objects(
+                class_=class_, submission__in=submissions, project=self
+            )
+
+        return ProgressReport.objects(class_=class_, project=self)
 
     def get_resource(self, type_):
         resources = reversed(self.resources)
