@@ -10,10 +10,12 @@ RUN pip3 install flask uwsgi
 RUN python3 setup.py develop
 RUN npm install --prefix bussaya/static
 
-ENV BUSSAYA_SETTINGS=/app/bussaya-production.cfg
-ENV FLASK_ENV=prodoction
-ENV AUTHLIB_INSECURE_TRANSPORT=true
+ENV BUSSAYA_SETTINGS=/app/bussaya-production.cfg \
+    FLASK_ENV=prodoction \
+    AUTHLIB_INSECURE_TRANSPORT=true
 
+RUN pip3 install poetry uwsgi
+RUN poetry config virtualenvs.create false && poetry install --no-interaction
 
 
 EXPOSE 9001
