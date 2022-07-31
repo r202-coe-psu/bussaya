@@ -11,7 +11,8 @@ RUN npm install --prefix bussaya/static
 
 ENV BUSSAYA_SETTINGS=/app/bussaya-production.cfg \
     FLASK_ENV=prodoction \
-    AUTHLIB_INSECURE_TRANSPORT=true
+    AUTHLIB_INSECURE_TRANSPORT=true\
+    PYTHONPATH=$(pwd):/usr/lib/python3.10/site-packages:$PYTHONPATH
 
 RUN pip3 install poetry uwsgi
 RUN poetry config virtualenvs.create false && poetry install --no-interaction
