@@ -7,7 +7,6 @@ RUN apt install -y g++ gcc build-essential python3 python3-dev python3-pip pytho
 COPY . /app
 WORKDIR /app
 RUN pip3 install flask uwsgi
-RUN python3 setup.py develop
 RUN npm install --prefix bussaya/static
 
 ENV BUSSAYA_SETTINGS=/app/bussaya-production.cfg \
