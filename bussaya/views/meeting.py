@@ -55,7 +55,7 @@ def view_admin(meeting_id):
     )
 
 
-@module.route("/<meeting_id>/view", methods=["GET", "POST"])
+@module.route("/<meeting_id>/view/lecturer", methods=["GET", "POST"])
 @login_required
 def view_lecturer(meeting_id):
     meeting = models.Meeting.objects.get(id=meeting_id)
@@ -93,20 +93,23 @@ def view_lecturer(meeting_id):
 
 
 @module.route(
-    "/<meeting_id>/students/<meeting_report_id>/approval/<action>",
+    "/<meeting_id>/reports/<meeting_report_id>/approval/<action>",
     methods=["GET", "POST"],
 )
 @login_required
 def approval(meeting_id, meeting_report_id, action):
 
     meeting_report = models.MeetingReport.objects.get(id=meeting_report_id)
-    meeting_report.status = action
-    if action == "approved":
-        meeting_report.remark = None
+    if action == "approve":
+        meeting_report.remark = ""
+        meeting_report.status = "approved"
+    elif action == "disapprove":
+        meeting_report.status = "disapproved"
+        meeting_report.remark = "check"
 
     meeting_report.save()
 
-    return redirect(url_for("meetings.view", meeting_id=meeting_id))
+    return redirect(url_for("classes.view", class_id=meeting_report.class_.id))
 
 
 @module.route(

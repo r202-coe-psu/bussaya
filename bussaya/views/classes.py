@@ -47,7 +47,7 @@ def view_lecturer(class_id):
 
     meeting_reports = models.MeetingReport.objects(
         class_=class_, project__in=projects
-    ).order_by("-updated_date")
+    ).order_by("-meeting_date")
     progress_reports = models.ProgressReport.objects(
         class_=class_, project__in=projects
     )
@@ -123,21 +123,11 @@ def get_student_group(student_id, class_id):
 
 
 @module.route("/<class_id>/students")
-@login_required
+@acl.roles_required("admin")
 def view_students(class_id):
     class_ = models.Class.objects.get(id=class_id)
-    # projects = models.Project.objects(
-    #     me.Or(
-    #         creators=current_user._get_current_object(),
-    #         students=current_user._get_current_object(),
-    #     )
-    # )
-
-    students = []
-    for id in class_.student_ids:
-        student = models.User.objects(username=id).first()
-        if not student or "student" not in student.roles:
-            continue
-        students.append(student)
+    students = models.User.objects(username__in=class_.student_ids).order_by(
+        "-username"
+    )
 
     return render_template("/classes/students.html", class_=class_, students=students)

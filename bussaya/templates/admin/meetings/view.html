@@ -49,7 +49,7 @@
     <thead>
         <tr>
             <th></th>
-            <th>Student IDS</th>
+            <th>Student</th>
             <th>Title</th>
             <th>Description</th>
             <th>Meeting Date</th>
@@ -65,7 +65,8 @@
                 {{ loop.index }}
             </td>
             <td>
-                {{meeting_report.owner.username}}
+              {{ meeting_report.owner.username }} <br/>
+              {{ meeting_report.owner.first_name }} {{ meeting_report.owner.last_name }}
             </td>
             <td>
                 {{meeting_report.title}}

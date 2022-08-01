@@ -70,12 +70,13 @@
     <table class="ui selectable celled table">
       <thead>
         <tr>
-          <th>ID</th>
           <th>Student</th>
           <th>Round</th>
           <th>Meeting</th>
           <th>Title / Description</th>
-          <th>Summited Date</th>
+          <th>Meeting Date</th>
+          <th>Status</th>
+          <th>Approval</th>
         </tr>
       </thead>
 
@@ -83,9 +84,7 @@
         {% for report in meeting_reports %}
           <tr>
             <td>
-              {{ report.owner.username }}
-            </td>
-            <td>
+              {{ report.owner.username }} <br/>
               {{ report.owner.first_name }} {{ report.owner.last_name }}
             </td>
             <td>
@@ -103,7 +102,14 @@
               </div>
             </td>
             <td>
-              {{ report.updated_date }}
+              {{ report.meeting_date }}
+            </td>
+            <td class="{{'green' if report.status == 'approved'}} {{'red' if report.status == 'disapproved'}}">
+              {{ report.get_status_display() if report.status else 'Waiting for approval'}}
+            </td>
+            <td>
+              <a href="{{ url_for('meetings.approval', meeting_report_id=report.id, meeting_id=report.meeting.id, action='approve') }}" class="ui positive icon button"><i class="icon check"></i></a>
+              <a href="{{ url_for('meetings.approval', meeting_report_id=report.id, meeting_id=report.meeting.id, action='disapprove') }}" class="ui negative icon button"><i class="icon close"></i></a>
             </td>
           </tr>
         {% endfor %}
