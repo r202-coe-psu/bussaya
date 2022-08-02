@@ -103,7 +103,7 @@
           {{ report.updated_date.ctime() }}
         </td>
         <td class="{{'green' if report.status == 'approved'}} {{'red' if report.status == 'disapproved'}}">
-          {{ report.get_status_display() if report.status else 'Waiting for approval'}}
+          {{ report.get_status_display() if report.status else 'Waiting for approval' }}
         </td>
         <td class="single line">
           <a href="{{ url_for('meetings.approval', meeting_report_id=report.id, meeting_id=report.meeting.id, action='approve') }}" class="ui positive icon button"><i class="icon check"></i></a>

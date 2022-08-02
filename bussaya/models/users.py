@@ -1,8 +1,8 @@
-import mongoengine as me
 import datetime
+import mongoengine as me
 
-from flask_login import UserMixin
 from flask import url_for
+from flask_login import UserMixin
 
 from bussaya import models
 
@@ -68,11 +68,11 @@ class User(me.Document, UserMixin):
 
     def get_presentation(self, class_id):
         class_ = models.Class.objects.get(id=class_id)
-        progress_reports = models.ProgressReport.objects(class_=class_, owner=self)
+        progress_report = models.ProgressReport.objects(
+            class_=class_, owner=self
+        ).first()
 
-        for progress_report in progress_reports:
-            return progress_report
-        return False
+        return progress_report
 
     def get_meeting_reports(self, class_, round=None):
         from . import submissions
@@ -102,7 +102,7 @@ class User(me.Document, UserMixin):
         return student_grades
 
     def get_average_grade(self, round_grade):
-        student_grades = models.StudentGrade.objects.all().filter(
+        student_grades = models.StudentGrade.objects(
             student=self, class_=round_grade.class_, round_grade=round_grade
         )
 

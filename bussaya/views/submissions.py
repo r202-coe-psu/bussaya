@@ -14,9 +14,13 @@ import socket
 module = Blueprint("submissions", __name__, url_prefix="/submissions")
 
 
-@module.route("/<class_id>/submission/create", methods=["GET", "POST"])
+@module.route("/create", methods=["GET", "POST"])
 @login_required
-def create(class_id):
+def create():
+    class_id = request.args.get("class_id", None)
+    if not class_id:
+        return redirect(url_for("dashboard.index"))
+
     form = forms.submissions.SubmissionForm()
     class_ = models.Class.objects.get(id=class_id)
     if not form.validate_on_submit():
@@ -46,7 +50,7 @@ def view(submission_id):
         return view_lecturer(submission_id)
 
 
-@module.route("/<submission_id>/view")
+@module.route("/<submission_id>/lecturer-view")
 @login_required
 def view_lecturer(submission_id):
     submission = models.Submission.objects.get(id=submission_id)
@@ -62,7 +66,7 @@ def view_lecturer(submission_id):
     )
 
 
-@module.route("/<submission_id>/admin/view")
+@module.route("/<submission_id>/admin-view")
 @acl.roles_required("admin")
 def view_admin(submission_id):
     submission = models.Submission.objects.get(id=submission_id)
@@ -106,16 +110,12 @@ def edit(submission_id):
 @login_required
 def delete(submission_id):
     submission = models.Submission.objects.get(id=submission_id)
+    progress_reports = models.ProgressReport.objects(submission=submission).delete()
+
+    class_ = submission.class_
     submission.delete()
 
-    progress_reports = models.ProgressReport.objects(submission=submission)
-    [progress_report.delete for progress_report in progress_reports]
-
-    return redirect(
-        url_for(
-            "admin.classes.view", submission=submission, class_id=submission.class_.id
-        )
-    )
+    return redirect(url_for("admin.classes.view", class_id=class_.id))
 
 
 @module.route(
