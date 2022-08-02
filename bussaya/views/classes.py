@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for, redirect
+from flask import Blueprint, render_template, url_for, redirect, request
 from flask_login import current_user, login_required
 import mongoengine as me
 from datetime import datetime
@@ -45,9 +45,9 @@ def view_lecturer(class_id):
     submissions = models.Submission.objects(class_=class_)
     meetings = models.Meeting.objects(class_=class_)
 
-    meeting_reports = models.MeetingReport.objects(
-        class_=class_, project__in=projects
-    ).order_by("-meeting_date")
+    # meeting_reports = models.MeetingReport.objects(
+    #     class_=class_, project__in=projects
+    # ).order_by("-meeting_date")
     progress_reports = models.ProgressReport.objects(
         class_=class_, project__in=projects
     )
@@ -63,15 +63,20 @@ def view_lecturer(class_id):
         committees=current_user._get_current_object(), students__in=students
     )
 
+    current_advisees = []
+    for project in advisee_projects:
+        current_advisees.extend(project.students)
+
     return render_template(
         "/classes/view-lecturer.html",
         class_=class_,
         class_id=class_id,
         projects=projects,
-        meeting_reports=meeting_reports,
+        # meeting_reports=meeting_reports,
         progress_reports=progress_reports,
         advisee_projects=advisee_projects,
         committee_projects=committee_projects,
+        current_advisees=current_advisees,
     )
 
 
@@ -120,6 +125,30 @@ def get_student_group(student_id, class_id):
             return group.name
 
     return ""
+
+
+@module.route("/<class_id>/students/<user_id>/meeting_reports")
+@acl.roles_required("lecturer", "admin")
+def list_report_by_user(class_id, user_id):
+
+    round = request.args.get("round", None)
+    class_ = models.Class.objects.get(id=class_id)
+
+    meetings = []
+    if round:
+        meetings = models.Meeting.objects(class_=class_, round=round)
+    else:
+        meetings = models.Meeting.objects(class_=class_)
+
+    user = models.User.objects.get(id=user_id)
+    meeting_reports = models.MeetingReport.objects(meeting__in=meetings, owner=user)
+
+    return render_template(
+        "/classes/list-report-by-user.html",
+        class_=class_,
+        user=user,
+        meeting_reports=meeting_reports,
+    )
 
 
 @module.route("/<class_id>/students")

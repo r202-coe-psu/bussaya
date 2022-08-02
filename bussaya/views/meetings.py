@@ -27,8 +27,10 @@ def view(meeting_id):
 @login_required
 def view_admin(meeting_id):
     meeting = models.Meeting.objects.get(id=meeting_id)
-    meeting_reports = models.MeetingReport.objects.all().filter(
-        class_=meeting.class_, meeting=meeting
+    meeting_reports = (
+        models.MeetingReport.objects.all()
+        .filter(class_=meeting.class_, meeting=meeting)
+        .order_by("-username")
     )
 
     form = forms.meetings.DisapproveForm()

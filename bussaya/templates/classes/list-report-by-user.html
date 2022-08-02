@@ -58,57 +58,63 @@
   </tbody>
 </table>
 
-<div class="ui segment">
-    <h2 class="ui header">Projects</h2>
-    {{ renderer_project.render_project_table(projects, current_user) }}
-</div>
 
-<div class="ui segment">
-    <h2 class="ui header">Submissions</h2>
-    <div class="ui divider"></div>
-    <h3 class="ui header">Meeting</h3>
-    <table class="ui selectable celled table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Midterm</th>
-          <th>Final</th>
-          <th></th>
-        </tr>
-      </thead>
+<h3 class="ui header">Meeting Report</h3>
+<div class="ui divider"></div>
+<table class="ui selectable celled table">
+  <thead>
+    <tr>
+      <th>Student</th>
+      <th>Round</th>
+      <th>Meeting</th>
+      <th>Title / Description</th>
+      <th>Meeting Date</th>
+      <th>Last Updated Date</th>
+      <th>Status</th>
+      <th>Approval</th>
+    </tr>
+  </thead>
 
-      <tbody>
-        {% for student in current_advisees %}
-          <tr>
-            <td>
-              {{ student.username }}
-            </td>
-            <td>
-              {{ student.first_name }} {{ student.last_name }}
-            </td>
-            <td>
-              {{ student.get_meeting_reports(class_, 'midterm').count() }}
-            </td>
-            <td>
-              {{ student.get_meeting_reports(class_, 'final').count() }}
-            </td>
-            <td>
-              <a href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}" class="ui primary circular icon button">
-                <i class="eye icon"></i>
-              </a>
-            </td>
-        {% endfor %}
-      </tbody>
-    </table>
+  <tbody>
+    {% for report in meeting_reports %}
+      <tr>
+        <td>
+          {{ report.owner.username }} <br/>
+          {{ report.owner.first_name }} {{ report.owner.last_name }}
+        </td>
+        <td>
+          {{ report.meeting.get_round_display() }}
+        </td>
+        <td>
+          <a href="{{ url_for('meetings.view', meeting_id=report.meeting.id) }}">
+            {{ report.meeting.name }}
+          </a>
+        </td>
+        <td>
+          <div><b>{{ report.title }}</b></div>
+          <div>
+            {{ report.description }}
+          </div>
+        </td>
+        <td>
+          {{ report.meeting_date }}
+        </td>
+        <td>
+          {{ report.updated_date.ctime() }}
+        </td>
+        <td class="{{'green' if report.status == 'approved'}} {{'red' if report.status == 'disapproved'}}">
+          {{ report.get_status_display() if report.status else 'Waiting for approval'}}
+        </td>
+        <td class="single line">
+          <a href="{{ url_for('meetings.approval', meeting_report_id=report.id, meeting_id=report.meeting.id, action='approve') }}" class="ui positive icon button"><i class="icon check"></i></a>
+          <a href="{{ url_for('meetings.approval', meeting_report_id=report.id, meeting_id=report.meeting.id, action='disapprove') }}" class="ui negative icon button"><i class="icon close"></i></a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 
-
-    <div class="ui divider"></div>
-
-    <h3 class="ui header">Report / Presentation</h3>
-    {{ renderer_project.render_project_section([], current_user, advisee_projects, committee_projects) }}
-</div>
 {% endblock %}
 
 {% block additional_js %}

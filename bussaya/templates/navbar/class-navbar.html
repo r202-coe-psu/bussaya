@@ -1,6 +1,6 @@
 {% macro render_class_navbar(class_, current_user) %}
 <div class="ui big compact menu" style="margin: auto">
-  {% if current_user.has_roles("admin") %}
+  {% if "admin" in request.endpoint and current_user.has_roles('admin') %}
   <a class="{{'active' if 'home' in request.path}} item" href="{{ url_for('admin.classes.view', class_id=class_.id )}}">
     <i class="chalkboard icon"></i>
     Class
