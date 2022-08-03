@@ -35,37 +35,55 @@
       <td>{{ project.name }}</td>
       <td class="right aligned collapsing">
         {%- for s in project.students %}
-          {{ s.first_name }} {{ s.last_name }}
+        {{ s.first_name }} {{ s.last_name }}
         {% if not loop.last %}<br>{% endif %}
         {% endfor -%}
       </td>
       <td class="right aligned collapsing">{{ project.advisor.first_name }} {{ project.advisor.last_name }}</td>
-      <td class="right aligned collapsing">
+      <td class="one wide">
+        {% if project.creator.get_meeting_reports(project.class_, 'midterm').count() > 0 %}
+        <a target="_blank"
+          href="{{ url_for('classes.list_report_by_user', class_id=project.class_.id, user_id=project.creator.id) }}">
+          <i class="clipboard large icon link pop" data-content="Meeting Report"></i>
+        </a>
+        {% else %}
+        <i class="disabled clipboard large icon" data-content="Meeting Report"></i>
+        {% endif %}
         {% set progress_reports = project.get_progress_reports(round='midterm') %}
         {% for pr in progress_reports %}
-          <a target="_blank" href="{{ url_for('submissions.download', progress_report_id=pr.id, filename=pr.file.filename) }}">
-            {% if pr.submission.type == 'report' %}
-              <i class="file pdf icon large"></i>
-            {% elif pr.submission.type == 'presentation' %}
-              <i class="file powerpoint icon large"></i>
-            {% else %}
-              <i class="file alternate icon large"></i>
-            {% endif %}
-          </a>
+        <a target="_blank"
+          href="{{ url_for('submissions.download', progress_report_id=pr.id, filename=pr.file.filename) }}">
+          {% if pr.submission.type == 'report' %}
+          <i class="file pdf icon large"></i>
+          {% elif pr.submission.type == 'presentation' %}
+          <i class="file powerpoint icon large"></i>
+          {% else %}
+          <i class="file alternate icon large"></i>
+          {% endif %}
+        </a>
         {% endfor %}
       </td>
-      <td class="right aligned collapsing">
+      <td class="one wide">
+        {% if project.creator.get_meeting_reports(project.class_, 'final').count() > 0 %}
+        <a target="_blank"
+          href="{{ url_for('classes.list_report_by_user', class_id=project.class_.id, user_id=project.creator.id) }}">
+          <i class="clipboard large icon link pop" data-content="Meeting Report"></i>
+        </a>
+        {% else %}
+        <i class="disabled clipboard large icon" data-content="Meeting Report"></i>
+        {% endif %}
         {% set progress_reports = project.get_progress_reports(round='final') %}
         {% for pr in progress_reports %}
-          <a target="_blank" href="{{ url_for('submissions.download', progress_report_id=pr.id, filename=pr.file.filename) }}">
-            {% if pr.submission.type == 'report' %}
-              <i class="file pdf icon large"></i>
-            {% elif pr.submission.type == 'presentation' %}
-              <i class="file powerpoint icon large"></i>
-            {% else %}
-              <i class="file alternate icon large"></i>
-            {% endif %}
-          </a>
+        <a target="_blank"
+          href="{{ url_for('submissions.download', progress_report_id=pr.id, filename=pr.file.filename) }}">
+          {% if pr.submission.type == 'report' %}
+          <i class="file pdf icon large"></i>
+          {% elif pr.submission.type == 'presentation' %}
+          <i class="file powerpoint icon large"></i>
+          {% else %}
+          <i class="file alternate icon large"></i>
+          {% endif %}
+        </a>
         {% endfor %}
       </td>
     </tr>
@@ -108,7 +126,7 @@
 
       {#
       <td class="right aligned collapsing">
-        
+
         {% if current_user and project.is_approval(current_user) %}
         <i class="large blue check icon"></i>
         <a class="ui disabled button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
@@ -116,6 +134,15 @@
         <i class="large check icon disabled"></i>
         <a class="ui primary button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
         {% else %}
+        <script type="text/javascript">
+          $('.icon.link.pop')
+            .popup({
+              delay: {
+                show: 50,
+                hide: 70
+              }
+            });
+        </script>
         {% endif %}
       </td>
       #}
@@ -133,4 +160,5 @@
       }
     });
 </script>
+
 {%- endmacro %}
