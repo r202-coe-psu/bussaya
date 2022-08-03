@@ -47,9 +47,13 @@ def create_student_grade(class_, round_grade, student, lecturer):
     round_grade.save()
 
 
-@module.route("/<class_id>/<round_grade_type>/view")
+@module.route("/<round_grade_type>/view")
 @acl.roles_required("admin")
-def view(class_id, round_grade_type):
+def view(round_grade_type):
+    class_id = request.args.get("class_id", None)
+    if not class_id:
+        return redirect(url_for("dashboard.index"))
+
     class_ = models.Class.objects.get(id=class_id)
     round_grades = models.RoundGrade.objects.all().filter(class_=class_)
     user = current_user._get_current_object()
@@ -108,10 +112,14 @@ def view(class_id, round_grade_type):
     final.save()
 
     round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
+    if round_grade.is_in_time():
+        return redirect(
+            url_for("admin.round_grades.grading", round_grade_id=round_grade.id)
+        )
+
     student_grades = models.StudentGrade.objects(
         class_=class_, lecturer=user, round_grade=round_grade
     )
-
     student_grades = sorted(student_grades, key=lambda s: s.student.username)
 
     return render_template(
@@ -124,9 +132,13 @@ def view(class_id, round_grade_type):
     )
 
 
-@module.route("/<class_id>/<round_grade_type>/view_total")
+@module.route("/<round_grade_type>/view_total")
 @acl.roles_required("admin")
-def view_total(class_id, round_grade_type):
+def view_total(round_grade_type):
+    class_id = request.args.get("class_id", None)
+    if not class_id:
+        return redirect(url_for("dashboard.index"))
+
     class_ = models.Class.objects.get(id=class_id)
     user = current_user._get_current_object()
 
@@ -156,11 +168,70 @@ def view_total(class_id, round_grade_type):
     )
 
 
+def count_lecturer_given_grade(lecturer_grades):
+    given_grade = 0
+    for grade in lecturer_grades:
+        if grade.result != '-':
+            given_grade += 1
+            
+    return given_grade
+
+@module.route("/<round_grade_type>/view_advisor")
+@acl.roles_required("admin")
+def view_advisor_grade(round_grade_type):
+    class_id = request.args.get("class_id", None)
+    if not class_id:
+        return redirect(url_for("dashboard.index"))
+
+    class_ = models.Class.objects.get(id=class_id)
+    user = current_user._get_current_object()
+
+    round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
+    total_student_grades = models.StudentGrade.objects(
+        class_=class_, round_grade=round_grade
+    )
+    lecturers = set([s.lecturer for s in total_student_grades])
+    lecturers = sorted(lecturers, key=lambda l: l.first_name)
+
+    print([lec.first_name for lec in lecturers])
+
+    total_student_grades = sorted(
+        total_student_grades, key=lambda s: s.student.username
+    )
+
+    student_grades = []
+    if total_student_grades:
+        student_grades = [total_student_grades[0]]
+        for student_grade in total_student_grades:
+            if student_grades[-1].student.username != student_grade.student.username:
+                student_grades.append(student_grade)
+
+    return render_template(
+        "/admin/round_grades/view-advisor-grade.html",
+        user=user,
+        class_=class_,
+        round_grade=round_grade,
+        round_grade_type=round_grade_type,
+        count_lecturer_given_grade=count_lecturer_given_grade,
+        student_grades=student_grades,
+        lecturers=lecturers,
+    )
+
+
 @module.route("/<round_grade_id>/grading", methods=["GET", "POST"])
 @acl.roles_required("admin")
 def grading(round_grade_id):
     round_grade = models.RoundGrade.objects.get(id=round_grade_id)
     class_ = round_grade.class_
+    if not round_grade.is_in_time():
+        return redirect(
+            url_for(
+                "admin.round_grades.view",
+                class_id=class_.id,
+                round_grade_type=round_grade.type,
+            )
+        )
+
     user = current_user._get_current_object()
     student_grades = models.StudentGrade.objects.all().filter(
         round_grade=round_grade, lecturer=user

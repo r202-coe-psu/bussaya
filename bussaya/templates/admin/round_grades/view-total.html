@@ -27,92 +27,90 @@
 
 {{ render_toolbars.render_admin_grade_menu_toolbars(round_grade) }}
 
-<form method="POST" id="form-round_grade">
-    <div class="ui attached segment">
-        <table class="ui celled structured single line table">
-            <thead>
-                <tr>
-                    <th class="one wide"></th>
-                    <th class="two wide">Student ID</th>
-                    <th class="four wide">Student Name</th>
-                    <th class="one wide">Average Grade</th>
-                    <th>Total Grade</th>
-                    <th class="two wide">Submissions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% set index = namespace(value=1) %}
-                {% for student_grade in student_grades %}
-                {% set student = student_grade.student %}
-                <tr>
-                    <td>{{index.value}}</td>
-                    {% set index.value = index.value + 1 %}
-                    <td>{{ student.username }}</td>
-                    <td>{{ student.first_name }} {{ student.last_name }}</td>
-                    <td>
-                        {{ student.get_average_grade(student_grade.round_grade) }}
-                    </td>
-                    <td>
-                        <div class="title">
-                            <a id="{{student_grade.id}}" style="cursor: pointer"
-                                onclick="accordion_show_hide('{{student_grade.id}}')">
-                                See More
-                            </a>
-                        </div>
-                        <div id="{{student_grade.id}} content" class="content" style="display: none">
-                            <p />
-                            {% for student_grade in student.get_total_student_grades(round_grade) %}
-                            <div class="ui relaxed divided list">
-                                <div class="item">
-                                    {% if student_grade.lecturer.get_picture() %}
-                                    <img class="ui avatar image" src="{{ student_grade.lecturer.get_picture() }}">
-                                    {% else %}
-                                    <i class="user icon"></i>
-                                    {% endif %}
-                                    <div class="content">
-                                        <a class="header">
-                                            {{ student_grade.lecturer.first_name }}
-                                            {{ student_grade.lecturer.last_name }}
-                                            {{
-                                            '(Advisor)'
-                                            if student_grade.lecturer == student.get_project().advisor
-                                            }}
-                                        </a>
-                                        <div class="description">{{ student_grade.get_result_display() }}</div>
-                                    </div>
+<div class="ui attached segment">
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th class="one wide">Meeting Report</th>
+                <th class="one wide">Submissions</th>
+                <th>Average Grade</th>
+                <th>Total Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set index = namespace(value=1) %}
+            {% for student_grade in student_grades %}
+            {% set student = student_grade.student %}
+            <tr>
+                <td>{{index.value}}</td>
+                {% set index.value = index.value + 1 %}
+                <td>{{ student.username }}</td>
+                <td>{{ student.first_name }} {{ student.last_name }}</td>
+                <td>{{ student.get_meeting_reports(class_, round_grade.type).count() }}</td>
+                {% set student_report = student.get_report(class_.id) %}
+                {% set student_presentation = student.get_presentation(class_.id) %}
+                <td>
+                    {% if student_report %}
+                    <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
+                        target="_blank">
+                        <i class="large pdf file icon link pop" data-content="Report"></i>
+                    </a>
+                    {% else %}
+                    <i class="grey large pdf file icon disable"></i>
+                    {% endif %}
+                    {% if student_presentation %}
+                    <a href="{{ url_for('submissions.download', progress_report_id=student_presentation.id, filename=student_presentation.file.filename) }}"
+                        target="_blank">
+                        <i class="large file powerpoint icon link pop" data-content="Presentation"></i>
+                    </a>
+                    {% else %}
+                    <i class="grey large file powerpoint icon disable"></i>
+                    {% endif %}
+                </td>
+                <td>
+                    {{ student.get_average_grade(student_grade.round_grade) }}
+                </td>
+                <td>
+                    <div class="title">
+                        <a id="{{student_grade.id}}" style="cursor: pointer"
+                            onclick="accordion_show_hide('{{student_grade.id}}')">
+                            See More
+                        </a>
+                    </div>
+                    <div id="{{student_grade.id}} content" class="content" style="display: none">
+                        <p />
+                        {% for student_grade in student.get_total_student_grades(round_grade) %}
+                        <div class="ui relaxed divided list">
+                            <div class="item">
+                                {% if student_grade.lecturer.get_picture() %}
+                                <img class="ui avatar image" src="{{ student_grade.lecturer.get_picture() }}">
+                                {% else %}
+                                <i class="user icon"></i>
+                                {% endif %}
+                                <div class="content">
+                                    <a class="header">
+                                        {{ student_grade.lecturer.first_name }}
+                                        {{ student_grade.lecturer.last_name }}
+                                        {{
+                                        '(Advisor)'
+                                        if student_grade.lecturer == student.get_project().advisor
+                                        }}
+                                    </a>
+                                    <div class="description">{{ student_grade.get_result_display() }}</div>
                                 </div>
                             </div>
-                            {% endfor %}
                         </div>
-                    </td>
-
-                    {% set student_report = student.get_report(class_.id) %}
-                    {% set student_presentation = student.get_presentation(class_.id) %}
-                    <td>
-                        {% if student_report %}
-                        <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
-                            target="_blank">
-                            <i class="large pdf file icon link pop" data-content="Report"></i>
-                        </a>
-                        {% else %}
-                        <i class="grey large pdf file icon disable"></i>
-                        {% endif %}
-                        {% if student_presentation %}
-                        <a href="{{ url_for('submissions.download', progress_report_id=student_presentation.id, filename=student_presentation.file.filename) }}"
-                            target="_blank">
-                            <i class="large file powerpoint icon link pop" data-content="Presentation"></i>
-                        </a>
-                        {% else %}
-                        <i class="grey large file powerpoint icon disable"></i>
-                        {% endif %}
-                    </td>
-
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</form>
+                        {% endfor %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}
 

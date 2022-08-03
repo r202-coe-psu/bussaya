@@ -96,8 +96,14 @@ class User(me.Document, UserMixin):
                 return group
 
     def get_total_student_grades(self, round_grade):
-        student_grades = models.StudentGrade.objects.all().filter(
+        student_grades = models.StudentGrade.objects(
             student=self, class_=round_grade.class_, round_grade=round_grade
+        )
+        return student_grades
+
+    def get_total_lecturer_grades(self, round_grade):
+        student_grades = models.StudentGrade.objects(
+            lecturer=self, class_=round_grade.class_, round_grade=round_grade
         )
         return student_grades
 

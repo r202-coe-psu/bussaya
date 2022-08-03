@@ -1,0 +1,142 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/error-handler.html' as eh %}
+{% import '/base/html-renderer.html' as renderer %}
+{% import '/navbar/class-navbar.html' as renderer_navbar %}
+{% import '/admin/round_grades/admin-grade-menu-toolbars.html' as render_toolbars %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
+        {{ round_grade.get_type_display() }}
+    </a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.round_grades.view_total', class_id=class_.id, round_grade_type=round_grade.type) }}">View
+        Total
+        Grade
+    </a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+{{ renderer_navbar.render_class_navbar(class_, current_user) }}
+
+{{ render_toolbars.render_admin_grade_menu_toolbars(round_grade) }}
+
+<div class="ui attached segment">
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th class="one wide"></th>
+                <th class="three wide">Lecturer Name</th>
+                <th class="two wide">Total Given Grade</th>
+                <th>View</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lecturer in lecturers %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ lecturer.get_fullname() }}</td>
+                {% set lecturer_grades = lecturer.get_total_lecturer_grades(round_grade) %}
+                {% set given_grade = count_lecturer_given_grade(lecturer_grades) %}
+                <td class="{{'red' if given_grade - lecturer_grades.count() != 0 else 'green' }}">
+                    {{ given_grade }} / {{ lecturer_grades.count() }}
+                </td>
+                <td>
+                    <div class="title">
+                        <a id="{{ lecturer.id }}" style="cursor: pointer"
+                            onclick="accordion_show_hide('{{ lecturer.id }}')">
+                            See More
+                        </a>
+                    </div>
+                    <div id="{{ lecturer.id }} content" class="content" style="display: none">
+                        <p />
+                        <table class="ui celled table">
+                            <thead>
+                                <th>Student ID</th>
+                                <th>Student Name</th>
+                                <th>Given Grade</th>
+                            </thead>
+                            <tbody>
+                                {% for grade in lecturer_grades %}
+                                <tr>
+                                    <td>{{ grade.student.username }}</td>
+                                    <td>{{ grade.student.get_fullname() }}</td>
+                                    <td>{{ grade.get_result_display() }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+
+{% block additional_js %}
+<script type="text/javascript">
+    function showRelease() {
+        $('.ui.modal.release.round_grade')
+            .modal('show')
+            ;
+    }
+</script>
+<script type="text/javascript">
+    function accordion_show_hide(show_hide_id) {
+        $(document.getElementById(show_hide_id + " content")).transition('fade down')
+
+        if (document.getElementById(show_hide_id).textContent == "Hide") {
+            document.getElementById(show_hide_id).innerHTML = "See More"
+        } else {
+            document.getElementById(show_hide_id).innerHTML = "Hide"
+        }
+    }
+
+    function showSetTimeOff() {
+        $('.ui.time-off').transition('fade down')
+    }
+</script>
+<script type="text/javascript">
+    datetime_formatter = {
+        datetime: function (datetime, settings) {
+            if (!datetime) return '';
+            var day = datetime.getDate();
+            var month = datetime.getMonth() + 1;
+            var year = datetime.getFullYear();
+            var hour = datetime.getHours();
+            var minute = datetime.getMinutes();
+            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
+        }
+    };
+    $('#rangestart').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        endCalendar: $('#rangeend')
+    });
+    $('#rangeend').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        startCalendar: $('#rangestart')
+    });
+</script>
+<script type="text/javascript">
+    $('.icon.link.pop')
+        .popup({
+            delay: {
+                show: 50,
+                hide: 70
+            }
+        });
+</script>
+{% endblock additional_js %}

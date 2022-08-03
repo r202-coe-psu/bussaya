@@ -27,13 +27,14 @@
     <table class="ui celled structured single line table">
         <thead>
             <tr>
-                <th class="one wide"></th>
-                <th class="two wide">Student ID</th>
-                <th class="four wide">Student Name</th>
-                <th class="one wide">Given Grade</th>
-                <th class="one wide">Average Grade</th>
+                <th></th>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Meeting Report</th>
+                <th>Submissions</th>
+                <th>Given Grade</th>
+                <th>Average Grade</th>
                 <th>Total Grade</th>
-                <th class="two wide">Submissions</th>
             </tr>
         </thead>
         <tbody>
@@ -44,6 +45,27 @@
 
                 <td>{{ student.username }}</td>
                 <td>{{ student.first_name }} {{ student.last_name }}</td>
+                <td>{{ student.get_meeting_reports(class_, round_grade.type).count() }}</td>
+                {% set student_report = student.get_report(class_.id) %}
+                {% set student_presentation = student.get_presentation(class_.id) %}
+                <td>
+                    {% if student_report %}
+                    <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
+                        target="_blank">
+                        <i class="large pdf file icon link pop" data-content="Report"></i>
+                    </a>
+                    {% else %}
+                    <i class="grey large pdf file icon disable"></i>
+                    {% endif %}
+                    {% if student_presentation %}
+                    <a href="{{ url_for('submissions.download', progress_report_id=student_presentation.id, filename=student_presentation.file.filename) }}"
+                        target="_blank">
+                        <i class="large file powerpoint icon link pop" data-content="Presentation"></i>
+                    </a>
+                    {% else %}
+                    <i class="grey large file powerpoint icon disable"></i>
+                    {% endif %}
+                </td>
                 <td>{{ student_grade.get_result_display() }}</td>
                 <td>{{ student.get_average_grade(student_grade.round_grade) }}</td>
                 <td>
@@ -79,28 +101,6 @@
                         {% endfor %}
                     </div>
                 </td>
-
-                {% set student_report = student.get_report(class_.id) %}
-                {% set student_presentation = student.get_presentation(class_.id) %}
-                <td>
-                    {% if student_report %}
-                    <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
-                        target="_blank">
-                        <i class="large pdf file icon link pop" data-content="Report"></i>
-                    </a>
-                    {% else %}
-                    <i class="grey large pdf file icon disable"></i>
-                    {% endif %}
-                    {% if student_presentation %}
-                    <a href="{{ url_for('submissions.download', progress_report_id=student_presentation.id, filename=student_presentation.file.filename) }}"
-                        target="_blank">
-                        <i class="large file powerpoint icon link pop" data-content="Presentation"></i>
-                    </a>
-                    {% else %}
-                    <i class="grey large file powerpoint icon disable"></i>
-                    {% endif %}
-                </td>
-
             </tr>
             {% endfor %}
         </tbody>

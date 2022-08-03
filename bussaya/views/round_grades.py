@@ -47,9 +47,13 @@ def create_student_grade(class_, round_grade, student, lecturer):
     round_grade.save()
 
 
-@module.route("/<class_id>/<round_grade_type>/view")
+@module.route("/<round_grade_type>/view")
 @acl.roles_required("lecturer")
-def view(class_id, round_grade_type):
+def view(round_grade_type):
+    class_id = request.args.get("class_id", None)
+    if not class_id:
+        return redirect(url_for("dashboard.index"))
+
     class_ = models.Class.objects.get(id=class_id)
     round_grades = models.RoundGrade.objects.all().filter(class_=class_)
     user = current_user._get_current_object()
@@ -108,6 +112,9 @@ def view(class_id, round_grade_type):
     final.save()
 
     round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
+    if round_grade.is_in_time():
+        return redirect(url_for("round_grades.grading", round_grade_id=round_grade.id))
+
     student_grades = models.StudentGrade.objects(
         class_=class_, lecturer=user, round_grade=round_grade
     )
@@ -129,6 +136,14 @@ def view(class_id, round_grade_type):
 def grading(round_grade_id):
     round_grade = models.RoundGrade.objects.get(id=round_grade_id)
     class_ = round_grade.class_
+    if not round_grade.is_in_time():
+        return redirect(
+            url_for(
+                "round_grade.view",
+                class_id=class_.id,
+                round_grade_type=round_grade.type,
+            )
+        )
     user = current_user._get_current_object()
     student_grades = models.StudentGrade.objects.all().filter(
         round_grade=round_grade, lecturer=user

@@ -27,16 +27,6 @@
 <div class="ui divider"></div>
 
 <div class="ui segment">
-    <a class="ui primary labeled icon button"
-        href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
-        <i class="eye icon"></i>
-        View
-    </a>
-    <a class="ui {{'green' if round_grade.is_in_time() else 'disabled'}} labeled icon button"
-        href="{{ url_for('round_grades.grading', round_grade_id=round_grade.id) }}">
-        <i class="edit icon"></i>
-        Grading
-    </a>
     <div class="ui large info message">
         <b>Time off date:</b> {{ round_grade.natural_ended_date() }} <br>
         <b>Remaining Time:</b> {{ round_grade.remain_time()[1]}} <br>
@@ -51,6 +41,7 @@
                 <th></th>
                 <th>Student ID</th>
                 <th>Student Name</th>
+                <th>Meeting Report</th>
                 <th>Given Grade</th>
                 <th>Average Grade</th>
                 <th>Total Grade</th>
@@ -71,6 +62,7 @@
                 {% set index.value = index.value + 1 %}
                 <td>{{ student.username }}</td>
                 <td>{{ student.first_name }} {{ student.last_name }}</td>
+                <td>{{ student.get_meeting_reports(class_, round_grade.type).count() }}</td>
                 <td>{{ student_grade.get_result_display() }}</td>
                 <td>{{ student.get_average_grade(student_grade.round_grade) }}</td>
                 <td>
