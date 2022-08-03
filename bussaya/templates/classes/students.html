@@ -24,35 +24,42 @@
 <div class="ui divider"></div>
 
 <table class="ui celled table">
-    <thead>
-        <th>No. </th>
-        <th>Project</th>
-        <th>Student Name</th>
-        <th>Student ID</th>
-        <th>Group</th>
-    </thead>
-    <tbody>
-        {% for student in students %}
-        {% set project = student.get_project() %}
-        <tr>
-            <td>
-                {{ loop.index }}
-            </td>
-            <td>
-                {{ project.name }}
-            </td>
-            <td>
-                {{ student.get_fullname() }}
-            </td>
-            <td>
-                {{ student.username }}
-            </td>
-            <td>
-                {{ student.get_group(class_).name }}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <thead>
+    <th>No. </th>
+    <th>Student Name</th>
+    <th>Student ID</th>
+    <th>Project</th>
+    <th>Group</th>
+  </thead>
+  <tbody>
+    {% for student_id in class_.student_ids %}
+    {% set student = get_student_by_id(student_id, students) %}
+    <tr>
+      <td>
+        {{ loop.index }}
+      </td>
+      <td>
+        {{ student_id }}
+      </td>
+      <td>
+        {% if student %}
+          {{ student.get_fullname() }}
+        {% endif %}
+      </td>
+      <td>
+        {% if student %}
+          {% set project = student.get_project() %}
+          {{ project.name }}
+        {% endif %}
+      </td>
+      <td>
+        {% if student %}
+          {{ student.get_group(class_).name }}
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 
 

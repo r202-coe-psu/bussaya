@@ -151,6 +151,14 @@ def list_report_by_user(class_id, user_id):
     )
 
 
+def get_student_by_id(student_id, students):
+    for s in students:
+        if s.username == student_id:
+            return s
+
+    return None
+
+
 @module.route("/<class_id>/students")
 @acl.roles_required("admin")
 def view_students(class_id):
@@ -159,4 +167,9 @@ def view_students(class_id):
         "-username"
     )
 
-    return render_template("/classes/students.html", class_=class_, students=students)
+    return render_template(
+        "/classes/students.html",
+        class_=class_,
+        students=students,
+        get_student_by_id=get_student_by_id,
+    )
