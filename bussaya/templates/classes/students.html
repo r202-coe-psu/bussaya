@@ -29,11 +29,16 @@
     <th>Student Name</th>
     <th>Student ID</th>
     <th>Project</th>
+    <th>Meetings</th>
+    <th>Adivisor / Committees</th>
     <th>Group</th>
   </thead>
   <tbody>
     {% for student_id in class_.student_ids %}
-    {% set student = get_student_by_id(student_id, students) %}
+      {% set student = get_student_by_id(student_id, students) %}
+      {% if student %} 
+        {% set project = student.get_project() %}
+      {% endif %}
     <tr>
       <td>
         {{ loop.index }}
@@ -47,9 +52,29 @@
         {% endif %}
       </td>
       <td>
-        {% if student %}
-          {% set project = student.get_project() %}
+        {% if project %}
           {{ project.name }}
+        {% endif %}
+      </td>
+      <td>
+        {% if student %}
+          <div class="ui blue label">
+            <i class="file icon"></i>
+            {{ student.get_meeting_reports(class_, 'midterm').count() }} 
+          </div>
+
+          <div class="ui red label">
+            <i class="file icon"></i>
+            {{ student.get_meeting_reports(class_, 'final').count() }}
+          </div>
+        {% endif %}
+      </td>
+      <td>
+        {% if project %}
+          {{ project.advisor.get_fullname() }}<br/>
+          {% for c in project.committees %}
+          {{ c.get_fullname() }},
+          {% endfor %}
         {% endif %}
       </td>
       <td>
