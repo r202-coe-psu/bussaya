@@ -67,12 +67,26 @@ class Project(me.Document):
 
     public = me.StringField(
         required=True,
-        default="only name",
+        default="abstract, poster",
         choices=[
+            # ('private', 'Private'),
             ("only name", "Only Name"),
+            ("abstract", "Abstract"),
+            ("poster", "Poster"),
             ("report", "Report"),
             ("presentation", "Presentation"),
-            ("report presentation", "Report Presentation"),
+            ("video", "Video"),
+            ("abstract, poster", "Abstract and Poster"),
+            ("abstract, report", "Abstract and Report"),
+            ("abstract, report, video", "Abstract, Report and Video"),
+            ("abstract, report, poster", "Abstract, Report and Poster"),
+            ("abstract, poster, git", "Abstract, Poster and Git"),
+            ("abstract, report, poster, git", "Abstract, Report, Poster and Git"),
+            ("abstract, poster, video, git", "Abstract, Poster, Video and Git"),
+            (
+                "abstract, report, poster, video, git",
+                "Abstract, Report, Poster, Video and Git",
+            ),
         ],
     )
 
