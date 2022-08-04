@@ -71,9 +71,9 @@
       </td>
       <td>
         {% if project %}
-          {{ project.advisor.get_fullname() }}<br/>
+          <b>{{ project.advisor.get_fullname() }}</b><br/>
           {% for c in project.committees %}
-          {{ c.get_fullname() }},
+            {{ c.get_fullname() }}<br/>
           {% endfor %}
         {% endif %}
       </td>
