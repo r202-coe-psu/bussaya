@@ -22,12 +22,14 @@
     View Students
 </h2>
 <div class="ui divider"></div>
-
+<div>
+  <a href="{{ url_for('exports.export_students', class_id=class_.id) }}" class="ui icon primary large circular button"><i class="icon file excel"></i></a>
+</div>
 <table class="ui celled table">
   <thead>
     <th>No. </th>
-    <th>Student Name</th>
-    <th>Student ID</th>
+    <th>ID</th>
+    <th>Name</th>
     <th>Project</th>
     <th>Meetings</th>
     <th>Adivisor / Committees</th>
