@@ -34,6 +34,7 @@
                 <th>Submissions</th>
                 <th>Given Grade</th>
                 <th>Average Grade</th>
+                <th>Final Grade</th>
                 <th>Total Grade</th>
             </tr>
         </thead>
@@ -46,8 +47,8 @@
                 <td>{{ student.username }}</td>
                 <td>{{ student.first_name }} {{ student.last_name }}</td>
                 <td>{{ student.get_meeting_reports(class_, round_grade.type).count() }}</td>
-                {% set student_report = student.get_report(class_.id) %}
-                {% set student_presentation = student.get_presentation(class_.id) %}
+                {% set student_report = student.get_report(class_.id, round_grade.type) %}
+                {% set student_presentation = student.get_presentation(class_.id, round_grade.type) %}
                 <td>
                     {% if student_report %}
                     <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
@@ -68,14 +69,33 @@
                 </td>
                 <td>{{ student_grade.get_result_display() }}</td>
                 <td>{{ student.get_average_grade(student_grade.round_grade) }}</td>
+                {% set final_grade, caused = student.get_final_grade(student_grade.round_grade) %}
                 <td>
                     <div class="title">
-                        <a id="{{student_grade.id}}" style="cursor: pointer"
-                            onclick="accordion_show_hide('{{student_grade.id}}')">
+                        {{ final_grade }}
+                        {% if caused %}
+                        <a id="{{student_grade.id}} header final" style="cursor: pointer"
+                            onclick="accordion_view_final('{{student_grade.id}}')">
+                            View
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div id="{{student_grade.id}} content final" class="content"
+                        style="display: none; width: fit-content">
+                        {% for cause in caused %}
+                        - {{ cause }}
+                        {% if not loop.last %} <br> {% endif %}
+                        {% endfor %}
+                    </div>
+                </td>
+                <td>
+                    <div class="title">
+                        <a id="{{student_grade.id}} header total" style="cursor: pointer"
+                            onclick="accordion_view_total('{{student_grade.id}}')">
                             See More
                         </a>
                     </div>
-                    <div id="{{student_grade.id}} content" class="content" style="display: none">
+                    <div id="{{student_grade.id}} content total" class="content" style="display: none">
                         <p />
                         {% for student_grade in student.get_total_student_grades(round_grade) %}
                         <div class="ui relaxed divided list">
@@ -112,13 +132,22 @@
 
 {% block additional_js %}
 <script type="text/javascript">
-    function accordion_show_hide(show_hide_id) {
-        $(document.getElementById(show_hide_id + " content")).transition('fade down')
+    function accordion_view_total(view_total_id) {
+        $(document.getElementById(view_total_id + " content total")).transition('fade down')
 
-        if (document.getElementById(show_hide_id).textContent == "Hide") {
-            document.getElementById(show_hide_id).innerHTML = "See More"
+        if (document.getElementById(view_total_id + " header total").textContent == "Hide") {
+            document.getElementById(view_total_id + " header total").innerHTML = "See More"
         } else {
-            document.getElementById(show_hide_id).innerHTML = "Hide"
+            document.getElementById(view_total_id + " header total").innerHTML = "Hide"
+        }
+    }
+    function accordion_view_final(view_final_id) {
+        $(document.getElementById(view_final_id + " content final")).transition('fade down')
+
+        if (document.getElementById(view_final_id + " header final").textContent == "Hide") {
+            document.getElementById(view_final_id + " header final").innerHTML = "View"
+        } else {
+            document.getElementById(view_final_id + " header final").innerHTML = "Hide"
         }
     }
 

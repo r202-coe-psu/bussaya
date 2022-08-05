@@ -227,7 +227,7 @@
 					{% if progress_report %}
 					<a href="{{ url_for('submissions.download', progress_report_id=progress_report.id, filename=progress_report.file.filename) }}"
 						target="_blank">
-						{{progress_report.file.filename}}
+						{{ progress_report.file.filename }}
 					</a>
 					{% else %}
 					-
@@ -236,20 +236,11 @@
 
 				<td>
 					{% if submission.get_status() == "opened" or submission.get_status() == "lated" %}
-					{% if progress_report %}
-					<a class="ui small fluid icon primary button"
-						href="{{ url_for('submissions.edit_progress_report', progress_report_id=progress_report.id)}}">
-						<i class="edit icon"></i>
-						Edit
-					</a>
-					{% else %}
-
 					<a class="ui small fluid icon {{ 'primary' if current_user.get_permission_to_upload(submission) else 'disabled' }} button"
 						href="{{ url_for('submissions.upload', submission_id=submission.id)}}">
 						<i class="upload icon"></i>
 						Upload
 					</a>
-					{% endif %}
 					{% endif %}
 				</td>
 

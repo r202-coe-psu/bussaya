@@ -58,18 +58,24 @@ class User(me.Document, UserMixin):
         project = models.Project.objects(students=self).order_by("-id").first()
         return project
 
-    def get_report(self, class_id):
+    def get_report(self, class_id, round):
         class_ = models.Class.objects.get(id=class_id)
-        progress_reports = models.ProgressReport.objects(class_=class_, owner=self)
-
-        for progress_report in progress_reports:
-            return progress_report
-        return False
-
-    def get_presentation(self, class_id):
-        class_ = models.Class.objects.get(id=class_id)
+        submission = models.Submission.objects(
+            type="report", class_=class_, round=round
+        ).first()
         progress_report = models.ProgressReport.objects(
-            class_=class_, owner=self
+            owner=self, submission=submission
+        ).first()
+
+        return progress_report
+
+    def get_presentation(self, class_id, round):
+        class_ = models.Class.objects.get(id=class_id)
+        submission = models.Submission.objects(
+            type="presentation", class_=class_, round=round
+        ).first()
+        progress_report = models.ProgressReport.objects(
+            owner=self, submission=submission
         ).first()
 
         return progress_report
@@ -107,9 +113,62 @@ class User(me.Document, UserMixin):
         )
         return student_grades
 
+    def get_permission_to_upload(self, submission):
+        meeting_reports = models.MeetingReport.objects(
+            class_=submission.class_, owner=self
+        )
+        count_report = 0
+        for report in meeting_reports:
+            if submission.round == report.meeting.round:
+                count_report += 1
+
+        if count_report > 1:
+            return True
+        return False
+
+    def get_grade_to_point(self, grade):
+        point = 0
+        if grade == "A":
+            point = 3.75
+        if grade == "B+":
+            point = 3.25
+        if grade == "B":
+            point = 2.75
+        if grade == "C+":
+            point = 2.25
+        if grade == "C":
+            point = 1.75
+        if grade == "D+":
+            point = 1.25
+        if grade == "D":
+            point = 0.75
+        if grade == "E":
+            point = 0.75
+        return point
+
+    def get_point_to_grade(self, point):
+        if point > 3.75:
+            grade = "A"
+        elif point >= 3.25:
+            grade = "B+"
+        elif point >= 2.75:
+            grade = "B"
+        elif point >= 2.25:
+            grade = "C+"
+        elif point >= 1.75:
+            grade = "C"
+        elif point >= 1.25:
+            grade = "D+"
+        elif point >= 0.75:
+            grade = "D"
+        elif point < 0.75:
+            grade = "E"
+        return grade
+
     def get_average_grade(self, round_grade):
+        class_ = round_grade.class_
         student_grades = models.StudentGrade.objects(
-            student=self, class_=round_grade.class_, round_grade=round_grade
+            student=self, class_=class_, round_grade=round_grade
         )
 
         total_student_grade = []
@@ -132,10 +191,10 @@ class User(me.Document, UserMixin):
             advisor_grade_ratio = 0.6
             committee_grade_ratio = 0.4
 
-        for round_grade in total_student_grade:
-            grade_point = round_grade.get_grade_point()
+        for student_grade in total_student_grade:
+            grade_point = student_grade.get_grade_point()
 
-            if round_grade.lecturer in project.committees:
+            if student_grade.lecturer in project.committees:
                 committees_grade_point += grade_point
 
             else:
@@ -143,34 +202,41 @@ class User(me.Document, UserMixin):
 
         average_point += committee_grade_ratio * committees_grade_point
 
-        if average_point > 3.75:
-            average_grade = "A"
-        elif average_point >= 3.25:
-            average_grade = "B+"
-        elif average_point >= 2.75:
-            average_grade = "B"
-        elif average_point >= 2.25:
-            average_grade = "C+"
-        elif average_point >= 1.75:
-            average_grade = "C"
-        elif average_point >= 1.25:
-            average_grade = "D+"
-        elif average_point >= 0.75:
-            average_grade = "D"
-        elif average_point < 0.75:
-            average_grade = "E"
-
+        average_grade = self.get_point_to_grade(average_point)
         return average_grade
 
-    def get_permission_to_upload(self, submission):
-        meeting_reports = models.MeetingReport.objects(
-            class_=submission.class_, owner=self
-        )
-        count_report = 0
-        for report in meeting_reports:
-            if submission.round == report.meeting.round:
-                count_report += 1
+    def get_final_grade(self, round_grade):
+        class_ = round_grade.class_
 
-        if count_report > 2:
-            return True
-        return False
+        average_grade = self.get_average_grade(round_grade)
+        final_point = self.get_grade_to_point(average_grade)
+
+        caused = []
+        report = self.get_report(class_.id, round_grade.type)
+        presentation = self.get_presentation(class_.id, round_grade.type)
+        meeting_reports = self.get_meeting_reports(class_, round_grade.type)
+        # if grade incomplete
+        if average_grade == "Incomplete":
+            return average_grade, caused
+
+        # if student not sent report -> -0.5 grade
+        if not report:
+            final_point -= 0.5
+            caused.append("Not sent Report")
+
+        # if student not sent presentation -> -0.5 grade
+        if not presentation:
+            final_point -= 0.5
+            caused.append("Not sent Presentation")
+
+        if len(meeting_reports) < 3:
+            final_point -= 1
+            caused.append("Not sent 2 meeting report")
+
+        elif len(meeting_reports) < 4:
+            final_point -= 0.5
+            caused.append("Not sent 1 meeting report")
+
+        final_grade = self.get_point_to_grade(final_point)
+
+        return final_grade, caused
