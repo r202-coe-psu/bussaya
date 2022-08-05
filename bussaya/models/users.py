@@ -157,7 +157,7 @@ class User(me.Document, UserMixin):
             average_grade = "D+"
         elif average_point >= 0.75:
             average_grade = "D"
-        elif average_point < 0.5:
+        elif average_point < 0.75:
             average_grade = "E"
 
         return average_grade
