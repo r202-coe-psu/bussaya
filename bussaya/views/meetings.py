@@ -111,7 +111,13 @@ def approval(meeting_id, meeting_report_id, action):
 
     meeting_report.save()
 
-    return redirect(url_for("classes.view", class_id=meeting_report.class_.id))
+    return redirect(
+        url_for(
+            "classes.list_report_by_user",
+            class_id=meeting_report.class_.id,
+            user_id=meeting_report.owner.id,
+        )
+    )
 
 
 @module.route(
