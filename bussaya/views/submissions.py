@@ -124,6 +124,7 @@ def delete(submission_id):
 )
 @login_required
 def upload(submission_id):
+    user = current_user._get_current_object()
     submission = models.Submission.objects.get(id=submission_id)
     class_ = submission.class_
     if submission.get_status() == "closed":
@@ -146,7 +147,9 @@ def upload(submission_id):
             projects=projects,
         )
 
-    progress_report = models.ProgressReport.objects(submission=submission).first()
+    progress_report = models.ProgressReport.objects(
+        submission=submission, owner=user
+    ).first()
     if not progress_report:
         progress_report = models.ProgressReport()
         progress_report.submission = models.Submission.objects.get(id=submission_id)

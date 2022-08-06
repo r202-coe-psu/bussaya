@@ -54,10 +54,7 @@
             {% for student_grade in student_grades %}
 
             {% set student = student_grade.student %}
-            {% set group = current_user.get_group(class_= class_) %}
-
             {% if student_grade.lecturer == current_user %}
-            {% if student in group.students %}
             <tr>
                 <td>{{index.value}}</td>
                 {% set index.value = index.value + 1 %}
@@ -111,10 +108,9 @@
                                     <a class="header">
                                         {{ student_grade.lecturer.first_name }}
                                         {{ student_grade.lecturer.last_name }}
-                                        {{
-                                        '(Advisor)'
-                                        if student_grade.lecturer == student.get_project().advisor
-                                        }}
+                                        {% if student_grade.lecturer == student.get_project().advisor %}
+                                        <i class="red star icon"></i>
+                                        {% endif %}
                                     </a>
                                     <div class="description">{{ student_grade.get_result_display() }}</div>
                                 </div>
@@ -146,7 +142,6 @@
                 </td>
 
             </tr>
-            {% endif %}
             {% endif %}
             {% endfor %}
         </tbody>

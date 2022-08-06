@@ -13,8 +13,6 @@ class RoundGrade(me.Document):
 
     type = me.StringField(choices=SEMESTER_TYPE)
     class_ = me.ReferenceField("Class", dbref=True, required=True)
-    student_ids = me.ListField()
-    student_grades = me.ListField()
 
     release_status = me.StringField(choices=RELEASE_STATUS, default="unreleased")
     started_date = me.DateTimeField(required=True, default=datetime.datetime.now)

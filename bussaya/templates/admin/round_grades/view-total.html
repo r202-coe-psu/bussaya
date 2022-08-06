@@ -50,10 +50,12 @@
                 {% set index.value = index.value + 1 %}
                 <td>{{ student.username }}</td>
                 <td>{{ student.first_name }} {{ student.last_name }}</td>
-                <a target="_blank"
-                    href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}">
-                    {{ student.get_meeting_reports(class_, round_grade.type).count() }}
-                </a>
+                <td>
+                    <a target="_blank"
+                        href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}">
+                        {{ student.get_meeting_reports(class_, round_grade.type).count() }}
+                    </a>
+                </td>
                 {% set student_report = student.get_report(class_.id, round_grade.type) %}
                 {% set student_presentation = student.get_presentation(class_.id, round_grade.type) %}
                 <td>
@@ -117,10 +119,9 @@
                                     <a class="header">
                                         {{ student_grade.lecturer.first_name }}
                                         {{ student_grade.lecturer.last_name }}
-                                        {{
-                                        '(Advisor)'
-                                        if student_grade.lecturer == student.get_project().advisor
-                                        }}
+                                        {% if student_grade.lecturer == student.get_project().advisor %}
+                                        <i class="red star icon"></i>
+                                        {% endif %}
                                     </a>
                                     <div class="description">{{ student_grade.get_result_display() }}</div>
                                 </div>

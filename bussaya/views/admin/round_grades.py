@@ -12,20 +12,15 @@ def index(class_id):
     return render_template("/round_grades/index.html", class_=class_)
 
 
-def get_lecturers_project_of_student(username):
-    student = models.User.objects(username=username).first()
-    if not student:
-        return []
-
+def get_lecturers_project_of_student(student):
     lecturers = []
+    if not student:
+        return lecturers
     project = student.get_project()
     if project:
-        if project.committees:
-            lecturers.append(project.advisor)
-            for committee in project.committees:
-                lecturers.append(committee)
-        else:
-            lecturers = [project.advisor]
+        lecturers.append(project.advisor)
+        for committee in project.committees:
+            lecturers.append(committee)
 
     return lecturers
 
@@ -36,14 +31,13 @@ def create_student_grade(class_, round_grade, student, lecturer):
     student_grade.round_grade = round_grade
     student_grade.student = student
     student_grade.lecturer = lecturer
-    if student.get_project():
-        student_grade.project
+
+    project = student.get_project()
+    if project:
+        student_grade.project = project
 
     student_grade.save()
-    if student.username not in round_grade.student_ids:
-        round_grade.student_ids.append(student.username)
 
-    round_grade.student_grades.append(student_grade)
     round_grade.save()
 
 
@@ -76,37 +70,16 @@ def view(round_grade_type):
     final = models.RoundGrade.objects.get(type="final", class_=class_)
 
     # Project create after round_grade has been created.
-    for id in class_.student_ids:
-        student = models.User.objects(username=id).first()
-        if not student or not student.has_roles("student"):
-            continue
-
-        for lecturer in get_lecturers_project_of_student(student.username):
+    for student in models.User.objects(username__in=class_.student_ids):
+        for lecturer in get_lecturers_project_of_student(student):
             if not models.StudentGrade.objects(
-                class_=class_, student=student, lecturer=lecturer
+                class_=class_, student=student, lecturer=lecturer, round_grade=midterm
             ):
                 create_student_grade(class_, midterm, student, lecturer)
+            if not models.StudentGrade.objects(
+                class_=class_, student=student, lecturer=lecturer, round_grade=final
+            ):
                 create_student_grade(class_, final, student, lecturer)
-
-    for student_id in midterm.student_ids:
-        # Student Has been 'REMOVED'
-        if student_id not in class_.student_ids:
-            student = models.User.objects(username=student_id).first()
-            if not student:
-                continue
-
-            old_midterm_Grade = models.StudentGrade.objects(
-                student=student, round_grade=midterm, class_=class_
-            )
-            old_final_Grade = models.StudentGrade.objects(
-                student=student, round_grade=final, class_=class_
-            )
-
-            old_midterm_Grade.delete()
-            old_final_Grade.delete()
-
-            midterm.student_ids.remove(student_id)
-            final.student_ids.remove(student_id)
 
     midterm.save()
     final.save()
@@ -171,10 +144,11 @@ def view_total(round_grade_type):
 def count_lecturer_given_grade(lecturer_grades):
     given_grade = 0
     for grade in lecturer_grades:
-        if grade.result != '-':
+        if grade.result != "-":
             given_grade += 1
-            
+
     return given_grade
+
 
 @module.route("/<round_grade_type>/view_advisor")
 @acl.roles_required("admin")

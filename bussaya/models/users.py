@@ -212,9 +212,13 @@ class User(me.Document, UserMixin):
         report = self.get_report(class_.id, round_grade.type)
         presentation = self.get_presentation(class_.id, round_grade.type)
         meeting_reports = self.get_meeting_reports(class_, round_grade.type)
+
         # if grade incomplete
         if average_grade == "Incomplete":
             return average_grade, caused
+
+        if presentation:
+            print(presentation.submission.ended_date - presentation.updated_date)
 
         # if student not sent report -> -0.5 grade
         if not report:

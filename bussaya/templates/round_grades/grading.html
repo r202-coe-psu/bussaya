@@ -138,10 +138,9 @@
                                         <a class="header">
                                             {{ student_grade.lecturer.first_name }}
                                             {{ student_grade.lecturer.last_name }}
-                                            {{
-                                            '(Advisor)'
-                                            if student_grade.lecturer == student.get_project().advisor
-                                            }}
+                                            {% if student_grade.lecturer == student.get_project().advisor %}
+                                            <i class="red star icon"></i>
+                                            {% endif %}
                                         </a>
                                         <div class="description">{{ student_grade.get_result_display() }}</div>
                                     </div>
