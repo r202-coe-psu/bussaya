@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, send_file, request
 from flask_login import login_required, current_user
 from bussaya import forms, models, acl
+import mongoengine as me
 
 module = Blueprint("round_grades", __name__, url_prefix="/round_grades")
 
@@ -36,10 +37,13 @@ def create_student_grade(class_, round_grade, student, lecturer):
     student_grade.round_grade = round_grade
     student_grade.student = student
     student_grade.lecturer = lecturer
-    if student.get_project():
-        student_grade.project
+
+    project = student.get_project()
+    if project:
+        student_grade.project = project
 
     student_grade.save()
+
     if student.username not in round_grade.student_ids:
         round_grade.student_ids.append(student.username)
 
@@ -83,9 +87,13 @@ def view(round_grade_type):
 
         for lecturer in get_lecturers_project_of_student(student.username):
             if not models.StudentGrade.objects(
-                class_=class_, student=student, lecturer=lecturer
+                class_=class_, student=student, lecturer=lecturer, round_grade=midterm
             ):
+
                 create_student_grade(class_, midterm, student, lecturer)
+            if not models.StudentGrade.objects(
+                class_=class_, student=student, lecturer=lecturer, round_grade=final
+            ):
                 create_student_grade(class_, final, student, lecturer)
 
     for student_id in midterm.student_ids:
@@ -173,27 +181,55 @@ def submit_grade(round_grade_id):
     class_ = round_grade.class_
     user = current_user._get_current_object()
 
+    if not round_grade.is_in_time():
+        return redirect(url_for("round_grades.grading", round_grade_id=round_grade_id))
+
     form = forms.round_grades.GroupGradingForm()
 
     if not form.validate_on_submit():
         return redirect(url_for("round_grades.grading", round_grade_id=round_grade_id))
 
     for grading in form.gradings.data:
-        print("grading", grading)
         student = models.User.objects.get(id=grading["student_id"])
-        student_grade = models.StudentGrade.objects(
-            student=student, class_=class_, round_grade=round_grade, lecturer=user
+        project = models.Project.objects(
+            (me.Q(creator=student) | me.Q(students=student))
+            & (me.Q(advisor=user) | me.Q(committees=user))
         ).first()
 
-        student_grade.result = grading["result"]
+        if not project:
+            continue
 
-        meetings = models.MeetingReport.objects(
-            class_=class_, owner=student_grade.student
-        )
-        for meeting in meetings:
-            meeting.status = "approved"
-            meeting.save()
+        student_grade = models.StudentGrade.objects(
+            student=student,
+            class_=class_,
+            round_grade=round_grade,
+            lecturer=user,
+            project=project,
+        ).first()
+
+        if not student_grade:
+            student_grade = models.StudentGrade(
+                student=student,
+                class_=class_,
+                round_grade=round_grade,
+                lecturer=user,
+                project=project,
+            )
+
+        student_grade.result = grading["result"]
         student_grade.save()
+
+        if project.advisor == current_user._get_current_object():
+            meetings = models.MeetingReport.objects(
+                class_=class_, owner=student_grade.student, status=None
+            )
+            for meeting in meetings:
+                meeting.status = "approved"
+                meeting.approver = current_user._get_current_object()
+                meeting.approver_ip_address = request.headers.get(
+                    "X-Forwarded-For", request.remote_addr
+                )
+                meeting.save()
 
     return redirect(
         url_for(

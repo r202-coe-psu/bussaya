@@ -20,7 +20,7 @@
       {{'Grading' if 'midterm' not in request.path and 'final' not in request.path}}
     </span>
     <div class="menu">
-      {% if 'admin' in current_user.roles %}
+      {% if 'admin' in request.path %}
       <a class="item" href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type='midterm') }}">
         Midterm
       </a>
