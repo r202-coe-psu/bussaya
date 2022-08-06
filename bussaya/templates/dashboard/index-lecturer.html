@@ -18,8 +18,11 @@ Dashboard
     <tr>
       <th>Name</th>
       <th>Description</th>
+      {#
       <th>Type</th>
+      #}
       <th>Ended Date</th>
+      <th></th>
     </tr>
   </thead>
 
@@ -32,11 +35,25 @@ Dashboard
       <td>
         {{ class_.description }}
       </td>
+      {#
       <td>
         {{ class_.get_type_display() }}
       </td>
+      #}
       <td>
         {{ class_.ended_date }}
+      </td>
+      <td>
+        <a href="{{ url_for('classes.view', class_id=class_.id) }}" class="ui icon primary circular button">
+          <i class="icon eye link pop" data-content="View class"></i>
+        </a>
+        <a href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='midterm') }}" class="ui icon blue circular button">
+          <i class="icon font link pop" data-content="Midterm grade"></i>
+        </a>
+        <a href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='final') }}" class="ui icon red circular button">
+          <i class="icon font link pop" data-content="Final grade"></i>
+        </a>
+
       </td>
     </tr>
     {% endfor %}

@@ -109,6 +109,10 @@ def approval(meeting_id, meeting_report_id, action):
         meeting_report.status = "disapproved"
         meeting_report.remark = "check"
 
+    meeting_report.approver = current_user._get_current_object()
+    meeting_report.approver_ip_address = request.headers.get(
+        "X-Forwarded-For", request.remote_addr
+    )
     meeting_report.save()
 
     return redirect(

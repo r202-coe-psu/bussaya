@@ -184,7 +184,7 @@ class MeetingReport(me.Document):
     owner = me.ReferenceField("User", dbref=True, required=True)
     class_ = me.ReferenceField("Class", dbref=True, required=True)
     project = me.ReferenceField("Project", dbref=True, required=True)
-    ip_address = me.StringField(required=True)
+    ip_address = me.StringField(required=True, max_length=255)
 
     title = me.StringField()
     description = me.StringField(required=True)
@@ -194,6 +194,8 @@ class MeetingReport(me.Document):
     )
 
     status = me.StringField(choices=APPROVAL_STATUS)
+    approver = me.ReferenceField("User", dbref=True)
+    approver_ip_address = me.StringField(max_length=255)
     remark = me.StringField()
 
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)

@@ -81,15 +81,12 @@ class User(me.Document, UserMixin):
         return progress_report
 
     def get_meeting_reports(self, class_, round=None):
-        from . import submissions
 
-        meetings = submissions.Meeting.objects(class_=class_)
+        meetings = models.Meeting.objects(class_=class_)
         if round:
             meetings = meetings.filter(round=round)
 
-        meeting_reports = submissions.MeetingReport.objects(
-            meeting__in=meetings, owner=self
-        )
+        meeting_reports = models.MeetingReport.objects(meeting__in=meetings, owner=self)
         return meeting_reports
 
     def get_advisee_projects(self):
