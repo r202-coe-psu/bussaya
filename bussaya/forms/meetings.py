@@ -1,5 +1,4 @@
-from wtforms import fields
-from wtforms import widgets
+from wtforms import fields, widgets, Form
 
 from flask_wtf import FlaskForm
 from flask_mongoengine.wtf import model_form
@@ -43,7 +42,6 @@ BaseMeetingReportForm = model_form(
         "updated_date",
         "owner",
         "status",
-        "remark",
         "ip_address",
         "class_",
         "meeting",
@@ -55,6 +53,7 @@ BaseMeetingReportForm = model_form(
             "label": "Project",
             "label_modifier": lambda p: p.name,
         },
+        "remark": {"label": "Disapprove Remark"},
     },
 )
 
@@ -65,5 +64,5 @@ class MeetingReportForm(BaseMeetingReportForm):
     meeting_date = fields.DateField("Meeting Date", format="%Y-%m-%d")
 
 
-class DisapproveForm(BaseMeetingForm):
-    remark = fields.StringField("Disapprove Remark")
+class DisapproveForm(BaseMeetingReportForm):
+    pass

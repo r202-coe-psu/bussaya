@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, url_for, redirect, request
 from flask_login import current_user, login_required
 import mongoengine as me
 from datetime import datetime
-from bussaya import acl
+from bussaya import acl, forms
 
 from .. import models
 
@@ -143,11 +143,14 @@ def list_report_by_user(class_id, user_id):
     user = models.User.objects.get(id=user_id)
     meeting_reports = models.MeetingReport.objects(meeting__in=meetings, owner=user)
 
+    form = forms.meetings.DisapproveForm()
+
     return render_template(
         "/classes/list-report-by-user.html",
         class_=class_,
         user=user,
         meeting_reports=meeting_reports,
+        form=form,
     )
 
 

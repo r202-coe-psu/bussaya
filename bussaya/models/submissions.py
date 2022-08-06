@@ -1,3 +1,4 @@
+from email.policy import default
 from telnetlib import STATUS
 import mongoengine as me
 
@@ -194,9 +195,9 @@ class MeetingReport(me.Document):
     )
 
     status = me.StringField(choices=APPROVAL_STATUS)
+    remark = me.StringField(max_length=2000, default="")
     approver = me.ReferenceField("User", dbref=True)
     approver_ip_address = me.StringField(max_length=255)
-    remark = me.StringField()
 
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
     updated_date = me.DateTimeField(
