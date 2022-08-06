@@ -43,7 +43,8 @@
 <div class="ui segment">
 	<h2 class="ui header">Grade</h2>
 	<div class="ui divider"></div>
-	<a class="ui green labeled icon button" href="{{ url_for('grades.view_student_grades', class_id=class_.id) }}">
+	<a class="ui green labeled icon button"
+		href="{{ url_for('round_grades.view_student_grades', class_id=class_.id) }}">
 		<i class="star icon"></i>
 		View Grades
 	</a>

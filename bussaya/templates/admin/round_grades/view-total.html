@@ -37,6 +37,7 @@
                 <th class="one wide">Meeting Report</th>
                 <th class="one wide">Submissions</th>
                 <th>Average Grade</th>
+                <th>Final Grade</th>
                 <th>Total Grade</th>
             </tr>
         </thead>
@@ -49,7 +50,10 @@
                 {% set index.value = index.value + 1 %}
                 <td>{{ student.username }}</td>
                 <td>{{ student.first_name }} {{ student.last_name }}</td>
-                <td>{{ student.get_meeting_reports(class_, round_grade.type).count() }}</td>
+                <a target="_blank"
+                    href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}">
+                    {{ student.get_meeting_reports(class_, round_grade.type).count() }}
+                </a>
                 {% set student_report = student.get_report(class_.id, round_grade.type) %}
                 {% set student_presentation = student.get_presentation(class_.id, round_grade.type) %}
                 <td>
@@ -72,6 +76,25 @@
                 </td>
                 <td>
                     {{ student.get_average_grade(student_grade.round_grade) }}
+                </td>
+                {% set final_grade, caused = student.get_final_grade(student_grade.round_grade) %}
+                <td>
+                    <div class="ui accordion">
+                        <div class="title">
+                            {% if caused %}
+                            <i class="blue dropdown icon"></i>
+                            {% else %}
+                            <i class="grey dropdown icon"></i>
+                            {% endif %}
+                            {{ final_grade }}
+                        </div>
+                        <div class="content" style="display: none; width: fit-content">
+                            {% for cause in caused %}
+                            - {{ cause }}
+                            {% if not loop.last %} <br> {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
                 </td>
                 <td>
                     <div class="title">
@@ -122,6 +145,9 @@
             .modal('show')
             ;
     }
+    $('.ui.accordion')
+        .accordion()
+        ;
 </script>
 <script type="text/javascript">
     function accordion_show_hide(show_hide_id) {

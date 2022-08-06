@@ -46,12 +46,19 @@
 
                 <td>{{ student.username }}</td>
                 <td>{{ student.first_name }} {{ student.last_name }}</td>
-                <td>{{ student.get_meeting_reports(class_, round_grade.type).count() }}</td>
+                <td>
+                    <a target="_blank"
+                        href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}">
+                        {{ student.get_meeting_reports(class_, round_grade.type).count() }}
+                    </a>
+                </td>
+                </a>
                 {% set student_report = student.get_report(class_.id, round_grade.type) %}
                 {% set student_presentation = student.get_presentation(class_.id, round_grade.type) %}
                 <td>
                     {% if student_report %}
-                    <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
+                    <a target="_blank"
+                        href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
                         target="_blank">
                         <i class="large pdf file icon link pop" data-content="Report"></i>
                     </a>
@@ -71,21 +78,21 @@
                 <td>{{ student.get_average_grade(student_grade.round_grade) }}</td>
                 {% set final_grade, caused = student.get_final_grade(student_grade.round_grade) %}
                 <td>
-                    <div class="title">
-                        {{ final_grade }}
-                        {% if caused %}
-                        <a id="{{student_grade.id}} header final" style="cursor: pointer"
-                            onclick="accordion_view_final('{{student_grade.id}}')">
-                            View
-                        </a>
-                        {% endif %}
-                    </div>
-                    <div id="{{student_grade.id}} content final" class="content"
-                        style="display: none; width: fit-content">
-                        {% for cause in caused %}
-                        - {{ cause }}
-                        {% if not loop.last %} <br> {% endif %}
-                        {% endfor %}
+                    <div class="ui accordion">
+                        <div class="title">
+                            {% if caused %}
+                            <i class="blue dropdown icon"></i>
+                            {% else %}
+                            <i class="grey dropdown icon"></i>
+                            {% endif %}
+                            {{ final_grade }}
+                        </div>
+                        <div class="content" style="display: none; width: fit-content">
+                            {% for cause in caused %}
+                            - {{ cause }}
+                            {% if not loop.last %} <br> {% endif %}
+                            {% endfor %}
+                        </div>
                     </div>
                 </td>
                 <td>
@@ -95,7 +102,7 @@
                             See More
                         </a>
                     </div>
-                    <div id="{{student_grade.id}} content total" class="content" style="display: none">
+                    <div id="{{ student_grade.id }} content total" class="content" style="display: none">
                         <p />
                         {% for student_grade in student.get_total_student_grades(round_grade) %}
                         <div class="ui relaxed divided list">
@@ -109,10 +116,9 @@
                                     <a class="header">
                                         {{ student_grade.lecturer.first_name }}
                                         {{ student_grade.lecturer.last_name }}
-                                        {{
-                                        '(Advisor)'
-                                        if student_grade.lecturer == student.get_project().advisor
-                                        }}
+                                        {% if student_grade.lecturer == student.get_project().advisor %}
+                                        <i class="red star icon"></i>
+                                        {% endif %}
                                     </a>
                                     <div class="description">{{ student_grade.get_result_display() }}</div>
                                 </div>
@@ -141,15 +147,9 @@
             document.getElementById(view_total_id + " header total").innerHTML = "Hide"
         }
     }
-    function accordion_view_final(view_final_id) {
-        $(document.getElementById(view_final_id + " content final")).transition('fade down')
-
-        if (document.getElementById(view_final_id + " header final").textContent == "Hide") {
-            document.getElementById(view_final_id + " header final").innerHTML = "View"
-        } else {
-            document.getElementById(view_final_id + " header final").innerHTML = "Hide"
-        }
-    }
+    $('.ui.accordion')
+        .accordion()
+        ;
 
     function showSetTimeOff() {
         $('.ui.time-off').transition('fade down')

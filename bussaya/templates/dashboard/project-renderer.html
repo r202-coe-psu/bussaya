@@ -42,14 +42,14 @@
         {% endfor -%}
       </td>
       <td class="right aligned collapsing">{{ project.advisor.first_name }} {{ project.advisor.last_name }}</td>
-      <td class="one wide">
+      <td class="one wide single line">
         {% set class_ = project.get_opened_class() %}
         {% if project.creator.get_meeting_reports(class_, 'midterm').count() > 0 and current_user == project.advisor %}
         <a target="_blank"
           href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=project.creator.id) }}">
           <i class="clipboard large icon link pop" data-content="Meeting Report"></i>
         </a>
-        {% elif current_user == project.advisor %}
+        {% elif current_user != project.advisor %}
         <i class="disabled clipboard large icon" data-content="Meeting Report"></i>
         {% endif %}
         {% set progress_reports = project.get_progress_reports(round='midterm') %}
@@ -64,16 +64,16 @@
           <i class="file alternate icon large"></i>
           {% endif %}
         </a>
-      {% endfor %}
+        {% endfor %}
 
       </td>
-      <td class="one wide">
+      <td class="one wide single line">
         {% if project.creator.get_meeting_reports(class_, 'final').count() > 0 and current_user == project.advisor %}
         <a target="_blank"
           href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=project.creator.id) }}">
           <i class="clipboard large icon link pop" data-content="Meeting Report"></i>
         </a>
-        {% elif current_user == project.advisor %}
+        {% elif current_user != project.advisor %}
         <i class="disabled clipboard large icon" data-content="Meeting Report"></i>
         {% endif %}
         {% set progress_reports = project.get_progress_reports(round='final') %}
@@ -88,7 +88,7 @@
           <i class="file alternate icon large"></i>
           {% endif %}
         </a>
-      {% endfor %}
+        {% endfor %}
 
       </td>
     </tr>

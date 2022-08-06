@@ -102,6 +102,9 @@ def view_lecturer(meeting_id):
 def approval(meeting_id, meeting_report_id, action):
 
     meeting_report = models.MeetingReport.objects.get(id=meeting_report_id)
+    if meeting_report.project.advior != current_user._get_current_object():
+        return redirect(url_for("dashboard.index"))
+
     if action == "approve":
         meeting_report.remark = ""
         meeting_report.status = "approved"

@@ -38,8 +38,9 @@
                     <th class="one wide">Meeting Report</th>
                     <th class="one wide">Submissions</th>
                     <th class="one wide">Grading</th>
-                    <th>Total Grade</th>
                     <th>Average Grade</th>
+                    <th>Final Grade</th>
+                    <th>Total Grade</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,7 +50,12 @@
                     <td>{{ loop.index }}</td>
                     <td>{{ student.username }}</td>
                     <td>{{ student.first_name }} {{ student.last_name }}</td>
-                    <td>{{ student.get_meeting_reports(class_, round_grade.type).count() }}</td>
+                    <td>
+                        <a target="_blank"
+                            href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}">
+                            {{ student.get_meeting_reports(class_, round_grade.type).count() }}
+                        </a>
+                    </td>
                     {% set student_report = student.get_report(class_.id, round_grade.type) %}
                     {% set student_presentation = student.get_presentation(class_.id, round_grade.type) %}
                     <td>
@@ -78,6 +84,25 @@
                         </div>
                     </td>
                     <td>{{ student.get_average_grade(student_grade.round_grade) }}</td>
+                    {% set final_grade, caused = student.get_final_grade(student_grade.round_grade) %}
+                    <td>
+                        <div class="ui accordion">
+                            <div class="title">
+                                {% if caused %}
+                                <i class="blue dropdown icon"></i>
+                                {% else %}
+                                <i class="grey dropdown icon"></i>
+                                {% endif %}
+                                {{ final_grade }}
+                            </div>
+                            <div class="content" style="display: none; width: fit-content">
+                                {% for cause in caused %}
+                                - {{ cause }}
+                                {% if not loop.last %} <br> {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </td>
                     <td>
                         <div class="title">
                             <a id="{{student_grade.id}}" style="cursor: pointer"
@@ -138,7 +163,9 @@
             document.getElementById(show_hide_id).innerHTML = "Hide"
         }
     }
-
+    $('.ui.accordion')
+        .accordion()
+        ;
     function showSetTimeOff() {
         $('.ui.time-off').transition('fade down')
     }
