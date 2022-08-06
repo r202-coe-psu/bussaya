@@ -106,4 +106,4 @@ class StudentGrade(me.Document):
         if self.result == "d":
             return 1
         if self.result == "e":
-            return 0
+            return 0.5

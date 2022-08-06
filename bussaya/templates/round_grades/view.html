@@ -99,8 +99,8 @@
                     </div>
                 </td>
 
-                {% set student_report = student.get_report(class_.id) %}
-                {% set student_presentation = student.get_presentation(class_.id) %}
+                {% set student_report = student.get_report(class_.id, round_grade.type) %}
+                {% set student_presentation = student.get_presentation(class_.id, round_grade.type) %}
                 <td>
                     {% if student_report %}
                     <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
