@@ -7,9 +7,9 @@
 
 {% block breadcrumbs %}
 <div class="ui breadcrumb">
-    <a href="{{ url_for('classes.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+  <a href="{{ url_for('classes.index') }}" class="section">Classes</a>
+  <div class="divider"> / </div>
+  <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
 </div>
 {% endblock %}
 
@@ -71,45 +71,64 @@
       <th>Meeting Date</th>
       <th>Last Updated Date</th>
       <th>Status</th>
+      <th>Remark</th>
+      {% if user.get_project().advisor == current_user %}
       <th>Approval</th>
+      {% endif %}
     </tr>
   </thead>
 
   <tbody>
     {% for report in meeting_reports %}
-      <tr>
-        <td>
-          {{ report.owner.username }} <br/>
-          {{ report.owner.first_name }} {{ report.owner.last_name }}
-        </td>
-        <td>
-          {{ report.meeting.get_round_display() }}
-        </td>
-        <td>
-          <a href="{{ url_for('meetings.view', meeting_id=report.meeting.id) }}">
-            {{ report.meeting.name }}
-          </a>
-        </td>
-        <td>
-          <div><b>{{ report.title }}</b></div>
-          <div>
-            {{ report.description }}
+    <tr>
+      <td>
+        {{ report.owner.username }} <br />
+        {{ report.owner.first_name }} {{ report.owner.last_name }}
+      </td>
+      <td>
+        {{ report.meeting.get_round_display() }}
+      </td>
+      <td>
+        <a href="{{ url_for('meetings.view', meeting_id=report.meeting.id) }}">
+          {{ report.meeting.name }}
+        </a>
+      </td>
+      <td>
+        <div><b>{{ report.title }}</b></div>
+        <div>
+          {{ report.description }}
+        </div>
+      </td>
+      <td>
+        {{ report.meeting_date }}
+      </td>
+      <td>
+        {{ report.updated_date.ctime() }}
+      </td>
+      <td class="{{'green' if report.status == 'approved'}} {{'red' if report.status == 'disapproved'}}">
+        {{ report.get_status_display() if report.status else 'Waiting for approval' }}
+      </td>
+      <td>
+        {{ report.remark }}
+      </td>
+      {% if user.get_project().advisor == current_user %}
+      <td class="single line">
+        <div style="margin-bottom: 0.5em">
+          <a href="{{ url_for('meetings.approval', meeting_report_id=report.id, meeting_id=report.meeting.id, action='approve') }}"
+            class="ui positive icon button"><i class="icon check"></i></a>
+          <a onclick="showDisapprove('{{report.id}}')" class="ui negative icon button"><i class="icon close"></i></a>
+        </div>
+        <form class="ui form" method="POST" id="form-round_grade"
+          action="{{ url_for('meetings.approval', meeting_report_id=report.id, meeting_id=report.meeting.id, action='disapprove') }}">
+          {{ form.csrf_token }}
+          <div id="disapprove form {{report.id}}" style="display: none">
+            {{ renderer.render_field(form.remark) }}
+            <button class="ui small primary button" type="submit">Submit</button>
           </div>
-        </td>
-        <td>
-          {{ report.meeting_date }}
-        </td>
-        <td>
-          {{ report.updated_date.ctime() }}
-        </td>
-        <td class="{{'green' if report.status == 'approved'}} {{'red' if report.status == 'disapproved'}}">
-          {{ report.get_status_display() if report.status else 'Waiting for approval' }}
-        </td>
-        <td class="single line">
-          <a href="{{ url_for('meetings.approval', meeting_report_id=report.id, meeting_id=report.meeting.id, action='approve') }}" class="ui positive icon button"><i class="icon check"></i></a>
-          <a href="{{ url_for('meetings.approval', meeting_report_id=report.id, meeting_id=report.meeting.id, action='disapprove') }}" class="ui negative icon button"><i class="icon close"></i></a>
-        </td>
-      </tr>
+        </form>
+      </td>
+      {% endif %}
+    </tr>
     {% endfor %}
   </tbody>
 </table>
@@ -120,26 +139,31 @@
 {% block additional_js %}
 <script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
 <script type="text/javascript">
-    datetime_formatter = {
-        datetime: function (datetime, settings) {
-            if (!datetime) return '';
-            var day = datetime.getDate();
-            var month = datetime.getMonth() + 1;
-            var year = datetime.getFullYear();
-            var hour = datetime.getHours();
-            var minute = datetime.getMinutes();
-            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
-        }
-    };
-    $('#rangestart').calendar({
-        // type: 'date',
-        formatter: datetime_formatter,
-        endCalendar: $('#rangeend')
-    });
-    $('#rangeend').calendar({
-        // type: 'date',
-        formatter: datetime_formatter,
-        startCalendar: $('#rangestart')
-    });
+  function showDisapprove(report_id) {
+    console.log("disapprove form " + report_id)
+    $(document.getElementById("disapprove form " + report_id)).transition('fade down')
+  }
+
+  datetime_formatter = {
+    datetime: function (datetime, settings) {
+      if (!datetime) return '';
+      var day = datetime.getDate();
+      var month = datetime.getMonth() + 1;
+      var year = datetime.getFullYear();
+      var hour = datetime.getHours();
+      var minute = datetime.getMinutes();
+      return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
+    }
+  };
+  $('#rangestart').calendar({
+    // type: 'date',
+    formatter: datetime_formatter,
+    endCalendar: $('#rangeend')
+  });
+  $('#rangeend').calendar({
+    // type: 'date',
+    formatter: datetime_formatter,
+    startCalendar: $('#rangestart')
+  });
 </script>
 {% endblock additional_js %}
