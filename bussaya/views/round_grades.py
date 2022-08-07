@@ -190,22 +190,16 @@ def submit_grade(round_grade_id):
             class_=class_,
             round_grade=round_grade,
             lecturer=user,
-            project=project,
+            # project=project,
         ).first()
-
-        if not student_grade:
-            student_grade = models.StudentGrade(
-                student=student,
-                class_=class_,
-                round_grade=round_grade,
-                lecturer=user,
-                project=project,
-            )
 
         student_grade.result = grading["result"]
         student_grade.save()
 
-        if project.advisor == current_user._get_current_object():
+        if (
+            project.advisor == current_user._get_current_object()
+            and grading["result"] != "-"
+        ):
             meetings = models.MeetingReport.objects(
                 class_=class_, owner=student_grade.student, status=None
             )

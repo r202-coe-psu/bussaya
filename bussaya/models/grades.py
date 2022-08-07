@@ -9,7 +9,7 @@ RELEASE_STATUS = [("unreleased", "Unreleased"), ("released", "Released")]
 
 
 class RoundGrade(me.Document):
-    meta = {"collection": "grades"}
+    meta = {"collection": "round_grades"}
 
     type = me.StringField(choices=SEMESTER_TYPE)
     class_ = me.ReferenceField("Class", dbref=True, required=True)

@@ -176,3 +176,19 @@ def view_students(class_id):
         students=students,
         get_student_by_id=get_student_by_id,
     )
+
+
+@module.route("/<class_id>/projects")
+@acl.roles_required("admin")
+def view_projects(class_id):
+    class_ = models.Class.objects.get(id=class_id)
+    students = models.User.objects(username__in=class_.student_ids).order_by(
+        "-username"
+    )
+    projects = models.Project.objects(
+        me.Q(creator__in=students) | me.Q(students__in=students)
+    )
+
+    return render_template(
+        "/classes/projects.html", class_=class_, students=students, projects=projects
+    )

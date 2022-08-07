@@ -251,13 +251,21 @@ def submit_grade(round_grade_id):
 
         student_grade.result = grading["result"]
 
-        meetings = models.MeetingReport.objects(
-            class_=class_, owner=student_grade.student
-        )
-        for meeting in meetings:
-            meeting.status = "approved"
-            meeting.save()
         student_grade.save()
+
+        if grading["result"] != "-":
+
+            meetings = models.MeetingReport.objects(
+                class_=class_, owner=student_grade.student, status=None
+            )
+            for meeting in meetings:
+                meeting.status = "approved"
+                meeting.approver = current_user._get_current_object()
+                meeting.approver_ip_address = request.headers.get(
+                    "X-Forwarded-For", request.remote_addr
+                )
+                meeting.remark += "\n\n-> approve by admin"
+                meeting.save()
 
     return redirect(
         url_for(

@@ -13,7 +13,7 @@
   {% endif %}
 
   <div class="item ui floating labeled dropdown">
-    <i class="star icon"></i>
+    <i class="font icon"></i>
     <span class="text">
       {{'Midterm' if 'midterm' in request.path}}
       {{'Final' if 'final' in request.path}}
@@ -37,24 +37,33 @@
       {% endif %}
     </div>
   </div>
+  {% if current_user.has_roles('admin', 'lecturer') %}
+    {% if 'admin' in current_user.roles %}
   <a class="{{'active' if 'student_ids' in request.path}} item"
     href="{{ url_for('classes.view_students', class_id=class_.id) }}">
     <i class="student icon"></i>
     View Students
   </a>
 
-  {% if current_user.has_roles('admin', 'lecturer') %}
-  {% if 'admin' in current_user.roles %}
+
+  <a class="{{ 'active' if 'classes.view_projects' == request.endpoint }} item"
+    href="{{ url_for('classes.view_projects', class_id=class_.id) }}">
+    <i class="computer icon"></i>
+    View Projects
+  </a>
+
   <a class="{{'active' if 'groups' in request.path}} item"
     href="{{ url_for('admin.groups.manage', class_id=class_.id) }}">
     <i class="group icon"></i>
     Manage Group
   </a>
+  {#
   {% else %}
   <a class="{{'active' if 'groups' in request.path}} item" href="{{ url_for('groups.view', class_id=class_.id) }}">
     <i class="group icon"></i>
     Group
   </a>
+  #}
   {% endif %}
   {% endif %}
   {% if current_user.has_roles("admin") %}

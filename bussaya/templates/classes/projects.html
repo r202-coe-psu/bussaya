@@ -1,0 +1,63 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/error-handler.html' as eh %}
+{% import '/admin/classes/project-renderer.html' as renderer %}
+{% import '/navbar/class-navbar.html' as renderer_navbar %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('classes.view_students', class_id=class_.id) }}">View Students</a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+{{ renderer_navbar.render_class_navbar(class_, current_user) }}
+
+<h2 class="ui header">
+    View Students
+</h2>
+<div class="ui divider"></div>
+<table class="ui celled table">
+  <thead>
+    <th>No. </th>
+    <th>Project</th>
+    <th>Students</th>
+    <th>Adivisor / Committees</th>
+    <th>Operation</th>
+  </thead>
+  <tbody>
+    {% for project in projects %}
+    <tr>
+      <td>
+        {{ loop.index }}
+      </td>
+      <td>
+        {{ project.name }}
+      </td>
+      <td>
+        {% for student in project.students %}
+          {{ student.get_fullname() }}<br/>
+        {% endfor %}
+      </td>
+      <td>
+        <b>{{ project.advisor.get_fullname() }}</b><br/>
+        {% for c in project.committees %}
+          {{ c.get_fullname() }}<br/>
+        {% endfor %}
+      </td>
+      <td>
+        <a href="{{ url_for('admin.projects.delete', project_id=project.id) }}" class="ui primary icon circular negative button"><i class="trash icon"></i></a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+
+{% endblock %}
