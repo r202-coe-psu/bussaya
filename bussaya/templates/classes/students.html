@@ -31,9 +31,13 @@
     <th>ID</th>
     <th>Name</th>
     <th>Project</th>
-    <th>Meetings</th>
     <th>Adivisor / Committees</th>
-    <th>Group</th>
+    <th>MT Meetings</th>
+    <th>MT Report</th>
+    <th>MT Presentation</th>
+    <th>F Meetings</th>
+    <th>F Report</th>
+    <th>F Presentation</th>
   </thead>
   <tbody>
     {% for student_id in class_.student_ids %}
@@ -59,19 +63,6 @@
         {% endif %}
       </td>
       <td>
-        {% if student %}
-          <div class="ui blue label">
-            <i class="file icon"></i>
-            {{ student.get_meeting_reports(class_, 'midterm').count() }} 
-          </div>
-
-          <div class="ui red label">
-            <i class="file icon"></i>
-            {{ student.get_meeting_reports(class_, 'final').count() }}
-          </div>
-        {% endif %}
-      </td>
-      <td>
         {% if project %}
           <b>{{ project.advisor.get_fullname() }}</b><br/>
           {% for c in project.committees %}
@@ -79,11 +70,27 @@
           {% endfor %}
         {% endif %}
       </td>
+
       <td>
         {% if student %}
-          {{ student.get_group(class_).name }}
+          {{ student.get_meeting_reports(class_, 'midterm', 'approved').count() }} 
+          /
+          {{ student.get_meeting_reports(class_, 'midterm').count() }} 
         {% endif %}
       </td>
+      <td>
+        {% if student %}
+          {{ student.get_report(class_, 'midterm') }} 
+        {% endif %}
+      </td>
+      <td>
+        {% if student %}
+          {{ student.get_presentation(class_, 'midterm') }} 
+        {% endif %}
+      </td>
+
+
+
     </tr>
     {% endfor %}
   </tbody>
