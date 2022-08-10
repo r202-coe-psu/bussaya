@@ -36,16 +36,42 @@ def export_students(class_id):
             project = student.get_project()
             if project:
                 student_data["Project"] = project.name
-            student_data["Midterm Meeting"] = student.get_meeting_reports(
-                class_, "midterm"
-            ).count()
-            student_data["Final Meeting"] = student.get_meeting_reports(
-                class_, "final"
-            ).count()
-            if project:
                 student_data[
                     "Advisor"
                 ] = f"{project.advisor.first_name} {project.advisor.last_name}"
+
+                for i, committee in enumerate(project.committees):
+                    student_data[f"Commitee {i+1}"] = committee.get_fullname()
+
+            student_data["Midterm Meeting"] = student.get_meeting_reports(
+                class_, "midterm"
+            ).count()
+            student_data["Midterm Meeting Approve"] = student.get_meeting_reports(
+                class_, "midterm", "approved"
+            ).count()
+
+            student_data["Midterm Report"] = 0
+            if student.get_report(class_, "midterm"):
+                student_data["Midterm Report"] = 1
+
+            student_data["Midterm Presentation"] = 0
+            if student.get_presentation(class_, "midterm"):
+                student_data["Midterm Presentation"] = 1
+
+            student_data["Final Meeting"] = student.get_meeting_reports(
+                class_, "final"
+            ).count()
+            student_data["Final Meeting Approve"] = student.get_meeting_reports(
+                class_, "final", "approved"
+            ).count()
+
+            student_data["Final Report"] = 0
+            if student.get_report(class_, "final"):
+                student_data["Final Report"] = 1
+
+            student_data["Final Presentation"] = 0
+            if student.get_presentation(class_, "final"):
+                student_data["Final Presentation"] = 1
 
         data.append(student_data)
 

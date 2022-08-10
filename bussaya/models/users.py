@@ -58,8 +58,7 @@ class User(me.Document, UserMixin):
         project = models.Project.objects(students=self).order_by("-id").first()
         return project
 
-    def get_report(self, class_id, round):
-        class_ = models.Class.objects.get(id=class_id)
+    def get_report(self, class_, round):
         submission = models.Submission.objects(
             type="report", class_=class_, round=round
         ).first()
@@ -69,8 +68,7 @@ class User(me.Document, UserMixin):
 
         return progress_report
 
-    def get_presentation(self, class_id, round):
-        class_ = models.Class.objects.get(id=class_id)
+    def get_presentation(self, class_, round):
         submission = models.Submission.objects(
             type="presentation", class_=class_, round=round
         ).first()
@@ -86,10 +84,10 @@ class User(me.Document, UserMixin):
         if round:
             meetings = meetings.filter(round=round)
 
-        if approval_status:
-            meetings = meetings.filter(status=approval_status)
-
         meeting_reports = models.MeetingReport.objects(meeting__in=meetings, owner=self)
+        if approval_status:
+            meeting_reports = meeting_reports.filter(status=approval_status)
+
         return meeting_reports
 
     def get_advisee_projects(self):

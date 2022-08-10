@@ -80,16 +80,54 @@
       </td>
       <td>
         {% if student %}
-          {{ student.get_report(class_, 'midterm') }} 
+          {% set report=student.get_report(class_, 'midterm') %}
+          {% if report %}
+            <a href="{{ url_for('submissions.download', progress_report_id=report.id, filename=report.file.filename) }}" target="_blank"><i class="file pdf icon large"></i></a>
+          {% else %}
+            <i class="file pdf icon large disable" />
+          {% endif %}
         {% endif %}
       </td>
       <td>
         {% if student %}
-          {{ student.get_presentation(class_, 'midterm') }} 
+          {% set report=student.get_presentation(class_, 'midterm') %}
+          {% if report %}
+            <a href="{{ url_for('submissions.download', progress_report_id=report.id, filename=report.file.filename) }}" target="_blank"><i class="file powerpoint icon large"></i></a>
+          {% else %}
+            <i class="file powerpoint icon large disable" />
+          {% endif %}
+
         {% endif %}
       </td>
 
+      <td>
+        {% if student %}
+          {{ student.get_meeting_reports(class_, 'final', 'approved').count() }} 
+          /
+          {{ student.get_meeting_reports(class_, 'final').count() }} 
+        {% endif %}
+      </td>
+      <td>
+        {% if student %}
+          {% set report=student.get_report(class_, 'final') %}
+          {% if report %}
+            <a href="{{ url_for('submissions.download', progress_report_id=report.id, filename=report.file.filename) }}" target="_blank"><i class="file pdf icon large"></i></a>
+          {% else %}
+            <i class="file pdf icon large disable" />
+          {% endif %}
+        {% endif %}
+      </td>
+      <td>
+        {% if student %}
+          {% set report=student.get_presentation(class_, 'final') %}
+          {% if report %}
+            <a href="{{ url_for('submissions.download', progress_report_id=report.id, filename=report.file.filename) }}" target="_blank"><i class="file powerpoint icon large"></i></a>
+          {% else %}
+            <i class="file powerpoint icon large disable" />
+          {% endif %}
 
+        {% endif %}
+      </td>
 
     </tr>
     {% endfor %}
