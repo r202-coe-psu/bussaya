@@ -94,9 +94,9 @@
         </a>
       </td>
       <td>
-        <div><b>{{ report.title }}</b></div>
+        <div><h3>{{ report.title }}</h3></div>
         <div>
-          {{ report.description }}
+          {{ markdown.markdown(report.description) | safe }}
         </div>
       </td>
       <td>

@@ -1,7 +1,10 @@
 from flask import Blueprint, render_template, url_for, redirect, request
 from flask_login import current_user, login_required
+
 import mongoengine as me
 from datetime import datetime
+import markdown
+
 from bussaya import acl, forms
 
 from .. import models
@@ -151,6 +154,7 @@ def list_report_by_user(class_id, user_id):
         user=user,
         meeting_reports=meeting_reports,
         form=form,
+        markdown=markdown,
     )
 
 

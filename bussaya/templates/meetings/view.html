@@ -70,8 +70,8 @@
                 {% endif %}
             </td>
             <td>
-                <div><b>{{ meeting_report.title }}</b></div>
-                <div>{{ meeting_report.description }}</div>
+                <h3>{{ meeting_report.title }}</h3>
+                <div>{{ markdown.markdown(meeting_report.description) | safe }}</div>
             </td>
             <td>{{ meeting_report.meeting_date }}</td>
             <td
@@ -79,7 +79,7 @@
                 {{meeting_report.get_status_display() if meeting_report.status else 'Waiting for approval'}}
             </td>
             <td>
-                {{meeting_report.remark if meeting_report.remark else '-' }}
+                {{ markdown.markdown(meeting_report.remark) if meeting_report.remark else '-' | safe }}
             </td>
             <td class="single line">
                 <div>

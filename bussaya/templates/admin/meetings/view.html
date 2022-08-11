@@ -50,8 +50,7 @@
         <tr>
             <th></th>
             <th>Student</th>
-            <th>Title</th>
-            <th>Description</th>
+            <th>Title / Description</th>
             <th>Meeting Date</th>
             <th>Status</th>
             <th>Remark</th>
@@ -69,10 +68,8 @@
                 {{ meeting_report.owner.first_name }} {{ meeting_report.owner.last_name }}
             </td>
             <td>
-                {{meeting_report.title}}
-            </td>
-            <td>
-                {{meeting_report.description}}
+              <h3>{{ meeting_report.title }}</h3>
+              <div>{{ markdown.markdown(meeting_report.description) | safe }}</div>
             </td>
             <td>
                 {{meeting_report.meeting_date}}
@@ -82,7 +79,7 @@
                 {{meeting_report.get_status_display() if meeting_report.status else 'Waiting for approval'}}
             </td>
             <td>
-                {{meeting_report.remark if meeting_report.remark else '-' }}
+                {{ markdown.markdown(meeting_report.remark) if meeting_report.remark else '-' | safe }}
             </td>
             <td class="four wide">
                 <div style="display: flex">

@@ -2,14 +2,17 @@ from flask import Blueprint, render_template, redirect, url_for, send_file, requ
 from flask_login import login_required, current_user
 
 from bussaya.models.submissions import MeetingReport
-from .. import forms
-from .. import models
 import mongoengine as me
-
-from bussaya import acl
+import markdown
 
 import datetime
 import socket
+
+from bussaya import acl
+
+from .. import forms
+from .. import models
+
 
 module = Blueprint("meetings", __name__, url_prefix="/meetings")
 
@@ -54,6 +57,7 @@ def view_admin(meeting_id):
         class_=meeting.class_,
         meeting_reports=meeting_reports,
         form=form,
+        markdown=markdown,
     )
 
 
@@ -91,6 +95,7 @@ def view_lecturer(meeting_id):
         class_=meeting.class_,
         meeting_reports=meeting_reports,
         form=form,
+        markdown=markdown,
     )
 
 
