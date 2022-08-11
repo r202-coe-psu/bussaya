@@ -51,7 +51,8 @@
         {% endfor %}
       </td>
       <td>
-        <a href="{{ url_for('admin.projects.delete', project_id=project.id) }}" class="ui primary icon circular negative button"><i class="trash icon"></i></a>
+        <a href="{{ url_for('projects.edit', project_id=project.id) }}" class="ui primary icon circular button"><i class="edit icon"></i></a>
+        <a href="{{ url_for('admin.projects.delete', project_id=project.id) }}" class="ui icon circular negative button"><i class="trash icon"></i></a>
       </td>
     </tr>
     {% endfor %}
