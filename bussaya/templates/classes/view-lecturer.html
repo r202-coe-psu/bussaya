@@ -88,10 +88,23 @@
               {{ student.first_name }} {{ student.last_name }}
             </td>
             <td>
-              {{ student.get_meeting_reports(class_, 'midterm').count() }}
+              <div class="ui green label">
+                <i class="check icon"></i> {{ student.get_meeting_reports(class_, 'midterm', 'approved').count() }}
+              </div>
+
+              <div class="ui primary label">
+                <i class="clipboard icon"></i> {{ student.get_meeting_reports(class_, 'midterm').count() }}
+              </div>
             </td>
             <td>
-              {{ student.get_meeting_reports(class_, 'final').count() }}
+              <div class="ui green label">
+                <i class="check icon"></i> {{ student.get_meeting_reports(class_, 'final', 'approved').count() }}
+              </div>
+
+              <div class="ui primary label">
+                <i class="clipboard icon"></i> {{ student.get_meeting_reports(class_, 'final').count() }}
+              </div>
+
             </td>
             <td>
               <a href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}" class="ui primary circular icon button">
