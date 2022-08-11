@@ -7,6 +7,8 @@ from flask import (
 )
 from flask_login import current_user, login_required
 
+import mongoengine as me
+
 from bussaya import models, forms, acl
 from bussaya.views.projects import populate_obj
 
@@ -15,6 +17,74 @@ module = Blueprint(
     __name__,
     url_prefix="/groups",
 )
+
+
+@module.route("/<class_id>/view")
+@acl.roles_required("admin")
+def view(class_id):
+    class_ = models.Class.objects.get(id=class_id)
+    students = models.User.objects(username__in=class_.student_ids)
+    lecturers = models.User.objects(roles="lecturer")
+
+    project_groups = models.Project.objects(students__in=students).aggregate(
+        [
+            {
+                "$addFields": {
+                    "test_committees": {"$concatArrays": ["$committees", ["$advisor"]]}
+                }
+            },
+            {"$sort": {"test_committees": -1}},
+            {
+                "$group": {
+                    "_id": "$test_committees",
+                    "project_ids": {"$push": "$_id"},
+                }
+            },
+        ]
+    )
+    # print(list(project_groups))
+
+    groups = []
+
+    for project_group in project_groups:
+        committees = []
+        for committee in project_group["_id"]:
+            committees.extend(lecturers.filter(id=committee.id))
+
+        committees.sort(key=lambda c: c.username)
+
+        projects = models.Project.objects(id__in=project_group["project_ids"])
+
+        available_committees = None
+        for g in groups:
+            if g["committees"] == committees:
+                available_committees = g
+                break
+        students = []
+        for project in projects:
+            students.extend(project.students)
+
+        if available_committees:
+            available_committees["projects"].extend(list(projects))
+            available_committees["students"].extend(students)
+            available_committees["students"].sort(key=lambda s: s.username)
+        else:
+            students.sort(key=lambda s: s.username)
+            groups.append(
+                dict(
+                    committees=committees,
+                    projects=list(projects),
+                    students=students,
+                )
+            )
+
+    return render_template(
+        "/admin/groups/view.html",
+        class_=class_,
+        students=students,
+        groups=groups,
+        project_groups=project_groups,
+    )
 
 
 @module.route("/<class_id>")
