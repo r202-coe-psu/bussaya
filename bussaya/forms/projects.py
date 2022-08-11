@@ -29,7 +29,7 @@ BaseProjectForm = model_form(
         "abstract": {"label": "English Abstract"},
         "abstract_th": {"label": "Thai Abstract"},
         "advisor": {
-            "label": "Advisor",
+            "label": "Project Advisor",
             "label_modifier": lambda a: f"{a.first_name} {a.last_name}",
         },
         "committees": {
