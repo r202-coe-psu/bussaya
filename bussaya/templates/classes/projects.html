@@ -41,7 +41,7 @@
       </td>
       <td>
         {% for student in project.students %}
-          {{ student.get_fullname() }}<br/>
+          <b>{{ student.username }}</b> - {{ student.get_fullname() }}<br/>
         {% endfor %}
       </td>
       <td>

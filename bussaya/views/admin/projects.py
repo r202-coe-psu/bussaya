@@ -47,7 +47,7 @@ def edit(project_id):
     project.save()
     class_id = request.args.get("class_id")
     if class_id:
-        return redirect(url_for("classes.projects", class_id=class_id))
+        return redirect(url_for("classes.view_projects", class_id=class_id))
 
     return redirect(url_for("dashboard.index"))
 
