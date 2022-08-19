@@ -244,20 +244,20 @@ def view_student_grades(class_id):
 
         if average_grade == "a":
             total_grade += grade_ratio * 4
-        if average_grade == "b+":
+        elif average_grade == "b+":
             total_grade += grade_ratio * 3.5
-        if average_grade == "b":
+        elif average_grade == "b":
             total_grade += grade_ratio * 3
-        if average_grade == "c+":
+        elif average_grade == "c+":
             total_grade += grade_ratio * 2.5
-        if average_grade == "c":
+        elif average_grade == "c":
             total_grade += grade_ratio * 2
-        if average_grade == "d+":
+        elif average_grade == "d+":
             total_grade += grade_ratio * 1.5
-        if average_grade == "d":
+        elif average_grade == "d":
             total_grade += grade_ratio * 1
-        if average_grade == "e":
-            total_grade += grade_ratio * 0
+        elif average_grade == "e":
+            total_grade += grade_ratio * 0.5
 
     if average_total_grade != "Incomplete":
         if total_grade > 3.75:
@@ -274,7 +274,7 @@ def view_student_grades(class_id):
             average_total_grade = "D+"
         elif total_grade >= 0.75:
             average_total_grade = "D"
-        elif total_grade < 0.5:
+        else:
             average_total_grade = "E"
 
     return render_template(
