@@ -30,6 +30,7 @@
                 <th></th>
                 <th>Student ID</th>
                 <th>Student Name</th>
+                <th>Advisor</th>
                 <th>Meeting Report</th>
                 <th>Submissions</th>
                 <th>Given Grade</th>
@@ -46,9 +47,11 @@
 
                 <td>{{ student.username }}</td>
                 <td>{{ student.first_name }} {{ student.last_name }}</td>
+                <td>{{ student.get_project().advisor.get_fullname() }}</td>
                 <td>
                     <a target="_blank"
                         href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}">
+                        {{ student.get_meeting_reports(class_, round_grade.type, 'approved').count() }} /
                         {{ student.get_meeting_reports(class_, round_grade.type).count() }}
                     </a>
                 </td>
@@ -76,16 +79,15 @@
                 </td>
                 <td>{{ student_grade.get_result_display() }}</td>
                 <td>{{ student.get_average_grade(student_grade.round_grade) }}</td>
-                {% set final_grade, caused = student.get_final_grade(student_grade.round_grade) %}
+                {% set actual_grade, caused = student.get_actual_grade(student_grade.round_grade) %}
                 <td>
+                    {% if not caused %}
+                      {{ actual_grade }}
+                    {% else %}
                     <div class="ui accordion">
                         <div class="title">
-                            {% if caused %}
                             <i class="blue dropdown icon"></i>
-                            {% else %}
-                            <i class="grey dropdown icon"></i>
-                            {% endif %}
-                            {{ final_grade }}
+                            {{ actual_grade }}
                         </div>
                         <div class="content" style="display: none; width: fit-content">
                             {% for cause in caused %}
@@ -94,6 +96,7 @@
                             {% endfor %}
                         </div>
                     </div>
+                    {% endif %}
                 </td>
                 <td>
                     <div class="title">
