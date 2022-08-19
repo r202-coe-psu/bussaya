@@ -227,40 +227,30 @@ def view_student_grades(class_id):
     class_ = models.Class.objects.get(id=class_id)
 
     project = student.get_project()
-    round_grades = models.RoundGrade.objects.all().filter(class_=class_)
+    round_grades = models.RoundGrade.objects(class_=class_)
 
     total_grade = 0
     average_total_grade = 0
+    is_fail = False
     for round_grade in round_grades:
-        average_grade = student.get_average_grade(round_grade).lower()
-        if round_grade.type == "midterm":
-            grade_ratio = 0.4
-        if round_grade.type == "final":
-            grade_ratio = 0.6
-
-        if average_grade == "incomplete" or round_grade.release_status == "unreleased":
+        actual_grade = student.get_actual_grade(round_grade)
+        if actual_grade == "incomplete" or round_grade.release_status == "unreleased":
             average_total_grade = "Incomplete"
             break
 
-        if average_grade == "a":
-            total_grade += grade_ratio * 4
-        elif average_grade == "b+":
-            total_grade += grade_ratio * 3.5
-        elif average_grade == "b":
-            total_grade += grade_ratio * 3
-        elif average_grade == "c+":
-            total_grade += grade_ratio * 2.5
-        elif average_grade == "c":
-            total_grade += grade_ratio * 2
-        elif average_grade == "d+":
-            total_grade += grade_ratio * 1.5
-        elif average_grade == "d":
-            total_grade += grade_ratio * 1
-        elif average_grade == "e":
-            total_grade += grade_ratio * 0.5
+        if round_grade.type == "midterm":
+            grade_ratio = 0.4
+        elif round_grade.type == "final":
+            grade_ratio = 0.6
+
+        total_grade += grade_ratio * student.get_grade_to_point(actual_grade)
+        if actual_grade == "E":
+            is_fail = True
 
     if average_total_grade != "Incomplete":
-        if total_grade > 3.75:
+        if is_fail:
+            average_total_grade = "E"
+        elif total_grade > 3.75:
             average_total_grade = "A"
         elif total_grade >= 3.25:
             average_total_grade = "B+"

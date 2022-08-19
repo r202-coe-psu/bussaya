@@ -57,15 +57,26 @@
 </h3>
 
 {% for round_grade in round_grades %}
+{% set actual_grade, causes = student.get_actual_grade(round_grade) %}
 <div class="ui segment">
     <h4>{{ round_grade.get_type_display() }}</h4>
     <table class="ui definition table">
         <tbody>
             <tr>
                 <td class="three wide column">Average Grade Point</td>
+                {% if round_grade.release_status == "released" %}
                 <td>
-                    {{ student.get_average_grade(round_grade) if round_grade.release_status == "released" else "-" }}
+                    {{ actual_grade }}
                 </td>
+                <td>
+                  {% for cause in causes %}
+                    - {{ cause }}<br/>
+                  {% endfor %}
+                </td>
+              {% else %}
+                <td></td>
+                <td></td>
+              {% endif %}
             </tr>
         </tbody>
     </table>
