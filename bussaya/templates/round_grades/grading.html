@@ -46,6 +46,7 @@
                     <th></th>
                     <th>Student ID</th>
                     <th>Student Name</th>
+                    <th>Advisor</th>
                     <th class="one wide">Meeting Report</th>
                     <th class="one wide">Submissions</th>
                     <th>Grading</th>
@@ -59,14 +60,15 @@
                 {% for student_grade in student_grades %}
                 {% set student = student_grade.student %}
 
-                <tr>
-                    <td>{{loop.index}}</td>
-                    {% set index.value = index.value + 1 %}
+                <tr class="top aligned">
+                    <td>{{ loop.index }}</td>
                     <td>{{ student.username }}</td>
                     <td>{{ student.first_name }} {{ student.last_name }}</td>
+                    <td>{{ student.get_project().advisor.get_fullname() }}</td>
                     <td>
                         <a target="_blank"
                             href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}">
+                            {{ student.get_meeting_reports(class_, round_grade.type, 'approved').count() }} /
                             {{ student.get_meeting_reports(class_, round_grade.type).count() }}
                         </a>
                     </td>
@@ -98,16 +100,15 @@
                         </div>
                     </td>
                     <td>{{ student.get_average_grade(student_grade.round_grade) }}</td>
-                    {% set final_grade, caused = student.get_final_grade(student_grade.round_grade) %}
+                    {% set actual_grade, caused = student.get_actual_grade(student_grade.round_grade) %}
                     <td>
+                      {% if not caused %}
+                        {{ actual_grade }}
+                      {% else %}
                         <div class="ui accordion">
                             <div class="title">
-                                {% if caused %}
                                 <i class="blue dropdown icon"></i>
-                                {% else %}
-                                <i class="grey dropdown icon"></i>
-                                {% endif %}
-                                {{ final_grade }}
+                                {{ actual_grade }}
                             </div>
                             <div class="content" style="display: none; width: fit-content">
                                 {% for cause in caused %}
@@ -116,6 +117,7 @@
                                 {% endfor %}
                             </div>
                         </div>
+                      {% endif %}
                     </td>
                     <td>
                         <div class="title">
@@ -125,9 +127,8 @@
                             </a>
                         </div>
                         <div id="{{student_grade.id}} content" class="content" style="display: none">
-                            <p />
                             {% for student_grade in student.get_total_student_grades(round_grade) %}
-                            <div class="ui relaxed divided list">
+                              <div class="ui relaxed divided list">
                                 <div class="item">
                                     {% if student_grade.lecturer.get_picture() %}
                                     <img class="ui avatar image" src="{{ student_grade.lecturer.get_picture() }}">
@@ -136,8 +137,7 @@
                                     {% endif %}
                                     <div class="content">
                                         <a class="header">
-                                            {{ student_grade.lecturer.first_name }}
-                                            {{ student_grade.lecturer.last_name }}
+                                            {{ student_grade.lecturer.get_fullname() }}
                                             {% if student_grade.lecturer == student.get_project().advisor %}
                                             <i class="red star icon"></i>
                                             {% endif %}

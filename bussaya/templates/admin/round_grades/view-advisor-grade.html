@@ -40,7 +40,7 @@
         </thead>
         <tbody>
             {% for lecturer in lecturers %}
-            <tr>
+            <tr class="top aligned">
                 <td>{{ loop.index }}</td>
                 <td>{{ lecturer.get_fullname() }}</td>
                 {% set lecturer_grades = lecturer.get_total_lecturer_grades(round_grade) %}

@@ -128,24 +128,24 @@ class User(me.Document, UserMixin):
         point = 0
         if grade == "A":
             point = 3.75
-        if grade == "B+":
+        elif grade == "B+":
             point = 3.25
-        if grade == "B":
+        elif grade == "B":
             point = 2.75
-        if grade == "C+":
+        elif grade == "C+":
             point = 2.25
-        if grade == "C":
+        elif grade == "C":
             point = 1.75
-        if grade == "D+":
+        elif grade == "D+":
             point = 1.25
-        if grade == "D":
+        elif grade == "D":
             point = 0.75
-        if grade == "E":
-            point = 0.75
+        elif grade == "E":
+            point = 0.5
         return point
 
     def get_point_to_grade(self, point):
-        if point > 3.75:
+        if point >= 3.75:
             grade = "A"
         elif point >= 3.25:
             grade = "B+"
@@ -159,7 +159,7 @@ class User(me.Document, UserMixin):
             grade = "D+"
         elif point >= 0.75:
             grade = "D"
-        elif point < 0.75:
+        else:
             grade = "E"
         return grade
 
@@ -169,16 +169,23 @@ class User(me.Document, UserMixin):
             student=self, class_=class_, round_grade=round_grade
         )
 
+        has_advisor = False
         total_student_grade = []
         for student_grade in student_grades:
             if student_grade.result != "-":
                 total_student_grade.append(student_grade)
+                if student_grade.lecturer == student_grade.project.advisor:
+                    has_advisor = True
+
+        if not has_advisor:
+            return "Incomplete"
 
         if len(total_student_grade) < 2:
             return "Incomplete"
 
         average_point = 0
         committees_grade_point = 0
+        committees_count = 0
 
         project = self.get_project()
 
@@ -194,16 +201,18 @@ class User(me.Document, UserMixin):
 
             if student_grade.lecturer in project.committees:
                 committees_grade_point += grade_point
-
-            else:
+                committees_count += 1
+            elif student_grade.lecturer == project.advisor:
                 average_point += advisor_grade_ratio * grade_point
 
-        average_point += committee_grade_ratio * committees_grade_point
+        average_point += (
+            committee_grade_ratio / committees_count
+        ) * committees_grade_point
 
         average_grade = self.get_point_to_grade(average_point)
         return average_grade
 
-    def get_final_grade(self, round_grade):
+    def get_actual_grade(self, round_grade):
         class_ = round_grade.class_
 
         average_grade = self.get_average_grade(round_grade)

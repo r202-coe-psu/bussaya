@@ -91,17 +91,17 @@ class StudentGrade(me.Document):
     def get_grade_point(self):
         if self.result == "a":
             return 4
-        if self.result == "b+":
+        elif self.result == "b+":
             return 3.5
-        if self.result == "b":
+        elif self.result == "b":
             return 3
-        if self.result == "c+":
+        elif self.result == "c+":
             return 2.5
-        if self.result == "c":
+        elif self.result == "c":
             return 2
-        if self.result == "d+":
+        elif self.result == "d+":
             return 1.5
-        if self.result == "d":
+        elif self.result == "d":
             return 1
-        if self.result == "e":
+        elif self.result == "e":
             return 0.5
