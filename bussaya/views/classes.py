@@ -90,6 +90,7 @@ def view_student(class_id):
     submissions = models.Submission.objects.all().filter(
         class_=class_,
     )
+    final_submission = models.FinalSubmission.objects(class_=class_).first()
     meetings = models.Meeting.objects.all().filter(class_=class_)
     user = current_user._get_current_object()
 
@@ -107,6 +108,7 @@ def view_student(class_id):
         submissions=submissions,
         meetings=meetings,
         grade_released=grade_released,
+        final_submission=final_submission,
     )
 
 
@@ -155,44 +157,4 @@ def list_report_by_user(class_id, user_id):
         meeting_reports=meeting_reports,
         form=form,
         markdown=markdown,
-    )
-
-
-def get_student_by_id(student_id, students):
-    for s in students:
-        if s.username == student_id:
-            return s
-
-    return None
-
-
-@module.route("/<class_id>/students")
-@acl.roles_required("admin")
-def view_students(class_id):
-    class_ = models.Class.objects.get(id=class_id)
-    students = models.User.objects(username__in=class_.student_ids).order_by(
-        "-username"
-    )
-
-    return render_template(
-        "/classes/students.html",
-        class_=class_,
-        students=students,
-        get_student_by_id=get_student_by_id,
-    )
-
-
-@module.route("/<class_id>/projects")
-@acl.roles_required("admin")
-def view_projects(class_id):
-    class_ = models.Class.objects.get(id=class_id)
-    students = models.User.objects(username__in=class_.student_ids).order_by(
-        "-username"
-    )
-    projects = models.Project.objects(
-        me.Q(creator__in=students) | me.Q(students__in=students)
-    )
-
-    return render_template(
-        "/classes/projects.html", class_=class_, students=students, projects=projects
     )

@@ -19,9 +19,10 @@ module = Blueprint(
 )
 
 
-@module.route("/<class_id>/view")
+@module.route("/view")
 @acl.roles_required("admin")
-def view(class_id):
+def view():
+    class_id = request.args.get("class_id", None)
     class_ = models.Class.objects.get(id=class_id)
     students = models.User.objects(username__in=class_.student_ids)
     lecturers = models.User.objects(roles="lecturer")
@@ -90,8 +91,7 @@ def view(class_id):
 @module.route("/<class_id>")
 @acl.roles_required("admin")
 def index(class_id):
-    class_ = models.Class.objects.get(id=class_id)
-
+    class_ = models.Class.objects().get(id=class_id)
     return render_template("/admin/grades/index.html", class_=class_)
 
 

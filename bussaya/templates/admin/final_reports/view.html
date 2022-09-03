@@ -1,0 +1,64 @@
+{% extends '/base/default-dashboard.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+{% import '/navbar/class-navbar.html' as renderer_navbar %}
+{% import '/base/project-material-renderer.html' as pm_renderer %}
+
+{% block dashboard_title %}
+Classes
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view_final_reports', class_id=class_.id) }}">View Final Report</a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+{{ renderer_navbar.render_class_navbar(class_, current_user) }}
+
+<h2 class="ui header">
+    View Final Report {{ class_.name }}
+</h2>
+<div class="ui divider"></div>
+
+<table class="ui celled table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Project</th>
+            <th>Student</th>
+            <th>Advisor</th>
+            <th>Public</th>
+            <th>Document</th>
+            <th>Last Updated Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for project in projects %}
+        {% set final_report = get_final_report_project(project) %}
+        <tr>
+            <td class="one wide">{{ loop.index }}</td>
+            <td>{{ project.name }}</td>
+            <td class="right aligned collapsing">
+                {%- for s in project.students %}
+                {{ s.first_name }} {{ s.last_name }} ({{ s.username }})
+                {% if not loop.last %}<br>{% endif %}
+                {% endfor -%}
+            </td>
+            <td class="right aligned collapsing">{{ project.advisor.get_fullname() }}</td>
+            <td class="right aligned collapsing">{{ project.get_public_display() }}</td>
+            <td class="right aligned collapsing">
+                {{ pm_renderer.render_project_material(project) }}
+            </td>
+            <td class="collapsing">{{ final_report.natural_updated_date() if final_report else "-" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

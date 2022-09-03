@@ -58,10 +58,6 @@
   </tbody>
 </table>
 
-<div class="ui segment">
-    <h2 class="ui header">Projects</h2>
-    {{ renderer_project.render_project_table(projects, current_user) }}
-</div>
 
 <div class="ui segment">
     <h2 class="ui header">Submissions</h2>
@@ -122,11 +118,23 @@
     <h3 class="ui header">Report / Presentation</h3>
     {{ renderer_project.render_project_section([], current_user, advisee_projects, committee_projects) }}
 </div>
+
+<div class="ui segment">
+  <h2 class="ui header">Projects</h2>
+  {{ renderer_project.render_project_table(projects, current_user) }}
+</div>
 {% endblock %}
 
 {% block additional_js %}
 <script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
 <script type="text/javascript">
+    $('.icon.link.pop')
+      .popup({
+        delay: {
+          show: 50,
+          hide: 70
+        }
+      });
     datetime_formatter = {
         datetime: function (datetime, settings) {
             if (!datetime) return '';

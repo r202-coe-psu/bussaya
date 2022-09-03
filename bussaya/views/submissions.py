@@ -255,3 +255,19 @@ def download(progress_report_id, filename):
     )
 
     return response
+
+
+@module.route(
+    "/<class_id>/upload_final_report",
+)
+@login_required
+def upload_final_report(class_id):
+    class_ = models.Class.objects.get(id=class_id)
+    form = forms.submissions.FinalReport()
+
+    if not form.validate_on_submit():
+        return render_template(
+            "/submissions/upload-final-report.html", class_=class_, form=form
+        )
+    
+    return redirect(url_for('classes.view', class_id=class_.id))

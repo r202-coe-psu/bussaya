@@ -189,7 +189,50 @@
 		<i class="plus icon"></i>
 		Create Submission
 	</a>
+
 </div>
+
+<div class="ui divider"></div>
+<div class="ui segment">
+	<h2 class="ui header">Final Submission</h2>
+	{% if not final_submission %}
+<div class="ui info message">Final submission has not been set.</div>
+{% else %}
+<table class="ui definition table">
+	<tbody>
+		<tr>
+			<td>Started Date</td>
+			<td>{{ final_submission.natural_started_date() }}</td>
+		</tr>
+		<tr>
+			<td>Ended Date</td>
+			<td>{{ final_submission.natural_ended_date() }}</td>
+		</tr>
+		<tr>
+			<td>Extended Date</td>
+			<td>{{ final_submission.natural_extended_date() }}</td>
+		</tr>
+	</tbody>
+</table>
+{% endif %}
+{% if final_submission %}
+<a class="ui primary labeled icon button" href="{{ url_for('admin.classes.view_final_reports', class_id=class_.id) }}">
+	<i class="eye icon"></i>
+	View
+</a>
+<a class="ui teal labeled icon button" href="{{ url_for('admin.classes.edit_final_submission', class_id=class_.id, final_submission_id=final_submission.id) }}">
+	<i class="share alternate icon"></i>
+	 Edit Final Submission
+</a>
+{% else %}
+<a class="ui teal labeled icon button" href="{{ url_for('admin.classes.set_final_submission', class_id=class_.id) }}">
+	<i class="share alternate icon"></i>
+	 Set Final Submission
+</a>
+{% endif %}
+</div>
+
+
 
 <div class="ui modal delete class">
 	<i class="close icon"></i>

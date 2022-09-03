@@ -51,6 +51,19 @@
 </div>
 {% endif %}
 
+{% if final_submission %}
+<div class="ui segment">
+	<h2 class="ui header">Final Report</h2>
+	<div class="ui divider"></div>
+	<a class="ui primary labeled icon button"
+		href="{{ url_for('final_reports.upload', final_submission_id=final_submission.id) }}">
+		<i class="upload icon"></i>
+		Upload Final Report
+	</a>
+</div>
+{% endif %}
+	
+
 <div class="ui segment">
 
 	<h2 class="ui header">Submissions</h2>
@@ -263,5 +276,6 @@
 	{% endif %}
 </div>
 
-<div class="ui divider"></div>
+
+
 {% endblock %}

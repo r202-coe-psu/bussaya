@@ -9,7 +9,7 @@
     <div class="divider"> / </div>
     <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
     <div class="divider"> / </div>
-    <a href="{{ url_for('classes.view_students', class_id=class_.id) }}">View Students</a>
+    <a href="{{ url_for('admin.classes.view_students', class_id=class_.id) }}">View Students</a>
 </div>
 {% endblock %}
 

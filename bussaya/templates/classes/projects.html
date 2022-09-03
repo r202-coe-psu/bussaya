@@ -9,7 +9,7 @@
     <div class="divider"> / </div>
     <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
     <div class="divider"> / </div>
-    <a href="{{ url_for('classes.view_students', class_id=class_.id) }}">View Students</a>
+    <a href="{{ url_for('admin.classes.view_projects', class_id=class_.id) }}">View Project</a>
 </div>
 {% endblock %}
 
@@ -19,7 +19,7 @@
 {{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
 <h2 class="ui header">
-    View Students
+    View Project
 </h2>
 <div class="ui divider"></div>
 <table class="ui celled table">

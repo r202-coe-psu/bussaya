@@ -1,4 +1,5 @@
 from email.policy import default
+import resource
 from telnetlib import STATUS
 import mongoengine as me
 
@@ -203,3 +204,93 @@ class MeetingReport(me.Document):
     updated_date = me.DateTimeField(
         required=True, default=datetime.datetime.now, auto_now=True
     )
+
+
+class FinalSubmission(me.Document):
+    meta = {"collection": "final_submissions", "strict": False}
+
+    description = me.StringField()
+
+    created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
+    updated_date = me.DateTimeField(
+        required=True, default=datetime.datetime.now, auto_now=True
+    )
+
+    started_date = me.DateTimeField(required=True, default=datetime.datetime.today)
+    ended_date = me.DateTimeField(required=True, default=datetime.datetime.today)
+    extended_date = me.DateTimeField(required=True, default=datetime.datetime.today)
+
+    class_ = me.ReferenceField("Class", dbref=True, required=True)
+
+    def get_status(self):
+        if self.started_date > datetime.datetime.now():
+            return "upcoming"
+
+        if self.started_date <= datetime.datetime.now() <= self.ended_date:
+            return "opened"
+
+        if self.ended_date <= datetime.datetime.now() <= self.extended_date:
+            return "lated"
+
+        else:
+            return "closed"
+
+    def get_remain_time(self):
+        now = datetime.datetime.now()
+        start = self.started_date
+        end = self.ended_date
+        extend = self.extended_date
+
+        if start > now:
+            delta = start - now
+            return (
+                delta.days,
+                f"Opening in {humanize.naturaltime(delta).removesuffix(' ago')}",
+            )
+
+        if now > end and extend > now:
+            delta = extend - now
+            return (
+                delta.days,
+                f"Closing in {humanize.naturaltime(delta).removesuffix(' ago')}",
+            )
+
+        if now > start and end > now:
+            delta = end - now
+            return (
+                delta.days,
+                f"Due in {humanize.naturaltime(delta).removesuffix(' ago')}",
+            )
+
+        else:
+            return (extend - now).days, "Out of time"
+
+    def natural_started_date(self):
+        return self.started_date.strftime("%d %B %Y, %I:%M %p")
+
+    def natural_ended_date(self):
+        return self.ended_date.strftime("%d %B %Y, %I:%M %p")
+
+    def natural_extended_date(self):
+        return self.extended_date.strftime("%d %B %Y, %I:%M %p")
+
+
+class FinalReport(me.Document):
+    meta = {
+        "collection": "final_reports",
+        "strict": False,
+    }
+
+    final_submission = me.ReferenceField("FinalSubmission", required=True, dbref=True)
+
+    owner = me.ReferenceField("User", dbref=True)
+    project = me.ReferenceField("Project", required=True, dbref=True)
+    ip_address = me.StringField(required=True, max_length=255)
+
+    created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
+    updated_date = me.DateTimeField(
+        required=True, default=datetime.datetime.now, auto_now=True
+    )
+
+    def natural_updated_date(self):
+        return self.updated_date.strftime("%d %B %Y, %I:%M %p")

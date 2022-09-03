@@ -1,0 +1,74 @@
+{% extends '/base/default-dashboard.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+{% import '/navbar/class-navbar.html' as renderer_navbar %}
+
+{% block dashboard_title %}
+{{ 'Edit' if 'edit' in request.path else 'Set' }} Final Submission
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    {{ 'Edit' if 'edit' in request.path else 'Set' }} Final Submission
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+{{ renderer_navbar.render_class_navbar(class_, current_user) }}
+
+<h3 class="ui header horizontal divider">
+    {{ 'Edit' if 'edit' in request.path else 'Set' }} Final Submission {{ class_.name }}
+</h3>
+<div class="row">
+    <form method="POST" class="ui form">
+        <div class="ui segment">
+            {{ form.csrf_token }}
+            {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
+            {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
+            {{ renderer.render_calendar(form.extended_date, calendar_id="rangeextend") }}
+            <button type="submit" class="ui large primary icon button">
+                <i class="clock icon"></i>
+                {{ 'Edit' if 'edit' in request.path else 'Set' }} Final Submission
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+{% block additional_js %}
+<script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
+<script type="text/javascript">
+    datetime_formatter = {
+        datetime: function (datetime, settings) {
+            if (!datetime) return '';
+            var day = datetime.getDate();
+            var month = datetime.getMonth() + 1;
+            var year = datetime.getFullYear();
+            var hour = datetime.getHours();
+            var minute = datetime.getMinutes();
+            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
+        }
+    };
+    $('#rangestart').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        endCalendar: $('#rangeend')
+    });
+    $('#rangeend').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        startCalendar: $('#rangestart')
+    });
+    $('#rangeextend').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        startCalendar: $('#rangeend')
+    });
+</script>
+{% endblock %}

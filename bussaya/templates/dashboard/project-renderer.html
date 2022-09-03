@@ -50,16 +50,18 @@
           <i class="clipboard large icon link pop" data-content="Meeting Report"></i>
         </a>
         {% elif current_user != project.advisor %}
-        <i class="disabled clipboard large icon" data-content="Meeting Report"></i>
+        {# 
+          <i class="disabled clipboard large icon" data-content="Meeting Report"></i>
+        #}
         {% endif %}
         {% set progress_reports = project.get_progress_reports(round='midterm') %}
         {% for pr in progress_reports %}
         <a target="_blank"
           href="{{ url_for('submissions.download', progress_report_id=pr.id, filename=pr.file.filename) }}">
-          {% if pr.submission.type == 'report' %}
-          <i class="file pdf icon large"></i>
+          {% if pr.submission.type == 'report' and project.advisor == current_user %}
+          <i class="file pdf icon link pop large" data-content="Report"></i>
           {% elif pr.submission.type == 'presentation' %}
-          <i class="file powerpoint icon large"></i>
+          <i class="file powerpoint icon link pop large" data-content="Presentation"></i>
           {% else %}
           <i class="file alternate icon large"></i>
           {% endif %}
@@ -74,7 +76,9 @@
           <i class="clipboard large icon link pop" data-content="Meeting Report"></i>
         </a>
         {% elif current_user != project.advisor %}
-        <i class="disabled clipboard large icon" data-content="Meeting Report"></i>
+        {#
+          <i class="disabled clipboard large icon" data-content="Meeting Report"></i>
+        #}
         {% endif %}
         {% set progress_reports = project.get_progress_reports(round='final') %}
         {% for pr in progress_reports %}
