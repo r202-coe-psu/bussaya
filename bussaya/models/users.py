@@ -228,7 +228,24 @@ class User(me.Document, UserMixin):
             return average_grade, caused
 
         if presentation:
-            print(presentation.submission.ended_date - presentation.updated_date)
+            delta_time = presentation.submission.ended_date - presentation.updated_date
+            if delta_time.days <= -1:
+                final_point -= 0.5
+                cause = "Presentation Submitted 1 Day Late"
+                if delta_time.days <= -2:
+                    final_point -= 0.5
+                    cause = "Presentation Submitted 2 Day Late"
+                caused.append(cause)
+
+        if report:
+            delta_time = report.submission.ended_date - report.updated_date
+            if delta_time.days <= -1:
+                final_point -= 0.5
+                cause = "Report Submitted 1 Day Late"
+                if delta_time.days <= -2:
+                    final_point -= 0.5
+                    cause = "Report Submitted 2 Day Late"
+                caused.append(cause)
 
         # if student not sent report -> -0.5 grade
         if not report:

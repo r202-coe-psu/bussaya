@@ -155,6 +155,7 @@ def upload(submission_id):
         progress_report.submission = models.Submission.objects.get(id=submission_id)
         progress_report.class_ = submission.class_
 
+    progress_report.updated_date = datetime.datetime.now()
     progress_report.owner = current_user._get_current_object()
     progress_report.ip_address = request.headers.get(
         "X-Forwarded-For", request.remote_addr
@@ -269,5 +270,5 @@ def upload_final_report(class_id):
         return render_template(
             "/submissions/upload-final-report.html", class_=class_, form=form
         )
-    
-    return redirect(url_for('classes.view', class_id=class_.id))
+
+    return redirect(url_for("classes.view", class_id=class_.id))
