@@ -50,6 +50,7 @@
         <tr>
             <th></th>
             <th>Student</th>
+            <th>Advisor</th>
             <th>Title / Description</th>
             <th>Meeting Date</th>
             <th>Status</th>
@@ -66,6 +67,9 @@
             <td>
                 {{ meeting_report.owner.username }} <br />
                 {{ meeting_report.owner.first_name }} {{ meeting_report.owner.last_name }}
+            </td>
+            <td>
+              {{ meeting_report.project.advisor.get_fullname() }}
             </td>
             <td>
               <h3>{{ meeting_report.title }}</h3>
