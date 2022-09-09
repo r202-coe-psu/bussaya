@@ -267,3 +267,49 @@ class User(me.Document, UserMixin):
         final_grade = self.get_point_to_grade(final_point)
 
         return final_grade, caused
+
+    def get_complete_grade(self, class_):
+        round_grades = models.RoundGrade.objects(class_=class_)
+
+        total_grade = 0
+        average_total_grade = 0
+        is_fail = False
+        for round_grade in round_grades:
+            actual_grade = self.get_actual_grade(round_grade)
+            if (
+                actual_grade == "incomplete"
+                or round_grade.release_status == "unreleased"
+            ):
+                average_total_grade = "Incomplete"
+                break
+
+            if round_grade.type == "midterm":
+                grade_ratio = 0.4
+            elif round_grade.type == "final":
+                grade_ratio = 0.6
+
+            total_grade += grade_ratio * self.get_grade_to_point(actual_grade)
+            if actual_grade == "E":
+                is_fail = True
+
+        if average_total_grade != "Incomplete":
+            if is_fail:
+                average_total_grade = "E"
+            elif total_grade > 3.75:
+                average_total_grade = "A"
+            elif total_grade >= 3.25:
+                average_total_grade = "B+"
+            elif total_grade >= 2.75:
+                average_total_grade = "B"
+            elif total_grade >= 2.25:
+                average_total_grade = "C+"
+            elif total_grade >= 1.75:
+                average_total_grade = "C"
+            elif total_grade >= 1.25:
+                average_total_grade = "D+"
+            elif total_grade >= 0.75:
+                average_total_grade = "D"
+            else:
+                average_total_grade = "E"
+
+        return average_total_grade

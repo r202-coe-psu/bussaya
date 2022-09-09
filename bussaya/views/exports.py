@@ -16,7 +16,9 @@ from bussaya import acl
 import datetime
 import pandas
 import io
+
 from .. import models
+
 
 module = Blueprint("exports", __name__, url_prefix="/exports")
 
@@ -72,6 +74,16 @@ def export_students(class_id):
             student_data["Final Presentation"] = 0
             if student.get_presentation(class_, "final"):
                 student_data["Final Presentation"] = 1
+
+            round_grades = models.RoundGrade.objects(class_=class_)
+            for rg in round_grades:
+                grade = student.get_actual_grade(rg)
+                if rg.type == "midterm":
+                    student_data["Midterm Grade"] = grade[0]
+                if rg.type == "final":
+                    student_data["Final Grade"] = grade[0]
+
+            student_data["Complete Grade"] = student.get_complete_grade(class_)
 
         data.append(student_data)
 
