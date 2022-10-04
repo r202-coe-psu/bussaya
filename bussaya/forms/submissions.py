@@ -60,6 +60,17 @@ class ProgressReportForm(BaseProgressReportForm):
     )
 
 
+class ProgressReportDateForm(FlaskForm):
+    created_date = fields.DateTimeField(
+        "Created Date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
+    )
+    updated_date = fields.DateTimeField(
+        "Updated Date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
+    )
+
+    remark = fields.StringField("Remark", widget=widgets.TextArea())
+
+
 BaseFinalSubmissionForm = model_form(
     models.FinalSubmission,
     FlaskForm,

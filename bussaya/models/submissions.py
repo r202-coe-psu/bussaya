@@ -169,6 +169,7 @@ class ProgressReport(me.Document):
     ip_address = me.StringField(required=True)
 
     description = me.StringField()
+    remark = me.StringField(default="")
     file = me.FileField(
         collection_name="progress_report_fs",
     )

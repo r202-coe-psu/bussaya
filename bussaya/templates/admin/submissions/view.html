@@ -67,6 +67,7 @@
             <th>File</th>
             <th>Description</th>
             <th>Submitted time</th>
+            <th>Operation</th>
         </tr>
     </thead>
     <tbody>
@@ -89,7 +90,6 @@
                 {% for student in project.students %}
                 <a target="_blank" href="{{ url_for('accounts.profile', user_id=student.id) }}">
                     {{ student.get_fullname() }} ({{ student.username }}) </a>
-                {% if not loop.last %}<br>{% endif %}
                 {% endfor %}
 
                 {% endif %}
@@ -106,6 +106,9 @@
                 <span class='ui orange text'>(Late)</span>
                 {% endif %}
                 {{ progress_report.get_uploaded_date() }}
+            </td>
+            <td>
+              <a class="ui icon primary button" href="{{ url_for('admin.submissions.change_reported_date', submission_id=submission.id, progress_report_id=progress_report.id) }}"><i class="calendar icon"></i></a>
             </td>
         </tr>
 
