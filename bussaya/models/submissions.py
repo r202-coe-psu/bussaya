@@ -8,7 +8,11 @@ import humanize
 
 SUBMISSION_TYPE = [("report", "Report"), ("presentation", "Presentation")]
 
-APPROVAL_STATUS = [("approved", "Approved"), ("disapproved", "Disapproved")]
+APPROVAL_STATUS = [
+    ("approved", "Approved"),
+    ("disapproved", "Disapproved"),
+    ("wait", "Wait"),
+]
 
 
 class Submission(me.Document):
@@ -188,7 +192,7 @@ class MeetingReport(me.Document):
     project = me.ReferenceField("Project", dbref=True, required=True)
     ip_address = me.StringField(required=True, max_length=255)
 
-    title = me.StringField(max_length=255)
+    title = me.StringField(max_length=255, required=True)
     description = me.StringField()
     meeting_date = me.DateField(default=datetime.datetime.today)
     file = me.FileField(

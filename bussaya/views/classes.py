@@ -87,7 +87,7 @@ def view_lecturer(class_id):
 @login_required
 def view_student(class_id):
     class_ = models.Class.objects.get(id=class_id)
-    submissions = models.Submission.objects.all().filter(
+    submissions = models.Submission.objects(
         class_=class_,
     )
     final_submission = models.FinalSubmission.objects(class_=class_).first()

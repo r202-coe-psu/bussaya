@@ -112,16 +112,20 @@ class User(me.Document, UserMixin):
         return student_grades
 
     def get_permission_to_upload(self, submission):
-        meeting_reports = models.MeetingReport.objects(
-            class_=submission.class_, owner=self
+        meetings = models.Meeting.objects(
+            class_=submission.class_,
+            round=submission.round,
         )
-        count_report = 0
-        for report in meeting_reports:
-            if submission.round == report.meeting.round:
-                count_report += 1
+        report_count = models.MeetingReport.objects(
+            class_=submission.class_,
+            owner=self,
+            status__in=["approved", "wait", None],
+            meeting__in=meetings,
+        ).count()
 
-        if count_report > 1:
+        if report_count > 2:
             return True
+
         return False
 
     def get_grade_to_point(self, grade):

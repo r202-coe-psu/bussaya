@@ -54,7 +54,7 @@ Submission Form
         {{ renderer.render_fileinput(form.uploaded_file) }}
         <button type="submit" class="ui button primary">
             {{ 'Edit' if 'edit' in request.path else 'Upload' }}
-            {{ "Late" if submission.get_status() == "lated" }}
+            {{ "Late Upload" if submission.get_status() == "lated" }}
         </button>
     </div>
 </form>

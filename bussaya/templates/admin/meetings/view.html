@@ -78,29 +78,27 @@
             </td>
             <td>
               <h3>{{ meeting_report.title }}</h3>
-              <div>{{ markdown.markdown(meeting_report.description) | safe }}</div>
+              <div>{{ markdown.markdown(meeting_report.description)|safe }}</div>
             </td>
             <td>
                 {{meeting_report.meeting_date}}
             </td>
-            <td
-                class="{{'green' if meeting_report.status == 'approved'}} {{'red' if meeting_report.status == 'disapproved'}}">
-                {{meeting_report.get_status_display() if meeting_report.status else 'Waiting for approval'}}
+            <td class="{{'green' if meeting_report.status == 'approved'}} {{'red' if meeting_report.status == 'disapproved'}}">
+              {{ meeting_report.get_status_display() if meeting_report.status else 'Waiting for approval' }}
             </td>
             <td>
-                {{ markdown.markdown(meeting_report.remark) if meeting_report.remark else '-' | safe }}
+              {{ markdown.markdown(meeting_report.remark)|safe }}
             </td>
             <td class="right aligned">
                 <div style="display: flex">
 
-                    <a class="ui primary popupmsg button" href="{{url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, 
-                    action='approved')}}" style="height: fit-content; margin-top: 0.5em" data-content="Approved">
-                        Approve
+                    <a class="ui green popupmsg icon button" href="{{url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, action='approved')}}" style="height: fit-content; margin-top: 0.5em" data-content="Approved">
+                      <i class="check icon button"></i>
                     </a>
                     <div class="ui accordion" style="width: fit-content; height: fit-content">
                         <div class=" title">
-                            <button class="ui red button">
-                                Disapprove
+                            <button class="ui red icon popupmsg button" data-content="Disapprove">
+                              <i class="times icon"></i>
                             </button>
                         </div>
                         <div class="content">

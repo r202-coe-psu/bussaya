@@ -17,7 +17,7 @@ from .. import models
 module = Blueprint("meetings", __name__, url_prefix="/meetings")
 
 
-@module.route("/<meeting_id>/")
+@module.route("/<meeting_id>/", methods=["GET", "POST"])
 @login_required
 def view(meeting_id):
     if current_user.has_roles("admin"):
@@ -116,7 +116,7 @@ def approval(meeting_id, meeting_report_id, action):
         meeting_report.status = "approved"
     elif action == "disapprove":
         meeting_report.status = "disapproved"
-        meeting_report.remark += f"\r\n\r\n{form.remark.data}"
+        meeting_report.remark += f"\n\n{form.remark.data}"
 
     meeting_report.approver = current_user._get_current_object()
     meeting_report.approver_ip_address = request.headers.get(
@@ -292,4 +292,4 @@ def force_report(meeting_id, meeting_report_id):
 
     meeting_report.save()
 
-    return redirect(url_for("classes.view", class_id=class_.id))
+    return redirect(url_for("meetings.view_admin", meeting_id=meeting_id))
