@@ -1,0 +1,105 @@
+{% extends '/base/default-dashboard.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+
+{% block dashboard_title %}
+Meeting Form
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('dashboard.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    Form:<a href="{{ url_for('meetings.report', meeting_id=meeting.id) }}">
+        {{meeting.name}}</a>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<table class="ui definition table">
+    <tr>
+        <td class="two wide">
+            Meeting
+        </td>
+        <td>
+            {{ meeting.name }}
+        </td>
+    </tr>
+    <tr>
+        <td class="two wide">
+            Remaining time:
+        </td>
+        <td>
+            {{ meeting.get_remain_time()[1] }}
+        </td>
+    </tr>
+</table>
+{% if projects | length == 0 %}
+<div class="ui message warning">
+    <div class="header">
+        Please, create project before report.
+    </div>
+    <p>
+        <a href="{{ url_for('projects.create') }}" class="ui primary button">Create Project</a>
+    </p>
+</div>
+{% endif %}
+
+<form method="POST" class="ui form" enctype="multipart/form-data">
+    <div class="ui segment">
+      {{ form.csrf_token }}
+      <div class="two fields">
+        {{ renderer.render_select(form.project) }}
+        {{ renderer.render_select(form.student) }}
+      </div>
+      {{ renderer.render_field(form.title) }}
+      {{ renderer.render_field(form.description) }}
+      {{ renderer.render_field(form.remark) }}
+      <div class="two fields">
+          {{ renderer.render_calendar(form.meeting_date, 'meeting_date_calendar') }}
+      </div>
+        <button type="submit" class="ui button primary">{{ 'Edit' if 'edit' in request.path else 'Report' }}</button>
+    </div>
+</form>
+
+{% endblock content %}
+
+
+{% block additional_js %}
+  <script>
+    datetime_formatter = {
+      datetime: function (datetime, settings) {
+        if (!datetime) return '';
+        var day = datetime.getDate();
+        var month = datetime.getMonth() + 1;
+        var year = datetime.getFullYear();
+        return ("0" + day).slice(-2) + '-' + ("0" + month).slice(-2) + '-' + year;
+      }
+    };
+
+    var calendar_setting = {
+      type: 'date',
+      monthFirst: false,
+      formatter: datetime_formatter,
+      today: false,
+      ampm: false,
+      {#
+      text: {
+        days: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
+        months: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤษจิกายน', 'ธันวาคม'],
+        monthsShort: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
+        today: 'วันนี้',
+        now: 'ปัจจุบัน',
+        am: 'AM',
+        pm: 'PM'
+      },
+      #}
+    };
+
+    $('#meeting_date_calendar').calendar(calendar_setting);
+
+  </script>
+{% endblock %}

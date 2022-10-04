@@ -43,6 +43,11 @@
     <i class="trash icon"></i> Delete
 </a>
 
+<a class="ui primary icon button" href="{{ url_for('meetings.force_report', meeting_id=meeting.id) }}">
+    <i class="add icon"></i> Force Add Student Report
+</a>
+
+
 <h2 class="ui horizontal header divider">{{meeting.name}}</h2>
 
 <table class="ui celled table">
@@ -85,11 +90,11 @@
             <td>
                 {{ markdown.markdown(meeting_report.remark) if meeting_report.remark else '-' | safe }}
             </td>
-            <td class="four wide">
+            <td class="right aligned">
                 <div style="display: flex">
 
-                    <a class="ui primary button" href="{{url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, 
-                    action='approved')}}" style="height: fit-content; margin-top: 0.5em">
+                    <a class="ui primary popupmsg button" href="{{url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, 
+                    action='approved')}}" style="height: fit-content; margin-top: 0.5em" data-content="Approved">
                         Approve
                     </a>
                     <div class="ui accordion" style="width: fit-content; height: fit-content">
@@ -130,6 +135,8 @@
         $(".disapprove.remark").transition('fade down')
             ;
     }
-    $(".ui.accordion").accordion()
+    $(".ui.accordion").accordion();
+
+    $(".ui.popupmsg.button").popup();
 </script>
 {% endblock additional_js%}

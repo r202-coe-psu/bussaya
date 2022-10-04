@@ -1,4 +1,4 @@
-{% extends '/admin/classes/index.html' %}
+{% extends '/classes/index.html' %}
 {% import '/base/error-handler.html' as eh %}
 {% import '/base/html-renderer.html' as renderer %}
 
@@ -83,8 +83,7 @@
             </td>
             <td class="single line">
                 <div>
-                    <a class="ui primary button"
-                        href="{{ url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, action='approved')}}">
+                    <a class="ui primary popmsg button" href="{{ url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, action='approved')}}" data-content="Approve">
                         Approve
                     </a>
                     <div class="ui accordion" style="width: fit-content; height: fit-content">
@@ -124,6 +123,9 @@
         $(".disapprove.remark").transition('fade down')
             ;
     }
+
     $(".ui.accordion").accordion()
+
+    $(".ui.popupmsg.button").popup();
 </script>
 {% endblock additional_js%}

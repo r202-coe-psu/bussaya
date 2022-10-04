@@ -114,10 +114,9 @@ def approval(meeting_id, meeting_report_id, action):
 
     if action == "approve":
         meeting_report.status = "approved"
-        meeting_report.remark = ""
     elif action == "disapprove":
         meeting_report.status = "disapproved"
-        meeting_report.remark = form.remark.data
+        meeting_report.remark += f"\r\n\r\n{form.remark.data}"
 
     meeting_report.approver = current_user._get_current_object()
     meeting_report.approver_ip_address = request.headers.get(
@@ -227,6 +226,66 @@ def report(meeting_id, meeting_report_id):
     form.populate_obj(meeting_report)
     meeting_report.updated_date = datetime.datetime.now()
     meeting_report.owner = current_user._get_current_object()
+    meeting_report.ip_address = request.headers.get(
+        "X-Forwarded-For", request.remote_addr
+    )
+
+    meeting_report.save()
+
+    return redirect(url_for("classes.view", class_id=class_.id))
+
+
+@module.route(
+    "/<meeting_id>/reports/admin-force-create",
+    methods=["GET", "POST"],
+    defaults=dict(meeting_report_id=""),
+)
+@module.route(
+    "/<meeting_id>/reports/<meeting_report_id>/admin-force-edit",
+    methods=["GET", "POST"],
+)
+@acl.roles_required("admin")
+def force_report(meeting_id, meeting_report_id):
+    meeting = models.Meeting.objects.get(id=meeting_id)
+
+    meeting_report = None
+    if meeting_report_id:
+        meeting_report = models.MeetingReport.objects(id=meeting_report_id).first()
+
+    class_ = meeting.class_
+    students = class_.get_students()
+
+    projects = models.Project.objects(
+        me.Q(creator__in=students) | me.Q(students__in=students)
+    ).order_by("name")
+
+    form = forms.meetings.AdminMeetingReportForm(obj=meeting_report)
+    form.project.queryset = projects
+    form.student.choices = [
+        (str(s.id), f"{s.username} - {s.first_name} {s.last_name}") for s in students
+    ]
+    form.student.choices.sort()
+
+    if not form.validate_on_submit():
+        return render_template(
+            "/admin/meetings/report.html",
+            projects=projects,
+            meeting=meeting,
+            class_=class_,
+            form=form,
+            meeting_report=meeting_report,
+        )
+
+    if not meeting_report:
+        meeting_report = models.MeetingReport()
+        meeting_report.owner = models.User.objects.get(id=form.student.data)
+
+        meeting_report.class_ = meeting.class_
+        meeting_report.meeting = meeting
+
+    form.populate_obj(meeting_report)
+    meeting_report.updated_date = datetime.datetime.now()
+    meeting_report.owner = models.User.objects.get(id=form.student.data)
     meeting_report.ip_address = request.headers.get(
         "X-Forwarded-For", request.remote_addr
     )

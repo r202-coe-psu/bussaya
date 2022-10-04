@@ -188,15 +188,15 @@ class MeetingReport(me.Document):
     project = me.ReferenceField("Project", dbref=True, required=True)
     ip_address = me.StringField(required=True, max_length=255)
 
-    title = me.StringField()
-    description = me.StringField(required=True)
+    title = me.StringField(max_length=255)
+    description = me.StringField()
     meeting_date = me.DateField(default=datetime.datetime.today)
     file = me.FileField(
         collection_name="meeting_report_fs",
     )
 
     status = me.StringField(choices=APPROVAL_STATUS)
-    remark = me.StringField(max_length=2000, default="")
+    remark = me.StringField(default="")
     approver = me.ReferenceField("User", dbref=True)
     approver_ip_address = me.StringField(max_length=255)
 

@@ -47,21 +47,28 @@ BaseMeetingReportForm = model_form(
         "meeting",
     ],
     field_args={
-        "name": {"label": "Meeting Name"},
-        "round": {"label": "Round"},
         "project": {
             "label": "Project",
             "label_modifier": lambda p: p.name,
         },
-        "remark": {"label": "Disapprove Remark"},
+        "title": {"label": "Title"},
+        "description": {"label": "Desctription"},
+        "remark": {"label": "Remark"},
+        "meeting_date": {
+            "label": "Meeting Date",
+            "format": "%d-%m-%Y",
+            "widget": widgets.TextInput(),
+        },
     },
 )
 
 
 class MeetingReportForm(BaseMeetingReportForm):
-    title = fields.StringField("Title")
-    description = fields.TextAreaField("Description")
-    meeting_date = fields.DateField("Meeting Date", format="%Y-%m-%d")
+    pass
+
+
+class AdminMeetingReportForm(MeetingReportForm):
+    student = fields.SelectField("Student")
 
 
 class DisapproveForm(BaseMeetingReportForm):
