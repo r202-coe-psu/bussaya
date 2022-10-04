@@ -40,15 +40,15 @@
     action="{{ url_for('round_grades.submit_grade', round_grade_id=round_grade.id) }}">
     {{ form.csrf_token }}
     <div class="ui attached segment">
-        <table class="ui celled structured table">
+        <table class="ui celled table">
             <thead>
                 <tr>
                     <th></th>
                     <th>Student ID</th>
                     <th>Student Name</th>
                     <th>Advisor</th>
-                    <th class="one wide">Meeting Report</th>
-                    <th class="one wide">Submissions</th>
+                    <th>Meeting Report</th>
+                    <th>Submissions</th>
                     <th>Grading</th>
                     <th>Average Grade</th>
                     <th>Final Grade</th>
@@ -94,12 +94,14 @@
                     </td>
                     <td>
                         {% set grading = form.gradings[loop.index - 1] %}
-                        <div id="{{grading.id}}">
+                        <div id="{{ grading.id }}" style="width: auto">
                             {{ grading.student_id }}
-                            {{ grading.result(class_="ui dropdown ") }}
+                            {{ grading.result(class_="ui fluid dropdown") }}
                         </div>
                     </td>
-                    <td>{{ student.get_average_grade(student_grade.round_grade) }}</td>
+                    <td>
+                        {{ student.get_average_grade(student_grade.round_grade) }}
+                    </td>
                     {% set actual_grade, caused = student.get_actual_grade(student_grade.round_grade) %}
                     <td>
                       {% if not caused %}
@@ -121,12 +123,12 @@
                     </td>
                     <td>
                         <div class="title">
-                            <a id="{{student_grade.id}}" style="cursor: pointer"
+                            <a id="{{ student_grade.id }}" style="cursor: pointer"
                                 onclick="accordion_show_hide('{{student_grade.id}}')">
                                 See More
                             </a>
                         </div>
-                        <div id="{{student_grade.id}} content" class="content" style="display: none">
+                        <div id="{{ student_grade.id }} content" class="content" style="display: none">
                             {% for student_grade in student.get_total_student_grades(round_grade) %}
                               <div class="ui relaxed divided list">
                                 <div class="item">
