@@ -58,12 +58,12 @@
         {% for pr in progress_reports %}
         <a target="_blank"
           href="{{ url_for('submissions.download', progress_report_id=pr.id, filename=pr.file.filename) }}">
-          {% if pr.submission.type == 'report' and project.advisor == current_user %}
-          <i class="file pdf icon link pop large" data-content="Report"></i>
+          {% if pr.submission.type == 'report' %}
+            <i class="file pdf icon link pop large" data-content="Report of {{ pr.owner.username }}"></i>
           {% elif pr.submission.type == 'presentation' %}
-          <i class="file powerpoint icon link pop large" data-content="Presentation"></i>
+          <i class="file powerpoint icon link pop large" data-content="Presentation of {{ pr.owner.username }}"></i>
           {% else %}
-          <i class="file alternate icon large"></i>
+            <i class="file alternate icon link pop large" data-content="Other of {{ pr.owner.username }}"></i>
           {% endif %}
         </a>
         {% endfor %}
@@ -85,11 +85,11 @@
         <a target="_blank"
           href="{{ url_for('submissions.download', progress_report_id=pr.id, filename=pr.file.filename) }}">
           {% if pr.submission.type == 'report' %}
-          <i class="file pdf icon large"></i>
+          <i class="file pdf icon link pop large" data-content="Report of {{ pr.owner.username }}"></i>
           {% elif pr.submission.type == 'presentation' %}
-          <i class="file powerpoint icon large"></i>
+          <i class="file powerpoint icon link pop large" data-content="Presentation of {{ pr.owner.username }}"></i>
           {% else %}
-          <i class="file alternate icon large"></i>
+          <i class="file alternate icon link pop large" data-content="Other of {{ pr.owner.username }}"></i>
           {% endif %}
         </a>
         {% endfor %}
