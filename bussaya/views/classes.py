@@ -175,6 +175,11 @@ def approve_meeting_report(class_id):
         meeting__in=meetings, owner__in=students, status__in=wait_statuses
     )
 
+    meeting_reports = list(meeting_reports)
+    meeting_reports.sort(
+        key=lambda m: (m.owner.username, m.meeting.round, m.meeting.name)
+    )
+
     form = forms.meetings.DisapproveForm()
 
     return render_template(
