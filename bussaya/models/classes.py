@@ -2,11 +2,12 @@ import mongoengine as me
 import datetime
 
 from . import users
+from . import projects
 
 TYPE_CHOICE = [
     ("preproject", "Preproject"),
-    ("project_1", "Project 1"),
-    ("project_2", "Project 2"),
+    ("project", "Project"),
+    ("cooperative", "Cooperative Education"),
 ]
 
 
@@ -33,6 +34,14 @@ class Class(me.Document):
 
     def get_students(self):
         return users.User.objects(username__in=self.student_ids).order_by("username")
+
+    def get_projects_by_advisors(self, *args):
+        return projects.Project.objects(advisors__in=args)
+
+    def get_advisees_by_advisors(self, *args):
+        students = self.get_students()
+        adv_projects = projects.Project.objects(advisor__in=args, students__in=students)
+        return [s for project in adv_projects for s in project.students]
 
     def is_in_time(self):
         return self.started_date <= datetime.datetime.now().date() <= self.ended_date

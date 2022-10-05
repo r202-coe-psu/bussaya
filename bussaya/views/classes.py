@@ -55,10 +55,6 @@ def view_lecturer(class_id):
         class_=class_, project__in=projects
     )
 
-    student_ids = class_.student_ids
-
-    students = models.User.objects(username__in=student_ids)
-
     advisee_projects = models.Project.objects(
         advisor=current_user._get_current_object(), students__in=students
     )
@@ -132,7 +128,7 @@ def get_student_group(student_id, class_id):
     return ""
 
 
-@module.route("/<class_id>/students/<user_id>/meeting_reports")
+@module.route("/<class_id>/students/<user_id>/meeting-reports")
 @acl.roles_required("lecturer", "admin")
 def list_report_by_user(class_id, user_id):
 
@@ -153,7 +149,37 @@ def list_report_by_user(class_id, user_id):
     return render_template(
         "/classes/list-report-by-user.html",
         class_=class_,
-        user=user,
+        meeting_reports=meeting_reports,
+        form=form,
+        markdown=markdown,
+    )
+
+
+@module.route("/<class_id>/students/approve-meeting-reports")
+@acl.roles_required("lecturer", "admin")
+def approve_meeting_report(class_id):
+
+    round = request.args.get("round", None)
+    class_ = models.Class.objects.get(id=class_id)
+
+    meetings = []
+    if round:
+        meetings = models.Meeting.objects(class_=class_, round=round)
+    else:
+        meetings = models.Meeting.objects(class_=class_)
+
+    students = class_.get_advisees_by_advisors(current_user._get_current_object())
+
+    wait_statuses = ["wait", "late-report", None]
+    meeting_reports = models.MeetingReport.objects(
+        meeting__in=meetings, owner__in=students, status__in=wait_statuses
+    )
+
+    form = forms.meetings.DisapproveForm()
+
+    return render_template(
+        "/classes/list-report-by-user.html",
+        class_=class_,
         meeting_reports=meeting_reports,
         form=form,
         markdown=markdown,

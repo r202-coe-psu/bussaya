@@ -33,14 +33,6 @@
     </tr>
     <tr>
       <td>
-        <div style="color: grey">OWNER </div>{{ class_.owner.first_name }} {{ class_.owner.last_name }}
-      </td>
-      <td>
-        <div style="color: grey">CODE </div>{{ class_.code }}
-      </td>
-    </tr>
-    <tr>
-      <td>
         <div style="color: grey">TYPE</div> {{ class_.get_type_display() }}
       </td>
       <td>
@@ -58,8 +50,13 @@
   </tbody>
 </table>
 
-
-<h3 class="ui header">Meeting Report</h3>
+<h3 class="ui header">
+  {% if 'class_.approve_meeting_report' in request.endpoint %}
+    Waiting Meeting Report Approval
+  {% else %}
+    Meeting Report
+  {% endif %}
+</h3>
 <div class="ui divider"></div>
 <table class="ui selectable celled table">
   <thead>
@@ -72,15 +69,13 @@
       <th>Last Updated Date</th>
       <th>Status</th>
       <th>Remark</th>
-      {% if user.get_project().advisor == current_user %}
       <th>Approval</th>
-      {% endif %}
     </tr>
   </thead>
 
   <tbody>
     {% for report in meeting_reports %}
-    {%- set tr_class='' %}
+    {%- set tr_class='top aligned' %}
     {%- if report.status == 'late-report' %}
       {% set tr_class='yellow' %}
     {%- endif %}
@@ -126,7 +121,6 @@
           </div>
         {% endif %}
       </td>
-      {% if user.get_project().advisor == current_user %}
       <td class="single line">
         <div style="margin-bottom: 0.5em">
           <a href="{{ url_for('meetings.approval', meeting_report_id=report.id, meeting_id=report.meeting.id, action='approve') }}"
@@ -142,7 +136,6 @@
           </div>
         </form>
       </td>
-      {% endif %}
     </tr>
     {% endfor %}
   </tbody>
