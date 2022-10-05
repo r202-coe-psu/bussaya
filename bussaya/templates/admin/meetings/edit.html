@@ -32,6 +32,7 @@
             {{ renderer.render_select(form.round) }}
             {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
             {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
+            {{ renderer.render_calendar(form.extended_date, calendar_id="rangeextend") }}
         </div>
         <button name="edit" type="submit" class="ui small primary labeled icon button">
             <i class="edit icon"></i>
@@ -65,7 +66,14 @@
     $('#rangeend').calendar({
         // type: 'date',
         formatter: datetime_formatter,
-        startCalendar: $('#rangestart')
+        startCalendar: $('#rangestart'),
+        endCalendar: $('#rangeextend')
     });
+    $('#rangeextend').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        startCalendar: $('#rangeend'),
+    });
+
 </script>
 {% endblock additional_js %}

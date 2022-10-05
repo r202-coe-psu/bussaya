@@ -80,7 +80,11 @@
 
   <tbody>
     {% for report in meeting_reports %}
-    <tr>
+    {%- set tr_class='' %}
+    {%- if report.status == 'late-report' %}
+      {% set tr_class='yellow' %}
+    {%- endif %}
+    <tr class="{{ tr_class }}">
       <td>
         {{ report.owner.username }} <br />
         {{ report.owner.first_name }} {{ report.owner.last_name }}
@@ -96,7 +100,7 @@
       <td>
         <div><h3>{{ report.title }}</h3></div>
         <div>
-          {{ markdown.markdown(report.description) | safe }}
+          {{ markdown.markdown(report.description)|safe }}
         </div>
       </td>
       <td>
@@ -105,11 +109,22 @@
       <td>
         {{ report.updated_date.ctime() }}
       </td>
-      <td class="{{'green' if report.status == 'approved'}} {{'red' if report.status == 'disapproved'}}">
-        {{ report.get_status_display() if report.status else 'Waiting for approval' }}
+      <td class="{{'green' if report.status == 'approved'}}{{'red' if report.status == 'disapproved'}}">
+        <b>{{ report.get_status_display() if report.status else 'Waiting for approval' }}</b>
       </td>
       <td>
-        {{ report.remark }}
+        {% if report.late_reason %}
+          <div>
+            <b>Late Submission Reason</b>
+            {{ markdown.markdown(report.late_reason)|safe }}
+          </div>
+        {% endif %}
+        {% if report.remark %}
+          <div>
+            <b>Remark</b>
+            {{ markdown.markdown(report.remark)|safe }}
+          </div>
+        {% endif %}
       </td>
       {% if user.get_project().advisor == current_user %}
       <td class="single line">

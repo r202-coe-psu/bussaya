@@ -32,6 +32,11 @@
             <td>Ended Date</td>
             <td>{{ meeting.ended_date }}</td>
         </tr>
+        <tr>
+            <td>Extended Date</td>
+            <td>{{ meeting.extended_date }}</td>
+        </tr>
+
     </tbody>
 </table>
 
@@ -71,7 +76,7 @@
             </td>
             <td>
                 <h3>{{ meeting_report.title }}</h3>
-                <div>{{ markdown.markdown(meeting_report.description) | safe }}</div>
+                <div>{{ markdown.markdown(meeting_report.description)|safe }}</div>
             </td>
             <td>{{ meeting_report.meeting_date }}</td>
             <td
@@ -79,7 +84,13 @@
                 {{meeting_report.get_status_display() if meeting_report.status else 'Waiting for approval'}}
             </td>
             <td>
-                {{ markdown.markdown(meeting_report.remark) if meeting_report.remark else '-' | safe }}
+              {{ markdown.markdown(meeting_report.remark)|safe }}
+              {% if meeting_report.late_reason %}
+                <div>
+                  <h3>Late Submition</h3>
+                  {{ markdown.markdown(meeting_report.late_reason)|safe }}
+                </div>
+              {% endif %}
             </td>
             <td class="single line">
                 <div>

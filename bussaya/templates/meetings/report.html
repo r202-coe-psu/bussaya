@@ -54,11 +54,52 @@ Meeting Form
         {{ renderer.render_select(form.project) }}
         {{ renderer.render_field(form.title) }}
         {{ renderer.render_field(form.description) }}
+        {% if 'late_report' in request.endpoint %}
+          {{ renderer.render_field(form.late_reason) }}
+        {% endif %}
         <div class="two fields">
-            {{ renderer.render_field(form.meeting_date) }}
+            {{ renderer.render_calendar(form.meeting_date, "meeting_date_calendar") }}
         </div>
         <button type="submit" class="ui button primary">{{ 'Edit' if 'edit' in request.path else 'Report' }}</button>
     </div>
 </form>
 
 {% endblock content %}
+
+
+{% block additional_js %}
+  <script type="text/javascript">
+    datetime_formatter = {
+      datetime: function (datetime, settings) {
+        if (!datetime) return '';
+        var day = datetime.getDate();
+        var month = datetime.getMonth() + 1;
+        var year = datetime.getFullYear();
+        return ("0" + day).slice(-2) + '-' + ("0" + month).slice(-2) + '-' + year;
+      }
+    };
+
+    var calendar_setting = {
+      type: 'date',
+      monthFirst: false,
+      formatter: datetime_formatter,
+      today: false,
+      ampm: false,
+      {#
+      text: {
+        days: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
+        months: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤษจิกายน', 'ธันวาคม'],
+        monthsShort: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
+        today: 'วันนี้',
+        now: 'ปัจจุบัน',
+        am: 'AM',
+        pm: 'PM'
+      },
+      #}
+    };
+
+    $('#meeting_date_calendar').calendar(calendar_setting);
+
+  </script>
+{% endblock %}
+

@@ -1,4 +1,4 @@
-from wtforms import fields, widgets, Form
+from wtforms import fields, widgets, Form, validators
 
 from flask_wtf import FlaskForm
 from flask_mongoengine.wtf import model_form
@@ -14,24 +14,20 @@ BaseMeetingForm = model_form(
         "updated_date",
         "owner",
         "class_",
-        "started_date",
-        "ended_date",
         "title",
     ],
     field_args={
         "name": {"label": "Meeting Name"},
         "round": {"label": "Round"},
+        "started_date": {"label": "Started Date", "format": "%Y-%m-%d %H:%M"},
+        "ended_date": {"label": "Ended Date", "format": "%Y-%m-%d %H:%M"},
+        "extended_date": {"label": "Extended Date", "format": "%Y-%m-%d %H:%M"},
     },
 )
 
 
 class MeetingForm(BaseMeetingForm):
-    started_date = fields.DateTimeField(
-        "Started Date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
-    )
-    ended_date = fields.DateTimeField(
-        "Ended date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
-    )
+    pass
 
 
 BaseMeetingReportForm = model_form(
@@ -45,6 +41,7 @@ BaseMeetingReportForm = model_form(
         "ip_address",
         "class_",
         "meeting",
+        "late_reason",
     ],
     field_args={
         "project": {
@@ -65,6 +62,14 @@ BaseMeetingReportForm = model_form(
 
 class MeetingReportForm(BaseMeetingReportForm):
     pass
+
+
+class LateMeetingReportForm(MeetingReportForm):
+    late_reason = fields.StringField(
+        "Late Reason",
+        widget=widgets.TextArea(),
+        validators=[validators.InputRequired()],
+    )
 
 
 class AdminMeetingReportForm(MeetingReportForm):

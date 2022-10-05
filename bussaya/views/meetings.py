@@ -236,6 +236,62 @@ def report(meeting_id, meeting_report_id):
 
 
 @module.route(
+    "/<meeting_id>/reports/late-report",
+    methods=["GET", "POST"],
+    defaults=dict(meeting_report_id=""),
+)
+@module.route(
+    "/<meeting_id>/reports/<meeting_report_id>/edit-late-report",
+    methods=["GET", "POST"],
+)
+@login_required
+def late_report(meeting_id, meeting_report_id):
+    meeting = models.Meeting.objects.get(id=meeting_id)
+
+    meeting_report = None
+    if meeting_report_id:
+        meeting_report = models.MeetingReport.objects(id=meeting_report_id).first()
+
+    class_ = meeting.class_
+    projects = models.Project.objects(
+        me.Q(creator=current_user._get_current_object())
+        | me.Q(students=current_user._get_current_object())
+    ).order_by("name")
+
+    form = forms.meetings.LateMeetingReportForm(obj=meeting_report)
+    form.project.queryset = projects
+
+    if not form.validate_on_submit():
+        return render_template(
+            "/meetings/report.html",
+            projects=projects,
+            meeting=meeting,
+            class_=class_,
+            form=form,
+            meeting_report=meeting_report,
+        )
+
+    if not meeting_report:
+        meeting_report = models.MeetingReport()
+        meeting_report.owner = current_user._get_current_object()
+
+        meeting_report.class_ = meeting.class_
+        meeting_report.meeting = meeting
+        meeting_report.status = "late-report"
+
+    form.populate_obj(meeting_report)
+    meeting_report.updated_date = datetime.datetime.now()
+    meeting_report.owner = current_user._get_current_object()
+    meeting_report.ip_address = request.headers.get(
+        "X-Forwarded-For", request.remote_addr
+    )
+
+    meeting_report.save()
+
+    return redirect(url_for("classes.view", class_id=class_.id))
+
+
+@module.route(
     "/<meeting_id>/reports/admin-force-create",
     methods=["GET", "POST"],
     defaults=dict(meeting_report_id=""),

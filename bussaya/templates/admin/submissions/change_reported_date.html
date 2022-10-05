@@ -1,0 +1,97 @@
+{% extends '/base/default-dashboard.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+{% block dashboard_title %}
+{{ 'Edit' if 'edit' in request.path else 'Create' }} Submission
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a class="section" href="{{ url_for('admin.classes.index') }}">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <a class="section" href=" {{ url_for('submissions.create', class_id=class_.id) }}">{{ 'Edit' if 'edit' in
+        request.path else 'Create' }} Submission</a>
+</div>
+{% endblock %}
+
+{% block content %}
+
+
+<table class="ui definition table">
+    <tbody>
+        <tr>
+          <td class="two wide column">Name</td>
+          <td>{{ progress_report.owner.get_fullname() }}</td>
+        </tr>
+        <tr>
+          <td class="two wide column">Project</td>
+          <td>{{ progress_report.project.name }}</td>
+        </tr>
+
+        <tr>
+          <td>File</td>
+          <td>{{ progress_report.file.filename }}</td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td>Created Date</td>
+          <td>{{ progress_report.created_date }}</td>
+        </tr>
+        <tr>
+          <td>Updated Date</td>
+          <td>{{ progress_report.updated_date }}</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+<div class="row">
+    <div class="ui segment">
+        <form method="POST" class="ui form">
+            {{ form.csrf_token }}
+            <div class="two fields">
+                <div class="field">
+                    {{ renderer.render_calendar(form.created_date, calendar_id="rangestart") }}
+                </div>
+                <div class="field">
+                    {{ renderer.render_calendar(form.updated_date, calendar_id="rangeend") }}
+                </div>
+            </div>
+            {{ renderer.render_field(form.remark) }}
+            <button class="ui primary button" type="submit">Change</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block additional_js %}
+<script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
+<script type="text/javascript">
+    datetime_formatter = {
+        datetime: function (datetime, settings) {
+            if (!datetime) return '';
+            var day = datetime.getDate();
+            var month = datetime.getMonth() + 1;
+            var year = datetime.getFullYear();
+            var hour = datetime.getHours();
+            var minute = datetime.getMinutes();
+            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
+        }
+    };
+    $('#rangeend').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        startCalendar: $('#rangestart')
+    });
+    $('#rangestart').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        endCalendar: $('#rangeend')
+    });
+</script>
+{% endblock %}

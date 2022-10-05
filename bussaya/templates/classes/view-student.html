@@ -75,12 +75,13 @@
 		<thead>
 			<tr>
 				<th>Name</th>
-				<th>Round</th>
+        <th>Round</th>
+				<th>Started Date</th>
+				<th>Ended Date</th>
+				<th>Extended Date</th>
 				<th>Status</th>
 				<th>Time Remaining</th>
 				<th>Action</th>
-				<th>Started Date</th>
-				<th>Ended Date</th>
 			</tr>
 		</thead>
 
@@ -94,6 +95,19 @@
 				<td>
 					{{ meeting.get_round_display() }}
 				</td>
+
+				<td class="right aligned">
+					{{ meeting.started_date.strftime("%d %B %Y, %I:%M %p") }}
+				</td>
+
+				<td class="right aligned">
+					{{ meeting.ended_date.strftime("%d %B %Y, %I:%M %p") }}
+        </td>
+				<td class="right aligned">
+					{{ meeting.extended_date.strftime("%d %B %Y, %I:%M %p") }}
+				</td>
+
+
 
 				{# Status #}
 				{% if meeting_report %}
@@ -133,29 +147,32 @@
 				</td>
 
 				<td>
-					{% if meeting.get_status() == "opened" or meeting.get_status() == "lated" %}
-					{% if meeting_report %}
-					<a class="ui fluid icon primary button"
-						href="{{ url_for('meetings.report',meeting_id=meeting.id,  meeting_report_id=meeting_report.id)}}">
+					{% if meeting.get_status() == "opened" and meeting_report %}
+					<a class="ui fluid labeled icon primary button"
+						href="{{ url_for('meetings.report', meeting_id=meeting.id,  meeting_report_id=meeting_report.id) }}">
 						<i class="edit icon"></i>
 						Edit
 					</a>
-					{% else %}
-					<a class="ui fluid icon primary button"
+					{% elif meeting.get_status() == "opened" %}
+					<a class="ui fluid labeled icon primary button"
 						href="{{ url_for('meetings.report', meeting_id=meeting.id)}}">
 						<i class="file alternate outline icon"></i>
 						Report
+          </a>
+					{% elif meeting.get_status() == "lated" and meeting_report %}
+					<a class="ui fluid labeled icon yellow button"
+						href="{{ url_for('meetings.late_report', meeting_id=meeting.id, meeting_report_id=meeting_report.id) }}">
+						<i class="hand paper icon"></i>
+						Late Report Edit
+					</a>
+
+					{% elif meeting.get_status() == "lated" %}
+					<a class="ui fluid labeled icon yellow button"
+						href="{{ url_for('meetings.late_report', meeting_id=meeting.id)}}">
+						<i class="hand paper icon"></i>
+						Late Report
 					</a>
 					{% endif %}
-					{% endif %}
-				</td>
-
-				<td>
-					{{ meeting.natural_started_date() }}
-				</td>
-
-				<td>
-					{{ meeting.natural_ended_date() }}
 				</td>
 			</tr>
 			{% endfor %}
@@ -173,14 +190,14 @@
 			<tr>
 				<th>Type</th>
 				<th>Round</th>
-				<th>Description</th>
+        <th>Description</th>
+				<th>Started Date</th>
+				<th>Ended Date</th>
+				<th>Extended Date</th>
 				<th>Status</th>
 				<th>Time Remaining</th>
 				<th>File</th>
 				<th>Action</th>
-				<th>Started Date</th>
-				<th>Ended Date</th>
-				<th>Extended Date</th>
 			</tr>
 		</thead>
 
@@ -196,6 +213,16 @@
 				</td>
 				<td>
 					{{ submission.description }}
+				</td>
+
+				<td>
+					{{ submission.natural_started_date() }}
+				</td>
+				<td>
+					{{ submission.natural_ended_date() }}
+				</td>
+				<td>
+					{{ submission.natural_extended_date() }}
 				</td>
 
 				{# Status #}
@@ -256,16 +283,6 @@
 						Upload
 					</a>
 					{% endif %}
-				</td>
-
-				<td>
-					{{ submission.natural_started_date() }}
-				</td>
-				<td>
-					{{ submission.natural_ended_date() }}
-				</td>
-				<td>
-					{{ submission.natural_extended_date() }}
 				</td>
 			</tr>
 			{% endfor %}

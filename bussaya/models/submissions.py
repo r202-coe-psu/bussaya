@@ -12,6 +12,7 @@ APPROVAL_STATUS = [
     ("approved", "Approved"),
     ("disapproved", "Disapproved"),
     ("wait", "Wait"),
+    ("late-report", "Late Report"),
 ]
 
 
@@ -37,13 +38,14 @@ class Submission(me.Document):
     owner = me.ReferenceField("User", dbref=True, required=True)
 
     def get_status(self):
-        if self.started_date > datetime.datetime.now():
+        now = datetime.datetime.now()
+        if self.started_date > now:
             return "upcoming"
 
-        if self.started_date <= datetime.datetime.now() <= self.ended_date:
+        elif self.started_date <= now <= self.ended_date:
             return "opened"
 
-        if self.ended_date <= datetime.datetime.now() <= self.extended_date:
+        elif self.ended_date <= now <= self.extended_date:
             return "lated"
 
         else:
@@ -62,22 +64,21 @@ class Submission(me.Document):
                 f"Opening in {humanize.naturaltime(delta).removesuffix(' ago')}",
             )
 
-        if now > end and extend > now:
+        elif now > end and extend > now:
             delta = extend - now
             return (
                 delta.days,
                 f"Closing in {humanize.naturaltime(delta).removesuffix(' ago')}",
             )
 
-        if now > start and end > now:
+        elif now > start and end > now:
             delta = end - now
             return (
                 delta.days,
                 f"Due in {humanize.naturaltime(delta).removesuffix(' ago')}",
             )
 
-        else:
-            return (extend - now).days, "Out of time"
+        return (extend - now).days, "Out of time"
 
     def natural_started_date(self):
         return self.started_date.strftime("%d %B %Y, %I:%M %p")
@@ -111,6 +112,7 @@ class Meeting(me.Document):
 
     started_date = me.DateTimeField(required=True, default=datetime.datetime.today)
     ended_date = me.DateTimeField(required=True, default=datetime.datetime.today)
+    extended_date = me.DateTimeField(required=True, default=datetime.datetime.today)
 
     class_ = me.ReferenceField("Class", dbref=True, required=True)
     owner = me.ReferenceField("User", dbref=True, required=True)
@@ -119,11 +121,13 @@ class Meeting(me.Document):
         if self.started_date > datetime.datetime.now():
             return "upcoming"
 
-        if self.started_date <= datetime.datetime.now() <= self.ended_date:
+        elif self.started_date <= datetime.datetime.now() <= self.ended_date:
             return "opened"
 
-        else:
-            return "closed"
+        elif self.ended_date <= datetime.datetime.now() <= self.extended_date:
+            return "lated"
+
+        return "closed"
 
     def get_remain_time(self):
         now = datetime.datetime.now()
@@ -199,11 +203,14 @@ class MeetingReport(me.Document):
     file = me.FileField(
         collection_name="meeting_report_fs",
     )
+    late_reason = me.StringField(default="")
 
     status = me.StringField(choices=APPROVAL_STATUS)
     remark = me.StringField(default="")
+
     approver = me.ReferenceField("User", dbref=True)
     approver_ip_address = me.StringField(max_length=255)
+    approved_date = me.DateTimeField()
 
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
     updated_date = me.DateTimeField(
