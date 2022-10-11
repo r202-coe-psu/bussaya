@@ -20,7 +20,11 @@ def index():
 
     classes = models.Class.objects(ended_date__lt=now)
     projects = (
-        models.Project.objects(public__ne="private", class___in=classes)
+        models.Project.objects(
+            public__ne="private",
+            class___in=classes,
+            resources__match={"type": "report"},
+        )
         .order_by("-id")
         .limit(100)
     )
