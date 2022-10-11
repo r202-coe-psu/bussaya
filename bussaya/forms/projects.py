@@ -21,7 +21,6 @@ BaseProjectForm = model_form(
         "approvals",
         "resources",
         "class_",
-        "public",
     ],
     field_args={
         "name": {"label": "English Name"},
@@ -43,6 +42,9 @@ BaseProjectForm = model_form(
             "allow_blank": True,
             "blank_text": "There are no contributors",
             "label_modifier": lambda a: f"{a.first_name} {a.last_name}",
+        },
+        "public": {
+            "label": "Public",
         },
     },
 )
