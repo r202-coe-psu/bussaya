@@ -200,7 +200,7 @@ def download(project_id, resource_id, filename):
     if resource:
         response = send_file(
             resource.data,
-            attachment_filename=resource.data.filename,
+            download_name=resource.data.filename,
             # as_attachment=True,
             mimetype=resource.data.content_type,
         )
