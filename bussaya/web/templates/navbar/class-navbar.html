@@ -1,0 +1,119 @@
+{% macro render_class_navbar(class_, current_user) %}
+<div class="ui big compact menu" style="margin: auto">
+  {% if "admin" in request.endpoint and current_user.has_roles('admin') %}
+    <a class="{{'active' if 'home' in request.path}} item" href="{{ url_for('admin.classes.view', class_id=class_.id) }}">
+      <i class="chalkboard icon"></i>
+      Class
+    </a>
+  {% else %}
+    <a class="{{'active' if 'home' in request.path}} item" href="{{ url_for('classes.view', class_id=class_.id) }}">
+      <i class="chalkboard icon"></i>
+      Class
+    </a>
+  {% endif %}
+
+  <a href="{{ url_for('classes.approve_meeting_report', class_id=class_.id) }}" class="item">
+    <i class="clipboard icon"></i> Meeting Report Approval
+  </a>
+
+
+  <div class="item ui floating labeled dropdown">
+    <i class="font icon"></i>
+    <span class="text">
+      {{'Midterm' if 'midterm' in request.path}}
+      {{'Final' if 'final' in request.path}}
+      {{'Grading' if 'midterm' not in request.path and 'final' not in request.path}}
+    </span>
+    <div class="menu">
+      {% if 'admin' in request.path %}
+      <a class="item" href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type='midterm') }}">
+        Midterm
+      </a>
+      <a class="item" href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type='final') }}">
+        Final
+      </a>
+      {% else %}
+      <a class="item" href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='midterm') }}">
+        Midterm
+      </a>
+      <a class="item" href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='final') }}">
+        Final
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  {% if current_user.has_roles('admin', 'lecturer') %}
+    {% if 'admin' in current_user.roles and 'admin' in request.path %}
+  <a class="{{'active' if 'student_ids' in request.path}} item"
+    href="{{ url_for('admin.classes.view_students', class_id=class_.id) }}">
+    <i class="student icon"></i>
+    View Students
+  </a>
+
+
+  <a class="{{ 'active' if 'classes.view_projects' == request.endpoint }} item"
+    href="{{ url_for('admin.classes.view_projects', class_id=class_.id) }}">
+    <i class="computer icon"></i>
+    View Projects
+  </a>
+
+  <a class="{{'active' if 'groups' in request.path}} item"
+    href="{{ url_for('admin.groups.view', class_id=class_.id) }}">
+    <i class="group icon"></i>
+    Manage Group
+  </a>
+  {#
+  {% else %}
+  <a class="{{'active' if 'groups' in request.path}} item" href="{{ url_for('groups.view', class_id=class_.id) }}">
+    <i class="group icon"></i>
+    Group
+  </a>
+  #}
+  {% endif %}
+  {% endif %}
+  {% if current_user.has_roles("admin") and 'admin' in request.path %}
+  <a class="{{'active' if 'edit' in request.path and 'classes' in request.path}} item"
+    href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">
+    <i class="edit icon"></i>
+    Edit Class
+  </a>
+  <a class="item" onclick="showDelete()">
+    <i class="trash icon"></i>
+    Delete Class
+  </a>
+  {% endif %}
+</div>
+
+<div class="ui modal delete class">
+  <i class="close icon"></i>
+  <div class="header">
+    Delete Class
+  </div>
+  <div class="image content">
+    <div class="description">
+      <div class="ui small header">Are you sure you want to delete <span class="ui blue text">{{class_.name}}</span>
+        class?</div>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="ui black deny button">
+      No
+    </div>
+    <a class="ui very small red icon button" style="margin-top:0.5em"
+      href="{{ url_for('admin.classes.delete', class_id=class_.id) }}">
+      <i class="trash icon"></i> Delete
+    </a>
+  </div>
+</div>
+
+{% block additional_js %}
+<script>
+  function showDelete() {
+    $('.ui.modal.delete.class')
+      .modal('show')
+      ;
+  }
+</script>
+{% endblock additional_js %}
+
+{% endmacro %}

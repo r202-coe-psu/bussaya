@@ -1,0 +1,149 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/error-handler.html' as eh %}
+{% import '/base/html-renderer.html' as renderer %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a class="section" href="{{ url_for('admin.classes.index') }}">Classes</a>
+    <div class="divider"> / </div>
+    <a class="section" href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <div class="section">Submission: {{ meeting.name }}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+
+<table class="ui definition table">
+    <tbody>
+        <tr>
+            <td class="two wide column">Name</td>
+            <td>{{ meeting.name }}</td>
+        </tr>
+        </tr>
+        <tr>
+            <td>Started Date</td>
+            <td>{{ meeting.started_date }}</td>
+        </tr>
+        <tr>
+            <td>Ended Date</td>
+            <td>{{ meeting.ended_date }}</td>
+        </tr>
+        <tr>
+            <td>Extended Date</td>
+            <td>{{ meeting.extended_date }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<a class="ui very small primary icon button" style="margin-top:0.5em"
+    href="{{url_for('meetings.edit', meeting_id=meeting.id)}}">
+    <i class="edit icon"></i> Edit
+</a>
+<a class="ui very small negative icon button" style="margin-top:0.5em">
+    <i class="trash icon"></i> Delete
+</a>
+
+<a class="ui primary icon button" href="{{ url_for('meetings.force_report', meeting_id=meeting.id) }}">
+    <i class="add icon"></i> Force Add Student Report
+</a>
+
+
+<h2 class="ui horizontal header divider">{{meeting.name}}</h2>
+
+<table class="ui celled table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Student</th>
+            <th>Advisor</th>
+            <th>Title / Description</th>
+            <th>Meeting Date</th>
+            <th>Status</th>
+            <th>Remark</th>
+            <th>Approval</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for meeting_report in meeting_reports %}
+        <tr>
+            <td>
+                {{ loop.index }}
+            </td>
+            <td>
+                {{ meeting_report.owner.username }} <br />
+                {{ meeting_report.owner.first_name }} {{ meeting_report.owner.last_name }}
+            </td>
+            <td>
+              {{ meeting_report.project.advisor.get_fullname() }}
+            </td>
+            <td>
+              <h3>{{ meeting_report.title }}</h3>
+              <div>{{ markdown.markdown(meeting_report.description)|safe }}</div>
+              <div><b>Submit Date</b> {{ meeting_report.updated_date }}</div>
+            </td>
+            <td>
+                {{meeting_report.meeting_date}}
+            </td>
+            <td class="{{'green' if meeting_report.status == 'approved'}} {{'red' if meeting_report.status == 'disapproved'}}">
+              {{ meeting_report.get_status_display() if meeting_report.status else 'Waiting for approval' }} <br>
+              {% if meeting_report.approver %}
+                {{ meeting_report.approver.get_fullname() }} <br>
+                {{ meeting_report.approved_date }} <br>
+              {% endif %}
+            </td>
+            <td>
+              {{ markdown.markdown(meeting_report.remark)|safe }}
+            </td>
+            <td class="right aligned">
+                <div style="display: flex">
+
+                    <a class="ui green popupmsg icon button" href="{{url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, action='approved')}}" style="height: fit-content; margin-top: 0.5em" data-content="Approved">
+                      <i class="check icon button"></i>
+                    </a>
+                    <div class="ui accordion" style="width: fit-content; height: fit-content">
+                        <div class=" title">
+                            <button class="ui red icon popupmsg button" data-content="Disapprove">
+                              <i class="times icon"></i>
+                            </button>
+                        </div>
+                        <div class="content">
+                            <p class="transition hidden">
+                            <div class="disapprove remark">
+                                <div class="ui segment">
+                                    <form method="post" class="ui form">
+                                        {{renderer.render_field(form.remark)}}
+                                        <input type="hidden" name=meeting_report_id" value="{{meeting_report.id}}">
+                                        <button type="submit" class="ui primary button" style="margin-top: 0.5em">
+                                            Submit
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+
+{% block additional_js %}
+<script type="text/javascript">
+    function showDisapproveRemark() {
+        $(".disapprove.remark").transition('fade down')
+            ;
+    }
+    $(".ui.accordion").accordion();
+
+    $(".ui.popupmsg.button").popup();
+</script>
+{% endblock additional_js%}
