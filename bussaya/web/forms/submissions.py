@@ -101,6 +101,9 @@ class FinalSubmissionForm(BaseFinalSubmissionForm):
 
 
 class FinalReportForm(FlaskForm):
+    project = fields.SelectField(
+        "Project", choices=[("", "Create and select project first")]
+    )
     report = fields.FileField(
         "Report: pdf", validators=[FileAllowed(["pdf"], "PDF only")]
     )

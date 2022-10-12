@@ -96,10 +96,14 @@ def view_student(class_id):
         if grade.release_status == "released":
             grade_released = True
 
+    project = models.Project.objects(
+        students=current_user._get_current_object(), class_=class_
+    ).first()
     return render_template(
         "/classes/view-student.html",
         user=user,
         class_=class_,
+        project=project,
         submissions=submissions,
         meetings=meetings,
         grade_released=grade_released,

@@ -77,7 +77,7 @@
             <td>
                 <h3>{{ meeting_report.title }}</h3>
                 <div>{{ markdown.markdown(meeting_report.description)|safe }}</div>
-            </td>
+                <div><b>Submission Date:</b> {{ meeting_report.updated_date }}</div>
             <td>{{ meeting_report.meeting_date }}</td>
             <td
                 class="{{'green' if meeting_report.status == 'approved'}} {{'red' if meeting_report.status == 'disapproved'}}">
@@ -88,7 +88,9 @@
               {% if meeting_report.late_reason %}
                 <div>
                   <h3>Late Submition</h3>
-                  {{ markdown.markdown(meeting_report.late_reason)|safe }}
+                  <div>
+                    {{ markdown.markdown(meeting_report.late_reason)|safe }}
+                  </div>
                 </div>
               {% endif %}
             </td>

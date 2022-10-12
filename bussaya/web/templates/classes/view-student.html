@@ -1,5 +1,5 @@
 {% extends '/classes/index.html' %}
-{% import '/base/error-handler.html' as eh %}
+{% import '/base/project-material-renderer.html' as project_material_renderer %}
 
 {% block breadcrumbs %}
 <div class="ui breadcrumb">
@@ -51,18 +51,6 @@
 </div>
 {% endif %}
 
-{% if final_submission %}
-<div class="ui segment">
-	<h2 class="ui header">Final Report</h2>
-	<div class="ui divider"></div>
-	<a class="ui primary labeled icon button"
-		href="{{ url_for('final_reports.upload', final_submission_id=final_submission.id) }}">
-		<i class="upload icon"></i>
-		Upload Final Report
-	</a>
-</div>
-{% endif %}
-	
 
 <div class="ui segment">
 
@@ -290,7 +278,32 @@
 	</table>
 	{% else %}
 	<div class="ui info message">No submission at this time.</div>
-	{% endif %}
+{% endif %}
+
+
+{% if final_submission %}
+<div class="ui segment">
+  <h2 class="ui header">Completed Final Report</h2>
+  {% if project %}
+    <div class="ui divider"></div>
+    <div class="ui horizontal stackable segments">
+      <div class="ui segment">
+        {{ project.name }}
+      </div>
+      <div class="ui segment">
+        {{ project_material_renderer.render_project_material(project) }}
+      </div>
+    </div>
+  {% endif %}
+	<div class="ui divider"></div>
+	<a class="ui primary labeled icon button"
+		href="{{ url_for('final_reports.upload', final_submission_id=final_submission.id) }}">
+		<i class="upload icon"></i>
+		Upload Final Report
+	</a>
+</div>
+{% endif %}
+	
 </div>
 
 

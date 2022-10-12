@@ -44,10 +44,20 @@ def get_resource(data, type, project_id):
 def upload(final_submission_id):
     final_submission = models.FinalSubmission.objects.get(id=final_submission_id)
     class_ = final_submission.class_
-    project = current_user._get_current_object().get_project()
+    projects = models.Project.objects(
+        students=current_user._get_current_object()
+    ).order_by("-id")
 
     form = forms.submissions.FinalReportForm()
+    form.project.choices.extend([(str(p.id), p.name) for p in projects])
+
     if not form.validate_on_submit():
+        if request.method == "GET":
+            for project in projects:
+                if project.class_ == class_:
+                    form.project.data = str(project.id)
+                    break
+
         return render_template(
             "/final_reports/upload.html",
             form=form,
@@ -55,6 +65,7 @@ def upload(final_submission_id):
             class_=class_,
         )
 
+    project = models.Project.objects.get(id=form.project.data)
     final_report = models.FinalReport.objects(final_submission=final_submission).first()
     if not final_report:
         final_report = models.FinalReport()
@@ -90,6 +101,7 @@ def upload(final_submission_id):
             continue
         resource = models.ProjectResource(type=t, link=f)
         project.resources.append(resource)
+    project.class_ = class_
     project.save()
 
-    return redirect(url_for("classes.index", class_id=class_.id))
+    return redirect(url_for("classes.view", class_id=class_.id))

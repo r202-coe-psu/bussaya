@@ -23,6 +23,7 @@ Final Report Form
 <div class="ui segment">
 <form method="POST" enctype="multipart/form-data" class="ui form">
     {{ form.csrf_token }}
+    {{ renderer.render_select(form.project) }}
     {{ renderer.render_fileinput(form.report) }}
     {{ renderer.render_fileinput(form.presentation) }}
     {{ renderer.render_fileinput(form.poster) }}
