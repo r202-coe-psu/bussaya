@@ -91,7 +91,7 @@ class User(me.Document, UserMixin):
         return meeting_reports
 
     def get_advisee_projects(self):
-        projects = models.Project.objects(advisor=self).order_by("-id")
+        projects = models.Project.objects(advisor=self, class___ne=None).order_by("-id")
         return projects
 
     def get_group(self, class_):
