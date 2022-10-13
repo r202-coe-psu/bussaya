@@ -119,10 +119,12 @@
     {{ renderer_project.render_project_section([], current_user, advisee_projects, committee_projects) }}
 </div>
 
+{% if projects %}
 <div class="ui segment">
-  <h2 class="ui header">Projects</h2>
+  <h2 class="ui header">Final Report</h2>
   {{ renderer_project.render_project_table(projects, current_user) }}
 </div>
+{% endif %}
 {% endblock %}
 
 {% block additional_js %}

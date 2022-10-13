@@ -42,7 +42,7 @@ def view_lecturer(class_id):
     class_ = models.Class.objects.get(id=class_id)
     students = models.User.objects(username__in=class_.student_ids)
     projects = models.Project.objects(
-        advisor=current_user._get_current_object(), students__in=students
+        advisor=current_user._get_current_object(), students__in=students, class_=class_
     )
     submissions = models.Submission.objects(class_=class_)
     meetings = models.Meeting.objects(class_=class_)

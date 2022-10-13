@@ -24,6 +24,7 @@ Classes
 			<tr>
 				<th>Name</th>
 				<th>Description</th>
+				<th>Operation</th>
 			</tr>
 		</thead>
 
@@ -35,7 +36,10 @@ Classes
 				</td>
 				<td>
 					{{ class_.description }}
-				</td>
+        </td>
+        <td>
+          <a href="{{ url_for('admin.classes.copy', class_id=class_.id) }}" class="ui icon primary circular button"><i class="copy icon"></i></a>
+        </td>
 			</tr>
 			{% endfor %}
 		</body>
