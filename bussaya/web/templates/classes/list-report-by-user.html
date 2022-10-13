@@ -105,7 +105,10 @@
         {{ report.updated_date.ctime() }}
       </td>
       <td class="{{'green' if report.status == 'approved'}}{{'red' if report.status == 'disapproved'}}">
-        <b>{{ report.get_status_display() if report.status else 'Waiting for approval' }}</b>
+        <b>{{ report.get_status_display() if report.status else 'Waiting for approval' }}</b><br/>
+        {% if report.status == 'approved' and report.approved_date %}
+          {{ report.approved_date.ctime() }}
+        {% endif %}
       </td>
       <td>
         {% if report.late_reason %}

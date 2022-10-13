@@ -80,7 +80,7 @@ def export_students(class_id):
                 grade = student.get_actual_grade(rg)
                 if rg.type == "midterm":
                     student_data["Midterm Grade"] = grade[0]
-                if rg.type == "final":
+                elif rg.type == "final":
                     student_data["Final Grade"] = grade[0]
 
             student_data["Complete Grade"] = student.get_complete_grade(class_)
