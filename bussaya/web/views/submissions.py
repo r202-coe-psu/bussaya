@@ -252,7 +252,7 @@ def download(progress_report_id, filename):
 
     response = send_file(
         progress_report.file,
-        attachment_filename=progress_report.file.filename,
+        download_name=progress_report.file.filename,
         mimetype=progress_report.file.content_type,
     )
 

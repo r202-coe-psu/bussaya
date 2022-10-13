@@ -11,7 +11,7 @@ RUN $PYTHON -m pip install wheel poetry uwsgi
 
 WORKDIR /app
 COPY poetry.lock pyproject.toml /app/
-RUN $PYTHON -m poetry config virtualenvs.create false && $PYTHON -m poetry install --no-interaction --no-dev
+RUN $PYTHON -m poetry config virtualenvs.create false && $PYTHON -m poetry install --no-interaction --only main
 
 COPY bussaya/web/static/package.json bussaya/web/static/package-lock.json bussaya/web/static/
 RUN npm install --prefix bussaya/web/static
@@ -22,5 +22,5 @@ ENV BUSSAYA_SETTINGS=/app/bussaya-production.cfg
 
 
 EXPOSE 9000
-CMD $PYTHON -m uwsgi --lazy-apps --ini scripts/bussaya-uwsgi.ini
+CMD /venv/bin/uwsgi --lazy-apps --ini scripts/bussaya-uwsgi.ini
 
