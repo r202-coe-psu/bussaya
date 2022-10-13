@@ -1,4 +1,3 @@
-*.lock
 *.pyc
 *.cfg
 venv
@@ -6,6 +5,5 @@ __pycache__
 data
 node_modules
 deployment
-package-lock.json
 *.egg-*
 .coverage
