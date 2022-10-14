@@ -42,6 +42,21 @@ def create_student_grade(class_, round_grade, student, lecturer):
     round_grade.save()
 
 
+def create_student_grade_profile(round_grade):
+
+    # Project create after round_grade has been created.
+    class_ = round_grade.class_
+    for student in models.User.objects(username__in=class_.student_ids):
+        for lecturer in get_lecturers_project_of_student(student):
+            if not models.StudentGrade.objects(
+                class_=class_,
+                student=student,
+                lecturer=lecturer,
+                round_grade=round_grade,
+            ):
+                create_student_grade(class_, round_grade, student, lecturer)
+
+
 @module.route("/<round_grade_type>/view")
 @acl.roles_required("admin")
 def view(round_grade_type):
@@ -50,55 +65,28 @@ def view(round_grade_type):
         return redirect(url_for("dashboard.index"))
 
     class_ = models.Class.objects.get(id=class_id)
-    round_grades = models.RoundGrade.objects.all().filter(class_=class_)
-    user = current_user._get_current_object()
-    # Create Midterm and Final RoundGrade
-    if not round_grades:
-        midterm = models.RoundGrade()
-        midterm.type = "midterm"
-        midterm.class_ = class_
-        midterm.save()
+    round_grade = models.RoundGrade.objects(
+        type=round_grade_type, class_=class_
+    ).first()
+    if not round_grade:
+        round_grade = models.RoundGrade(type=round_grade_type, class_=class_)
+        round_grade.save()
 
-        final = models.RoundGrade()
-        final.type = "final"
-        final.class_ = class_
-        final.save()
-
-        midterm.save()
-        final.save()
-
-    midterm = models.RoundGrade.objects.get(type="midterm", class_=class_)
-    final = models.RoundGrade.objects.get(type="final", class_=class_)
-
-    # Project create after round_grade has been created.
-    for student in models.User.objects(username__in=class_.student_ids):
-        for lecturer in get_lecturers_project_of_student(student):
-            if not models.StudentGrade.objects(
-                class_=class_, student=student, lecturer=lecturer, round_grade=midterm
-            ):
-                create_student_grade(class_, midterm, student, lecturer)
-            if not models.StudentGrade.objects(
-                class_=class_, student=student, lecturer=lecturer, round_grade=final
-            ):
-                create_student_grade(class_, final, student, lecturer)
-
-    midterm.save()
-    final.save()
-
-    round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
     if round_grade.is_in_time():
         return redirect(
             url_for("admin.round_grades.grading", round_grade_id=round_grade.id)
         )
 
     student_grades = models.StudentGrade.objects(
-        class_=class_, lecturer=user, round_grade=round_grade
+        class_=class_,
+        lecturer=current_user._get_current_object(),
+        round_grade=round_grade,
     )
     student_grades = sorted(student_grades, key=lambda s: s.student.username)
 
     return render_template(
         "/admin/round_grades/view.html",
-        user=user,
+        user=current_user,
         class_=class_,
         round_grade=round_grade,
         round_grade_type=round_grade_type,
@@ -296,6 +284,9 @@ def set_time(round_grade_id):
 
     form.populate_obj(round_grade)
     round_grade.save()
+
+    create_student_grade_profile(round_grade)
+
     return redirect(
         url_for(
             "admin.round_grades.view",

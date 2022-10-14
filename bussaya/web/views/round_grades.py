@@ -70,44 +70,14 @@ def view(round_grade_type):
         return redirect(url_for("dashboard.index"))
 
     class_ = models.Class.objects.get(id=class_id)
-    round_grades = models.RoundGrade.objects(class_=class_)
     user = current_user._get_current_object()
-    # Create Midterm and Final Grade
-    if not round_grades:
-        midterm = models.RoundGrade()
-        midterm.type = "midterm"
-        midterm.class_ = class_
-        midterm.save()
+    round_grade = models.RoundGrade.objects(
+        type=round_grade_type, class_=class_
+    ).first()
 
-        final = models.RoundGrade()
-        final.type = "final"
-        final.class_ = class_
-        final.save()
+    if not round_grade:
+        return redirect(url_for("classes.view", class_id=class_.id))
 
-        midterm.save()
-        final.save()
-
-    midterm = models.RoundGrade.objects.get(type="midterm", class_=class_)
-    final = models.RoundGrade.objects.get(type="final", class_=class_)
-
-    # Project create after round_grade has been created.
-
-    for student in models.User.objects(username__in=class_.student_ids):
-        for lecturer in get_lecturers_project_of_student(student):
-            if not models.StudentGrade.objects(
-                class_=class_, student=student, lecturer=lecturer, round_grade=midterm
-            ):
-
-                create_student_grade(class_, midterm, student, lecturer)
-            if not models.StudentGrade.objects(
-                class_=class_, student=student, lecturer=lecturer, round_grade=final
-            ):
-                create_student_grade(class_, final, student, lecturer)
-
-    midterm.save()
-    final.save()
-
-    round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
     if round_grade.is_in_time():
         return redirect(url_for("round_grades.grading", round_grade_id=round_grade.id))
 
