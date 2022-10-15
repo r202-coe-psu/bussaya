@@ -41,15 +41,15 @@
         {% if not loop.last %}<br>{% endif %}
         {% endfor -%}
       </td>
-      <td class="right aligned collapsing">{{ project.advisor.first_name }} {{ project.advisor.last_name }}</td>
+      <td class="right aligned collapsing">{{ project.advisors|map(attribute='fullname')|join(', ') }}</td>
       <td class="one wide single line">
         {% set class_ = project.get_opened_class() %}
-        {% if project.creator.get_meeting_reports(class_, 'midterm').count() > 0 and current_user == project.advisor %}
+        {% if project.creator.get_meeting_reports(class_, 'midterm').count() > 0 and current_user in project.advisors %}
         <a target="_blank"
           href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=project.creator.id) }}">
           <i class="clipboard large icon link pop" data-content="Meeting Report"></i>
         </a>
-        {% elif current_user != project.advisor %}
+        {% elif current_user not in project.advisors %}
         {# 
           <i class="disabled clipboard large icon" data-content="Meeting Report"></i>
         #}
@@ -70,12 +70,12 @@
 
       </td>
       <td class="one wide single line">
-        {% if project.creator.get_meeting_reports(class_, 'final').count() > 0 and current_user == project.advisor %}
+        {% if project.creator.get_meeting_reports(class_, 'final').count() > 0 and current_user not in project.advisors %}
         <a target="_blank"
           href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=project.creator.id) }}">
           <i class="clipboard large icon link pop" data-content="Meeting Report"></i>
         </a>
-        {% elif current_user != project.advisor %}
+        {% elif current_user not in project.advisors %}
         {#
           <i class="disabled clipboard large icon" data-content="Meeting Report"></i>
         #}
@@ -127,7 +127,7 @@
         {% if not loop.last %}<br>{% endif %}
         {% endfor -%}
       </td>
-      <td class="right aligned collapsing">{{ project.advisor.first_name }} {{ project.advisor.last_name }}</td>
+      <td class="right aligned collapsing">{{ project.advisors|map(attribute='fullname')|join(', ') }}</td>
       <td class="right aligned collapsing">{{ project.public.title() }}</td>
       <td class="right aligned collapsing">
         {{ pm_renderer.render_project_material(project) }}

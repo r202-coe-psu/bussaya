@@ -78,7 +78,7 @@
                 {{ meeting_report.owner.first_name }} {{ meeting_report.owner.last_name }}
             </td>
             <td>
-              {{ meeting_report.project.advisor.get_fullname() }}
+              {{ meeting_report.project.advisors|map(attribute='fullname')|join(', ') }}
             </td>
             <td>
               <h3>{{ meeting_report.title }}</h3>

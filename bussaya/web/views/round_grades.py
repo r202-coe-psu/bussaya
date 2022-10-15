@@ -107,7 +107,7 @@ def submit_grade(round_grade_id):
         student = models.User.objects.get(id=grading["student_id"])
         project = models.Project.objects(
             (me.Q(creator=student) | me.Q(students=student))
-            & (me.Q(advisor=user) | me.Q(committees=user))
+            & (me.Q(advisors=user) | me.Q(committees=user))
         ).first()
 
         if not project:
@@ -125,7 +125,7 @@ def submit_grade(round_grade_id):
         student_grade.save()
 
         if (
-            project.advisor == current_user._get_current_object()
+            current_user._get_current_object() in project.advisors
             and grading["result"] != "-"
         ):
             meetings = models.MeetingReport.objects(

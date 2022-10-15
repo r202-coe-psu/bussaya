@@ -40,7 +40,8 @@ class Class(me.Document):
 
     def get_advisees_by_advisors(self, *args):
         students = self.get_students()
-        adv_projects = projects.Project.objects(advisor__in=args, students__in=students)
+        # adv_projects = projects.Project.objects(advisor__in=args, students__in=students)
+        adv_projects = projects.Project.objects(advisors=args, students__in=students)
         return [s for project in adv_projects for s in project.students]
 
     def is_in_time(self):

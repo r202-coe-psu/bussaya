@@ -15,7 +15,8 @@ def get_lecturers_project_of_student(student):
         return lecturers
     project = student.get_project()
     if project:
-        lecturers.append(project.advisor)
+        for advisor in project.advisors:
+            lecturers.append(advisor)
         for committee in project.committees:
             lecturers.append(committee)
 
@@ -56,7 +57,7 @@ def get_grading_student(class_, lecturer):
     students = models.User.objects(username__in=class_.student_ids)
     projects = models.Project.objects(
         (me.Q(creator__in=students) | me.Q(students__in=students))
-        & (me.Q(advisor=lecturer) | me.Q(committees=lecturer))
+        & (me.Q(advisors=lecturer) | me.Q(committees=lecturer))
     )
     grading_students = []
     for p in projects:
@@ -78,7 +79,7 @@ def check_and_crate_student_grade_profile(round_grade, lecturer):
             lecturer=lecturer,
             round_grade=round_grade,
         ).first():
-            admin_round_grades.create_student_grade(round_grade, student, lecturer)
+            create_student_grade(round_grade, student, lecturer)
 
 
 @module.route("/<class_id>")

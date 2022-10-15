@@ -27,7 +27,7 @@ BaseProjectForm = model_form(
         "name_th": {"label": "Thai Name"},
         "abstract": {"label": "English Abstract"},
         "abstract_th": {"label": "Thai Abstract"},
-        "advisor": {
+        "advisors": {
             "label": "Project Advisor",
             "label_modifier": lambda a: f"{a.first_name} {a.last_name}",
         },
@@ -41,7 +41,7 @@ BaseProjectForm = model_form(
             "label": "Contributors",
             "allow_blank": True,
             "blank_text": "There are no contributors",
-            "label_modifier": lambda a: f"{a.first_name} {a.last_name}",
+            "label_modifier": lambda s: f"{s.first_name} {s.last_name}",
         },
         "public": {
             "label": "Public",

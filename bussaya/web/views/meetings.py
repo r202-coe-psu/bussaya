@@ -65,7 +65,7 @@ def view_lecturer(meeting_id):
     meeting = models.Meeting.objects.get(id=meeting_id)
     students = models.User.objects(username__in=meeting.class_.student_ids)
     projects = models.Project.objects(
-        me.Q(advisor=current_user._get_current_object())
+        me.Q(advisors=current_user._get_current_object())
         & (me.Q(creator__in=students) | me.Q(students__in=students))
     )
     meeting_reports = models.MeetingReport.objects(
@@ -107,7 +107,7 @@ def view_lecturer(meeting_id):
 def approval(meeting_id, meeting_report_id, action):
 
     meeting_report = models.MeetingReport.objects.get(id=meeting_report_id)
-    if meeting_report.project.advisor != current_user._get_current_object():
+    if current_user._get_current_object() not in meeting_report.project.advisors:
         return redirect(url_for("dashboard.index"))
 
     form = forms.meetings.DisapproveForm()

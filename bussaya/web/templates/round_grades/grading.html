@@ -64,7 +64,7 @@
                     <td>{{ loop.index }}</td>
                     <td>{{ student.username }}</td>
                     <td>{{ student.first_name }} {{ student.last_name }}</td>
-                    <td>{{ student.get_project().advisor.get_fullname() }}</td>
+                    <td>{{ student.get_project().advisors|map(attribute='fullname')|join(', ') }}</td>
                     <td>
                         <a target="_blank"
                             href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}">
@@ -140,7 +140,7 @@
                                     <div class="content">
                                         <a class="header">
                                             {{ student_grade.lecturer.get_fullname() }}
-                                            {% if student_grade.lecturer == student.get_project().advisor %}
+                                            {% if student_grade.lecturer in student.get_project().advisors %}
                                             <i class="red star icon"></i>
                                             {% endif %}
                                         </a>

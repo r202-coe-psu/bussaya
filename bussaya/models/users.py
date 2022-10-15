@@ -36,8 +36,12 @@ class User(me.Document, UserMixin):
 
     meta = {"collection": "users", "strict": False}
 
+    @property
+    def fullname(self):
+        return self.get_fullname()
+
     def get_fullname(self):
-        return self.first_name + " " + self.last_name
+        return f"{self.first_name} {self.last_name}"
 
     def has_roles(self, *roles):
         for role in roles:
@@ -178,7 +182,7 @@ class User(me.Document, UserMixin):
         for student_grade in student_grades:
             if student_grade.result != "-":
                 total_student_grade.append(student_grade)
-                if student_grade.lecturer == student_grade.project.advisor:
+                if student_grade.lecturer in student_grade.project.advisors:
                     has_advisor = True
 
         if not has_advisor:
@@ -188,6 +192,8 @@ class User(me.Document, UserMixin):
             return "Incomplete"
 
         average_point = 0
+        advisor_grade_point = 0
+        advisor_count = 0
         committees_grade_point = 0
         committees_count = 0
 
@@ -206,8 +212,11 @@ class User(me.Document, UserMixin):
             if student_grade.lecturer in project.committees:
                 committees_grade_point += grade_point
                 committees_count += 1
-            elif student_grade.lecturer == project.advisor:
-                average_point += advisor_grade_ratio * grade_point
+            elif student_grade.lecturer in project.advisors:
+                advisor_grade_point += grade_point
+                advisor_count += 1
+
+        average_point = (advisor_grade_point / advisor_count) * advisor_grade_ratio
 
         average_point += (
             committee_grade_ratio / committees_count

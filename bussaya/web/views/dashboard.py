@@ -42,14 +42,14 @@ def index_lecturer():
     students = models.User.objects(username__in=student_ids)
 
     advisee_projects = models.Project.objects(
-        advisor=current_user._get_current_object(), students__in=students
+        advisors=current_user._get_current_object(), students__in=students
     )
     committee_projects = models.Project.objects(
         committees=current_user._get_current_object(), students__in=students
     )
 
     alumni_projects = models.Project.objects(
-        advisor=current_user._get_current_object(),
+        advisors=current_user._get_current_object(),
         class___nin=opened_classes,
     ).order_by("-id")
 
