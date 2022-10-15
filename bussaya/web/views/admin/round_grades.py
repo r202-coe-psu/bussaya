@@ -1,16 +1,12 @@
 from flask import Blueprint, render_template, redirect, url_for, send_file, request
 from flask_login import login_required, current_user
+
+import mongoengine as me
+
 from bussaya import models
 from bussaya.web import forms, acl
 
 module = Blueprint("round_grades", __name__, url_prefix="/round_grades")
-
-
-@module.route("/<class_id>")
-@login_required
-def index(class_id):
-    class_ = models.Class.objects.get(id=class_id)
-    return render_template("/round_grades/index.html", class_=class_)
 
 
 def get_lecturers_project_of_student(student):
@@ -26,20 +22,19 @@ def get_lecturers_project_of_student(student):
     return lecturers
 
 
-def create_student_grade(class_, round_grade, student, lecturer):
-    student_grade = models.StudentGrade()
-    student_grade.class_ = class_
-    student_grade.round_grade = round_grade
-    student_grade.student = student
-    student_grade.lecturer = lecturer
+def create_student_grade(round_grade, student, lecturer):
+    student_grade = models.StudentGrade(
+        class_=round_grade.class_,
+        round_grade=round_grade,
+        student=student,
+        lecturer=lecturer,
+    )
 
     project = student.get_project()
     if project:
         student_grade.project = project
 
     student_grade.save()
-
-    round_grade.save()
 
 
 def create_student_grade_profile(round_grade):
@@ -55,6 +50,42 @@ def create_student_grade_profile(round_grade):
                 round_grade=round_grade,
             ):
                 create_student_grade(class_, round_grade, student, lecturer)
+
+
+def get_grading_student(class_, lecturer):
+    students = models.User.objects(username__in=class_.student_ids)
+    projects = models.Project.objects(
+        (me.Q(creator__in=students) | me.Q(students__in=students))
+        & (me.Q(advisor=lecturer) | me.Q(committees=lecturer))
+    )
+    grading_students = []
+    for p in projects:
+        if p.creator not in grading_students:
+            grading_students.append(p.creator)
+
+        for s in p.students:
+            if s not in grading_students:
+                grading_students.append(s)
+
+    return grading_students
+
+
+def check_and_crate_student_grade_profile(round_grade, lecturer):
+    for student in get_grading_student(round_grade.class_, lecturer):
+        if not models.StudentGrade.objects(
+            class_=round_grade.class_,
+            student=student,
+            lecturer=lecturer,
+            round_grade=round_grade,
+        ).first():
+            admin_round_grades.create_student_grade(round_grade, student, lecturer)
+
+
+@module.route("/<class_id>")
+@login_required
+def index(class_id):
+    class_ = models.Class.objects.get(id=class_id)
+    return render_template("/round_grades/index.html", class_=class_)
 
 
 @module.route("/<round_grade_type>/view")
@@ -196,6 +227,7 @@ def grading(round_grade_id):
         )
 
     user = current_user._get_current_object()
+    check_and_crate_student_grade_profile(round_grade, user)
     student_grades = models.StudentGrade.objects.all().filter(
         round_grade=round_grade, lecturer=user
     )

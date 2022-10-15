@@ -55,7 +55,7 @@
 
             {% set student = student_grade.student %}
             {% if student_grade.lecturer == current_user %}
-            <tr>
+            <tr class="top aligned">
                 <td>{{index.value}}</td>
                 {% set index.value = index.value + 1 %}
                 <td>{{ student.username }}</td>
@@ -70,13 +70,12 @@
                 <td>{{ student.get_average_grade(student_grade.round_grade) }}</td>
                 {% set final_grade, caused = student.get_actual_grade(student_grade.round_grade) %}
                 <td>
+                  {% if not caused %}
+                    {{ final_grade }}
+                  {% else %}
                     <div class="ui accordion">
                         <div class="title">
-                            {% if caused %}
                             <i class="blue dropdown icon"></i>
-                            {% else %}
-                            <i class="grey dropdown icon"></i>
-                            {% endif %}
                             {{ final_grade }}
                         </div>
                         <div class="content" style="display: none; width: fit-content">
@@ -86,6 +85,7 @@
                             {% endfor %}
                         </div>
                     </div>
+                  {% endif %}
                 </td>
                 <td>
                     <div class="title">

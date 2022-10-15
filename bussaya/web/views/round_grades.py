@@ -4,6 +4,7 @@ import mongoengine as me
 
 from bussaya import models
 from .. import forms, acl
+from .admin import round_grades as admin_round_grades
 
 module = Blueprint("round_grades", __name__, url_prefix="/round_grades")
 
@@ -13,53 +14,6 @@ module = Blueprint("round_grades", __name__, url_prefix="/round_grades")
 def index(class_id):
     class_ = models.Class.objects.get(id=class_id)
     return render_template("/round_grades/index.html", class_=class_)
-
-
-def get_grading_student(class_, lecturer):
-    students = models.User.objects(username__in=class_.student_ids)
-    projects = models.Project.objects(
-        (me.Q(creator__in=students) | me.Q(students__in=students))
-        & (me.Q(advisor=lecturer) | me.Q(committees=lecturer))
-    )
-    grading_students = []
-    for p in projects:
-        if p.creator not in grading_students:
-            grading_students.append(p.creator)
-
-        for s in p.students:
-            if s not in grading_students:
-                grading_students.append(s)
-
-    return grading_students
-
-
-def get_lecturers_project_of_student(student):
-    lecturers = []
-    if not student:
-        return lecturers
-    project = student.get_project()
-    if project:
-        lecturers.append(project.advisor)
-        for committee in project.committees:
-            lecturers.append(committee)
-
-    return lecturers
-
-
-def create_student_grade(class_, round_grade, student, lecturer):
-    student_grade = models.StudentGrade()
-    student_grade.class_ = class_
-    student_grade.round_grade = round_grade
-    student_grade.student = student
-    student_grade.lecturer = lecturer
-
-    project = student.get_project()
-    if project:
-        student_grade.project = project
-
-    student_grade.save()
-
-    round_grade.save()
 
 
 @module.route("/<round_grade_type>/view")
@@ -111,6 +65,8 @@ def grading(round_grade_id):
             )
         )
     user = current_user._get_current_object()
+    admin_round_grades.check_and_crate_student_grade_profile(round_grade, user)
+
     student_grades = models.StudentGrade.objects.all().filter(
         round_grade=round_grade, lecturer=user
     )

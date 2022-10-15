@@ -253,7 +253,7 @@ class User(me.Document, UserMixin):
 
         # if student not sent report -> -0.5 grade
         if not report:
-            final_point -= 0.5
+            final_point = 0
             caused.append("Missing Report")
 
         # if student not sent presentation -> -0.5 grade
@@ -263,8 +263,11 @@ class User(me.Document, UserMixin):
 
         if len(meeting_reports) < 4:
             count = 4 - len(meeting_reports)
-            for i in range(count):
-                final_point -= 0.5
+            if count > 0 or count <= 2:
+                for i in range(count):
+                    final_point -= 0.5
+            elif count > 2:
+                final_point = 0
 
             caused.append(f"Missing {count} Meeting report")
 
