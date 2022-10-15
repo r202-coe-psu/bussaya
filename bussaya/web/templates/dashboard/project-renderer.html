@@ -33,7 +33,7 @@
   </thead>
   <tbody>
     {% for project in projects %}
-    <tr>
+    <tr class="top aligned">
       <td>{{ project.name }}</td>
       <td class="right aligned collapsing">
         {%- for s in project.students %}
@@ -117,7 +117,7 @@
   </thead>
   <tbody>
     {% for project in projects %}
-    <tr>
+    <tr class="top aligned">
       <td>{{ project.name }}</td>
       <td class="right aligned collapsing">
         {%- for s in project.students %}
@@ -132,29 +132,6 @@
       <td class="right aligned collapsing">
         {{ pm_renderer.render_project_material(project) }}
       </td>
-
-      {#
-      <td class="right aligned collapsing">
-
-        {% if current_user and project.is_approval(current_user) %}
-        <i class="large blue check icon"></i>
-        <a class="ui disabled button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
-        {% elif current_user %}
-        <i class="large check icon disabled"></i>
-        <a class="ui primary button" href="{{ url_for('projects.approve', project_id=project.id) }}">Approve</a>
-        {% else %}
-        <script type="text/javascript">
-          $('.icon.link.pop')
-            .popup({
-              delay: {
-                show: 50,
-                hide: 70
-              }
-            });
-        </script>
-        {% endif %}
-      </td>
-      #}
     </tr>
     {% endfor %}
   </tbody>

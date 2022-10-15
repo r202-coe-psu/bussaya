@@ -31,15 +31,10 @@ Dashboard
       <td>
         {{ class_.description }}
       </td>
-      {#
-      <td>
-        {{ class_.get_type_display() }}
-      </td>
-      #}
-      <td>
+      <td class="one wide">
         {{ class_.ended_date }}
       </td>
-      <td class="single line">
+      <td class="one wide single line right aligned">
         <a href="{{ url_for('classes.view', class_id=class_.id) }}" class="ui icon primary circular button">
           <i class="icon eye link pop" data-content="View class"></i>
         </a>
