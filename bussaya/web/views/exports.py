@@ -38,9 +38,12 @@ def export_students(class_id):
             project = student.get_project()
             if project:
                 student_data["Project"] = project.name
-                student_data[
-                    "Advisor"
-                ] = f"{project.advisor.first_name} {project.advisor.last_name}"
+                student_data["Advisor"] = ",".join(
+                    [
+                        f"{advisor.first_name} {advisor.last_name}"
+                        for advisor in project.advisors
+                    ]
+                )
 
                 for i, committee in enumerate(project.committees):
                     student_data[f"Commitee {i+1}"] = committee.get_fullname()
