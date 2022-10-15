@@ -45,7 +45,7 @@
       {% if student %} 
         {% set project = student.get_project() %}
       {% endif %}
-    <tr>
+    <tr class="top aligned">
       <td>
         {{ loop.index }}
       </td>
@@ -64,7 +64,7 @@
       </td>
       <td>
         {% if project %}
-          <b>{{ project.advisor.get_fullname() }}</b><br/>
+          <b>{{ project.advisors|map(attribute='fullname')|join(', ') }}</b><br/>
           {% for c in project.committees %}
             {{ c.get_fullname() }}<br/>
           {% endfor %}

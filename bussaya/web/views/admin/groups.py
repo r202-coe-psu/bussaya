@@ -32,7 +32,7 @@ def view():
         [
             {
                 "$addFields": {
-                    "test_committees": {"$concatArrays": ["$committees", ["$advisor"]]}
+                    "test_committees": {"$concatArrays": ["$committees", "$advisors"]}
                 }
             },
             {"$sort": {"test_committees": -1}},
