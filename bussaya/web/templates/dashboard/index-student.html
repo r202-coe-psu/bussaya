@@ -42,7 +42,7 @@ Dashboard
               {% if not loop.last %}, {% endif %}
               {% endfor %}
 
-              <i class="user tie icon"></i> {{ project.advisors|map(attribute='fullname')|join(', ' }}
+              <i class="user tie icon"></i> {{ project.advisors|map(attribute='fullname')|join(', ') }}
               {#
               {% if project.is_approval(project.advisor) %}
               <i class="large blue check icon"></i>

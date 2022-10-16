@@ -10,7 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "brython": "^3.9.1",
-    "fomantic-ui-css": "^2.8.7",
-    "leaflet": "^1.7.1"
+    "fomantic-ui-css": "^2.8.7"
   }
 }
