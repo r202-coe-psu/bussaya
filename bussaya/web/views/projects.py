@@ -31,8 +31,8 @@ def populate_obj(form, project):
     # project.committees = [
     # models.User.objects.get(id=uid) for uid in form.committees.data
     # ]
-    if project.advisor in project.committees:
-        project.committees.remove(project.advisor)
+    if project.advisors in project.committees:
+        project.committees.remove(project.advisors)
     project.creator = current_user._get_current_object()
     if current_user._get_current_object() not in project.students:
         project.students.append(current_user._get_current_object())
@@ -50,7 +50,7 @@ def get_project_form(project=None):
         form = forms.projects.ProjectForm(obj=project)
 
     lecturers = models.User.objects(roles="CoE-lecturer").order_by("first_name")
-    form.advisor.queryset = lecturers
+    form.advisors.queryset = lecturers
     form.committees.queryset = lecturers
 
     classes = models.Class.objects(student_ids=current_user.username).order_by("-id")

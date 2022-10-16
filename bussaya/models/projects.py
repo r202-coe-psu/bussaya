@@ -91,6 +91,7 @@ class Project(me.Document):
         ],
     )
 
+    advisors_label_modifier = lambda c: f"{c.first_name} {c.last_name}"
     committees_label_modifier = lambda c: f"{c.first_name} {c.last_name}"
     students_label_modifier = lambda s: f"{s.username} - {s.first_name} {s.last_name}"
 

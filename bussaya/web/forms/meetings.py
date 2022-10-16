@@ -51,6 +51,10 @@ BaseMeetingReportForm = model_form(
         "title": {"label": "Title"},
         "description": {"label": "Desctription"},
         "remark": {"label": "Remark"},
+        "advisors": {
+            "label": "Advisors",
+            "label_modifier": lambda l: l.get_fullname(),
+        },
         "meeting_date": {
             "label": "Meeting Date",
             "format": "%d-%m-%Y",

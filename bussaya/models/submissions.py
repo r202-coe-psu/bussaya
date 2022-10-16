@@ -208,6 +208,8 @@ class MeetingReport(me.Document):
     status = me.StringField(choices=APPROVAL_STATUS)
     remark = me.StringField(default="")
 
+    advisors = me.ListField(me.ReferenceField("User", dbref=True))
+
     approver = me.ReferenceField("User", dbref=True)
     approver_ip_address = me.StringField(max_length=255)
     approved_date = me.DateTimeField()
@@ -216,6 +218,8 @@ class MeetingReport(me.Document):
     updated_date = me.DateTimeField(
         required=True, default=datetime.datetime.now, auto_now=True
     )
+
+    advisors_label_modifier = lambda a: a.fullname
 
 
 class FinalSubmission(me.Document):

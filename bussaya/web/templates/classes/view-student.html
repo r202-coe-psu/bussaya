@@ -61,7 +61,7 @@
 	{% if meetings | count > 0 %}
 	<table class="ui celled table">
 		<thead>
-			<tr>
+			<tr class="top aligned">
 				<th>Name</th>
         <th>Round</th>
 				<th>Started Date</th>
@@ -76,7 +76,7 @@
 		<body>
 			{% for meeting in meetings %}
 			{% set meeting_report = meeting.get_meeting_report_by_owner(user) %}
-			<tr>
+			<tr class="top aligned">
 				<td>
 					{{ meeting.name }}
 				</td>
@@ -175,7 +175,7 @@
 	{% if submissions | count > 0 %}
 	<table class="ui celled table">
 		<thead>
-			<tr>
+			<tr class="top aligned">
 				<th>Type</th>
 				<th>Round</th>
         <th>Description</th>
@@ -192,7 +192,7 @@
 		<body>
 			{% for submission in submissions %}
 			{% set progress_report = submission.get_progress_report_by_owner(user) %}
-			<tr>
+			<tr class="top aligned">
 				<td>
 					{{ submission.get_type_display() }}
 				</td>
@@ -305,7 +305,5 @@
 {% endif %}
 	
 </div>
-
-
 
 {% endblock %}

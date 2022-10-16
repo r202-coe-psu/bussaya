@@ -200,8 +200,17 @@ def report(meeting_id, meeting_report_id):
 
     form = forms.meetings.MeetingReportForm(obj=meeting_report)
     form.project.queryset = projects
+    project_advisors = []
+    for p in projects:
+        project_advisors += p.advisors
+    form.advisors.queryset = models.User.objects(
+        id__in=[a.id for a in project_advisors]
+    )
 
     if not form.validate_on_submit():
+        if request.method == "GET" and len(projects) > 0:
+            form.advisors.data = projects[0].advisors
+
         return render_template(
             "/meetings/report.html",
             projects=projects,
@@ -255,8 +264,17 @@ def late_report(meeting_id, meeting_report_id):
 
     form = forms.meetings.LateMeetingReportForm(obj=meeting_report)
     form.project.queryset = projects
+    project_advisors = []
+    for p in projects:
+        project_advisors += p.advisors
+    form.advisors.queryset = models.User.objects(
+        id__in=[a.id for a in project_advisors]
+    )
 
     if not form.validate_on_submit():
+        if request.method == "GET" and len(projects) > 0:
+            form.advisors.data = projects[0].advisors
+
         return render_template(
             "/meetings/report.html",
             projects=projects,

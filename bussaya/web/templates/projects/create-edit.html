@@ -29,7 +29,7 @@
       {{ renderer.render_select(form.public) }}
       {{ renderer.render_field(form.tags) }}
 
-      {{ renderer.render_select(form.advisor) }}
+      {{ renderer.render_select(form.advisors) }}
       {{ renderer.render_multiple_select(form.committees) }}
       <button name="create" type="submit" class="ui button primary">{{ 'Create' if 'create' in request.path else 'Edit' }}</button>
     </form>
