@@ -72,9 +72,11 @@
 
     <div class="ui message text large" >
       <div class="header">Advisor</div>
-      <a target="_blank" href="{{ url_for('accounts.profile', user_id=project.advisor.id) }}">
-        {{ project.advisor.title }} {{ project.advisor.first_name }} {{ project.advisor.last_name }}
-      </a>
+      {% for advisor in project.advisors %}
+        <a target="_blank" href="{{ url_for('accounts.profile', user_id=advisor.id) }}">
+          {{ advisor.title }} {{ advisor.first_name }} {{ advisor.last_name }}
+        </a><br>
+      {% endfor %}
     </div>
   </div>
 </div> {# end div container #}
