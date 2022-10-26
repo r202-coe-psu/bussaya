@@ -137,24 +137,27 @@ class User(me.Document, UserMixin):
     def get_grade_to_point(self, grade):
         point = 0
         if grade == "A":
-            point = 3.75
+            point = 4
         elif grade == "B+":
-            point = 3.25
+            point = 3.5
         elif grade == "B":
-            point = 2.75
+            point = 3
         elif grade == "C+":
-            point = 2.25
+            point = 2.5
         elif grade == "C":
-            point = 1.75
+            point = 2
         elif grade == "D+":
-            point = 1.25
+            point = 1.5
         elif grade == "D":
-            point = 0.75
+            point = 1
         elif grade == "E":
             point = 0.5
+
         return point
 
     def get_point_to_grade(self, point):
+        grade = "-"
+
         if point >= 3.75:
             grade = "A"
         elif point >= 3.25:
@@ -171,6 +174,7 @@ class User(me.Document, UserMixin):
             grade = "D"
         else:
             grade = "E"
+
         return grade
 
     def get_average_grade(self, round_grade):
@@ -188,10 +192,10 @@ class User(me.Document, UserMixin):
                     has_advisor = True
 
         if not has_advisor:
-            return "Incomplete"
+            return "uncompleted"
 
         if len(total_student_grade) < 2:
-            return "Incomplete"
+            return "uncompleted"
 
         average_point = 0
         advisor_grade_point = 0
@@ -239,7 +243,7 @@ class User(me.Document, UserMixin):
         meeting_reports = self.get_meeting_reports(class_, round_grade.type)
 
         # if grade incomplete
-        if average_grade == "Incomplete":
+        if average_grade == "uncompleted":
             return average_grade, caused
 
         if presentation:
@@ -290,15 +294,15 @@ class User(me.Document, UserMixin):
         round_grades = models.RoundGrade.objects(class_=class_)
 
         total_grade = 0
-        average_total_grade = 0
-        is_fail = False
+        average_total_grade = "-"
         for round_grade in round_grades:
             actual_grade = self.get_actual_grade(round_grade)
+
             if (
-                actual_grade == "incomplete"
+                actual_grade[0].lower() == "uncompleted"
                 or round_grade.release_status == "unreleased"
             ):
-                average_total_grade = "Incomplete"
+                average_total_grade = "uncompleted"
                 break
 
             if round_grade.type == "midterm":
@@ -306,28 +310,12 @@ class User(me.Document, UserMixin):
             elif round_grade.type == "final":
                 grade_ratio = 0.6
 
-            total_grade += grade_ratio * self.get_grade_to_point(actual_grade)
-            if actual_grade == "E":
-                is_fail = True
-
-        if average_total_grade != "Incomplete":
-            if is_fail:
-                average_total_grade = "E"
-            elif total_grade > 3.75:
-                average_total_grade = "A"
-            elif total_grade >= 3.25:
-                average_total_grade = "B+"
-            elif total_grade >= 2.75:
-                average_total_grade = "B"
-            elif total_grade >= 2.25:
-                average_total_grade = "C+"
-            elif total_grade >= 1.75:
-                average_total_grade = "C"
-            elif total_grade >= 1.25:
-                average_total_grade = "D+"
-            elif total_grade >= 0.75:
-                average_total_grade = "D"
+            if actual_grade[0] == "E":
+                total_grade = 0
             else:
-                average_total_grade = "E"
+                total_grade += grade_ratio * self.get_grade_to_point(actual_grade[0])
+
+        if average_total_grade != "uncompleted":
+            average_total_grade = self.get_point_to_grade(total_grade)
 
         return average_total_grade

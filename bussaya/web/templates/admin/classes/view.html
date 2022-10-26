@@ -85,7 +85,7 @@
 
 		<tbody>
 			{% for meeting in meetings %}
-			<tr>
+			<tr class="top aligned">
 				<td>
 					<a href="{{url_for('meetings.view', meeting_id=meeting.id)}}">
 						{{ meeting.name }}
@@ -103,7 +103,7 @@
 				<td>
 					{{ meeting.extended_date.strftime("%d %B %Y, %I:%M %p") }}
 				</td>
-				<td>
+				<td class="one wide single line right aligned">
 					<a class="ui primary icon button" href="{{url_for('meetings.edit', meeting_id=meeting.id)}}">
 						<i class="edit icon"></i>
 					</a>
@@ -161,7 +161,7 @@
 
 		<body>
 			{% for submission in submissions %}
-			<tr>
+			<tr class="top aligned">
 				<td>
 					<a href="{{ url_for('submissions.view', submission_id=submission.id)}}">
 						{{ submission.get_type_display() }}
@@ -176,7 +176,7 @@
 				<td>{{ submission.natural_started_date() }}</td>
 				<td>{{ submission.natural_ended_date() }}</td>
 				<td>{{ submission.natural_extended_date() }}</td>
-				<td class="single line">
+				<td class="single line one wide right aligned">
 					<a class="ui primary icon button"
 						href="{{ url_for('submissions.edit', submission_id=submission.id) }}">
 						<i class="edit icon"></i>
