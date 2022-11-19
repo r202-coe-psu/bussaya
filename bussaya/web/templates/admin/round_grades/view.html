@@ -82,12 +82,12 @@
                 {% set actual_grade, caused = student.get_actual_grade(student_grade.round_grade) %}
                 <td>
                     {% if not caused %}
-                      {{ final_grade }}
+                      {{ actual_grade }}
                     {% else %}
                     <div class="ui accordion">
                         <div class="title">
                             <i class="blue dropdown icon"></i>
-                            {{ final_grade }}
+                            {{ actual_grade }}
                         </div>
                         <div class="content" style="display: none; width: fit-content">
                             {% for cause in caused %}
