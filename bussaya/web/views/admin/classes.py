@@ -86,7 +86,7 @@ def copy(class_id):
     new_class.ended_date = now.today() + datetime.timedelta(days=30 * 4)
     new_class.save()
 
-    meetings = models.Meeting.objects(class_=class_).order_by("+ended_date")
+    meetings = models.Meeting.objects(class_=class_).order_by("ended_date")
 
     for meeting in meetings:
         data = meeting.to_mongo()
@@ -125,7 +125,7 @@ def view(class_id):
     projects = models.Project.objects(class_=class_)
     submissions = models.Submission.objects(class_=class_)
     final_submission = models.FinalSubmission.objects(class_=class_).first()
-    meetings = models.Meeting.objects(class_=class_).order_by("-ended_date")
+    meetings = models.Meeting.objects(class_=class_).order_by("ended_date")
 
     form = forms.meetings.MeetingForm()
     if form.validate_on_submit():
