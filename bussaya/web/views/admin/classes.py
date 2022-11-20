@@ -86,7 +86,7 @@ def copy(class_id):
     new_class.ended_date = now.today() + datetime.timedelta(days=30 * 4)
     new_class.save()
 
-    meetings = models.Meeting.objects(class_=class_).order_by("ended_date")
+    meetings = models.Meeting.objects(class_=class_).order_by("+ended_date")
 
     for meeting in meetings:
         data = meeting.to_mongo()
