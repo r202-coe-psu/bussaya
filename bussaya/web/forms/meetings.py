@@ -1,6 +1,7 @@
 from wtforms import fields, widgets, Form, validators
 
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed
 from flask_mongoengine.wtf import model_form
 import mongoengine as me
 
@@ -65,7 +66,10 @@ BaseMeetingReportForm = model_form(
 
 
 class MeetingReportForm(BaseMeetingReportForm):
-    pass
+    uploaded_file = fields.FileField(
+        "Upload File: PDF or PNG",
+        validators=[FileAllowed(["pdf", "png"], "file extension not allow")],
+    )
 
 
 class LateMeetingReportForm(MeetingReportForm):

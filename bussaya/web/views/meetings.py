@@ -234,9 +234,46 @@ def report(meeting_id, meeting_report_id):
         "X-Forwarded-For", request.remote_addr
     )
 
+    if not meeting_report.file:
+        meeting_report.file.put(
+            form.uploaded_file.data,
+            filename=form.uploaded_file.data.filename,
+            content_type=form.uploaded_file.data.content_type,
+        )
+    else:
+        meeting_report.file.replace(
+            form.uploaded_file.data,
+            filename=form.uploaded_file.data.filename,
+            content_type=form.uploaded_file.data.content_type,
+        )
+
     meeting_report.save()
 
     return redirect(url_for("classes.view", class_id=class_.id))
+
+
+@module.route(
+    "/<meeting_report_id>/<filename>",
+)
+@login_required
+def download(meeting_report_id, filename):
+
+    meeting_report = models.MeetingReport.objects.get(id=meeting_report_id)
+
+    if (
+        not meeting_report
+        or not meeting_report.file
+        or meeting_report.file.filename != filename
+    ):
+        return abort(403)
+
+    response = send_file(
+        meeting_report.file,
+        download_name=meeting_report.file.filename,
+        mimetype=meeting_report.file.content_type,
+    )
+
+    return response
 
 
 @module.route(

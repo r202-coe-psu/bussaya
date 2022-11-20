@@ -97,6 +97,15 @@
         <div>
           {{ markdown.markdown(report.description)|safe }}
         </div>
+        {% if report.file %}
+          <div>
+            {%- if report.file.filename[-3:].lower() == 'png' %}
+              <img class="ui image" src="{{ url_for('meetings.download', meeting_report_id=report.id, filename=report.file.filename) }}">
+            {% else %}
+              <a href="{{ url_for('meetings.download', meeting_report_id=report.id, filename=report.file.filename) }}">{{ report.file.filename }}</a>
+            {%- endif %}
+          </div>
+        {% endif %}
       </td>
       <td>
         {{ report.meeting_date }}

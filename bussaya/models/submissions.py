@@ -214,6 +214,10 @@ class MeetingReport(me.Document):
     approver_ip_address = me.StringField(max_length=255)
     approved_date = me.DateTimeField()
 
+    file = me.FileField(
+        collection_name="meeting_fs",
+    )
+
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
     updated_date = me.DateTimeField(
         required=True, default=datetime.datetime.now, auto_now=True

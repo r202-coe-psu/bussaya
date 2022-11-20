@@ -61,6 +61,13 @@ Meeting Form
         <div class="two fields">
             {{ renderer.render_calendar(form.meeting_date, "meeting_date_calendar") }}
         </div>
+
+        {{ renderer.render_fileinput(form.uploaded_file) }}
+        <div class="field">
+          {%- if meeting_report and meeting_report.file %}
+            <a href="{{ url_for('meetings.download', meeting_report_id=meeting_report.id, filename=meeting_report.file.filename) }}">{{ meeting_report.file.filename }}</a>
+          {%- endif %}
+        </div>
         <button type="submit" class="ui button primary">{{ 'Edit' if 'edit' in request.path else 'Report' }}</button>
     </div>
 </form>
@@ -94,6 +101,18 @@ Meeting Form
     };
 
     $('#meeting_date_calendar').calendar(calendar_setting);
+
+    $(".attach-file-{{ form.uploaded_file.name }}").click(function () {
+        $("#{{ form.uploaded_file.name }}").click();
+    });
+
+    $('#{{ form.uploaded_file.name }}')
+        .on('change', function (e) {
+            var name = e.target.files[0].name;
+            $('.attach-file-{{ form.uploaded_file.name }}', $(e.target).parent()).val(name);
+        });
+
+
 
   </script>
 {% endblock %}
