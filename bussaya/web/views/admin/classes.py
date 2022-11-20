@@ -125,7 +125,7 @@ def view(class_id):
     projects = models.Project.objects(class_=class_)
     submissions = models.Submission.objects(class_=class_)
     final_submission = models.FinalSubmission.objects(class_=class_).first()
-    meetings = models.Meeting.objects(class_=class_)
+    meetings = models.Meeting.objects(class_=class_).order_by("-ended_date")
 
     form = forms.meetings.MeetingForm()
     if form.validate_on_submit():
