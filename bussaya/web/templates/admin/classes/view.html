@@ -121,7 +121,7 @@
 	</div>
 	<p />
 	<div class="create meeting" style="display: none;">
-		<div class="ui segment" style="width: fit-content;">
+		<div class="ui segment">
 			<div class="ui left aligned horizontal divider">
 				Meeting Form
 			</div>
@@ -131,14 +131,18 @@
 
 				<div class="fields">
 					{{ renderer.render_field(form.name) }}
-					{{ renderer.render_select(form.round) }}
+          {{ renderer.render_select(form.round) }}
+        </div>
+        <div class="fields">
 					{{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
 					{{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
-				</div>
-				<div class="ui horizontal right aligned divider">
-					<button name="create" type="submit" class="ui small primary right floated button">
+					{{ renderer.render_calendar(form.extended_date, calendar_id="rangeextend") }}
+        </div>
+
+					<button name="create" type="submit" class="ui small primary button">
 						Create
 					</button>
+				<div class="ui horizontal right aligned divider">
 				</div>
 			</form>
 		</div>
@@ -297,7 +301,14 @@
 	$('#rangeend').calendar({
 		// type: 'date',
 		formatter: datetime_formatter,
-		startCalendar: $('#rangestart')
+		startCalendar: $('#rangestart'),
+		endCalendar: $('#rangeextend')
+  });
+	$('#rangeextend').calendar({
+		// type: 'date',
+		formatter: datetime_formatter,
+		startCalendar: $('#rangeend'),
 	});
+
 </script>
 {% endblock additional_js %}
