@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 
 from bussaya import models
@@ -97,7 +97,7 @@ def index():
     elif "student" in user.roles:
         return index_student()
     elif "admin" in user.roles:
-        return redirect(url("dashboard.index_admin"))
+        return redirect(url_for("dashboard.index_admin"))
 
     return index_user()
 
