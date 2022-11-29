@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, request
 from flask_login import current_user, login_required
 
 from bussaya import models
@@ -26,7 +26,6 @@ def view(user_id):
     if not form.validate_on_submit():
         return render_template("/admin/users/view.html", form=form, user=user)
 
-    user = models.User.objects.get(id=user_id)
     form.populate_obj(user)
 
     user.updated_date = datetime.datetime.now()

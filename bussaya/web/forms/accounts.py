@@ -75,6 +75,7 @@ BaseProfileForm = model_form(
         "status",
         "resources",
         "username",
+        "roles",
     ],
     field_args={
         "title": {"label": "Title"},
