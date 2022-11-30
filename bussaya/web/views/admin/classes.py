@@ -69,48 +69,71 @@ def edit(class_id):
     return redirect(url_for("admin.classes.view", class_id=class_.id))
 
 
-@module.route("/<class_id>/copy")
+@module.route("/<class_id>/copy", methods=["GET", "POST"])
 @acl.roles_required("admin")
 def copy(class_id):
-    class_ = models.Class.objects.get(id=class_id)
-    data = class_.to_mongo()
-    data.pop("_id")
-    print(data)
-    new_class = models.Class(**data)
-    new_class.name = f"Copy of {class_.name}"
+    old_class = models.Class.objects.get(id=class_id)
+
+    form = forms.classes.ClassForm(obj=old_class)
+    if not form.validate_on_submit():
+        if request.method == "GET":
+            form.name.data = f"Copy of {form.name.data}"
+
+        return render_template(
+            "/admin/classes/create-edit.html", form=form, class_=old_class
+        )
+
+    new_class = models.Class()
+    form.populate_obj(new_class)
     new_class.owner = current_user._get_current_object()
-    now = datetime.datetime.now()
-    new_class.created_date = now
-    new_class.updated_date = now
-    new_class.started_date = now.today()
-    new_class.ended_date = now.today() + datetime.timedelta(days=30 * 4)
     new_class.save()
 
-    meetings = models.Meeting.objects(class_=class_).order_by("ended_date")
+    new_class.student_ids = sorted(old_class.student_ids)
+    new_class.save()
 
+    meetings = models.Meeting.objects(class_=old_class).order_by("started_date")
+
+    new_class_started_date = datetime.datetime.combine(
+        new_class.started_date, datetime.datetime.min.time()
+    )
+    old_class_started_date = datetime.datetime.combine(
+        old_class.started_date, datetime.datetime.min.time()
+    )
     for meeting in meetings:
         data = meeting.to_mongo()
         data.pop("_id")
+        data.pop("created_date")
+        data.pop("updated_date")
         new_meeting = models.Meeting(**data)
-        new_meeting.created_date = now
-        new_meeting.updated_date = now
-        new_meeting.started_date = now + (now - meeting.started_date)
-        new_meeting.ended_date = now + (now - meeting.ended_date)
-        new_meeting.extended_date = now + (now - meeting.extended_date)
+        new_meeting.started_date = new_class_started_date + (
+            meeting.started_date - old_class_started_date
+        )
+        new_meeting.ended_date = new_class_started_date + (
+            meeting.ended_date - old_class_started_date
+        )
+        new_meeting.extended_date = new_class_started_date + (
+            meeting.extended_date - old_class_started_date
+        )
         new_meeting.owner = current_user._get_current_object()
         new_meeting.class_ = new_class
         new_meeting.save()
 
-    submissions = models.Submission.objects(class_=class_)
+    submissions = models.Submission.objects(class_=old_class)
     for submission in submissions:
         data = submission.to_mongo()
         data.pop("_id")
+        data.pop("created_date")
+        data.pop("updated_date")
         new_submission = models.Submission(**data)
-        new_submission.created_date = now
-        new_submission.updated_date = now
-        new_submission.started_date = now + (now - submission.started_date)
-        new_submission.ended_date = now + (now - submission.ended_date)
-        new_submission.extended_date = now + (now - submission.extended_date)
+        new_submission.started_date = new_class_started_date + (
+            submission.started_date - old_class_started_date
+        )
+        new_submission.ended_date = new_class_started_date + (
+            submission.ended_date - old_class_started_date
+        )
+        new_submission.extended_date = new_class_started_date + (
+            submission.extended_date - old_class_started_date
+        )
         new_submission.owner = current_user._get_current_object()
         new_submission.class_ = new_class
         new_submission.save()
