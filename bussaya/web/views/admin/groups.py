@@ -50,10 +50,13 @@ def view():
 
     for project_group in project_groups:
         committees = []
-        for committee in project_group["_id"]:
-            committees.extend(lecturers.filter(id=committee.id))
 
-        committees.sort(key=lambda c: c.username)
+        if project_group["_id"]:
+
+            for committee in project_group["_id"]:
+                committees.extend(lecturers.filter(id=committee.id))
+
+            committees.sort(key=lambda c: c.username)
 
         projects = models.Project.objects(id__in=project_group["project_ids"])
 
