@@ -18,8 +18,8 @@ Edit User
 <div class="ui content">
     <div class="ui segment">
         <h2>Profile</h2>
-        <form method="POST" class="ui form" enctype="multipart/form-data">
-            {{ form.csrf_token }}
+        <form method="POST" class="ui form">
+            {{ form.hidden_tag() }}
 
             {{ renderer.render_field(form.username)}}
 

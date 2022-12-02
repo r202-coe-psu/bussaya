@@ -3,7 +3,14 @@
 {% import '/navbar/class-navbar.html' as renderer_navbar %}
 
 {% block dashboard_title %}
-{{ 'Create' if 'create' in request.path else 'Edit' }} Classes
+	{% if 'admin.classes.create' == request.endpoint %}
+		Create
+	{% elif 'admin.classes.edit' == request.endpoint %}
+		Edit
+	{% elif 'admin.classes.copy' == request.endpoint %}
+		Copy
+	{% endif %}
+	Classes
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -13,7 +20,12 @@
   <div class="divider"> / </div>
   <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
   <div class="divider"> / </div>
-  <a href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">Edit</a>
+
+  {% if 'admin.classes.edit' == request.endpoint %}
+	<a href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">Edit</a>
+  {% elif 'admin.classes.copy' == request.endpoint %}
+  	<a href="{{ url_for('admin.classes.copy', class_id=class_.id) }}">Copy</a>
+  {% endif %}
 </div>
 {% else %}
 <div class="ui breadcrumb">
