@@ -32,7 +32,12 @@ def view():
         [
             {
                 "$addFields": {
-                    "test_committees": {"$concatArrays": ["$committees", "$advisors"]}
+                    "test_committees": {
+                        "$concatArrays": [
+                            {"$ifNull": ["$advisors", []]},
+                            {"$ifNull": ["$committees", []]},
+                        ]
+                    }
                 }
             },
             {"$sort": {"test_committees": -1}},
@@ -44,8 +49,6 @@ def view():
             },
         ]
     )
-    # print(list(project_groups))
-
     groups = []
 
     for project_group in project_groups:
@@ -57,9 +60,10 @@ def view():
                 committees.extend(lecturers.filter(id=committee.id))
 
             committees.sort(key=lambda c: c.username)
-
+        print("--->", committees)
         projects = models.Project.objects(id__in=project_group["project_ids"])
 
+        print([c.username for c in committees])
         available_committees = None
         for g in groups:
             if g["committees"] == committees:

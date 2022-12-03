@@ -27,7 +27,7 @@ def edit(project_id):
     form = forms.projects.ProjectForm(obj=project)
 
     lecturers = models.User.objects(roles="lecturer").order_by("first_name")
-    form.advisor.queryset = lecturers
+    form.advisors.queryset = lecturers
     form.committees.queryset = lecturers
 
     # classes = models.Class.objects(student_ids=current_user.username).order_by("-id")
@@ -39,8 +39,9 @@ def edit(project_id):
         return render_template("/projects/create-edit.html", form=form)
 
     form.populate_obj(project)
-    if project.advisor in project.committees:
-        project.committees.remove(project.advisor)
+    for advisor in project.advisors:
+        if advisor in project.committees:
+            project.committees.remove(advisor)
     # project.creator = current_user._get_current_object()
 
     project.save()
