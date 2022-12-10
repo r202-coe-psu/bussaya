@@ -68,7 +68,11 @@ BaseMeetingReportForm = model_form(
 class MeetingReportForm(BaseMeetingReportForm):
     uploaded_file = fields.FileField(
         "Upload File: PDF or PNG",
-        validators=[FileAllowed(["pdf", "png"], "file extension not allow")],
+        validators=[
+            FileAllowed(
+                ["pdf", "png", "jpg", "jpeg", "webp"], "file extension not allow"
+            )
+        ],
     )
 
 
