@@ -1,0 +1,33 @@
+{% extends "/base/default-page.html" %}
+
+{% block content %}
+
+  <div class="ui container">
+    <div class="ui segment">
+      <div class="ui grid two column row">
+        <div class="column">
+          <h3>Lecturers</h3> 
+        </div>
+        <div class="right aligned column">
+          <a class="ui small button" href="{{ url_for('tags.index') }}"><i class="tag icon"></i>Tags</a>
+        </div>
+      </div>
+      <table class="ui table">
+        <tbody>
+          {% for lecturer in lecturers %}
+          <tr>
+            <td class="ten wide">
+              <a href="{{ url_for('accounts.profile', user_id=lecturer.id) }}">
+                <i class="icon user tie"></i>
+                {{ lecturer.title }} {{ lecturer.get_fullname() }}
+              </a>
+            </td>
+            <td>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock content %}

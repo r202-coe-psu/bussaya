@@ -29,3 +29,10 @@ def index():
         .limit(100)
     )
     return render_template("/site/index.html", projects=projects)
+
+
+@module.route("/lecturers")
+def list_lecturers():
+    lecturers = models.User.objects(roles="lecturer")
+    lecturers = sorted(lecturers, key=lambda l: (l.title, l.first_name))
+    return render_template("/site/lecturers.html", lecturers=lecturers)
