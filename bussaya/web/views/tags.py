@@ -23,6 +23,7 @@ def index():
     )
 
     tags = {t["_id"]: t["count"] for t in tags}
+    print(tags)
 
     return render_template("/tags/index.html", tags=tags)
 

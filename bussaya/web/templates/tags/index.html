@@ -7,9 +7,9 @@
   {%- set color_style_size = color_styles | count %}
   {%- set max_freq = tags.values() | max %}
   {%- for tag, freq in tags.items() %}
-    {%- set size_id = (freq / max_freq * size_style_size) | round | int - 1 %}
-    {%- set color_id = (freq / max_freq * color_style_size) | round | int - 1 %}
-    <a class="ui {{ size_styles[size_id] }} {{ color_styles[color_id] }} tertiary button" href="{{ url_for('tags.view', name=tag) }}">{{ tag }}</a>
+    {%- set size_id = (freq / max_freq * size_style_size) | round | int %}
+    {%- set color_id = (freq / max_freq * color_style_size) | round | int %}
+    <a class="ui {{ size_styles[size_id] }} {{ color_styles[color_id] }} tertiary button" href="{{ url_for('tags.view', name=tag) }}">{{ tag }} ({{ freq }})</a>
   {%- endfor %}
 {%- endmacro %}
 
