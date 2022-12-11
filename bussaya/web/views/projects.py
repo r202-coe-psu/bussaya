@@ -189,21 +189,24 @@ def download(project_id, resource_id, filename):
             resource = r
             break
 
+    if not resource:
+        return resource
+
     now = datetime.datetime.now()
     election = models.Election.objects(
         started_date__lte=now, ended_date__gte=now
     ).first()
-    if not election and not current_user.is_authenticated:
+    if not election and current_user.is_anonymous:
         if resource.type not in project.public:
+            response.status_code = 403
             return response
 
-    if resource:
-        response = send_file(
-            resource.data,
-            download_name=resource.data.filename,
-            # as_attachment=True,
-            mimetype=resource.data.content_type,
-        )
+    response = send_file(
+        resource.data,
+        download_name=resource.data.filename,
+        # as_attachment=True,
+        mimetype=resource.data.content_type,
+    )
 
     return response
 

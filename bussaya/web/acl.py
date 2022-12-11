@@ -11,7 +11,7 @@ login_manager = LoginManager()
 def init_acl(app):
     login_manager.init_app(app)
 
-    @app.errorhandler(403)
+    @app.errorhandler(401)
     def page_not_found(e):
         return unauthorized_callback()
 
