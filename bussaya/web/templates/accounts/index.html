@@ -103,7 +103,7 @@ Profile
     </div>
     {% endif %}
 
-    {% if current_user.has_roles('lecturer') %}
+    {% if current_user.is_authenticated and current_user.has_roles('lecturer') %}
     <div class="ui message text large">
       <div class="header">Special for Lecturer</div>
       <p>

@@ -44,6 +44,21 @@
     </div>
     {% endif %}
 
+    {% if current_user.is_authenticated and current_user.has_roles('lecturer') %}
+    <div class="ui message text large">
+      <div class="header">Special for Lecturer</div>
+      <p>
+        {% for type_, icon in [('report', 'pdf file'), ('poster', 'image file'), ('presentation', 'powerpoint file'),
+        ('video', 'video file'), ('git', 'git')] %}
+            {% set r = project.get_resource(type_) %}
+            {% if r %}
+              <a target="_blank" href="{{ r.link }}"><i class="big {{ icon }} icon link pop" data-content="{{ type_.title() }}"></i></a>
+            {% endif %}
+        {% endfor %}
+      </p>
+    </div>
+    {% endif %}
+
 
     <div class="ui segment">
       <h2 class="ui header">By</h2>
@@ -81,3 +96,16 @@
   </div>
 </div> {# end div container #}
 {% endblock %}
+
+
+{% block additional_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    $().ready(function(){
+      $('.icon.link.pop')
+        .popup()
+        ;
+    });
+  </script>
+{% endblock %}
+
