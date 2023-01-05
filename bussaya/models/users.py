@@ -118,7 +118,7 @@ class User(me.Document, UserMixin):
         return student_grades
 
     def get_permission_to_upload(self, submission):
-        if submission._class and submission._class.type == "cooperative":
+        if submission.class_ and submission.class_.type == "cooperative":
             return True
 
         meetings = models.Meeting.objects(
@@ -259,7 +259,7 @@ class User(me.Document, UserMixin):
                     cause = "Presentation Submitted 2 Day Late"
                 caused.append(cause)
 
-        if report:
+das        if report:
             delta_time = report.submission.ended_date - report.updated_date
             if delta_time.days <= -1:
                 final_point -= 0.5
@@ -279,15 +279,16 @@ class User(me.Document, UserMixin):
             final_point -= 0.5
             caused.append("Missing Presentation")
 
-        if len(meeting_reports) < 4:
-            count = 4 - len(meeting_reports)
-            if count > 0 or count <= 2:
-                for i in range(count):
-                    final_point -= 0.5
-            elif count > 2:
-                final_point = 0
+        if round_grade.class_.type != "cooperative":
+            if len(meeting_reports) < 4:
+                count = 4 - len(meeting_reports)
+                if count > 0 or count <= 2:
+                    for i in range(count):
+                        final_point -= 0.5
+                elif count > 2:
+                    final_point = 0
 
-            caused.append(f"Missing {count} Meeting report")
+                caused.append(f"Missing {count} Meeting report")
 
         final_grade = self.get_point_to_grade(final_point)
 
