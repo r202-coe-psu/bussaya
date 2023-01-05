@@ -85,9 +85,10 @@
                       {{ actual_grade }}
                     {% else %}
                     <div class="ui accordion">
-                        <div class="title">
-                            <i class="blue dropdown icon"></i>
+                      <div class="title">
+                            {{ student.get_average_grade(student_grade.round_grade) }} 
                             {{ actual_grade }}
+                            <i class="blue dropdown icon"></i>
                         </div>
                         <div class="content" style="display: none; width: fit-content">
                             {% for cause in caused %}

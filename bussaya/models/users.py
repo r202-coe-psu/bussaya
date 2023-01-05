@@ -259,7 +259,7 @@ class User(me.Document, UserMixin):
                     cause = "Presentation Submitted 2 Day Late"
                 caused.append(cause)
 
-das        if report:
+        if report:
             delta_time = report.submission.ended_date - report.updated_date
             if delta_time.days <= -1:
                 final_point -= 0.5
