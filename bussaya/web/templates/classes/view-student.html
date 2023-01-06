@@ -265,10 +265,9 @@
 
 				<td>
 					{% if submission.get_status() == "opened" or submission.get_status() == "lated" %}
-					<a class="ui small fluid icon {{ 'primary' if current_user.get_permission_to_upload(submission) else 'disabled' }} button"
-						href="{{ url_for('submissions.upload', submission_id=submission.id)}}">
+					<a class="ui small fluid icon {{ 'primary' if current_user.get_permission_to_upload(submission) else 'disabled' }} button" href="{{ url_for('submissions.upload', submission_id=submission.id)}}">
 						<i class="upload icon"></i>
-						Upload
+					  	Upload
 					</a>
 					{% endif %}
 				</td>

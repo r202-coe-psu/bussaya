@@ -107,7 +107,10 @@ def view_lecturer(meeting_id):
 def approval(meeting_id, meeting_report_id, action):
 
     meeting_report = models.MeetingReport.objects.get(id=meeting_report_id)
-    if current_user._get_current_object() not in meeting_report.project.advisors:
+    if (
+        not current_user.has_roles("admin")
+        and current_user._get_current_object() not in meeting_report.project.advisors
+    ):
         return redirect(url_for("dashboard.index"))
 
     form = forms.meetings.DisapproveForm()

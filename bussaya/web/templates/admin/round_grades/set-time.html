@@ -47,15 +47,7 @@
 <script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
 <script type="text/javascript">
     datetime_formatter = {
-        datetime: function (datetime, settings) {
-            if (!datetime) return '';
-            var day = datetime.getDate();
-            var month = datetime.getMonth() + 1;
-            var year = datetime.getFullYear();
-            var hour = datetime.getHours();
-            var minute = datetime.getMinutes();
-            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
-        }
+	datetime: 'DD-MM-YYYY'
     };
     $('#rangestart').calendar({
         // type: 'date',

@@ -109,7 +109,11 @@
               {{ markdown.markdown(meeting_report.remark)|safe }}
             </td>
             <td class="right aligned">
-                <div style="display: flex">
+		    <div style="display: flex">
+
+			<a class="ui primary icon button" href="{{ url_for('meetings.force_report', meeting_id=meeting.id, meeting_report_id=meeting_report.id) }}" style="height: fit-content; margin-top: 0.5em" data-content="Edit Report">
+			    <i class="edit icon"></i>
+			</a>
 
                     <a class="ui green popupmsg icon button" href="{{url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, action='approved')}}" style="height: fit-content; margin-top: 0.5em" data-content="Approved">
                       <i class="check icon button"></i>
