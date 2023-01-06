@@ -51,10 +51,8 @@ Meeting Form
 <form method="POST" class="ui form" enctype="multipart/form-data">
     <div class="ui segment">
       {{ form.csrf_token }}
-      <div class="two fields">
-        {{ renderer.render_select(form.project) }}
-        {{ renderer.render_select(form.student) }}
-      </div>
+      {{ renderer.render_select(form.project) }}
+      {{ renderer.render_select(form.student) }}
       {{ renderer.render_field(form.title) }}
       {{ renderer.render_field(form.description) }}
       {{ renderer.render_field(form.remark) }}
