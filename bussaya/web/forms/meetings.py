@@ -43,6 +43,9 @@ BaseMeetingReportForm = model_form(
         "class_",
         "meeting",
         "late_reason",
+        "approved_date",
+        "advisors",
+        "approver_ip_address",
     ],
     field_args={
         "project": {

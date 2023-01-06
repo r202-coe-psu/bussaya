@@ -77,15 +77,15 @@ Meeting Form
 
 {% block additional_js %}
   <script type="text/javascript">
-    datetime_formatter = {
-      date: 'D-M-YYYY'
+    date_formatter = {
+      date: 'DD-MM-YYYY'
     };
 
     var calendar_setting = {
       type: 'date',
       monthFirst: false,
-      formatter: datetime_formatter,
-      today: false,
+      formatter: date_formatter,
+      today: true,
       ampm: false,
       {#
       text: {

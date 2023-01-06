@@ -373,6 +373,8 @@ def force_report(meeting_id, meeting_report_id):
     form.student.choices.sort()
 
     if not form.validate_on_submit():
+        print(form.errors)
+        print(form.data)
         return render_template(
             "/admin/meetings/report.html",
             projects=projects,
