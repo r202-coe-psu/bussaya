@@ -38,7 +38,11 @@
             </tr>
             <tr>
                 <td>Advisor</td>
-                <td>{{ project.advisor.get_fullname() }}</td>
+                <td>
+                  {% for advisor in project.advisors %}
+                    {{ advisor.get_fullname() }}
+                  {% endfor %}
+                </td>
             </tr>
             <tr>
                 <td>Committees</td>

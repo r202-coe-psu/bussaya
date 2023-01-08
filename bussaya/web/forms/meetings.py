@@ -44,7 +44,7 @@ BaseMeetingReportForm = model_form(
         "meeting",
         "late_reason",
         "approved_date",
-        "advisors",
+        # "advisors",
         "approver_ip_address",
     ],
     field_args={
