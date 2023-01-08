@@ -50,7 +50,7 @@ def create_student_grade_profile(round_grade):
                 lecturer=lecturer,
                 round_grade=round_grade,
             ):
-                create_student_grade(class_, round_grade, student, lecturer)
+                create_student_grade(round_grade, student, lecturer)
 
 
 def get_grading_student(class_, lecturer):
