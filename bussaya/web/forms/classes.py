@@ -16,8 +16,16 @@ BaseClassForm = model_form(
         "code": {"label": "Code"},
         "description": {"label": "Desctiption"},
         "type": {"label": "Type"},
-        "started_date": {"label": "Start Date", "format": "%Y-%m-%d"},
-        "ended_date": {"label": "End Date", "format": "%Y-%m-%d"},
+        "started_date": {
+            "label": "Start Date",
+            "format": "%d-%m-%Y",
+            "widget": widgets.TextInput(),
+        },
+        "ended_date": {
+            "label": "End Date",
+            "format": "%d-%m-%Y",
+            "widget": widgets.TextInput(),
+        },
     },
 )
 

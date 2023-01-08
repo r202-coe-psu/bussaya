@@ -60,8 +60,8 @@
       {{ renderer.render_field(form.tags) }}
       {{ renderer.render_select(form.type) }}
       <div class="fields">
-        {{ renderer.render_field(form.started_date) }}
-        {{ renderer.render_field(form.ended_date) }}
+        {{ renderer.render_calendar(form.started_date, 'rangestart') }}
+        {{ renderer.render_calendar(form.ended_date, 'rangeend') }}
       </div>
       <button name="create" type="submit" class="ui button primary">
         {{ 'Create' if 'create' in request.path else 'Edit'}}
@@ -71,3 +71,21 @@
 </div>
 
 {% endblock %}
+
+{% block additional_js %}
+<script type="text/javascript">
+  datetime_formatter = {
+	datetime: 'DD-MM-YYYY HH:mm'
+    };
+    $('#rangestart').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        endCalendar: $('#rangeend')
+    });
+    $('#rangeend').calendar({
+        // type: 'date',
+        formatter: datetime_formatter,
+        startCalendar: $('#rangestart')
+    });
+</script>
+{% endblock additional_js %}
