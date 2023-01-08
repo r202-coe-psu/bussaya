@@ -165,6 +165,7 @@ def list_report_by_user(class_id, user_id):
 def approve_meeting_report(class_id):
 
     round = request.args.get("round", None)
+    admin_view = request.args.get("admin_view", "false")
     class_ = models.Class.objects.get(id=class_id)
 
     meetings = []
@@ -173,7 +174,10 @@ def approve_meeting_report(class_id):
     else:
         meetings = models.Meeting.objects(class_=class_)
 
-    students = class_.get_advisees_by_advisors(current_user._get_current_object())
+    if current_user.has_roles("admin") and admin_view == "true":
+        students = class_.get_students()
+    else:
+        students = class_.get_advisees_by_advisors(current_user._get_current_object())
 
     wait_statuses = ["wait", "late-report", None]
     meeting_reports = models.MeetingReport.objects(

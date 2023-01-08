@@ -20,9 +20,9 @@ BaseMeetingForm = model_form(
     field_args={
         "name": {"label": "Meeting Name"},
         "round": {"label": "Round"},
-        "started_date": {"label": "Started Date", "format": "%Y-%m-%d %H:%M"},
-        "ended_date": {"label": "Ended Date", "format": "%Y-%m-%d %H:%M"},
-        "extended_date": {"label": "Extended Date", "format": "%Y-%m-%d %H:%M"},
+        "started_date": {"label": "Started Date", "format": "%d-%m-%Y %H:%M"},
+        "ended_date": {"label": "Ended Date", "format": "%d-%m-%Y %H:%M"},
+        "extended_date": {"label": "Extended Date", "format": "%d-%m-%Y %H:%M"},
     },
 )
 
@@ -44,7 +44,6 @@ BaseMeetingReportForm = model_form(
         "meeting",
         "late_reason",
         "approved_date",
-        # "advisors",
         "approver_ip_address",
     ],
     field_args={

@@ -5,17 +5,18 @@
       <i class="chalkboard icon"></i>
       Class
     </a>
+    <a href="{{ url_for('classes.approve_meeting_report', class_id=class_.id, admin_view='true') }}" class="item">
+      <i class="clipboard icon"></i> Meeting Report Approval
+    </a>
   {% else %}
     <a class="{{'active' if 'home' in request.path}} item" href="{{ url_for('classes.view', class_id=class_.id) }}">
       <i class="chalkboard icon"></i>
       Class
     </a>
+    <a href="{{ url_for('classes.approve_meeting_report', class_id=class_.id) }}" class="item">
+      <i class="clipboard icon"></i> Meeting Report Approval
+    </a>
   {% endif %}
-
-  <a href="{{ url_for('classes.approve_meeting_report', class_id=class_.id) }}" class="item">
-    <i class="clipboard icon"></i> Meeting Report Approval
-  </a>
-
 
   <div class="item ui floating labeled dropdown">
     <i class="font icon"></i>

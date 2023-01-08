@@ -161,6 +161,7 @@ def edit(meeting_id):
     if request.method != "POST":
         return render_template("/admin/meetings/edit.html", class_=class_, form=form)
 
+    print(form.data)
     form.populate_obj(meeting)
     meeting.save()
     return redirect(url_for("admin.classes.view", class_id=class_.id))

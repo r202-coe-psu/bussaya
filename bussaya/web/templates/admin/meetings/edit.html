@@ -25,20 +25,22 @@
 <div class="ui divider"></div>
 
 <div class="ui segment">
-    <form method="POST" class="ui form">
-        {{ form.csrf_token }}
-        <div class="fields">
-            {{ renderer.render_field(form.name) }}
-            {{ renderer.render_select(form.round) }}
-            {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
-            {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
-            {{ renderer.render_calendar(form.extended_date, calendar_id="rangeextend") }}
-        </div>
-        <button name="edit" type="submit" class="ui small primary labeled icon button">
-            <i class="edit icon"></i>
-            Edit
-        </button>
-    </form>
+  <form method="POST" class="ui form">
+    {{ form.csrf_token }}
+    <div class="fields">
+      {{ renderer.render_field(form.name) }}
+      {{ renderer.render_select(form.round) }}
+    </div> 
+    <div class="fields">
+      {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
+      {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
+      {{ renderer.render_calendar(form.extended_date, calendar_id="rangeextend") }}
+    </div>
+    <button name="edit" type="submit" class="ui small primary labeled icon button">
+        <i class="edit icon"></i>
+        Edit
+    </button>
+  </form>
 </div>
 </p>
 
@@ -48,21 +50,21 @@
 <script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
 <script type="text/javascript">
     datetime_formatter = {
-        datetime: 'DD-MM-YY HH:mm'
+        datetime: 'DD-MM-YYYY HH:mm'
     };
     $('#rangestart').calendar({
-        // type: 'date',
+        type: 'datetime',
         formatter: datetime_formatter,
         endCalendar: $('#rangeend')
     });
     $('#rangeend').calendar({
-        // type: 'date',
+        type: 'datetime',
         formatter: datetime_formatter,
         startCalendar: $('#rangestart'),
         endCalendar: $('#rangeextend')
     });
     $('#rangeextend').calendar({
-        // type: 'date',
+        type: 'datetime',
         formatter: datetime_formatter,
         startCalendar: $('#rangeend'),
     });
