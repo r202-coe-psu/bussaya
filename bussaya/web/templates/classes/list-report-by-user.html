@@ -51,10 +51,13 @@
 </table>
 
 <h3 class="ui header">
-  {% if 'class_.approve_meeting_report' in request.endpoint %}
+  {% if 'classes.approve_meeting_report' in request.endpoint %}
     Waiting Meeting Report Approval
   {% else %}
     Meeting Report
+  {% endif %}
+  {% if current_user.has_roles('admin') and 'admin' in request.endpoint %}
+    <a href="{{ url_for('admin.classes.approve_meeting_report', class_id=class_.id, filter='late', admin_view='true') }}">Late Report</a>
   {% endif %}
 </h3>
 <div class="ui divider"></div>

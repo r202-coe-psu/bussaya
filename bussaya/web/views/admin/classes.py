@@ -12,6 +12,7 @@ import datetime
 from bussaya import models
 from bussaya.web import forms, acl
 
+from .. import classes
 
 module = Blueprint(
     "classes",
@@ -280,3 +281,9 @@ def edit_final_submission(class_id, final_submission_id):
     final_submission.save()
 
     return redirect(url_for("admin.classes.view", class_id=class_.id))
+
+
+@module.route("/<class_id>/students/approve-meeting-reports")
+@acl.roles_required("admin")
+def approve_meeting_report(class_id):
+    return classes.approve_meeting_report(class_id)

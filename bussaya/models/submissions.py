@@ -200,9 +200,6 @@ class MeetingReport(me.Document):
     title = me.StringField(max_length=255, required=True)
     description = me.StringField()
     meeting_date = me.DateField(default=datetime.datetime.today)
-    file = me.FileField(
-        collection_name="meeting_report_fs",
-    )
     late_reason = me.StringField(default="")
 
     status = me.StringField(choices=APPROVAL_STATUS)

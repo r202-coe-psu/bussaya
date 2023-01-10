@@ -166,6 +166,7 @@ def approve_meeting_report(class_id):
 
     round = request.args.get("round", None)
     admin_view = request.args.get("admin_view", "false")
+    filter = request.args.get("filter", "")
     class_ = models.Class.objects.get(id=class_id)
 
     meetings = []
@@ -180,6 +181,9 @@ def approve_meeting_report(class_id):
         students = class_.get_advisees_by_advisors(current_user._get_current_object())
 
     wait_statuses = ["wait", "late-report", None]
+    if filter == "late":
+        wait_statuses = ["late-report"]
+
     meeting_reports = models.MeetingReport.objects(
         meeting__in=meetings, owner__in=students, status__in=wait_statuses
     )
