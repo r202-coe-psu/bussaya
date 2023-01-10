@@ -217,19 +217,15 @@
 				{% if progress_report %}
 				<td class="green">
 					{{ "Submitted Late" if submission.ended_date < progress_report.updated_date else "Submitted" }}
-						</td>
-						{% else %}
-						{% if submission.get_status() == "opened" %}
+				</td>
+				{% else %}
+					{% if submission.get_status() == "opened" %}
 				<td class="blue">
-					<a href="{{ url_for('submissions.upload', submission_id=submission.id)}}">
 						Opened
-					</a>
 				</td>
 				{% elif submission.get_status() == "lated" %}
 				<td class="yellow">
-					<a href="{{ url_for('submissions.upload', submission_id=submission.id)}}" style="color: orange">
 						Lated
-					</a>
 				</td>
 				{% elif submission.get_status() == "closed" %}
 				<td class="red">
