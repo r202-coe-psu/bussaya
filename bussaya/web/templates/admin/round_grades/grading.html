@@ -33,9 +33,9 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th>Student ID</th>
-                    <th>Student Name</th>
-                    <th>Advisors</th>
+                    <th>Student ID / Student Name</th>
+		    <th>Advisors</th>
+		    <th>Project</th>
                     <th>Meeting Report</th>
                     <th>Submissions</th>
                     <th>Grading</th>
@@ -49,11 +49,13 @@
                 {% set student = student_grade.student %}
                 <tr class="top aligned">
                     <td>{{ loop.index }}</td>
-                    <td>{{ student.username }}</td>
-                    <td>{{ student.first_name }} {{ student.last_name }}</td>
+		    <td>{{ student.username }} <br/>
+			{{ student.first_name }} {{ student.last_name }}
+		    </td>
                     <td>
                       {{ student.get_project().advisors|map(attribute='fullname')|join(', ') }}
-                    </td>
+		    </td>
+		    <td>{{ student_grade.project.name }}</td>
                     <td>
                         <a target="_blank"
                             href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}">

@@ -202,7 +202,7 @@ class User(me.Document, UserMixin):
 
         average_point = 0
         advisor_grade_point = 0
-        advisor_count = 1
+        advisor_count = 0
         committees_grade_point = 0
         committees_count = 0
 
@@ -224,6 +224,11 @@ class User(me.Document, UserMixin):
             elif student_grade.lecturer in project.advisors:
                 advisor_grade_point += grade_point
                 advisor_count += 1
+
+        if advisor_count == 0:
+            return "uncompleted"
+        if committees_count == 0:
+            return "uncompleted"
 
         average_point = (advisor_grade_point / advisor_count) * advisor_grade_ratio
 
