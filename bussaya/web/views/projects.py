@@ -32,8 +32,11 @@ def populate_obj(form, project):
     # models.User.objects.get(id=uid) for uid in form.committees.data
     # ]
     if project.advisors in project.committees:
-        project.committees.remove(project.advisors)
+        for advisor in project.advisors:
+            project.committees.remove(advisor)
+
     project.creator = current_user._get_current_object()
+
     if current_user._get_current_object() not in project.students:
         project.students.append(current_user._get_current_object())
     # project.students = [current_user._get_current_object()]
