@@ -202,7 +202,7 @@ class User(me.Document, UserMixin):
 
         average_point = 0
         advisor_grade_point = 0
-        advisor_count = 0
+        advisor_count = 1
         committees_grade_point = 0
         committees_count = 0
 
