@@ -137,26 +137,6 @@
           hide: 70
         }
       });
-    datetime_formatter = {
-        datetime: function (datetime, settings) {
-            if (!datetime) return '';
-            var day = datetime.getDate();
-            var month = datetime.getMonth() + 1;
-            var year = datetime.getFullYear();
-            var hour = datetime.getHours();
-            var minute = datetime.getMinutes();
-            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
-        }
-    };
-    $('#rangestart').calendar({
-        // type: 'date',
-        formatter: datetime_formatter,
-        endCalendar: $('#rangeend')
-    });
-    $('#rangeend').calendar({
-        // type: 'date',
-        formatter: datetime_formatter,
-        startCalendar: $('#rangestart')
-    });
+
 </script>
 {% endblock additional_js %}
