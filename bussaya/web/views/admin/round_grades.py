@@ -306,6 +306,7 @@ def set_time(round_grade_id):
     class_ = round_grade.class_
     form = forms.round_grades.RoundGradeForm(obj=round_grade)
 
+    print(round_grade.started_date)
     if not form.validate_on_submit():
         return render_template(
             "admin/round_grades/set-time.html",

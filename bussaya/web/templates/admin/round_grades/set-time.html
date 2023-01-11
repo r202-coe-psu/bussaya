@@ -30,7 +30,7 @@
 <div class="row">
     <form method="POST" class="ui form">
         <div class="ui segment">
-            {{ form.csrf_token }}
+          {{ form.csrf_token }}
             {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
             {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
             <button type="submit" class="ui large primary icon button" id="submit-button">
@@ -47,7 +47,7 @@
 <script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
 <script type="text/javascript">
     datetime_formatter = {
-	datetime: 'DD-MM-YYYY HH:mm'
+	    datetime: 'DD-MM-YYYY HH:mm'
     };
     $('#rangestart').calendar({
         // type: 'date',

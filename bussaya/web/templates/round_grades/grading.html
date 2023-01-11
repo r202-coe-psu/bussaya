@@ -28,7 +28,7 @@
     Grading {{ round_grade.get_type_display() }} Grade</h2>
 <div class="ui divider"></div>
 
-<div class="ui segment">
+<div class="">
     <div class="ui large info message">
         <b>Time off date:</b> {{ round_grade.natural_ended_date() }} <br>
         <b>Remaining Time:</b> {{round_grade.remain_time()[1]}} <br>
@@ -39,7 +39,7 @@
 <form class="ui form" method="POST" id="form-round_grade"
     action="{{ url_for('round_grades.submit_grade', round_grade_id=round_grade.id) }}">
     {{ form.csrf_token }}
-    <div class="ui attached segment">
+    <div class="" style="padding-top: 1em;">
         <table class="ui celled tablet stackable table">
             <thead>
                 <tr>
