@@ -69,7 +69,6 @@
       <th>Meeting</th>
       <th>Title / Description</th>
       <th>Meeting Date</th>
-      <th>Last Updated Date</th>
       <th>Status</th>
       <th>Remark</th>
       <th>Approval</th>
@@ -82,7 +81,7 @@
     {%- if report.status == 'late-report' %}
       {% set tr_class='yellow' %}
     {%- endif %}
-    <tr class="{{ tr_class }}">
+    <tr class="{{ tr_class }} top aligned">
       <td>
         {{ report.owner.username }} <br />
         {{ report.owner.first_name }} {{ report.owner.last_name }}
@@ -109,12 +108,15 @@
             {%- endif %}
           </div>
         {% endif %}
+        <div>
+          <b>Advisors: </b> {{ report.advisors|map(attribute="fullname")|join(', ') }} 
+
+          <br/>
+          <b>Last Updated Date: </b>{{ report.updated_date.ctime() }}
+        </div>
       </td>
       <td>
         {{ report.meeting_date }}
-      </td>
-      <td>
-        {{ report.updated_date.ctime() }}
       </td>
       <td class="{{'green' if report.status == 'approved'}}{{'red' if report.status == 'disapproved'}}">
         <b>{{ report.get_status_display() if report.status else 'Waiting for approval' }}</b><br/>
