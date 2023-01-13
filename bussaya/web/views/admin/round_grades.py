@@ -71,7 +71,19 @@ def get_grading_student(class_, lecturer):
     return grading_students
 
 
-def check_and_crate_student_grade_profile(round_grade, lecturer):
+def check_and_create_student_grade_profile(round_grade, lecturer):
+    student_grades = models.StudentGrade.objects(
+        lecturer=lecturer, round_grade=round_grade
+    )
+
+    for student_grade in student_grades:
+        projects = models.Project.objects(
+            me.Q(students=student_grade.student)
+            & (me.Q(advisors=lecturer) | me.Q(committees=lecturer))
+        )
+        if not projects:
+            student_grade.delete()
+
     for student in get_grading_student(round_grade.class_, lecturer):
         if not models.StudentGrade.objects(
             class_=round_grade.class_,
@@ -228,7 +240,7 @@ def grading(round_grade_id):
         )
 
     user = current_user._get_current_object()
-    check_and_crate_student_grade_profile(round_grade, user)
+    check_and_create_student_grade_profile(round_grade, user)
     student_grades = models.StudentGrade.objects.all().filter(
         round_grade=round_grade, lecturer=user
     )
@@ -298,7 +310,7 @@ def submit_grade(round_grade_id):
     )
 
 
-@module.route("/<round_grade_id>/set_time", methods=["GET", "POST"])
+@module.route("/<round_grade_id>/set-time", methods=["GET", "POST"])
 @acl.roles_required("admin")
 def set_time(round_grade_id):
     round_grade = models.RoundGrade.objects.get(id=round_grade_id)
@@ -306,7 +318,7 @@ def set_time(round_grade_id):
     class_ = round_grade.class_
     form = forms.round_grades.RoundGradeForm(obj=round_grade)
 
-    print(round_grade.started_date)
+    # print(round_grade.started_date)
     if not form.validate_on_submit():
         return render_template(
             "admin/round_grades/set-time.html",
@@ -320,6 +332,27 @@ def set_time(round_grade_id):
     round_grade.save()
 
     create_student_grade_profile(round_grade)
+
+    return redirect(
+        url_for(
+            "admin.round_grades.view",
+            round_grade_type=round_grade.type,
+            class_id=class_.id,
+        )
+    )
+
+
+@module.route("/<round_grade_id>/reset-grading")
+@acl.roles_required("admin")
+def reset_grading(round_grade_id):
+    round_grade = models.RoundGrade.objects.get(id=round_grade_id)
+    round_grade_type = round_grade.type
+    class_ = round_grade.class_
+
+    lecturers = models.User.objects(roles="lecturer")
+
+    for user in lecturers:
+        check_and_create_student_grade_profile(round_grade, user)
 
     return redirect(
         url_for(

@@ -67,7 +67,7 @@ def grading(round_grade_id):
             )
         )
     user = current_user._get_current_object()
-    admin_round_grades.check_and_crate_student_grade_profile(round_grade, user)
+    admin_round_grades.check_and_create_student_grade_profile(round_grade, user)
 
     student_grades = models.StudentGrade.objects.all().filter(
         round_grade=round_grade, lecturer=user
