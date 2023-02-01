@@ -32,6 +32,11 @@
         <i class="portrait icon"></i>
         View Lecturer Grade
     </a>
+    <a class="ui primary labeled icon button"
+        href="{{ url_for('exports.export_round_students', class_id=round_grade.class_.id, round_grade_id=round_grade.id) }}">
+        <i class="file export icon"></i>
+        Export Grade
+    </a>
     <a aria-disabled="true" class="ui orange labeled icon button"
         href="{{ url_for('admin.round_grades.set_time', round_grade_id=round_grade.id) }}">
         <i class="clock icon"></i>

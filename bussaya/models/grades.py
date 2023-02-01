@@ -63,14 +63,14 @@ class RoundGrade(me.Document):
 
 STUDENT_GRADE_CHOICES = [
     ("-", "-"),
-    ("a", "A"),
-    ("b+", "B+"),
-    ("b", "B"),
-    ("c+", "C+"),
-    ("c", "C"),
-    ("d+", "D+"),
-    ("d", "D"),
-    ("e", "E"),
+    ("A", "A"),
+    ("B+", "B+"),
+    ("B", "B"),
+    ("C+", "C+"),
+    ("C", "C"),
+    ("D+", "D+"),
+    ("D", "D"),
+    ("E", "E"),
 ]
 
 
@@ -89,19 +89,14 @@ class StudentGrade(me.Document):
         return StudentGrade.result.choices
 
     def get_grade_point(self):
-        if self.result == "a":
-            return 4
-        elif self.result == "b+":
-            return 3.5
-        elif self.result == "b":
-            return 3
-        elif self.result == "c+":
-            return 2.5
-        elif self.result == "c":
-            return 2
-        elif self.result == "d+":
-            return 1.5
-        elif self.result == "d":
-            return 1
-        elif self.result == "e":
-            return 0.5
+        GRADE_POINTS = {
+            "A": 4,
+            "B+": 3.5,
+            "B": 3,
+            "C+": 2.5,
+            "C": 2,
+            "D+": 1.5,
+            "D": 1,
+            "E": 0.5,
+        }
+        return GRADE_POINTS[self.result.upper()]
