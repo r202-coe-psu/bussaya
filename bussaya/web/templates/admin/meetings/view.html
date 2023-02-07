@@ -54,7 +54,7 @@
 
 <h2 class="ui horizontal header divider">{{meeting.name}}</h2>
 
-<table class="ui celled table">
+<table class="ui celled stackable tablet table">
     <thead>
         <tr>
             <th></th>
@@ -68,7 +68,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for meeting_report in meeting_reports %}
+        {% for meeting_report in meeting_reports if meeting_report.project %}
         <tr>
             <td>
                 {{ loop.index }}
@@ -86,7 +86,7 @@
               {% if meeting_report.file %}
                 <div>
                   {%- if meeting_report.file.filename[-3:].lower() == 'png' %}
-                    <img class="ui image" src="{{ url_for('meetings.download', meeting_report_id=meeting_report.id, filename=meeting_report.file.filename) }}">
+                    <img class="ui fluid large image" src="{{ url_for('meetings.download', meeting_report_id=meeting_report.id, filename=meeting_report.file.filename) }}">
                   {% else %}
                     <a href="{{ url_for('meetings.download', meeting_report_id=meeting_report.id, filename=meeting_report.file.filename) }}">{{ meeting_report.file.filename }}</a>
                   {%- endif %}
@@ -109,39 +109,39 @@
               {{ markdown.markdown(meeting_report.remark)|safe }}
             </td>
             <td class="right aligned">
-		    <div style="display: flex">
+		          <div style="display: flex">
 
-			<a class="ui primary icon button" href="{{ url_for('meetings.force_report', meeting_id=meeting.id, meeting_report_id=meeting_report.id) }}" style="height: fit-content; margin-top: 0.5em" data-content="Edit Report">
-			    <i class="edit icon"></i>
-			</a>
+			          <a class="ui primary icon button" href="{{ url_for('meetings.force_report', meeting_id=meeting.id, meeting_report_id=meeting_report.id) }}" style="height: fit-content; margin-top: 0.5em" data-content="Edit Report">
+			            <i class="edit icon"></i>
+			          </a>
 
-                    <a class="ui green popupmsg icon button" href="{{url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, action='approve')}}" style="height: fit-content; margin-top: 0.5em" data-content="Approved">
-                      <i class="check icon button"></i>
-                    </a>
-                    <div class="ui accordion" style="width: fit-content; height: fit-content">
-                        <div class=" title">
-                            <button class="ui red icon popupmsg button" data-content="Disapprove">
-                              <i class="times icon"></i>
-                            </button>
-                        </div>
-                        <div class="content">
-                            <p class="transition hidden">
-                            <div class="disapprove remark">
-                                <div class="ui segment">
-                                    <form method="post" class="ui form">
-                                        {{renderer.render_field(form.remark)}}
-                                        <input type="hidden" name=meeting_report_id" value="{{meeting_report.id}}">
-                                        <button type="submit" class="ui primary button" style="margin-top: 0.5em">
-                                            Submit
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                            </p>
-                        </div>
+                <a class="ui green popupmsg icon button" href="{{url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, action='approve')}}" style="height: fit-content; margin-top: 0.5em" data-content="Approved">
+                  <i class="check icon button"></i>
+                </a>
+                <div class="ui accordion" style="width: fit-content; height: fit-content">
+                    <div class=" title">
+                        <button class="ui red icon popupmsg button" data-content="Disapprove">
+                          <i class="times icon"></i>
+                        </button>
                     </div>
-
+                    <div class="content">
+                        <p class="transition hidden">
+                        <div class="disapprove remark">
+                            <div class="ui segment">
+                                <form method="post" class="ui form">
+                                    {{renderer.render_field(form.remark)}}
+                                    <input type="hidden" name=meeting_report_id" value="{{meeting_report.id}}">
+                                    <button type="submit" class="ui primary button" style="margin-top: 0.5em">
+                                        Submit
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        </p>
+                    </div>
                 </div>
+
+              </div>
             </td>
         </tr>
         {% endfor %}

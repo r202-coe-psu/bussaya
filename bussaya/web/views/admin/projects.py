@@ -57,6 +57,17 @@ def edit(project_id):
 def delete(project_id):
     project = models.Project.objects.get(id=project_id)
 
+    project.satatus = "delete"
+    project.save()
+
+    return redirect(request.referrer)
+
+
+@module.route("/<project_id>/force-delete")
+@acl.roles_required("admin")
+def force_delete(project_id):
+    project = models.Project.objects.get(id=project_id)
+
     for resource in project.resources:
         if resource.data:
             resource.data.delete()
