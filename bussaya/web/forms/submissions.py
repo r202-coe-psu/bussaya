@@ -71,6 +71,13 @@ class ProgressReportDateForm(FlaskForm):
     remark = fields.StringField("Remark", widget=widgets.TextArea())
 
 
+class AdminProgressReportForm(ProgressReportForm):
+    student = fields.SelectField("Student")
+    uploaded_date = fields.DateTimeField(
+        "Uploaded Date", widget=widgets.TextInput(), format="%d-%m-%Y %H:%M"
+    )
+
+
 BaseFinalSubmissionForm = model_form(
     models.FinalSubmission,
     FlaskForm,

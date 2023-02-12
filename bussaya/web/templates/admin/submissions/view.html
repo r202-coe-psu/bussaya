@@ -51,10 +51,17 @@
     href="{{ url_for('submissions.edit', submission_id=submission.id, class_id=class_.id) }}">
     <i class="edit icon"></i> Edit
 </a>
+
 <a class="ui very small negative icon button" style="margin-top:0.5em"
     href="{{ url_for('submissions.delete', submission_id=submission.id, class_id=class_.id) }}">
     <i class="trash icon"></i> Delete
 </a>
+
+<a class="ui very small yellow icon button" style="margin-top:0.5em"
+    href="{{ url_for('submissions.force_report', submission_id=submission.id) }}">
+    <i class="add icon"></i> Admin Force Create Report
+</a>
+
 {% endif %}
 
 <h2 class="ui horizontal header divider">{{submission.get_type_display()}}</h2>

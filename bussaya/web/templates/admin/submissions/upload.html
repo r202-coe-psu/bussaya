@@ -1,0 +1,108 @@
+{% extends '/base/default-dashboard.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+
+{% block dashboard_title %}
+Submission Form
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('dashboard.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    Form:<a href="{{ url_for('submissions.upload', class_id=class_.id, submission_id=submission.id) }}">
+        {{submission.get_type_display()}}</a>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<table class="ui definition table">
+    <tr>
+        <td class="two wide">
+            Submission
+        </td>
+        <td>
+            {{ submission.get_type_display() }}
+        </td>
+    </tr>
+    <tr>
+        <td class="two wide">
+            Description:
+        </td>
+        <td>
+            {{ submission.description }}
+        </td>
+    </tr>
+    <tr>
+        <td class="two wide">
+            Remaining time:
+        </td>
+        <td>
+            {{ submission.get_remain_time()[1] }}
+        </td>
+    </tr>
+</table>
+
+<form method="POST" class="ui form" enctype="multipart/form-data">
+    <div class="ui segment">
+      {{ form.csrf_token }}
+      <div class="two fields">
+        {{ renderer.render_select(form.student) }}
+        {{ renderer.render_select(form.project) }}
+      </div>
+      {{ renderer.render_field(form.description) }}
+      <div class="two fields">
+        {{ renderer.render_fileinput(form.uploaded_file) }}
+        {{ renderer.render_calendar(form.uploaded_date, 'uploaded_date_calendar') }}
+      </div>
+        <button type="submit" class="ui button primary">
+            Upload
+        </button>
+    </div>
+</form>
+
+{% endblock content %}
+
+{% block additional_js %}
+<script type="text/javascript">
+    $(".attach-file-{{ form.uploaded_file.name }}").click(function () {
+        $("#{{ form.uploaded_file.name }}").click();
+    });
+
+    $('#{{ form.uploaded_file.name }}')
+        .on('change', function (e) {
+            var name = e.target.files[0].name;
+            $('.attach-file-{{ form.uploaded_file.name }}', $(e.target).parent()).val(name);
+        });
+
+    var datetime_formatter = {
+      datetime: 'DD-MM-YYYY HH:mm'
+    };
+
+    var calendar_setting = {
+      type: 'datetime',
+      monthFirst: false,
+      formatter: datetime_formatter,
+      today: true,
+      ampm: false,
+      {#
+      text: {
+        days: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
+        months: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤษจิกายน', 'ธันวาคม'],
+        monthsShort: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
+        today: 'วันนี้',
+        now: 'ปัจจุบัน',
+        am: 'AM',
+        pm: 'PM'
+      },
+      #}
+    };
+
+    $('#uploaded_date_calendar').calendar(calendar_setting);
+
+
+</script>
+{% endblock additional_js %}

@@ -39,6 +39,12 @@ class Class(me.Document):
     def get_projects_by_advisors(self, *args):
         return projects.Project.objects(advisors__in=args)
 
+    def get_projects(self):
+        students = self.get_students()
+        return projects.Project.objects(
+            me.Q(creator__in=students) | me.Q(students__in=students)
+        ).order_by("name")
+
     def get_advisees_by_advisors(self, *args):
         students = self.get_students()
         # adv_projects = projects.Project.objects(advisor__in=args, students__in=students)
