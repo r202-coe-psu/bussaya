@@ -225,8 +225,8 @@ def force_report(submission_id):
         progress_report.submission = models.Submission.objects.get(id=submission_id)
         progress_report.class_ = submission.class_
 
-    progress_report.updated_date = datetime.datetime.now()
-    progress_report.owner = current_user._get_current_object()
+    progress_report.updated_date = form.uploaded_date.data
+    progress_report.owner = models.User.objects.get(id=form.student.data)
     progress_report.ip_address = request.headers.get(
         "X-Forwarded-For", request.remote_addr
     )
@@ -247,7 +247,7 @@ def force_report(submission_id):
 
     progress_report.save()
 
-    return redirect(url_for("admin.submissions.view", submission_id=submission.id))
+    return redirect(url_for("submissions.view", submission_id=submission.id))
 
 
 @module.route(
