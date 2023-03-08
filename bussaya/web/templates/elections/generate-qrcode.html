@@ -22,6 +22,9 @@
         <div style="text-align: center;">
           {{ project.name_th }}
         </div>
+        <div style="text-align: center;">
+          {{ project.students|map(attribute='username')|join('/') }}                                                          
+        </div>
       </div>
     {% endfor %}
     </div>
