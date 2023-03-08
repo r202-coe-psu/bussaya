@@ -45,6 +45,12 @@ class Class(me.Document):
             me.Q(creator__in=students) | me.Q(students__in=students)
         ).order_by("name")
 
+    def is_available_project(self, project):
+        for student in project.students:
+            if str(student.username) not in self.student_ids:
+                return False
+        return True
+
     def get_advisees_by_advisors(self, *args):
         students = self.get_students()
         # adv_projects = projects.Project.objects(advisor__in=args, students__in=students)

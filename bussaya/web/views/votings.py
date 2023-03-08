@@ -54,10 +54,11 @@ def vote(election_id, project_id):
 
     project = models.Project.objects.get(
         id=project_id,
-        class_=election.class_,
     )
 
-    if now < election.started_date or election.ended_date < now:
+    if election.class_.is_available_project(project) and (
+        now < election.started_date or election.ended_date < now
+    ):
         message = f"ไม่อยู่ในช่วงเวลาลงโหวต"
         return render_template(
             "/votings/vote-fail.html",
@@ -106,7 +107,7 @@ def vote(election_id, project_id):
 
     voting.election = election
     voting.project = project
-    voting.class_ = project.class_
+    voting.class_ = election.class_
 
     data = form.data
     data.pop("csrf_token")

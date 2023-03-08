@@ -77,7 +77,7 @@ def edit(election_id):
 def generate_qrcode(election_id):
     election = models.Election.objects.get(id=election_id)
 
-    projects = models.Project.objects(class_=election.class_)
+    projects = class_ = election.class_.get_projects()
 
     coe_logo_path = (
         pathlib.Path(current_app.root_path) / "static" / "images" / "coe-logo.png"
@@ -154,7 +154,6 @@ def generate_qrcode(election_id):
 # @login_required
 # @acl.allows.requires(acl.is_admin)
 def show_election(election_id):
-
     now = datetime.datetime.now()
     election = models.Election.objects(
         id=election_id,
@@ -165,9 +164,7 @@ def show_election(election_id):
     if not election:
         return redirect(url_for("site.index"))
 
-    projects = models.Project.objects(
-        class_=election.class_,
-    )
+    projects = election.class_.get_projects()
 
     return render_template(
         "/elections/show_election.html",

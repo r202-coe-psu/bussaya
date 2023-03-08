@@ -54,7 +54,9 @@
       </td>
       <td>
         {% if student %}
-          {{ student.get_fullname() }}
+          <a href="{{ url_for('accounts.profile', user_id=student.id) }}">
+            {{ student.get_fullname() }}
+          </a>
         {% endif %}
       </td>
       <td>
