@@ -49,7 +49,7 @@ def upload(final_submission_id):
     ).order_by("-id")
 
     form = forms.submissions.FinalReportForm()
-    form.project.choices.extend([(str(p.id), p.name) for p in projects])
+    form.project.choices = [(str(p.id), p.name) for p in projects]
 
     if not form.validate_on_submit():
         if request.method == "GET":

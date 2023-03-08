@@ -83,7 +83,6 @@ class User(me.Document, UserMixin):
         return progress_report
 
     def get_meeting_reports(self, class_, round=None, approval_status=None):
-
         meetings = models.Meeting.objects(class_=class_)
         if round:
             meetings = meetings.filter(round=round)
@@ -195,10 +194,10 @@ class User(me.Document, UserMixin):
                     has_advisor = True
 
         if not has_advisor:
-            return "uncompleted"
+            return "missing advisor grade"
 
         if len(total_student_grade) < 2:
-            return "uncompleted"
+            return "grade not found"
 
         average_point = 0
         advisor_grade_point = 0
@@ -207,6 +206,9 @@ class User(me.Document, UserMixin):
         committees_count = 0
 
         project = self.get_project()
+
+        if not project:
+            return "project not found"
 
         if len(project.committees) > 1:
             advisor_grade_ratio = 0.5
