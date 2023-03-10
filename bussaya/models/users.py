@@ -197,7 +197,7 @@ class User(me.Document, UserMixin):
             return "missing advisor grade"
 
         if len(total_student_grade) < 2:
-            return "grade not found"
+            return "uncompleted"
 
         average_point = 0
         advisor_grade_point = 0
