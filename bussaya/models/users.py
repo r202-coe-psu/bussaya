@@ -15,9 +15,9 @@ class User(me.Document, UserMixin):
     first_name = me.StringField(required=True, max_length=200)
     last_name = me.StringField(required=True, max_length=200)
 
-    title_th = me.StringField(max_length=50)
-    first_name_th = me.StringField(max_length=200)
-    last_name_th = me.StringField(max_length=200)
+    title_th = me.StringField(max_length=50, default="")
+    first_name_th = me.StringField(max_length=200, default="")
+    last_name_th = me.StringField(max_length=200, default="")
 
     biography = me.StringField()
 
@@ -253,7 +253,7 @@ class User(me.Document, UserMixin):
         meeting_reports = self.get_meeting_reports(class_, round_grade.type)
 
         # if grade incomplete
-        if average_grade == "uncompleted":
+        if len(average_grade) != 1:
             return average_grade, caused
 
         if presentation:

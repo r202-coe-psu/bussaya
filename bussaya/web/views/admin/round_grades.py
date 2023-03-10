@@ -39,7 +39,6 @@ def create_student_grade(round_grade, student, lecturer):
 
 
 def create_student_grade_profile(round_grade):
-
     # Project create after round_grade has been created.
     class_ = round_grade.class_
     for student in models.User.objects(username__in=class_.student_ids):
@@ -244,7 +243,7 @@ def grading(round_grade_id):
     student_grades = models.StudentGrade.objects.all().filter(
         round_grade=round_grade, lecturer=user
     )
-    student_grades = sorted(student_grades, key=lambda s: s.student.username)
+    student_grades = sorted(student_grades, key=lambda s: (s.student.username))
 
     form = forms.round_grades.GroupGradingForm()
     for s in student_grades:
@@ -288,7 +287,6 @@ def submit_grade(round_grade_id):
         student_grade.save()
 
         if grading["result"] != "-":
-
             meetings = models.MeetingReport.objects(
                 class_=class_, owner=student_grade.student, status=None
             )
