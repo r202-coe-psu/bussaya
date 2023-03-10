@@ -62,9 +62,16 @@
 
                 <tr class="top aligned">
                     <td>{{ loop.index }}</td>
-		    <td>{{ student.username }} <br/> {{ student.first_name }} {{ student.last_name }}</td>
+                    <td>
+                      {{ student.username }} <br/> 
+                      {{ student.first_name }} {{ student.last_name }}</td>
+                      {{ student.th_first_name }} {{ student.th_last_name }}</td>
                     <td>{{ student.get_project().advisors|map(attribute='fullname')|join(', ') }}</td>
-		    <td>{{ student_grade.project.name }}</td>
+                    <td>
+                      {{ student_grade.project.name }} <br/>
+                      {{ student_grade.project.name_th }}
+
+                    </td>
                     <td>
                         <a target="_blank"
                             href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}">
