@@ -51,7 +51,7 @@ Classes
                 {% if not loop.last %}<br>{% endif %}
                 {% endfor -%}
             </td>
-            <td class="right aligned collapsing">{{ project.advisor.get_fullname() }}</td>
+            <td class="right aligned collapsing">{{ project.advisors|selectattr("full_name")|join(', ') }}</td>
             <td class="right aligned collapsing">{{ project.get_public_display() }}</td>
             <td class="right aligned collapsing">
                 {{ pm_renderer.render_project_material(project) }}
