@@ -28,10 +28,10 @@ BaseRoundGradeForm = model_form(
 
 class RoundGradeForm(BaseRoundGradeForm):
     started_date = fields.DateTimeField(
-        "Started Date", widget=widgets.TextInput(), format="%d-%m-%Y %H:%M"
+        "Started Date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
     )
     ended_date = fields.DateTimeField(
-        "Ended date", widget=widgets.TextInput(), format="%d-%m-%Y %H:%M"
+        "Ended date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
     )
 
 

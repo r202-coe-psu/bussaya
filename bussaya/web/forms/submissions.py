@@ -74,7 +74,7 @@ class ProgressReportDateForm(FlaskForm):
 class AdminProgressReportForm(ProgressReportForm):
     student = fields.SelectField("Student")
     uploaded_date = fields.DateTimeField(
-        "Uploaded Date", widget=widgets.TextInput(), format="%d-%m-%Y %H:%M"
+        "Uploaded Date", widget=widgets.TextInput(), format="%Y-%m-%d %H:%M"
     )
 
 

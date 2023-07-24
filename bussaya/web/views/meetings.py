@@ -105,7 +105,6 @@ def view_lecturer(meeting_id):
 )
 @acl.roles_required("lecturer")
 def approval(meeting_id, meeting_report_id, action):
-
     meeting_report = models.MeetingReport.objects.get(id=meeting_report_id)
     if (
         not current_user.has_roles("admin")
@@ -158,10 +157,10 @@ def edit(meeting_id):
 
     form = forms.meetings.MeetingForm(obj=meeting)
 
+    print("x", form.data)
     if request.method != "POST":
         return render_template("/admin/meetings/edit.html", class_=class_, form=form)
 
-    print(form.data)
     form.populate_obj(meeting)
     meeting.save()
     return redirect(url_for("admin.classes.view", class_id=class_.id))
@@ -261,7 +260,6 @@ def report(meeting_id, meeting_report_id):
 )
 @login_required
 def download(meeting_report_id, filename):
-
     meeting_report = models.MeetingReport.objects.get(id=meeting_report_id)
 
     if (

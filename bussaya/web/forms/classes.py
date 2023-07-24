@@ -18,12 +18,12 @@ BaseClassForm = model_form(
         "type": {"label": "Type"},
         "started_date": {
             "label": "Start Date",
-            "format": "%d-%m-%Y",
+            "format": "%Y-%m-%d",
             "widget": widgets.TextInput(),
         },
         "ended_date": {
             "label": "End Date",
-            "format": "%d-%m-%Y",
+            "format": "%Y-%m-%d",
             "widget": widgets.TextInput(),
         },
     },
