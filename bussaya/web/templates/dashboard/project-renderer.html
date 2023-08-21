@@ -1,5 +1,6 @@
 {% import '/base/project-material-renderer.html' as pm_renderer %}
 
+{% set class_icons = {"preproject":{"icon":"laptop code", "color":"yellow"}, "project":{"icon":"laptop code", "color":"green"}, "precooperative":{"icon":"project diagram", "color":"yellow"}, "cooperative":{"icon":"project diagram", "color":"green"}} %}
 
 {% macro render_project_section(projects, current_user, advisee_projects, committee_projects) -%}
 <div class="ui segment row">
@@ -26,6 +27,7 @@
     <tr>
       <th>Project</th>
       <th>Student</th>
+      <th>Type</th>
       <th>Advisor</th>
       <th>Midterm</th>
       <th>Final</th>
@@ -40,6 +42,12 @@
         {{ s.first_name }} {{ s.last_name }}
         {% if not loop.last %}<br>{% endif %}
         {% endfor -%}
+      </td>
+      <td>
+        {% set class_ = project.get_opened_class() %}
+        {% if class_ and class_.type %}
+          <i class="ui {{ class_icons[class_.type]['icon'] }} icon {{ class_icons[class_.type]['color'] }}"></i> {{ class_.type | title }}
+        {% endif %}
       </td>
       <td class="right aligned collapsing">{{ project.advisors|map(attribute='fullname')|join(', ') }}</td>
       <td class="one wide single line">
@@ -108,6 +116,7 @@
       <th>Project</th>
       <th>Student</th>
       <th>Advisor</th>
+      <th>Type</th>
       <th>Public</th>
       <th>Document</th>
       {#
@@ -128,6 +137,12 @@
         {% endfor -%}
       </td>
       <td class="right aligned collapsing">{{ project.advisors|map(attribute='fullname')|join(', ') }}</td>
+      <td>
+        {% set class_ =  project.get_opened_class() or project.class_ %}
+        {% if class_ and class_.type %}
+          <i class="ui {{ class_icons[class_.type]['icon'] }} icon {{ class_icons[class_.type]['color'] }}"></i> {{ class_.type | title }}
+        {% endif %}
+      </td>
       <td class="right aligned collapsing">{{ project.public.title() }}</td>
       <td class="right aligned collapsing">
         {{ pm_renderer.render_project_material(project) }}

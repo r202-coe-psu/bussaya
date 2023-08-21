@@ -1,15 +1,18 @@
 {% extends '/base/default-dashboard.html' %}
 {% import '/dashboard/project-renderer.html' as renderer %}
 
+{% set class_icons = {"preproject":{"icon":"laptop code", "color":"yellow"}, "project":{"icon":"laptop code", "color":"green"}, "precooperative":{"icon":"project diagram", "color":"yellow"}, "cooperative":{"icon":"project diagram", "color":"green"}} %}
+
 {% block dashboard_title %}
 Dashboard
 {% endblock %}
 
 
 {% block content %}
+
 <h2 class="ui header horizontal divider">Classes</h2>
 {% if opened_classes %}
-<table class="ui celled table">
+<table class="ui celled table large">
   <thead>
     <tr>
       <th>Name</th>
@@ -26,6 +29,7 @@ Dashboard
     {% for class_ in opened_classes %}
     <tr>
       <td>
+        <i class="ui {{ class_icons[class_.type]['icon'] }} icon {{ class_icons[class_.type]['color'] }}"></i>
         <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
       </td>
       <td>
