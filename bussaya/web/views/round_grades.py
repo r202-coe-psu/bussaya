@@ -41,7 +41,13 @@ def view(round_grade_type):
         class_=class_, lecturer=user, round_grade=round_grade
     )
 
-    student_grades = sorted(student_grades, key=lambda s: s.student.username)
+    student_grades = sorted(
+        student_grades,
+        key=lambda s: (
+            [advisor.username for advisor in s.project.advisors],
+            s.student.username,
+        ),
+    )
 
     return render_template(
         "/round_grades/view.html",
@@ -72,7 +78,13 @@ def grading(round_grade_id):
     student_grades = models.StudentGrade.objects.all().filter(
         round_grade=round_grade, lecturer=user
     )
-    student_grades = sorted(student_grades, key=lambda s: s.student.username)
+    student_grades = sorted(
+        student_grades,
+        key=lambda s: (
+            [advisor.username for advisor in s.project.advisors],
+            s.student.username,
+        ),
+    )
 
     form = forms.round_grades.GroupGradingForm()
     for s in student_grades:

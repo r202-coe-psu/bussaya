@@ -127,7 +127,13 @@ def view(round_grade_type):
         lecturer=current_user._get_current_object(),
         round_grade=round_grade,
     )
-    student_grades = sorted(student_grades, key=lambda s: s.student.username)
+    student_grades = sorted(
+        student_grades,
+        key=lambda s: (
+            [advisor.username for advisor in s.project.advisors],
+            s.student.username,
+        ),
+    )
 
     return render_template(
         "/admin/round_grades/view.html",
@@ -246,6 +252,14 @@ def grading(round_grade_id):
         round_grade=round_grade, lecturer=user
     )
     student_grades = sorted(student_grades, key=lambda s: (s.student.username))
+
+    student_grades = sorted(
+        student_grades,
+        key=lambda s: (
+            [advisor.username for advisor in s.project.advisors],
+            s.student.username,
+        ),
+    )
 
     form = forms.round_grades.GroupGradingForm()
     for s in student_grades:

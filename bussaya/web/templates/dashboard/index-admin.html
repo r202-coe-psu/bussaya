@@ -1,5 +1,6 @@
 {% extends '/base/default-dashboard.html' %}
 {% import '/dashboard/project-renderer.html' as renderer %}
+{% import '/dashboard/class-attributes.html' as class_attributes %}
 
 {% block dashboard_title %}
 Dashboard
@@ -13,7 +14,7 @@ Dashboard
 
 <h2 class="ui header horizontal divider">Classes</h2>
 {% if opened_classes %}
-<table class="ui celled table">
+<table class="ui celled table large">
   <thead>
     <tr>
       <th>Name</th>
@@ -27,6 +28,7 @@ Dashboard
     {% for class_ in opened_classes %}
     <tr>
       <td>
+        <i class="ui {{ class_attributes.class_icons[class_.type]['icon'] }} icon {{ class_attributes.class_icons[class_.type]['color'] }}"></i>
         <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
       </td>
       <td>

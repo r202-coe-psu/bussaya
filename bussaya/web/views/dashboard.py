@@ -53,6 +53,23 @@ def index_lecturer():
         class___nin=opened_classes,
     ).order_by("-id")
 
+    advisee_projects = sorted(
+        advisee_projects,
+        key=lambda p: (
+            p.get_opened_class().type,
+            [s.username for s in p.students],
+        ),
+    )
+
+    committee_projects = sorted(
+        committee_projects,
+        key=lambda p: (
+            p.get_opened_class().type,
+            [advisor.username for advisor in p.advisors],
+            [s.username for s in p.students],
+        ),
+    )
+
     return render_template(
         "/dashboard/index-lecturer.html",
         classes=classes,
