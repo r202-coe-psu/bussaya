@@ -30,6 +30,8 @@ def create_student_grade(round_grade, student, lecturer):
         student=student,
         lecturer=lecturer,
     )
+    if not student:
+        return
 
     project = student.get_project()
     if project:

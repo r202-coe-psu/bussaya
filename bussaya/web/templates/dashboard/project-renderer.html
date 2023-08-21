@@ -70,7 +70,7 @@
 
       </td>
       <td class="one wide single line">
-        {% if project.creator.get_meeting_reports(class_, 'final').count() > 0 and current_user not in project.advisors %}
+        {% if project.creator and project.creator.get_meeting_reports(class_, 'final').count() > 0 and current_user not in project.advisors %}
         <a target="_blank"
           href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=project.creator.id) }}">
           <i class="clipboard large icon link pop" data-content="Meeting Report"></i>
