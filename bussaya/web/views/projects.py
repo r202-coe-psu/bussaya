@@ -38,6 +38,7 @@ def populate_obj(form, project):
 
     if current_user._get_current_object() not in project.students:
         project.students.append(current_user._get_current_object())
+
     # project.students = [current_user._get_current_object()]
     # if form.contributors.data and len(form.contributors.data) > 0:
     #     contributor = models.User.objects.get(id=form.contributors.data)
