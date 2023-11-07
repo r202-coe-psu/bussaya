@@ -78,6 +78,37 @@ def create_user_facebook(user_info):
     return user
 
 
+def create_user_engpsu(user_info):
+    user = models.User(
+        username=user_info.get("username"),
+        email=user_info.get("email"),
+        first_name=user_info.get("first_name").title(),
+        last_name=user_info.get("last_name").title(),
+        status="active",
+    )
+    user.resources[client.engpsu.name] = userinfo
+    if userinfo["username"].isdigit():
+        user.roles.append("student")
+    elif (
+        "COE_LECTURERS" in current_app.config
+        and userinfo["username"] in current_app.config["COE_LECTURERS"]
+    ):
+        user.roles.append("lecturer")
+        user.roles.append("CoE-lecturer")
+    elif (
+        "COE_STAFFS" in current_app.config
+        and userinfo["username"] in current_app.config["COE_STAFFS"]
+    ):
+        user.roles.append("staff")
+        user.roles.append("CoE-staff")
+
+    else:
+        user.roles.append("staff")
+
+    user.save()
+    return user
+
+
 def get_user_info(remote, token):
     if remote.name == "google":
         # resp = remote.get("userinfo")
@@ -115,6 +146,13 @@ def get_user_info(remote, token):
 
         userinfo = resp.json()
         return userinfo
+    elif remote.name == "engpsu":
+        userinfo_response = remote.get("userinfo")
+        userinfo = userinfo_response.json()
+        return userinfo
+
+    elif remote.name == "psu":
+        return {}
 
 
 def handle_authorized_oauth2(remote, token):
@@ -135,8 +173,14 @@ def handle_authorized_oauth2(remote, token):
             user = create_user_facebook(user_info)
         elif remote.name == "line":
             user = create_user_line(user_info)
+        elif remote.name == "engpsu":
+            user = create_user_engpsu(user_info)
+        elif remote.name == "psu":
+            user = create_user_psu(user_info)
 
     login_user(user)
+
+    user.last_login_date = datetime.datetime.now()
     user.resources[remote.name] = user_info
     user.save()
 
@@ -155,11 +199,10 @@ def handle_authorized_oauth2(remote, token):
     if next_uri:
         session.pop("next")
         return redirect(next_uri)
-    return redirect(url_for("site.index"))
+    return redirect(url_for("dashboard.index"))
 
 
 def handle_authorize(remote, token, user_info):
-
     if not user_info:
         return redirect(url_for("accounts.login"))
 
@@ -205,5 +248,5 @@ def init_oauth(app):
     oauth2_client.register("engpsu")
     oauth2_client.register(
         "google",
-        server_metadata_url=app.config.get("GOOGLE_METADATA_URL"),
+        server_metadata_url=app.config.get("GOOGLE_METADATA_SERVER_URL"),
     )

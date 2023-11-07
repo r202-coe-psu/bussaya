@@ -161,6 +161,10 @@ def login_oauth(name):
         response = client.facebook.authorize_redirect(redirect_uri)
     elif name == "line":
         response = client.line.authorize_redirect(redirect_uri)
+    elif name == "engpsu":
+        response = client.engpsu.authorize_redirect(redirect_uri)
+    elif name == "psu":
+        response = client.psu.authorize_redirect(redirect_uri)
 
     return response
 
@@ -170,13 +174,16 @@ def authorized_oauth(name):
     client = oauth2.oauth2_client
     remote = None
     try:
-
         if name == "google":
             remote = client.google
         elif name == "facebook":
             remote = client.facebook
         elif name == "line":
             remote = client.line
+        elif name == "engpsu":
+            remote = client.engpsu
+        elif name == "psu":
+            remote = client.psu
 
         token = remote.authorize_access_token()
 
@@ -207,7 +214,6 @@ def profile(user_id):
 @module.route("/accounts")
 @login_required
 def index():
-
     biography = ""
     if current_user.biography:
         biography = markdown.markdown(current_user.biography)

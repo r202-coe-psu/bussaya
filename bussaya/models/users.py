@@ -188,7 +188,9 @@ class User(me.Document, UserMixin):
         has_advisor = False
         total_student_grade = []
         for student_grade in student_grades:
-            if student_grade.result != "-":
+            if student_grade.result == "I":
+                return "I"
+            elif student_grade.result != "-":
                 total_student_grade.append(student_grade)
                 if student_grade.lecturer in student_grade.project.advisors:
                     has_advisor = True
@@ -245,6 +247,9 @@ class User(me.Document, UserMixin):
         class_ = round_grade.class_
 
         average_grade = self.get_average_grade(round_grade)
+        if average_grade == "I":
+            return average_grade, ["Committee gived I"]
+
         final_point = self.get_grade_to_point(average_grade)
 
         caused = []
@@ -308,6 +313,9 @@ class User(me.Document, UserMixin):
         average_total_grade = "-"
         for round_grade in round_grades:
             actual_grade = self.get_actual_grade(round_grade)
+
+            if actual_grade[0].lower() == "i":
+                return "I"
 
             if (
                 actual_grade[0].lower() == "uncompleted"

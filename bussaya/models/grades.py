@@ -71,6 +71,7 @@ STUDENT_GRADE_CHOICES = [
     ("D+", "D+"),
     ("D", "D"),
     ("E", "E"),
+    ("I", "I"),
 ]
 
 
