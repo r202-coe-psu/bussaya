@@ -12,7 +12,8 @@ from .submissions import (
     Meeting,
     MeetingReport,
 )
-from .grades import RoundGrade, StudentGrade
+from .grades import RoundGrade, StudentGrade, Grader
+from .organizations import Organization, Mentor
 
 from flask_mongoengine import MongoEngine
 

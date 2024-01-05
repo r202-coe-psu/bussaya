@@ -151,17 +151,19 @@ def export_round_students(class_id, round_grade_id):
 
         for i, advisor in enumerate(project.advisors):
             grade = models.StudentGrade.objects(
-                lecturer=advisor, round_grade=round_grade, student=student
+                grader__lecturer=advisor, round_grade=round_grade, student=student
             ).first()
-            student_data[f"Advisor {i+1} Grade"] = grade.result.upper()
+            if grade:
+                student_data[f"Advisor {i+1} Grade"] = grade.result.upper()
 
         for i, committee in enumerate(
             sorted(project.committees, key=lambda c: c.first_name)
         ):
             grade = models.StudentGrade.objects(
-                lecturer=committee, round_grade=round_grade, student=student
+                grader__lecturer=committee, round_grade=round_grade, student=student
             ).first()
-            student_data[f"Commitee {i+1} Grade"] = grade.result.upper()
+            if grade:
+                student_data[f"Commitee {i+1} Grade"] = grade.result.upper()
 
         student_data[f"{round_type.title()} Average Grade"] = student.get_average_grade(
             round_grade

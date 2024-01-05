@@ -112,7 +112,7 @@ class User(me.Document, UserMixin):
 
     def get_total_lecturer_grades(self, round_grade):
         student_grades = models.StudentGrade.objects(
-            lecturer=self, class_=round_grade.class_, round_grade=round_grade
+            grader__lecturer=self, class_=round_grade.class_, round_grade=round_grade
         )
         return student_grades
 
@@ -192,7 +192,7 @@ class User(me.Document, UserMixin):
                 return "I"
             elif student_grade.result != "-":
                 total_student_grade.append(student_grade)
-                if student_grade.lecturer in student_grade.project.advisors:
+                if student_grade.grader.lecturer in student_grade.project.advisors:
                     has_advisor = True
 
         if not has_advisor:
@@ -222,10 +222,10 @@ class User(me.Document, UserMixin):
         for student_grade in total_student_grade:
             grade_point = student_grade.get_grade_point()
 
-            if student_grade.lecturer in project.committees:
+            if student_grade.grader.lecturer in project.committees:
                 committees_grade_point += grade_point
                 committees_count += 1
-            elif student_grade.lecturer in project.advisors:
+            elif student_grade.grader.lecturer in project.advisors:
                 advisor_grade_point += grade_point
                 advisor_count += 1
 

@@ -1,48 +1,48 @@
 {% macro render_admin_grade_menu_toolbars(round_grade) %}
 <h2 class="ui header">
-    {{'Total' if 'total' in request.path }}
+    {{ 'Total' if 'total' in request.path }}
     {{ 'View' if 'total' not in request.path and 'view' in request.path }}
-    {{'Grading' if 'grading' in request.path}}
+    {{ 'Grading' if 'grading' in request.path}}
     {{ round_grade.get_type_display() }} Grade
 </h2>
 <div class="ui divider"></div>
 
 <div class="">
     {% if round_grade.is_in_time() %}
-    <a class="ui green labeled icon button"
+    <a class="ui green icon button" 
         href="{{ url_for('admin.round_grades.grading', round_grade_id=round_grade.id) }}">
         <i class="edit icon"></i>
         Grading
     </a>
     {% else %}
-    <a class="ui labeled icon button link pop"
+    <a class="ui icon button link pop"
         href="{{ url_for('admin.round_grades.view', class_id=round_grade.class_.id, round_grade_type=round_grade.type) }}"
         data-content="Out of time">
         <i class=" edit icon"></i>
         Grading
     </a>
     {% endif %}
-    <a class="ui primary labeled icon button"
+    <a class="ui primary icon button"
         href="{{ url_for('admin.round_grades.view_total', class_id=round_grade.class_.id, round_grade_type=round_grade.type) }}">
         <i class="portrait icon"></i>
         View Total Grade
     </a>
-    <a class="ui primary labeled icon button"
+    <a class="ui primary icon button"
         href="{{ url_for('admin.round_grades.view_advisor_grade', class_id=round_grade.class_.id, round_grade_type=round_grade.type) }}">
         <i class="portrait icon"></i>
         View Lecturer Grade
     </a>
-    <a class="ui primary labeled icon button"
+    <a class="ui primary icon button"
         href="{{ url_for('exports.export_round_students', class_id=round_grade.class_.id, round_grade_id=round_grade.id) }}">
         <i class="file export icon"></i>
         Export Grade
     </a>
-    <a aria-disabled="true" class="ui orange labeled icon button"
+    <a aria-disabled="true" class="ui orange icon button"
         href="{{ url_for('admin.round_grades.set_time', round_grade_id=round_grade.id) }}">
         <i class="clock icon"></i>
         Set Time Off Grading System
     </a>
-    <a aria-disabled="true" class="ui teal labeled icon button" onclick="showRelease()">
+    <a aria-disabled="true" class="ui teal icon button" onclick="showRelease()">
         <i class="share alternate icon"></i>
         {{'Release' if round_grade.release_status == 'unreleased' else "Unrelease"}}
         {{ round_grade.get_type_display() }} Grade

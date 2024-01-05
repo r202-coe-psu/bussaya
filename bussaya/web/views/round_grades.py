@@ -38,7 +38,7 @@ def view(round_grade_type):
         return redirect(url_for("round_grades.grading", round_grade_id=round_grade.id))
 
     student_grades = models.StudentGrade.objects(
-        class_=class_, lecturer=user, round_grade=round_grade
+        class_=class_, grader__lecturer=user, round_grade=round_grade
     )
 
     student_grades = sorted(
@@ -76,7 +76,7 @@ def grading(round_grade_id):
     admin_round_grades.check_and_create_student_grade_profile(round_grade, user)
 
     student_grades = models.StudentGrade.objects.all().filter(
-        round_grade=round_grade, lecturer=user
+        round_grade=round_grade, grader__lecturer=user
     )
     student_grades = sorted(
         student_grades,
@@ -131,11 +131,12 @@ def submit_grade(round_grade_id):
             student=student,
             class_=class_,
             round_grade=round_grade,
-            lecturer=user,
+            grader__lecturer=user,
             # project=project,
         ).first()
 
         student_grade.result = grading["result"]
+        student_grade.updated_date = datetime.datetime.now()
         student_grade.save()
 
         if (

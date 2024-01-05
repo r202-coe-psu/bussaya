@@ -75,6 +75,11 @@ STUDENT_GRADE_CHOICES = [
 ]
 
 
+class Grader(me.EmbeddedDocument):
+    lecturer = me.ReferenceField("User", dbref=True)
+    mentor = me.ReferenceField("Mentor", dbref=True)
+
+
 class StudentGrade(me.Document):
     meta = {"collection": "student_grades"}
 
@@ -83,8 +88,14 @@ class StudentGrade(me.Document):
     round_grade = me.ReferenceField("RoundGrade", dbref=True, required=True)
 
     class_ = me.ReferenceField("Class", dbref=True, required=True)
-    lecturer = me.ReferenceField("User", dbref=True, required=True)
+    grader = me.EmbeddedDocumentField(Grader)
+
     student = me.ReferenceField("User", dbref=True, required=True)
+
+    created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
+    updated_date = me.DateTimeField(
+        required=True, default=datetime.datetime.now, auto_now=True
+    )
 
     def get_result_choice(self):
         return StudentGrade.result.choices

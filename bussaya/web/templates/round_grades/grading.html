@@ -139,14 +139,14 @@
                             {% for student_grade in student.get_total_student_grades(round_grade) %}
                               <div class="ui relaxed divided list">
                                 <div class="item">
-                                    {% if student_grade.lecturer.get_picture() %}
-                                    <img class="ui avatar image" src="{{ student_grade.lecturer.get_picture() }}">
+                                    {% if student_grade.grader.lecturer.get_picture() %}
+                                    <img class="ui avatar image" src="{{ student_grade.grader.lecturer.get_picture() }}">
                                     {% else %}
                                     <i class="user icon"></i>
                                     {% endif %}
                                     <div class="content">
                                         <a class="header">
-                                            {{ student_grade.lecturer.get_fullname() }}
+                                            {{ student_grade.grader.lecturer.get_fullname() }}
                                             {% if student_grade.lecturer in student.get_project().advisors %}
                                             <i class="red star icon"></i>
                                             {% endif %}

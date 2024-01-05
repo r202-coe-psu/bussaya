@@ -24,11 +24,12 @@ def get_lecturers_project_of_student(student):
 
 
 def create_student_grade(round_grade, student, lecturer):
+    grader = models.Grader(lecturer=lecturer)
     student_grade = models.StudentGrade(
         class_=round_grade.class_,
         round_grade=round_grade,
         student=student,
-        lecturer=lecturer,
+        grader=grader,
     )
     if not student:
         return
@@ -48,7 +49,7 @@ def create_student_grade_profile(round_grade):
             if not models.StudentGrade.objects(
                 class_=class_,
                 student=student,
-                lecturer=lecturer,
+                grader__lecturer=lecturer,
                 round_grade=round_grade,
             ):
                 create_student_grade(round_grade, student, lecturer)
@@ -74,7 +75,7 @@ def get_grading_student(class_, lecturer):
 
 def check_and_create_student_grade_profile(round_grade, lecturer):
     student_grades = models.StudentGrade.objects(
-        lecturer=lecturer, round_grade=round_grade
+        grader__lecturer=lecturer, round_grade=round_grade
     )
 
     for student_grade in student_grades:
@@ -89,7 +90,7 @@ def check_and_create_student_grade_profile(round_grade, lecturer):
         if not models.StudentGrade.objects(
             class_=round_grade.class_,
             student=student,
-            lecturer=lecturer,
+            grader__lecturer=lecturer,
             round_grade=round_grade,
         ).first():
             create_student_grade(round_grade, student, lecturer)
@@ -124,7 +125,7 @@ def view(round_grade_type):
 
     student_grades = models.StudentGrade.objects(
         class_=class_,
-        lecturer=current_user._get_current_object(),
+        grader__lecturer=current_user._get_current_object(),
         round_grade=round_grade,
     )
     student_grades = sorted(
@@ -204,10 +205,10 @@ def view_advisor_grade(round_grade_type):
     total_student_grades = models.StudentGrade.objects(
         class_=class_, round_grade=round_grade
     )
-    lecturers = set([s.lecturer for s in total_student_grades])
-    lecturers = sorted(lecturers, key=lambda l: l.first_name)
+    lecturers = set([s.grader.lecturer for s in total_student_grades])
+    lecturers = sorted(lecturers, key=lambda l: (l.first_name, l.last_name))
 
-    print([lec.first_name for lec in lecturers])
+    # print([lec.first_name for lec in lecturers])
 
     total_student_grades = sorted(
         total_student_grades, key=lambda s: s.student.username
@@ -249,7 +250,7 @@ def grading(round_grade_id):
     user = current_user._get_current_object()
     check_and_create_student_grade_profile(round_grade, user)
     student_grades = models.StudentGrade.objects.all().filter(
-        round_grade=round_grade, lecturer=user
+        round_grade=round_grade, grader__lecturer=user
     )
     student_grades = sorted(student_grades, key=lambda s: (s.student.username))
 
@@ -292,10 +293,12 @@ def submit_grade(round_grade_id):
         )
 
     for grading in form.gradings.data:
-        print("grading", grading)
         student = models.User.objects.get(id=grading["student_id"])
         student_grade = models.StudentGrade.objects(
-            student=student, class_=class_, round_grade=round_grade, lecturer=user
+            student=student,
+            class_=class_,
+            round_grade=round_grade,
+            grader__lecturer=user,
         ).first()
 
         student_grade.result = grading["result"]
