@@ -9,5 +9,15 @@ from . import submissions
 from . import round_grades
 from . import groups
 from . import meetings
+from . import organizations
 
-__all__ = [accounts, classes, projects, submissions, round_grades, groups, meetings]
+__all__ = [
+    accounts,
+    classes,
+    projects,
+    submissions,
+    round_grades,
+    groups,
+    meetings,
+    organizations,
+]
