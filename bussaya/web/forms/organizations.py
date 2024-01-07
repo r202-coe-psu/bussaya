@@ -25,7 +25,14 @@ class OrganizationForm(BaseOrganizationForm):
 BaseMentorForm = model_form(
     models.Mentor,
     FlaskForm,
-    exclude=["created_date", "updated_date"],
+    exclude=[
+        "created_date",
+        "updated_date",
+        "status",
+        "adder",
+        "last_updated_by",
+        "organization",
+    ],
     field_args={
         "name": {"label": "Name"},
         "position": {"label": "Position"},

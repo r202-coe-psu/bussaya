@@ -24,6 +24,7 @@
 
 {% if current_user.has_roles('admin') %}
 <a class="item" href="{{ url_for('admin.index') }}"><i class="icon users"></i>Admin</a>
+<a class="item" href="{{ url_for('admin.organizations.index') }}"><i class="icon building"></i>Organization</a>
 <a class="item" href="{{ url_for('admin.users.index') }}"><i class="icon award"></i>Users</a>
 <a class="item" href="{{ url_for('elections.index') }}"><i class="icon vote yea"></i>Manage Election</a>
 {% endif %}

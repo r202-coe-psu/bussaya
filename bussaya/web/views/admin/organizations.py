@@ -38,7 +38,7 @@ def create_or_edit(organization_id):
     organization = None
 
     if organization_id:
-        organization = models.Organization.objects(id=organization)
+        organization = models.Organization.objects.get(id=organization_id)
         form = forms.organizations.OrganizationForm(obj=organization)
 
     if not form.validate_on_submit():
@@ -75,3 +75,46 @@ def view(organization_id):
         return redirect(url_for("admin.organizations.index"))
 
     return render_template("admin/organizations/view.html", organization=organization)
+
+
+@module.route(
+    "/<organization_id>/mentors/add",
+    methods=["GET", "POST"],
+    defaults=dict(mentor_id=None),
+)
+@module.route("/<organization_id>/mentors/<mentor_id>/edit", methods=["GET", "POST"])
+@acl.roles_required("admin")
+def add_or_edit_mentor(organization_id, mentor_id):
+    organization = models.Organization.objects.get(id=organization_id)
+
+    form = forms.organizations.MentorForm()
+    mentor = None
+
+    if mentor_id:
+        mentor = models.Mentor.objects.get(id=mentor_id)
+        form = forms.organizations.MentorForm(obj=mentor)
+
+    if not form.validate_on_submit():
+        print(form.errors)
+        return render_template(
+            "admin/organizations/add-or-edit-mentor.html",
+            form=form,
+            mentor=mentor,
+            organization=organization,
+        )
+
+    if not mentor:
+        mentor = models.Mentor()
+        mentor.created_date = datetime.datetime.now()
+        mentor.status = "active"
+        mentor.adder = current_user._get_current_object()
+        mentor.organization = organization
+
+    form.populate_obj(mentor)
+    mentor.updated_date = datetime.datetime.now()
+    mentor.last_updated_by = current_user._get_current_object()
+    mentor.save()
+
+    return redirect(
+        url_for("admin.organizations.view", organization_id=organization.id)
+    )
