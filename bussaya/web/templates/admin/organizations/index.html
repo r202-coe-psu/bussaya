@@ -1,0 +1,63 @@
+{% extends '/base/default-dashboard.html' %}
+
+{% block dashboard_title %}
+Organizations
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ super() }}
+    {% if request.endpoint == 'admin.organizations.index' %}
+
+      <div class="active section">Organizations</div>
+    {% else %}
+      <a href="{{ url_for('admin.organizations.index') }}" class="section">Organizations</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<h1 class="ui horizontal divider header">
+	<i class="small icon chalkboard end"></i>
+	All Organizations
+</h1>
+
+<div class="">
+	{% if organizations %}
+	<table class="ui celled table unstackable">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Remark</th>
+				<th>Operation</th>
+			</tr>
+		</thead>
+
+		<body>
+			{% for organization in organizations %}
+        <tr>
+          <td>
+            <a href="{{ url_for('admin.organizations.view', organization_id=organization.id) }}">{{ organization.name }}</a>
+          </td>
+          <td>
+            <div>Website: {{ organization.website }}</div>
+            <div>
+              {{ organization.remark }}
+            </div>
+          </td>
+          <td>
+            <a href="{{ url_for('admin.organizations.view', organization_id=organization.id) }}" class="ui icon button circular primary"><i class="eye icon"></i></a>
+            <a href="{{ url_for('admin.organizations.create_or_edit', organization_id=organization.id) }}" class="ui icon button circular primary"><i class="edit icon"></i></a>
+          </td>
+  			</tr>
+			{% endfor %}
+		</body>
+	</table>
+	{% endif %}
+
+	<a class="ui primary icon button" href="{{ url_for('admin.organizations.create_or_edit') }}">
+		Create Organization
+	</a>
+</div>
+
+
+{% endblock %}

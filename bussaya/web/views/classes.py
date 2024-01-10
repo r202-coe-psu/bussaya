@@ -45,6 +45,7 @@ def view_lecturer(class_id):
         advisors=current_user._get_current_object(),
         students__in=students,
         class_=class_,
+        status="active",
     )
     submissions = models.Submission.objects(class_=class_)
     meetings = models.Meeting.objects(class_=class_)
@@ -57,10 +58,14 @@ def view_lecturer(class_id):
     )
 
     advisee_projects = models.Project.objects(
-        advisors=current_user._get_current_object(), students__in=students
+        advisors=current_user._get_current_object(),
+        students__in=students,
+        status="active",
     )
     committee_projects = models.Project.objects(
-        committees=current_user._get_current_object(), students__in=students
+        committees=current_user._get_current_object(),
+        students__in=students,
+        status="active",
     )
 
     current_advisees = []
@@ -99,7 +104,7 @@ def view_student(class_id):
             grade_released = True
 
     project = models.Project.objects(
-        students=current_user._get_current_object(), class_=class_
+        students=current_user._get_current_object(), class_=class_, status="active"
     ).first()
     return render_template(
         "/classes/view-student.html",
@@ -136,7 +141,6 @@ def get_student_group(student_id, class_id):
 @module.route("/<class_id>/students/<user_id>/meeting-reports")
 @acl.roles_required("lecturer", "admin")
 def list_report_by_user(class_id, user_id):
-
     round = request.args.get("round", None)
     class_ = models.Class.objects.get(id=class_id)
 
@@ -163,7 +167,6 @@ def list_report_by_user(class_id, user_id):
 @module.route("/<class_id>/students/approve-meeting-reports")
 @acl.roles_required("lecturer", "admin")
 def approve_meeting_report(class_id):
-
     round = request.args.get("round", None)
     admin_view = request.args.get("admin_view", "false")
     filter = request.args.get("filter", "")

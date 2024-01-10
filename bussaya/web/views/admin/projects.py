@@ -57,7 +57,7 @@ def edit(project_id):
 def delete(project_id):
     project = models.Project.objects.get(id=project_id)
 
-    project.satatus = "delete"
+    project.status = "delete"
     project.save()
 
     return redirect(request.referrer)

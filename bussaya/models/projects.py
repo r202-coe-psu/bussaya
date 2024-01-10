@@ -64,7 +64,7 @@ class Project(me.Document):
     approvals = me.ListField(me.EmbeddedDocumentField(ProjectApproval))
 
     resources = me.ListField(me.EmbeddedDocumentField(ProjectResource))
-
+    status = me.StringField(required=True, default="active")
     public = me.StringField(
         required=True,
         default="abstract, report, video",

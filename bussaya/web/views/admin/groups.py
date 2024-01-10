@@ -28,7 +28,9 @@ def view():
     students = models.User.objects(username__in=class_.student_ids)
     lecturers = models.User.objects(roles="lecturer")
 
-    project_groups = models.Project.objects(students__in=students).aggregate(
+    project_groups = models.Project.objects(
+        students__in=students, status="active"
+    ).aggregate(
         [
             {
                 "$addFields": {
@@ -55,13 +57,14 @@ def view():
         committees = []
 
         if project_group["_id"]:
-
             for committee in project_group["_id"]:
                 committees.extend(lecturers.filter(id=committee.id))
 
             committees.sort(key=lambda c: c.username)
 
-        projects = models.Project.objects(id__in=project_group["project_ids"])
+        projects = models.Project.objects(
+            id__in=project_group["project_ids"], status="active"
+        )
 
         available_committees = None
         for g in groups:
@@ -126,8 +129,8 @@ def set_group_student_ids(class_id):
         group.students = []
 
         print([lec.first_name for lec in group.committees])
-        projects = models.Project.objects.all().filter(
-            advisor__in=group.committees, class_=class_
+        projects = models.Project.objects(
+            advisor__in=group.committees, class_=class_, status="active"
         )
 
         for project in projects:

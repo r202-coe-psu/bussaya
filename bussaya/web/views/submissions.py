@@ -133,7 +133,8 @@ def upload(submission_id):
 
     projects = models.Project.objects(
         me.Q(creator=current_user._get_current_object())
-        | me.Q(students=current_user._get_current_object())
+        | me.Q(students=current_user._get_current_object()),
+        status="active",
     )
 
     form = forms.submissions.ProgressReportForm()
@@ -255,7 +256,6 @@ def force_report(submission_id):
 )
 @login_required
 def download(progress_report_id, filename):
-
     progress_report = models.ProgressReport.objects.get(id=progress_report_id)
 
     if (

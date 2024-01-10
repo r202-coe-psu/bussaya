@@ -42,15 +42,20 @@ def index_lecturer():
     students = models.User.objects(username__in=student_ids)
 
     advisee_projects = models.Project.objects(
-        advisors=current_user._get_current_object(), students__in=students
+        advisors=current_user._get_current_object(),
+        students__in=students,
+        status="active",
     )
     committee_projects = models.Project.objects(
-        committees=current_user._get_current_object(), students__in=students
+        committees=current_user._get_current_object(),
+        students__in=students,
+        status="active",
     )
 
     alumni_projects = models.Project.objects(
         advisors=current_user._get_current_object(),
         class___nin=opened_classes,
+        status="active",
     ).order_by("-id")
 
     advisee_projects = sorted(
@@ -81,7 +86,9 @@ def index_lecturer():
 
 
 def index_student():
-    projects = models.Project.objects(students=current_user._get_current_object())
+    projects = models.Project.objects(
+        students=current_user._get_current_object(), status="active"
+    )
 
     classes = models.Class.objects.all()
     available_class = []
@@ -144,7 +151,7 @@ def index_voting():
             return render_template("/dashboard/index-lecturer.html")
         return index_user()
 
-    projects = models.Project.objects(class_=election.class_)
+    projects = models.Project.objects(class_=election.class_, status="active")
 
     form = forms.votings.VotingForm()
 

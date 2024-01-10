@@ -59,7 +59,8 @@ def get_grading_student(class_, lecturer):
     students = models.User.objects(username__in=class_.student_ids)
     projects = models.Project.objects(
         (me.Q(creator__in=students) | me.Q(students__in=students))
-        & (me.Q(advisors=lecturer) | me.Q(committees=lecturer))
+        & (me.Q(advisors=lecturer) | me.Q(committees=lecturer)),
+        status="active",
     )
     grading_students = []
     for p in projects:
@@ -81,7 +82,8 @@ def check_and_create_student_grade_profile(round_grade, lecturer):
     for student_grade in student_grades:
         projects = models.Project.objects(
             me.Q(students=student_grade.student)
-            & (me.Q(advisors=lecturer) | me.Q(committees=lecturer))
+            & (me.Q(advisors=lecturer) | me.Q(committees=lecturer)),
+            status="active",
         )
         if not projects:
             student_grade.delete()

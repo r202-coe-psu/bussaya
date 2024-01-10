@@ -121,7 +121,8 @@ def submit_grade(round_grade_id):
         student = models.User.objects.get(id=grading["student_id"])
         project = models.Project.objects(
             (me.Q(creator=student) | me.Q(students=student))
-            & (me.Q(advisors=user) | me.Q(committees=user))
+            & (me.Q(advisors=user) | me.Q(committees=user)),
+            status="active",
         ).first()
 
         if not project:

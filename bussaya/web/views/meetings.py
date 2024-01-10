@@ -66,7 +66,8 @@ def view_lecturer(meeting_id):
     students = models.User.objects(username__in=meeting.class_.student_ids)
     projects = models.Project.objects(
         me.Q(advisors=current_user._get_current_object())
-        & (me.Q(creator__in=students) | me.Q(students__in=students))
+        & (me.Q(creator__in=students) | me.Q(students__in=students)),
+        status="active",
     )
     meeting_reports = models.MeetingReport.objects(
         class_=meeting.class_, meeting=meeting, project__in=projects
@@ -198,7 +199,8 @@ def report(meeting_id, meeting_report_id):
     class_ = meeting.class_
     projects = models.Project.objects(
         me.Q(creator=current_user._get_current_object())
-        | me.Q(students=current_user._get_current_object())
+        | me.Q(students=current_user._get_current_object()),
+        status="active",
     ).order_by("name")
 
     form = forms.meetings.MeetingReportForm(obj=meeting_report)
@@ -298,7 +300,8 @@ def late_report(meeting_id, meeting_report_id):
     class_ = meeting.class_
     projects = models.Project.objects(
         me.Q(creator=current_user._get_current_object())
-        | me.Q(students=current_user._get_current_object())
+        | me.Q(students=current_user._get_current_object()),
+        status="active",
     ).order_by("name")
 
     form = forms.meetings.LateMeetingReportForm(obj=meeting_report)
@@ -364,7 +367,7 @@ def force_report(meeting_id, meeting_report_id):
     students = class_.get_students()
 
     projects = models.Project.objects(
-        me.Q(creator__in=students) | me.Q(students__in=students)
+        me.Q(creator__in=students) | me.Q(students__in=students), status="active"
     ).order_by("name")
 
     form = forms.meetings.AdminMeetingReportForm(obj=meeting_report)

@@ -95,7 +95,6 @@ def add_or_edit_mentor(organization_id, mentor_id):
         form = forms.organizations.MentorForm(obj=mentor)
 
     if not form.validate_on_submit():
-        print(form.errors)
         return render_template(
             "admin/organizations/add-or-edit-mentor.html",
             form=form,

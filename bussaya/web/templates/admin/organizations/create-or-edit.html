@@ -1,0 +1,57 @@
+{% extends '/admin/organizations/index.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+{% block dashboard_title %}
+	{% if 'admin.organizations.create' == request.endpoint %}
+		Create
+	{% elif 'admin.organizations.edit' == request.endpoint %}
+		Edit
+	{% elif 'admin.organizations.copy' == request.endpoint %}
+		Copy
+	{% endif %}
+	Organization
+{% endblock %}
+
+{% block breadcrumbs %}
+  {{ super() }}
+
+	<div class="active section">
+    {% if 'edit' == request.path %}
+      Edit
+    {% else %}
+      Create
+    {% endif %}
+    Organization
+  </div>
+{% endblock %}
+
+
+{% block content %}
+  <h2 class="ui header">
+    {% if organization %}
+      Edit Organization
+    {% else %}
+      Create Organization
+    {% endif %}
+  </h2>
+  <div class="ui divider"></div>
+
+  <div class="ui segment">
+    <form method="POST" class="ui form">
+      {{ form.csrf_token }}
+      {{ renderer.render_field(form.name) }}
+      {{ renderer.render_field(form.website) }}
+      {{ renderer.render_field(form.remark) }}
+
+      <button name="create" type="submit" class="ui button primary">
+        {{ 'Create' if 'create' in request.path else 'Edit'}}
+      </button>
+    </form>
+  </div>
+
+{% endblock %}
+
+{% block additional_js %}
+<script type="text/javascript">
+</script>
+{% endblock additional_js %}

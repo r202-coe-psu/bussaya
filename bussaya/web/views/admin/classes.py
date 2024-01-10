@@ -146,7 +146,7 @@ def copy(class_id):
 @acl.roles_required("admin")
 def view(class_id):
     class_ = models.Class.objects.get(id=class_id)
-    projects = models.Project.objects(class_=class_)
+    projects = models.Project.objects(class_=class_, status="active")
     submissions = models.Submission.objects(class_=class_)
     final_submission = models.FinalSubmission.objects(class_=class_).first()
     meetings = models.Meeting.objects(class_=class_).order_by("ended_date")
@@ -217,7 +217,7 @@ def view_projects(class_id):
         "-username"
     )
     projects = models.Project.objects(
-        me.Q(creator__in=students) | me.Q(students__in=students)
+        me.Q(creator__in=students) | me.Q(students__in=students), status="active"
     )
 
     return render_template(
@@ -235,7 +235,7 @@ def get_final_report_project(project):
 @acl.roles_required("admin")
 def view_final_reports(class_id):
     class_ = models.Class.objects.get(id=class_id)
-    projects = models.Project.objects(class_=class_)
+    projects = models.Project.objects(class_=class_, status="active")
 
     return render_template(
         "/admin/final_reports/view.html",

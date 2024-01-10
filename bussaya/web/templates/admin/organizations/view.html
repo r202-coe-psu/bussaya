@@ -1,0 +1,109 @@
+{% extends '/admin/organizations/index.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+{% block breadcrumbs %}
+  {{ super() }}
+  <div class="divider"> / </div>
+  {% if request.endpoint != 'admin.organizations.view' %}
+    <a class="section" href="{{ url_for('admin.organizations.view', organization_id=organization.id) }}">{{ organization.name }}</a>
+  {% else %}
+    <div class="active section">{{ organization.name }}</div>
+  {% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+<h2 class="ui header">
+  {{ organization.name }}
+</h2>
+<div class="ui divider"></div>
+
+<table class="ui single line table">
+	<tbody>
+		<tr>
+			<td>
+				<div style="color: grey">Name</div>{{ organization.name }}
+			</td>
+			<td>
+				<div style="color: grey">Web Site</div> {{ organization.website }}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div style="color: grey">Creator </div>{{ organization.creator.get_fullname() }}
+      </td>
+			<td>
+				<div style="color: grey">Last Updated By </div>{{ organization.last_updated_by.get_fullname() }}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div style="color: grey">Created Date</div> {{ organization.created_date }}
+      </td>
+			<td>
+				<div style="color: grey">Updated Date</div> {{ organization.updated_date }}
+			</td>
+
+    </tr>
+    <tr>
+      <td colspan="2">
+        {{ organization.remark }}
+      </td>
+    </tr>
+	</tbody>
+</table>
+
+
+<div>
+  <h3 class="ui header">Mentor</h3>
+  <div>
+    <a class="ui primary icon button" href="{{ url_for('admin.organizations.add_or_edit_mentor', organization_id=organization.id) }}"><i class="add icon"></i> เพิ่ม</a>
+  </div>
+  <table class="ui single line table">
+    <thead>
+      <tr>
+        <th>ชื่อ</th>
+        <th>ตำแหน่ง</th>
+        <th>ติดต่อ</th>
+        <th>หมายเหตุ</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for mentor in organization.get_mentors() %}
+        <tr>
+          <td>{{ mentor.name }}</td>
+          <td>{{ mentor.position }}</td>
+          <td>
+            <div>โทร: {{ mentor.phone }}</div>
+            <div>email: {{ mentor.email }}</div>
+          </td>
+          <td>{{ mentor.remark }}</td>
+          <td>
+            <a href="{{ url_for('admin.organizations.add_or_edit_mentor', organization_id=organization.id, mentor_id=mentor.id) }}" class="ui primary circular icon button"><i class="edit icon"></i></a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+	function showDelete() {
+		$('.ui.modal.delete.class')
+			.modal('show')
+			;
+	}
+	function showCreateMeeting() {
+		$(".create.meeting").transition('fade down')
+			;
+	}
+
+</script>
+<script type="text/javascript">
+</script>
+{% endblock additional_js %}

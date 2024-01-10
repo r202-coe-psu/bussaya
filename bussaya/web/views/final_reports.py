@@ -45,7 +45,7 @@ def upload(final_submission_id):
     final_submission = models.FinalSubmission.objects.get(id=final_submission_id)
     class_ = final_submission.class_
     projects = models.Project.objects(
-        students=current_user._get_current_object()
+        students=current_user._get_current_object(), status="active"
     ).order_by("-id")
 
     form = forms.submissions.FinalReportForm()

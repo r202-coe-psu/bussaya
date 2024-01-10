@@ -19,13 +19,11 @@ module = Blueprint("submissions", __name__, url_prefix="/submissions")
 )
 @acl.roles_required("admin")
 def change_reported_date(submission_id, progress_report_id):
-
     submission = models.Submission.objects.get(id=submission_id)
     progress_report = models.ProgressReport.objects.get(id=progress_report_id)
     form = forms.submissions.ProgressReportDateForm(obj=progress_report)
 
     if not form.validate_on_submit():
-
         return render_template(
             "/admin/submissions/change_reported_date.html",
             form=form,

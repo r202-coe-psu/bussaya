@@ -1,0 +1,56 @@
+{% extends '/admin/organizations/view.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+{% block dashboard_title %}
+	{% if 'edit' not in request.path %}
+    Create
+  {% else %}
+		Edit
+	{% endif %}
+	Mentor
+{% endblock %}
+
+{% block breadcrumbs %}
+  {{ super() }}
+  <div class="divider"> / </div>
+  {% if 'edit' in request.path %}
+    <div class="active section">Edit Mentor</div>
+  {% else %}
+    <div class="active section">Create Mentor</div>
+  {% endif %}
+{% endblock %}
+
+
+{% block content %}
+  <h2 class="ui header">
+    {% if mentor %}
+      Edit Mentor
+    {% else %}
+      Create Mentor
+    {% endif %}
+  </h2>
+  <div class="ui divider"></div>
+
+  <div class="ui segment">
+    <form method="POST" class="ui form">
+      {{ form.csrf_token }}
+      {{ renderer.render_field(form.name) }}
+      {{ renderer.render_field(form.position) }}
+      <div class="two fields">
+      {{ renderer.render_field(form.phone) }}
+      {{ renderer.render_field(form.email) }}
+      </div>
+      {{ renderer.render_field(form.remark) }}
+
+      <button name="create" type="submit" class="ui button primary">
+        {{ 'Create' if 'create' in request.path else 'Edit'}}
+      </button>
+    </form>
+  </div>
+
+{% endblock %}
+
+{% block additional_js %}
+<script type="text/javascript">
+</script>
+{% endblock additional_js %}
