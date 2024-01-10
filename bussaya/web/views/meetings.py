@@ -375,9 +375,12 @@ def force_report(meeting_id, meeting_report_id):
     form.student.choices = [
         (str(s.id), f"{s.username} - {s.first_name} {s.last_name}") for s in students
     ]
-    form.student.choices.sort()
+    # form.student.queryset = students
+    # form.student.choices.sort()
 
     if not form.validate_on_submit():
+        if request.method == "GET" and meeting_report:
+            form.student.data = str(meeting_report.owner.id)
         return render_template(
             "/admin/meetings/report.html",
             projects=projects,

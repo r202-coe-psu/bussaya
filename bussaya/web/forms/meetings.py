@@ -61,7 +61,7 @@ BaseMeetingReportForm = model_form(
     field_args={
         "project": {
             "label": "Project",
-            "label_modifier": lambda p: f"{p.name} - {''.join([s.username + ' ' + s.get_fullname() for s in p.students])}",
+            "label_modifier": lambda p: f"{p.name} - {''.join([s.username + ' ' + s.get_fullname() + ' ' for s in p.students])}",
         },
         "title": {"label": "Title"},
         "description": {"label": "Desctription"},
