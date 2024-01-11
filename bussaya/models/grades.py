@@ -97,6 +97,14 @@ class StudentGrade(me.Document):
         required=True, default=datetime.datetime.now, auto_now=True
     )
 
+    def get_grader(self):
+        if self.grader.lecturer:
+            return self.grader.lecturer
+        elif self.grader.mentor:
+            return self.grader.mentor
+
+        return None
+
     def get_result_choice(self):
         return StudentGrade.result.choices
 

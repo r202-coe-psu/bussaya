@@ -86,7 +86,7 @@ def create_user_engpsu(user_info):
         last_name=user_info.get("last_name").title(),
         status="active",
     )
-    user.resources[client.engpsu.name] = user_info
+    # user.resources[client.engpsu.name] = user_info
     if user_info["username"].isdigit():
         user.roles.append("student")
     elif (

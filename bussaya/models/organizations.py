@@ -38,3 +38,12 @@ class Mentor(me.Document):
     updated_date = me.DateTimeField(required=True, default=datetime.datetime.now)
 
     meta = {"collection": "mentors"}
+
+    def get_fullname(self):
+        return self.get_full_name()
+
+    def get_full_name(self):
+        return self.name
+
+    def get_picture(self):
+        return None
