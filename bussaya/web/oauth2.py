@@ -160,6 +160,7 @@ def handle_authorized_oauth2(remote, token):
     # print(token)
     user_info = get_user_info(remote, token)
 
+    print("0>", user_info)
     user = None
     if remote.name in ["engpsu", "psu"]:
         user = models.User.objects(me.Q(username=user_info.get("username"))).first()
