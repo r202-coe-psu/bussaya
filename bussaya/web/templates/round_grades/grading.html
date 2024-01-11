@@ -139,19 +139,23 @@
                             {% for student_grade in student.get_total_student_grades(round_grade) %}
                               <div class="ui relaxed divided list">
                                 <div class="item">
-                                    {% if student_grade.grader.lecturer.get_picture() %}
-                                    <img class="ui avatar image" src="{{ student_grade.grader.lecturer.get_picture() }}">
-                                    {% else %}
+                                  {% if student_grade.get_grader() and student_grade.get_grader().get_picture() %}
+                                    <img class="ui avatar image" src="{{ student_grade.get_grader().get_picture() }}">
+                                  {% else %}
                                     <i class="user icon"></i>
-                                    {% endif %}
+                                  {% endif %}
                                     <div class="content">
-                                        <a class="header">
-                                            {{ student_grade.grader.lecturer.get_fullname() }}
-                                            {% if student_grade.lecturer in student.get_project().advisors %}
+                                      <a class="header">
+                                        {% if student_grade.get_grader() %}
+                                          {{ student_grade.get_grader().get_fullname() }}
+                                          {% if student_grade.lecturer in student.get_project().advisors %}
                                             <i class="red star icon"></i>
-                                            {% endif %}
-                                        </a>
-                                        <div class="description">{{ student_grade.get_result_display() }}</div>
+                                          {% endif %}
+                                        {% else %}
+                                            Unknow Grader
+                                        {% endif %}
+                                      </a>
+                                      <div class="description">{{ student_grade.get_result_display() }}</div>
                                     </div>
                                 </div>
                             </div>
