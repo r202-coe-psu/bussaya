@@ -161,6 +161,8 @@ def handle_authorized_oauth2(remote, token):
     user_info = get_user_info(remote, token)
 
     user = None
+    if remote.name in ["engpsu", "psu"]:
+        user = models.User.objects(me.Q(username=user_info.get("username"))).first()
     if "email" in user_info and user_info["email"]:
         user = models.User.objects(me.Q(email=user_info.get("email"))).first()
     elif "sub" in user_info:

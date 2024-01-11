@@ -54,7 +54,7 @@
             {% for student_grade in student_grades %}
 
             {% set student = student_grade.student %}
-            {% if student_grade.lecturer == current_user %}
+            {% if student_grade.get_grader() == current_user %}
             <tr class="top aligned">
                 <td>{{index.value}}</td>
                 {% set index.value = index.value + 1 %}
@@ -99,16 +99,15 @@
                         {% for student_grade in student.get_total_student_grades(round_grade) %}
                         <div class="ui relaxed divided list">
                             <div class="item">
-                                {% if student_grade.lecturer.get_picture() %}
-                                <img class="ui avatar image" src="{{ student_grade.lecturer.get_picture() }}">
+                                {% if student_grade.get_grader() and student_grade.get_grader().get_picture() %}
+                                <img class="ui avatar image" src="{{ student_grade.get_grader().get_picture() }}">
                                 {% else %}
                                 <i class="user icon"></i>
                                 {% endif %}
                                 <div class="content">
                                     <a class="header">
-                                        {{ student_grade.lecturer.first_name }}
-                                        {{ student_grade.lecturer.last_name }}
-                                        {% if student_grade.lecturer == student.get_project().advisor %}
+                                        {{ student_grade.get_grader().get_full_name() }}
+                                        {% if student_grade.get_grader() == student.get_project().advisor %}
                                         <i class="red star icon"></i>
                                         {% endif %}
                                     </a>
