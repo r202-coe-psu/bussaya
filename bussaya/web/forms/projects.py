@@ -20,6 +20,7 @@ BaseProjectForm = model_form(
         "owner",
         "approvals",
         "resources",
+        "status",
         "class_",
     ],
     field_args={
