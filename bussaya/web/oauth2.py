@@ -86,18 +86,18 @@ def create_user_engpsu(user_info):
         last_name=user_info.get("last_name").title(),
         status="active",
     )
-    user.resources[client.engpsu.name] = userinfo
-    if userinfo["username"].isdigit():
+    user.resources[client.engpsu.name] = user_info
+    if user_info["username"].isdigit():
         user.roles.append("student")
     elif (
         "COE_LECTURERS" in current_app.config
-        and userinfo["username"] in current_app.config["COE_LECTURERS"]
+        and user_info["username"] in current_app.config["COE_LECTURERS"]
     ):
         user.roles.append("lecturer")
         user.roles.append("CoE-lecturer")
     elif (
         "COE_STAFFS" in current_app.config
-        and userinfo["username"] in current_app.config["COE_STAFFS"]
+        and user_info["username"] in current_app.config["COE_STAFFS"]
     ):
         user.roles.append("staff")
         user.roles.append("CoE-staff")
@@ -113,7 +113,7 @@ def get_user_info(remote, token):
     if remote.name == "google":
         # resp = remote.get("userinfo")
         # return resp.json()
-        print(token)
+        # print(token)
         return token["userinfo"]
     elif remote.name == "facebook":
         USERINFO_FIELDS = [
