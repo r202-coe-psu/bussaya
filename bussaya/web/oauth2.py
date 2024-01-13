@@ -1,4 +1,4 @@
-from flask import g, config, session, redirect, url_for
+from flask import g, config, session, redirect, url_for, current_app
 from flask_login import current_user, login_user
 from authlib.integrations.flask_client import OAuth
 import requests
@@ -109,12 +109,45 @@ def create_user_engpsu(user_info):
     return user
 
 
+def create_user_psu(user_info, user=None):
+    if not user:
+        user = models.User(
+            username=user_info.get("username"),
+            email=user_info.get("email"),
+            first_name=user_info.get("first_name").title(),
+            last_name=user_info.get("last_name").title(),
+            first_name_th=user_info.get("first_name_th", ""),
+            last_name_th=user_info.get("last_name_th", ""),
+            system_id=user_info.get("psu_id", user_info.get("username")),
+            status="active",
+        )
+    else:
+        user.first_name = user_info.get("first_name", "").title()
+        user.last_name = user_info.get("last_name", "").title()
+        user.first_name_th = user_info.get("first_name_th", "")
+        user.last_name_th = user_info.get("last_name_th", "")
+        user.email = user_info.get("email")
+        user.username = user_info.get("username")
+
+    user.save()
+
+    if user_info["username"].isdigit():
+        if "student" not in user.roles:
+            user.roles.append("student")
+    else:
+        if "staff" not in user.roles:
+            user.roles.append("staff")
+
+    user.save()
+    return user
+
+
 def get_user_info(remote, token):
     if remote.name == "google":
         # resp = remote.get("userinfo")
         # return resp.json()
         # print(token)
-        return token["userinfo"]
+        user_info = token["userinfo"]
     elif remote.name == "facebook":
         USERINFO_FIELDS = [
             "id",
@@ -129,8 +162,7 @@ def get_user_info(remote, token):
         ]
         USERINFO_ENDPOINT = "me?fields=" + ",".join(USERINFO_FIELDS)
         resp = remote.get(USERINFO_ENDPOINT)
-        profile = resp.json()
-        return profile
+        user_info = resp.json()
     elif remote.name == "line":
         id_token = token.get("id_token")
         # print("id_token", id_token)
@@ -145,14 +177,19 @@ def get_user_info(remote, token):
         # )
 
         userinfo = resp.json()
-        return userinfo
     elif remote.name == "engpsu":
         userinfo_response = remote.get("userinfo")
         userinfo = userinfo_response.json()
-        return userinfo
 
     elif remote.name == "psu":
-        return {}
+        AUTHLIB_SSL_VERIFY = current_app.config.get("AUTHLIB_SSL_VERIFY_PSU", False)
+        # token = remote.authorize_access_token(verify=AUTHLIB_SSL_VERIFY)
+        userinfo = token.get("userinfo")
+        if not userinfo:
+            userinfo_response = remote.get("userinfo", verify=AUTHLIB_SSL_VERIFY)
+            userinfo = userinfo_response.json()
+
+    return userinfo
 
 
 def handle_authorized_oauth2(remote, token):
@@ -248,6 +285,7 @@ def init_oauth(app):
     oauth2_client.init_app(app, fetch_token=fetch_token, update_token=update_token)
 
     oauth2_client.register("engpsu")
+    oauth2_client.register("psu")
     oauth2_client.register(
         "google",
         server_metadata_url=app.config.get("GOOGLE_METADATA_SERVER_URL"),

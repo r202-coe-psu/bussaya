@@ -13,6 +13,8 @@ BaseOrganizationForm = model_form(
     exclude=["created_date", "updated_date", "status", "creator", "last_updated_by"],
     field_args={
         "name": {"label": "Name"},
+        "website": {"label": "Web Site"},
+        "address": {"label": "Address"},
         "remark": {"label": "Remark"},
     },
 )

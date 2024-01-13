@@ -41,6 +41,7 @@
       {{ form.csrf_token }}
       {{ renderer.render_field(form.name) }}
       {{ renderer.render_field(form.website) }}
+      {{ renderer.render_field(form.address) }}
       {{ renderer.render_field(form.remark) }}
 
       <button name="create" type="submit" class="ui button primary">

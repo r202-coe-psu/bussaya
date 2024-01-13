@@ -21,34 +21,49 @@
       </div>
     </h2>
     <div>
+
       <div class="ui large vertical buttons" >
-        <div class="row" style="padding: 10px;">
+{% if 'psu' in oauth_clients %}
+    	  <div class="row" style="padding: 10px;">
           <div class="column header" style="text-align: left;">
-            <h3>For PSU Engineering Faculty Member</h3>
+            <h3>{{ "For PSU" }}</h3>
           </div>
         </div>
         <div class="row" style="padding-top: 5px;">
-          <a class="ui labeled icon button primary huge" href="{{ url_for('accounts.login_oauth', name="engpsu") }}">
+          <a class="ui labeled icon button primary huge" href="{{ url_for('accounts.login_oauth', name='psu') }}">
             <i class="user icon"></i>
-            PSU Passport by Eng
+            {{ "PSU Passport" }}
           </a>
         </div>
-        {% if 'GOOGLE' in config.LOGIN_PROVIDER %}
-          
+{% endif %}
+{% if 'engpsu' in oauth_clients %}
         <div class="row" style="padding: 10px;">
           <div class="column header" style="text-align: left;">
-            <h3>For Participant</h3>
+            <h3>{{ "For PSU Engineering Faculty Member" }}</h3>
+          </div>
+        </div>
+        <div class="row" style="padding-top: 5px;">
+          <a class="ui labeled icon button primary huge" href="{{ url_for('accounts.login_oauth', name='engpsu') }}">
+            <i class="user icon"></i>
+            {{ "PSU Passport by Eng" }}
+          </a>
+	      </div>
+{% endif %}
+{% if 'google' in oauth_clients %}
+        <div class="row" style="padding: 10px;">
+          <div class="column header" style="text-align: left;">
+            <h3>{{ "For Participant" }}</h3>
           </div>
         </div>
         <div class="row" style="padding-top: 5px;">
           <a class="ui  labeled icon red button huge" href="{{ url_for('accounts.login_oauth', name='google') }}">
             <i class="google icon"></i>
-            Google
+            {{ "Google" }}
           </a>
         </div>
-          
-        {% endif %}
+{% endif %}
       </div>
+
     </div>
   </div>
 </div>

@@ -5,6 +5,7 @@ import mongoengine as me
 class Organization(me.Document):
     name = me.StringField(required=True, unique=True, max_length=255)
     website = me.StringField(max_length=512)
+    address = me.StringField()
     remark = me.StringField()
 
     status = me.StringField(required=True, default="disactive")
