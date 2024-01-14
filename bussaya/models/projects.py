@@ -61,6 +61,7 @@ class Project(me.Document):
 
     advisors = me.ListField(me.ReferenceField("User", dbref=True), default=[])
     committees = me.ListField(me.ReferenceField("User", dbref=True), default=[])
+    mentors = me.ListField(me.ReferenceField("Mentor", dbref=True), default=[])
     approvals = me.ListField(me.EmbeddedDocumentField(ProjectApproval))
 
     resources = me.ListField(me.EmbeddedDocumentField(ProjectResource))

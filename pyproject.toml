@@ -8,7 +8,6 @@ authors = ["Thanathip Limna <boatkrap@gmail.com>"]
 python = "^3.10"
 Flask = "^2.1.2"
 mongoengine = "^0.24.2"
-flask-mongoengine = {git = "https://github.com/MongoEngine/flask-mongoengine.git"}
 email-validator = "^1.2.1"
 Authlib = "^1.0.1"
 Flask-Login = "^0.6.2"
@@ -20,6 +19,7 @@ Markdown = "^3.4.1"
 Pillow = "^9.2.0"
 pandas = "^1.4.3"
 XlsxWriter = "^3.0.3"
+flask-me = "^1.0.2"
 
 [tool.poetry.dev-dependencies]
 

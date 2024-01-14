@@ -71,6 +71,7 @@ def login_oauth(name):
     redirect_uri = url_for(
         "accounts.authorized_oauth", name=name, _external=True, _scheme=scheme
     )
+
     response = None
     if name == "google":
         response = client.google.authorize_redirect(redirect_uri)
@@ -105,7 +106,7 @@ def authorized_oauth(name):
         token = remote.authorize_access_token()
 
     except Exception as e:
-        print("autorize access error =>", e)
+        print("authorize access error =>", e)
         return redirect(url_for("accounts.login"))
 
     session["oauth_provider"] = name

@@ -195,6 +195,7 @@ def get_user_info(remote, token):
 def handle_authorized_oauth2(remote, token):
     # print(remote.name)
     # print(token)
+
     user_info = get_user_info(remote, token)
 
     user = None
