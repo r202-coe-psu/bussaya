@@ -98,9 +98,9 @@ class StudentGrade(me.Document):
     )
 
     def get_grader(self):
-        if self.grader.lecturer:
+        if self.grader and self.grader.lecturer:
             return self.grader.lecturer
-        elif self.grader.mentor:
+        elif self.grader and self.grader.mentor:
             return self.grader.mentor
 
         return None

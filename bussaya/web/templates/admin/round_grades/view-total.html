@@ -117,7 +117,7 @@
                                 {% endif %}
                                 <div class="content">
                                     <a class="header">
-                                        {{ student_grade.get_grader().get_full_name() }}
+                                        {{ student_grade.get_grader().get_full_name() if student_grade.get_grader() else 'Mentor' }}
                                         {% if student_grade.get_grader() in student.get_project().advisors %}
                                         <i class="red star icon"></i>
                                         {% endif %}

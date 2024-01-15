@@ -49,5 +49,13 @@ class GradingForm(BaseStudentGradeForm):
     student_id = fields.HiddenField()
 
 
+class MentorGradingForm(GradingForm):
+    mentor_id = fields.SelectField()
+
+
 class GroupGradingForm(FlaskForm):
     gradings = fields.FieldList(fields.FormField(GradingForm))
+
+
+class GroupMentorGradingForm(FlaskForm):
+    gradings = fields.FieldList(fields.FormField(MentorGradingForm))

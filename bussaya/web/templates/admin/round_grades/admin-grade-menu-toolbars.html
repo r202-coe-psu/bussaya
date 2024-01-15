@@ -37,6 +37,15 @@
         <i class="file export icon"></i>
         Export Grade
     </a>
+
+    {% if round_grade.class_.type == 'cooperative' %}
+    <a class="ui primary icon button"
+        href="{{ url_for('admin.round_grades.submit_mentor_grade', class_id=round_grade.class_.id, round_grade_id=round_grade.id) }}">
+        <i class="font icon"></i>
+        Mentor Grade
+    </a>
+    {% endif %}
+
     <a aria-disabled="true" class="ui orange icon button"
         href="{{ url_for('admin.round_grades.set_time', round_grade_id=round_grade.id) }}">
         <i class="clock icon"></i>

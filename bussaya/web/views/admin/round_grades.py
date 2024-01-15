@@ -98,6 +98,50 @@ def check_and_create_student_grade_profile(round_grade, lecturer):
             create_student_grade(round_grade, student, lecturer)
 
 
+def check_and_create_mentor_grade_profile(round_grade):
+    student_grades = models.StudentGrade.objects(
+        grader__mentor__ne=None, round_grade=round_grade
+    )
+    class_ = round_grade.class_
+
+    for student_grade in student_grades:
+        projects = models.Project.objects(
+            me.Q(students=student_grade.student),
+            status="active",
+        )
+        if not projects:
+            student_grade.delete()
+
+    students = models.User.objects(username__in=class_.student_ids)
+    projects = models.Project.objects(
+        (me.Q(creator__in=students) | me.Q(students__in=students)),
+        status="active",
+    )
+
+    grading_students = []
+    for p in projects:
+        if p.creator not in grading_students:
+            grading_students.append(p.creator)
+
+        for s in p.students:
+            if s not in grading_students:
+                grading_students.append(s)
+
+    for student in grading_students:
+        if not models.StudentGrade.objects(
+            class_=round_grade.class_,
+            student=student,
+            round_grade=round_grade,
+        ).first():
+            student_grade = models.StudentGrade(
+                class_=round_grade.class_,
+                student=student,
+                round_grade=round_grade,
+                status="active",
+            )
+            student_grade.save()
+
+
 @module.route("/<class_id>")
 @login_required
 def index(class_id):
@@ -205,7 +249,7 @@ def view_advisor_grade(round_grade_type):
 
     round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
     total_student_grades = models.StudentGrade.objects(
-        class_=class_, round_grade=round_grade
+        class_=class_, round_grade=round_grade, grader__lecturer__ne=None
     )
     lecturers = set([s.grader.lecturer for s in total_student_grades])
     lecturers = sorted(lecturers, key=lambda l: (l.first_name, l.last_name))
@@ -280,7 +324,7 @@ def grading(round_grade_id):
     )
 
 
-@module.route("/<round_grade_id>/submit_grade", methods=["GET", "POST"])
+@module.route("/<round_grade_id>/submit-grade", methods=["GET", "POST"])
 @acl.roles_required("admin")
 def submit_grade(round_grade_id):
     round_grade = models.RoundGrade.objects.get(id=round_grade_id)
@@ -292,6 +336,84 @@ def submit_grade(round_grade_id):
     if not form.validate_on_submit():
         return redirect(
             url_for("admin.round_grades.grading", round_grade_id=round_grade_id)
+        )
+
+    for grading in form.gradings.data:
+        student = models.User.objects.get(id=grading["student_id"])
+        student_grade = models.StudentGrade.objects(
+            student=student,
+            class_=class_,
+            round_grade=round_grade,
+            grader__lecturer=user,
+        ).first()
+
+        student_grade.result = grading["result"]
+
+        student_grade.save()
+
+        if grading["result"] != "-":
+            meetings = models.MeetingReport.objects(
+                class_=class_, owner=student_grade.student, status=None
+            )
+            for meeting in meetings:
+                meeting.status = "approved"
+                meeting.approver = current_user._get_current_object()
+                meeting.approver_ip_address = request.headers.get(
+                    "X-Forwarded-For", request.remote_addr
+                )
+                meeting.remark += "\n\n-> approve by admin"
+                meeting.save()
+
+    return redirect(
+        url_for(
+            "admin.round_grades.view",
+            class_id=class_.id,
+            round_grade_type=round_grade.type,
+        )
+    )
+
+
+@module.route("/<round_grade_id>/submit-mentor-grade", methods=["GET", "POST"])
+@acl.roles_required("admin")
+def submit_mentor_grade(round_grade_id):
+    round_grade = models.RoundGrade.objects.get(id=round_grade_id)
+    class_ = round_grade.class_
+    user = current_user._get_current_object()
+    # student_grades = models.StudentGrade.objects(round_grade=round_grade, lecturer=user)
+
+    check_and_create_mentor_grade_profile(round_grade)
+    student_grades = models.StudentGrade.objects.all().filter(
+        round_grade=round_grade, grader__lecturer=None
+    )
+    student_grades = sorted(student_grades, key=lambda s: (s.student.username))
+
+    student_grades = sorted(
+        student_grades,
+        key=lambda s: (s.student.username,),
+    )
+
+    form = forms.round_grades.GroupMentorGradingForm()
+
+    mentor_choices = [("xxx", "xxx")]
+    for s in student_grades:
+        form.gradings.append_entry(
+            {
+                "student_id": str(s.student.id),
+                "result": s.result,
+                "mentor_id": str(s.grader.mentor.id)
+                if s.grader and s.grader.mentor
+                else "",
+            }
+        )
+        form.gradings[-1].mentor_id.choices = mentor_choices
+
+    if not form.validate_on_submit():
+        return render_template(
+            "/admin/round_grades/submit-mentor-grade.html",
+            class_=class_,
+            round_grade=round_grade,
+            form=form,
+            student_grades=student_grades,
         )
 
     for grading in form.gradings.data:
