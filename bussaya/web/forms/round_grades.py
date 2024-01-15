@@ -1,4 +1,4 @@
-from wtforms import fields, widgets, Form
+from wtforms import fields, widgets, Form, validators
 
 from .projects import BaseProjectForm
 
@@ -50,7 +50,7 @@ class GradingForm(BaseStudentGradeForm):
 
 
 class MentorGradingForm(GradingForm):
-    mentor_id = fields.SelectField()
+    mentor_id = fields.SelectField("Mentor", validators=[validators.Optional()])
 
 
 class GroupGradingForm(FlaskForm):

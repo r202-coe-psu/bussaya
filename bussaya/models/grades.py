@@ -88,7 +88,7 @@ class StudentGrade(me.Document):
     round_grade = me.ReferenceField("RoundGrade", dbref=True, required=True)
 
     class_ = me.ReferenceField("Class", dbref=True, required=True)
-    grader = me.EmbeddedDocumentField(Grader)
+    grader = me.EmbeddedDocumentField(Grader, default=Grader())
 
     student = me.ReferenceField("User", dbref=True, required=True)
 

@@ -231,6 +231,9 @@ class User(me.Document, UserMixin):
             elif student_grade.grader.lecturer in project.advisors:
                 advisor_grade_point += grade_point
                 advisor_count += 1
+            elif student_grade.grader.mentor:
+                advisor_grade_point += grade_point
+                advisor_count += 1
 
         if advisor_count == 0:
             return "uncompleted"

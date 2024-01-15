@@ -119,7 +119,9 @@
                                     <a class="header">
                                         {{ student_grade.get_grader().get_full_name() if student_grade.get_grader() else 'Mentor' }}
                                         {% if student_grade.get_grader() in student.get_project().advisors %}
-                                        <i class="red star icon"></i>
+                                          <i class="red star icon"></i>
+                                        {% elif student_grade.grader.mentor %}
+                                          <i class="blue star icon"></i>
                                         {% endif %}
                                     </a>
                                     <div class="description">{{ student_grade.get_result_display() }}</div>

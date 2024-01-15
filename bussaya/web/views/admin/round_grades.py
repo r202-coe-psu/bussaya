@@ -51,6 +51,7 @@ def create_student_grade_profile(round_grade):
                 student=student,
                 grader__lecturer=lecturer,
                 round_grade=round_grade,
+                project=student.get_project(),
             ):
                 create_student_grade(round_grade, student, lecturer)
 
@@ -128,16 +129,21 @@ def check_and_create_mentor_grade_profile(round_grade):
                 grading_students.append(s)
 
     for student in grading_students:
-        if not models.StudentGrade.objects(
-            class_=round_grade.class_,
-            student=student,
-            round_grade=round_grade,
-        ).first():
-            student_grade = models.StudentGrade(
+        if (
+            student
+            and not models.StudentGrade.objects(
                 class_=round_grade.class_,
                 student=student,
                 round_grade=round_grade,
-                status="active",
+                project=student.get_project(),
+                grader__lecturer=None,
+            ).first()
+        ):
+            student_grade = models.StudentGrade(
+                class_=round_grade.class_,
+                student=student,
+                project=student.get_project(),
+                round_grade=round_grade,
             )
             student_grade.save()
 
@@ -391,21 +397,27 @@ def submit_mentor_grade(round_grade_id):
         student_grades,
         key=lambda s: (s.student.username,),
     )
-
     form = forms.round_grades.GroupMentorGradingForm()
 
-    mentor_choices = [("xxx", "xxx")]
-    for s in student_grades:
-        form.gradings.append_entry(
-            {
-                "student_id": str(s.student.id),
-                "result": s.result,
-                "mentor_id": str(s.grader.mentor.id)
-                if s.grader and s.grader.mentor
-                else "",
-            }
-        )
-        form.gradings[-1].mentor_id.choices = mentor_choices
+    mentors = models.Mentor.objects(status="active")
+    mentor_choices = [
+        (str(mentor.id), f"{mentor.name} - {mentor.organization.name}")
+        for mentor in mentors
+    ]
+    mentor_choices = [("-", "-")] + mentor_choices
+
+    for i, s in enumerate(student_grades):
+        if request.method == "GET":
+            form.gradings.append_entry(
+                {
+                    "student_id": str(s.student.id),
+                    "result": s.result,
+                    "mentor_id": str(s.grader.mentor.id)
+                    if s.grader and s.grader.mentor
+                    else "",
+                }
+            )
+        form.gradings[i].mentor_id.choices = mentor_choices
 
     if not form.validate_on_submit():
         return render_template(
@@ -418,29 +430,22 @@ def submit_mentor_grade(round_grade_id):
 
     for grading in form.gradings.data:
         student = models.User.objects.get(id=grading["student_id"])
+        mentor = None
+
+        if grading["mentor_id"] != "-":
+            mentor = models.Mentor.objects(id=grading["mentor_id"]).first()
+
         student_grade = models.StudentGrade.objects(
             student=student,
             class_=class_,
             round_grade=round_grade,
-            grader__lecturer=user,
+            grader__lecturer=None,
         ).first()
 
         student_grade.result = grading["result"]
+        student_grade.grader.mentor = mentor
 
         student_grade.save()
-
-        if grading["result"] != "-":
-            meetings = models.MeetingReport.objects(
-                class_=class_, owner=student_grade.student, status=None
-            )
-            for meeting in meetings:
-                meeting.status = "approved"
-                meeting.approver = current_user._get_current_object()
-                meeting.approver_ip_address = request.headers.get(
-                    "X-Forwarded-For", request.remote_addr
-                )
-                meeting.remark += "\n\n-> approve by admin"
-                meeting.save()
 
     return redirect(
         url_for(

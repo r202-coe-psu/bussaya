@@ -61,7 +61,7 @@
                     <td>
                         {% set grading = form.gradings[loop.index - 1] %}
                         <div id="{{ grading.id }}" style="width: auto">
-                            {{ grading.mentor_id(class_="ui fluid dropdown") }}
+                            {{ grading.mentor_id(class_="ui search selection dropdown") }}
                         </div>
 
                     </td>
@@ -112,10 +112,12 @@
                                     <div class="content">
                                       <a class="header">
                                         {% if student_grade.get_grader() %}
-                                          {{ student_grade.get_grader().get_full_name() }}
+                                          {{ student_grade.get_grader().get_full_name() }} 
                                           {% if student_grade.get_grader() in student.get_project().advisors %}
                                             <i class="red star icon"></i>
-                                          {% endif %}
+                                          {% elif student_grade.grader.mentor %}
+                                            <i class="blue star icon"></i>
+                                          {% endif %} 
                                         {% else %}
                                             Unknow Grader
                                         {% endif %}
