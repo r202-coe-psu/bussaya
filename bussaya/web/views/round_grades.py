@@ -82,6 +82,7 @@ def grading(round_grade_id):
         student_grades,
         key=lambda s: (
             sorted([advisor.username for advisor in s.project.advisors]),
+            s.get_project().name,
             s.student.username,
         ),
     )

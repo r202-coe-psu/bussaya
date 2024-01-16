@@ -50,7 +50,7 @@
         {{ pm_renderer.render_project_material(project) }}
       </td>
       {% if current_user.has_roles("admin") %}
-      <td class="right aligned collapsing">
+      <td class="right aligned collapsing single line">
         <a class="ui negative icon button" href="{{ url_for('admin.projects.delete', project_id=project.id) }}">
           <i class="trash icon"></i>
         </a>
