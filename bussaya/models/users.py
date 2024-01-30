@@ -62,7 +62,11 @@ class User(me.Document, UserMixin):
         return url_for("static", filename="images/user.png")
 
     def get_project(self):
-        project = models.Project.objects(students=self).order_by("-id").first()
+        project = (
+            models.Project.objects(students=self, status="active")
+            .order_by("-id")
+            .first()
+        )
         return project
 
     def get_report(self, class_, round):
@@ -97,9 +101,9 @@ class User(me.Document, UserMixin):
         return meeting_reports
 
     def get_advisee_projects(self):
-        projects = models.Project.objects(advisors=self, class___ne=None).order_by(
-            "-id"
-        )
+        projects = models.Project.objects(
+            advisors=self, class___ne=None, status="active"
+        ).order_by("-id")
         return projects
 
     def get_group(self, class_):
