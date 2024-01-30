@@ -47,6 +47,7 @@ BaseProjectForm = model_form(
         "public": {
             "label": "Public",
         },
+        "mentors": {"label": "Mentors, only coop project"},
     },
 )
 

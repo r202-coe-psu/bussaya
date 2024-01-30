@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Blueprint, render_template, redirect, url_for, send_file, request
 from flask_login import login_required, current_user
 
@@ -388,7 +390,7 @@ def submit_mentor_grade(round_grade_id):
     # student_grades = models.StudentGrade.objects(round_grade=round_grade, lecturer=user)
 
     check_and_create_mentor_grade_profile(round_grade)
-    student_grades = models.StudentGrade.objects.all().filter(
+    student_grades = models.StudentGrade.objects.filter(
         round_grade=round_grade, grader__lecturer=None
     )
     student_grades = sorted(student_grades, key=lambda s: (s.student.username))
@@ -435,15 +437,21 @@ def submit_mentor_grade(round_grade_id):
         if grading["mentor_id"] != "-":
             mentor = models.Mentor.objects(id=grading["mentor_id"]).first()
 
+        project = student.get_project()
         student_grade = models.StudentGrade.objects(
             student=student,
             class_=class_,
+            project=project,
             round_grade=round_grade,
             grader__lecturer=None,
         ).first()
 
+        if not student_grade:
+            continue
+
         student_grade.result = grading["result"]
         student_grade.grader.mentor = mentor
+        student_grade.updated_date = datetime.datetime.now()
 
         student_grade.save()
 

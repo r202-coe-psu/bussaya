@@ -48,7 +48,10 @@
             <tr class="top aligned">
                 <td>{{ loop.index }}</td>
                 <td>{{ student.username }}</td>
-                <td>{{ student.first_name }} {{ student.last_name }}</td>
+                <td>
+                  <a href="{{ url_for('admin.projects.edit', project_id=student.get_project().id) }}" class="ui circular primary icon button"><i class="code desktop icon"></i></a>
+                  {{ student.first_name }} {{ student.last_name }}
+                </td>
                 <td>{{ student.get_project().advisors|map(attribute='fullname')|join(', ') }}</td>
                 <td>
                     <a target="_blank"
