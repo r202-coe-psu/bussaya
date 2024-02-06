@@ -257,8 +257,8 @@ class User(me.Document, UserMixin):
         class_ = round_grade.class_
 
         average_grade = self.get_average_grade(round_grade)
-        if average_grade == "I":
-            return average_grade, ["Committee gived I"]
+        if average_grade in ["I", "W"]:
+            return average_grade, [average_grade]
 
         final_point = self.get_grade_to_point(average_grade)
 
