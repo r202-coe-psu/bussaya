@@ -336,8 +336,7 @@ class User(me.Document, UserMixin):
                 actual_grade[0].lower() == "uncompleted"
                 or round_grade.release_status == "unreleased"
             ):
-                average_total_grade = "uncompleted"
-                break
+                return "uncompleted"
 
             if round_grade.type == "midterm":
                 grade_ratio = 0.4
