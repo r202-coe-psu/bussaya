@@ -241,6 +241,7 @@ class User(me.Document, UserMixin):
 
         if advisor_count == 0:
             return "uncompleted"
+
         if committees_count == 0:
             return "uncompleted"
 
@@ -321,11 +322,15 @@ class User(me.Document, UserMixin):
 
         total_grade = 0
         average_total_grade = "-"
+
+        if len(round_grades) != 2:
+            return "uncompleted"
+
         for round_grade in round_grades:
             actual_grade = self.get_actual_grade(round_grade)
 
-            if actual_grade[0].lower() == "i":
-                return "I"
+            if actual_grade[0].lower() in ["i", "w"]:
+                return actual_grade[0]
 
             if (
                 actual_grade[0].lower() == "uncompleted"
