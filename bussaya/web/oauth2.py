@@ -287,7 +287,4 @@ def init_oauth(app):
 
     oauth2_client.register("engpsu")
     oauth2_client.register("psu")
-    oauth2_client.register(
-        "google",
-        server_metadata_url=app.config.get("GOOGLE_METADATA_SERVER_URL"),
-    )
+    oauth2_client.register("google")
