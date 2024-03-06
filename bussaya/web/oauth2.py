@@ -143,11 +143,13 @@ def create_user_psu(user_info, user=None):
 
 
 def get_user_info(remote, token):
+    userinfo = dict()
+
     if remote.name == "google":
         # resp = remote.get("userinfo")
         # return resp.json()
         # print(token)
-        user_info = token["userinfo"]
+        userinfo = token["userinfo"]
     elif remote.name == "facebook":
         USERINFO_FIELDS = [
             "id",
@@ -162,7 +164,7 @@ def get_user_info(remote, token):
         ]
         USERINFO_ENDPOINT = "me?fields=" + ",".join(USERINFO_FIELDS)
         resp = remote.get(USERINFO_ENDPOINT)
-        user_info = resp.json()
+        userinfo = resp.json()
     elif remote.name == "line":
         id_token = token.get("id_token")
         # print("id_token", id_token)
