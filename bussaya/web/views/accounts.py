@@ -123,9 +123,10 @@ def logout():
     client = oauth2.oauth2_client
     remote = None
     logout_url = None
+
     if name == "google":
         remote = client.google
-        logout_url = f"{ remote.server_metadata.get('end_session_endpoint') }?redirect={ request.scheme }://{ request.host }"
+        # logout_url = f"{ remote.server_metadata.get('end_session_endpoint') }?redirect={ request.scheme }://{ request.host }"
     elif name == "facebook":
         remote = client.facebook
     elif name == "line":
