@@ -80,9 +80,11 @@ class User(me.Document, UserMixin):
         return progress_report
 
     def get_presentation(self, class_, round):
+
         submission = models.Submission.objects(
             type="presentation", class_=class_, round=round
         ).first()
+
         progress_report = models.ProgressReport.objects(
             owner=self, submission=submission
         ).first()

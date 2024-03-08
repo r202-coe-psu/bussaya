@@ -56,8 +56,8 @@
                     </a>
                 </td>
                 </a>
-                {% set student_report = student.get_report(class_.id, round_grade.type) %}
-                {% set student_presentation = student.get_presentation(class_.id, round_grade.type) %}
+                {% set student_report = student.get_report(class_, round_grade.type) %}
+                {% set student_presentation = student.get_presentation(class_, round_grade.type) %}
                 <td>
                     {% if student_report %}
                     <a target="_blank"

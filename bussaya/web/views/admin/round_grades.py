@@ -414,9 +414,9 @@ def submit_mentor_grade(round_grade_id):
                 {
                     "student_id": str(s.student.id),
                     "result": s.result,
-                    "mentor_id": str(s.grader.mentor.id)
-                    if s.grader and s.grader.mentor
-                    else "",
+                    "mentor_id": (
+                        str(s.grader.mentor.id) if s.grader and s.grader.mentor else ""
+                    ),
                 }
             )
         form.gradings[i].mentor_id.choices = mentor_choices

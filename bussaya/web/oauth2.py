@@ -118,7 +118,7 @@ def create_user_psu(user_info, user=None):
             last_name=user_info.get("last_name").title(),
             first_name_th=user_info.get("first_name_th", ""),
             last_name_th=user_info.get("last_name_th", ""),
-            system_id=user_info.get("psu_id", user_info.get("username")),
+            # system_id=user_info.get("psu_id", user_info.get("username")),
             status="active",
         )
     else:

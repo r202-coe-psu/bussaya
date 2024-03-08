@@ -252,7 +252,7 @@ def force_report(submission_id):
 
 
 @module.route(
-    "/<progress_report_id>/<filename>",
+    "/items/<progress_report_id>/<filename>",
 )
 @login_required
 def download(progress_report_id, filename):
