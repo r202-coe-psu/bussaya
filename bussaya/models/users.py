@@ -197,8 +197,9 @@ class User(me.Document, UserMixin):
         has_advisor = False
         total_student_grade = []
         for student_grade in student_grades:
-            if student_grade.result == "I":
-                return "I"
+            if student_grade.result in ["I", "W"]:
+                return student_grade.result
+
             elif student_grade.result != "-":
                 total_student_grade.append(student_grade)
                 if student_grade.grader.lecturer in student_grade.project.advisors:

@@ -120,4 +120,4 @@ class StudentGrade(me.Document):
             "D": 1,
             "E": 0.5,
         }
-        return GRADE_POINTS[self.result.upper()]
+        return GRADE_POINTS.get(self.result.upper(), 0)
