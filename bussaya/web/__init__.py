@@ -22,7 +22,6 @@ def create_app():
     caches.init_cache(app)
 
     views.register_blueprint(app)
-    print(app.url_map)
 
     return app
 
