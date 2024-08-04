@@ -22,12 +22,12 @@ def create_app():
     caches.init_cache(app)
 
     views.register_blueprint(app)
+    print(app.url_map)
 
     return app
 
 
 def get_program_options(default_host="127.0.0.1", default_port="8080"):
-
     """
     Takes a flask.Flask instance and runs it.
     Parses command-line flags to configure the app.

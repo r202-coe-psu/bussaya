@@ -16,7 +16,7 @@ module = Blueprint(
 )
 
 
-@module.route("")
+@module.route("/")
 @acl.roles_required("lecturer")
 def index():
     classes = models.Class.objects().order_by("-id")

@@ -109,7 +109,7 @@ def index_user():
     return render_template("/dashboard/index-user.html")
 
 
-@module.route("")
+@module.route("/")
 @login_required
 def index():
     user = current_user
