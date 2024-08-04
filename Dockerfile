@@ -15,7 +15,7 @@ RUN $PYTHON -m pip install wheel poetry uwsgi
 
 WORKDIR /app
 COPY poetry.lock pyproject.toml /app/
-RUN source /venv/bin/activate \
+RUN . /venv/bin/activate \
     && poetry config virtualenvs.create false \
     && poetry install --no-interaction --only main
 
