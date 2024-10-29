@@ -92,7 +92,7 @@ def export_students(class_id):
     writer = pandas.ExcelWriter(output, engine="xlsxwriter")
     df.index += 1
     df.to_excel(writer, sheet_name="Student")
-    writer.save()
+    writer.close()
 
     return Response(
         output.getvalue(),
@@ -137,9 +137,9 @@ def export_round_students(class_id, round_grade_id):
         student_data[f"{round_type.title()} Meeting"] = student.get_meeting_reports(
             class_, round_grade.type
         ).count()
-        student_data[
-            f"{round_type.title()} Meeting Approve"
-        ] = student.get_meeting_reports(class_, round_grade.type, "approved").count()
+        student_data[f"{round_type.title()} Meeting Approve"] = (
+            student.get_meeting_reports(class_, round_grade.type, "approved").count()
+        )
 
         student_data[f"{round_type.title()} Report"] = 0
         if student.get_report(class_, round_grade.type):
@@ -179,7 +179,7 @@ def export_round_students(class_id, round_grade_id):
     writer = pandas.ExcelWriter(output, engine="xlsxwriter")
     df.index += 1
     df.to_excel(writer, sheet_name="Student")
-    writer.save()
+    writer.close()
 
     return Response(
         output.getvalue(),
