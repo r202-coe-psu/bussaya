@@ -31,55 +31,52 @@
 
 {% block content %}
 
-<div class="ui container">
-  <div class="ui breadcrumb">
-      <div class="ui container"> 
-          <div class="ui segment">
-              <h2 class="ui header">Profile
-                
-                <a class="btn-floating btn-large waves-effect waves-light" href="/accounts/edit-profile" title="Edit profile."><i class="edit icon"></i></a>
-                
-              </h2>
-              <div class="ui grid">
+
+
+  <div class="ui segment">
+      <h2 class="ui header">Profile
         
-                <div class="four wide column center aligned">
-                  <div class="ui small image">
-                    <img src="/static/images/user.png">
-                  </div>
+        <a class="btn-floating btn-large waves-effect waves-light" href="/accounts/edit-profile" title="Edit profile."><i class="edit icon"></i></a>
+        
+      </h2>
+      <div class="ui grid">
+
+        <div class="four wide column center aligned">
+          <div class="ui small image">
+            <img src="/static/images/user.png">
+          </div>
+        </div>
+        <div class="twelve wide column">
+          <div>
+              <h3 class="ui header">{{ advisor.title }} {{ advisor.first_name }} {{ advisor.last_name }}</h3>
+              <h3 class="ui header">{{ advisor.title_th }} {{ advisor.first_name_th }} {{ advisor.last_name_th }}</h3>
+              <div class="ui label large">
+                <i class="mail icon"></i>
+                {{ advisor.email }}
+              </div>
+              <div style="margin-top: .5vh;">
+                Role:
+                {% for role in advisor.roles %}
+                <div class="ui label">
+                  {{ role }}
                 </div>
-                <div class="twelve wide column">
-                  <div>
-                      <h3 class="ui header">{{ advisor.title }} {{ advisor.first_name }} {{ advisor.last_name }}</h3>
-                      <h3 class="ui header">{{ advisor.title_th }} {{ advisor.first_name_th }} {{ advisor.last_name_th }}</h3>
-                      <div class="ui label large">
-                        <i class="mail icon"></i>
-                        {{ advisor.email }}
-                      </div>
-                      <div style="margin-top: .5vh;">
-                        Role:
-                        {% for role in advisor.roles %}
-                        <div class="ui label">
-                          {{ role }}
-                        </div>
-                        {% endfor %}
-                      </div>
-                    </div>
-                  <div style="margin-top: 2vh;">
-                    <h4> Biography </h4>
-                    {{ advisor.Biography }}
-                  </div>
-                </div>
+                {% endfor %}
               </div>
             </div>
+          <div style="margin-top: 2vh;">
+            <h4> Biography </h4>
+            {{ advisor.Biography }}
           </div>
+        </div>
+      </div>
+  </div>
+
         
           
           
         
             
         
-        </div>
-</div>
 
 <div class="ui segment">
   <table class="ui celled table">

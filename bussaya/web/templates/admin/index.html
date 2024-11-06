@@ -43,13 +43,13 @@
         {% if not loop.last %}, {% endif %}
         {% endfor -%}
       </td>
-      <td>{{ project.advisor.first_name }} {{ project.advisor.last_name }}</td>
+      <td>{{ project.advisors.first_name }} {{ project.advisors.last_name }}</td>
       <td>{{ project.public.title() }}</td>
       <td class="single line">
         {{ pm_renderer.render_project_material(project) }}
       </td>
       <td class="single line">
-        {% for committee in [project.advisor] + project.committees %}
+        {% for committee in [project.advisors] + project.committees %}
           {{ committee.first_name }}
           {% if project.is_approval(committee) %}
             <i class="large blue check icon"></i>
