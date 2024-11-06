@@ -1,0 +1,119 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/error-handler.html' as eh %}
+{% import '/base/html-renderer.html' as renderer %}
+{% import '/navbar/class-navbar.html' as renderer_navbar %}
+{% import '/admin/round_grades/admin-grade-menu-toolbars.html' as render_toolbars %}
+
+
+{% block breadcrumbs %}
+{% set student = student_grades[0].student %}
+<div class="ui breadcrumb">
+  <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+  <div class="divider"> / </div>
+  <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+  <div class="divider"> / </div>
+  <a href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
+      {{ round_grade.get_type_display() }}
+  </a>
+  <div class="divider"> / </div>
+  <a href="{{ url_for('admin.round_grades.view_total', class_id=class_.id, round_grade_type=round_grade.type) }}">View
+      Total
+      Grade
+  </a>
+  <div class="divider"> / </div>
+  <a href="{{ url_for('admin.round_grades.view_advisor_students', round_grade_type=round_grade.type, class_id=class_.id, advisor_id=advisor.id) }}">View
+    Advisor
+    Students
+  </a>
+  
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="ui container">
+  <div class="ui breadcrumb">
+      <div class="ui container"> 
+          <div class="ui segment">
+              <h2 class="ui header">Profile
+                
+                <a class="btn-floating btn-large waves-effect waves-light" href="/accounts/edit-profile" title="Edit profile."><i class="edit icon"></i></a>
+                
+              </h2>
+              <div class="ui grid">
+        
+                <div class="four wide column center aligned">
+                  <div class="ui small image">
+                    <img src="/static/images/user.png">
+                  </div>
+                </div>
+                <div class="twelve wide column">
+                  <div>
+                      <h3 class="ui header">{{ advisor.title }} {{ advisor.first_name }} {{ advisor.last_name }}</h3>
+                      <h3 class="ui header">{{ advisor.title_th }} {{ advisor.first_name_th }} {{ advisor.last_name_th }}</h3>
+                      <div class="ui label large">
+                        <i class="mail icon"></i>
+                        {{ advisor.email }}
+                      </div>
+                      <div style="margin-top: .5vh;">
+                        Role:
+                        {% for role in advisor.roles %}
+                        <div class="ui label">
+                          {{ role }}
+                        </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  <div style="margin-top: 2vh;">
+                    <h4> Biography </h4>
+                    {{ advisor.Biography }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          
+          
+        
+            
+        
+        </div>
+</div>
+
+<div class="ui segment">
+  <table class="ui celled table">
+    <thead>
+      <tr class="top aligned">
+        <th>  </th>
+        <th> ID </th>
+        <th> Student </th>
+        <th> project name </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for project_info in project_infos  %}
+      <tr class="top aligned">
+        <td>
+          {{ loop.index }}
+        </td>
+        <td>
+          {{ project_info["student"].username }}
+        </td>
+        <td>
+          <a href="{{ url_for('admin.projects.edit', project_id=project_info['student'].get_project().id) }}" class="ui circular primary icon button"><i class="code desktop icon"></i></a>
+          <a target="_blank" href="{{ url_for('accounts.profile', user_id=project_info['student'].id) }}">
+            {{ project_info["student"].first_name }} {{ project_info["student"].last_name }}
+          </a>
+        </td>
+        <td>
+          {{ project_info["project"].name }}<br>{{ project_info["project"].name_th }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+{% endblock %}

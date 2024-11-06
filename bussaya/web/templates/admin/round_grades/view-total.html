@@ -38,7 +38,7 @@
                 <th class="one wide">Meeting Report</th>
                 <th class="one wide">Submissions</th>
                 <th>Average Grade</th>
-                <th>Actual Grade</th>
+                <th>Actustudental Grade</th>
                 <th>Total Grade</th>
             </tr>
         </thead>
@@ -52,7 +52,13 @@
                   <a href="{{ url_for('admin.projects.edit', project_id=student.get_project().id) }}" class="ui circular primary icon button"><i class="code desktop icon"></i></a>
                   {{ student.first_name }} {{ student.last_name }}
                 </td>
-                <td>{{ student.get_project().advisors|map(attribute='fullname')|join(', ') }}</td>
+                <td>
+                    {% for advisor in student.get_project().advisors%}
+                    <a target="_blank" href="{{ url_for('admin.round_grades.view_advisor_students', round_grade_type=round_grade.type, class_id=class_.id, advisor_id=advisor.id) }}">  
+                        {{ advisor.get_fullname() }}
+                    </a>
+                    {% endfor %}
+                </td>
                 <td>
                     <a target="_blank"
                         href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}">

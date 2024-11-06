@@ -1,5 +1,5 @@
 import datetime
-
+import markdown
 from flask import Blueprint, render_template, redirect, url_for, send_file, request
 from flask_login import login_required, current_user
 
@@ -534,3 +534,51 @@ def change_release_status(round_grade_id):
             class_id=round_grade.class_.id,
         )
     )
+
+
+@module.route("/<class_id>/<round_grade_type>/view_advisor_students/<advisor_id>",methods=["GET", "POST"])
+@acl.roles_required("admin")
+def view_advisor_students(round_grade_type,class_id,advisor_id):
+    advisor = models.User.objects.get(id=advisor_id)
+
+    class_ = models.Class.objects.get(id=class_id)
+    student_ids = class_.student_ids
+    round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
+    total_student_grades = models.StudentGrade.objects(
+        class_=class_, round_grade=round_grade
+    )
+
+    total_student_grades = sorted(
+        total_student_grades, key=lambda s: s.student.username
+    )
+
+    student_grades = []
+    if total_student_grades:
+        student_grades = [total_student_grades[0]]
+        for student_grade in total_student_grades:
+            if student_grades[-1].student.username != student_grade.student.username:
+                student_grades.append(student_grade)
+
+    project_infos = []
+
+
+
+    for student_grade in student_grades:
+        student = student_grade.student
+        if  advisor in student.get_project().advisors :
+            project_infos.append({"project":student.get_project(),
+                                        "student":student,
+                                        })
+        
+
+
+    return render_template("admin/round_grades/view-advisor-students.html",
+        advisor=advisor,
+        round_grade_type=round_grade_type,
+        round_grade=round_grade,
+        class_=class_,
+        student_grades=student_grades,
+        project_infos = project_infos,
+        )
+
+
