@@ -37,13 +37,13 @@
       <h2 class="ui header">Profile
         
         <a class="btn-floating btn-large waves-effect waves-light" href="/accounts/edit-profile" title="Edit profile."><i class="edit icon"></i></a>
-        
       </h2>
       <div class="ui grid">
 
         <div class="four wide column center aligned">
           <div class="ui small image">
-            <img src="/static/images/user.png">
+            <img src="{{ advisor.get_picture() }}">
+            
           </div>
         </div>
         <div class="twelve wide column">
@@ -95,16 +95,20 @@
           {{ loop.index }}
         </td>
         <td>
+          <a target="_blank" href="{{ url_for('accounts.profile', user_id=project_info['student'].id) }}">
           {{ project_info["student"].username }}
+          </a>
         </td>
         <td>
           <a href="{{ url_for('admin.projects.edit', project_id=project_info['student'].get_project().id) }}" class="ui circular primary icon button"><i class="code desktop icon"></i></a>
-          <a target="_blank" href="{{ url_for('accounts.profile', user_id=project_info['student'].id) }}">
+          <a href="{{ url_for('accounts.profile', user_id=project_info['student'].id) }}">
             {{ project_info["student"].first_name }} {{ project_info["student"].last_name }}
           </a>
         </td>
         <td>
-          {{ project_info["project"].name }}<br>{{ project_info["project"].name_th }}
+          <a href="{{ url_for('projects.view', project_id=project_info['project'].id) }}">
+            {{ project_info["project"].name }}<br>{{ project_info["project"].name_th }}
+          </>
         </td>
       </tr>
       {% endfor %}

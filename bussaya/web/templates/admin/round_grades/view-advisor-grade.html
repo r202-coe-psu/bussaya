@@ -42,7 +42,13 @@
             {% for lecturer in lecturers %}
             <tr class="top aligned">
                 <td>{{ loop.index }}</td>
-                <td>{{ lecturer.get_fullname() }}</td>
+
+                <td>
+                    <a target="_blank"
+                        href="{{ url_for('admin.round_grades.view_advisor_students', round_grade_type=round_grade.type, class_id=class_.id, advisor_id=lecturer.id) }}">
+                        {{ lecturer.get_fullname() }}
+                    </a>
+                </td>
                 {% set lecturer_grades = lecturer.get_total_lecturer_grades(round_grade) %}
                 {% set given_grade = count_lecturer_given_grade(lecturer_grades) %}
                 <td class="{{'red' if given_grade - lecturer_grades.count() != 0 else 'green' }}">
@@ -56,7 +62,6 @@
                         </a>
                     </div>
                     <div id="{{ lecturer.id }} content" class="content" style="display: none">
-                        <p />
                         <table class="ui celled table">
                             <thead>
                                 <th>Student ID</th>
@@ -66,8 +71,16 @@
                             <tbody>
                                 {% for grade in lecturer_grades %}
                                 <tr>
-                                    <td>{{ grade.student.username }}</td>
-                                    <td>{{ grade.student.get_fullname() }}</td>
+                                    <td>
+                                        <a target="_blank" href="{{ url_for('accounts.profile', user_id=grade.student.id) }}">
+                                            {{ grade.student.username }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a target="_blank" href="{{ url_for('accounts.profile', user_id=grade.student.id) }}">
+                                            {{ grade.student.get_fullname() }}
+                                        </a>                                 
+                                    </td>   
                                     <td>{{ grade.get_result_display() }}</td>
                                 </tr>
                                 {% endfor %}

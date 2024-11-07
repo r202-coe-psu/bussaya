@@ -73,8 +73,11 @@
 
         <div class="column">
           <div>
-            <h3 class="ui header">{{ user.title }} {{ user.first_name }} {{ user.last_name }}</h3>
-            <h3 class="ui header">{{ user.title_th }} {{ user.first_name_th }} {{ user.last_name_th }}</h3>
+            <a target="_blank" 
+              href="{{ url_for('accounts.profile', user_id=user.id) }}">
+              <h3>{{ user.title }} {{ user.first_name }} {{ user.last_name }}</h3>
+              <h3>{{ user.title_th }} {{ user.first_name_th }} {{ user.last_name_th }}</h3>
+            </a>
             <div class="ui label large">
               <i class="mail icon"></i>
               {{ user.email }} 
