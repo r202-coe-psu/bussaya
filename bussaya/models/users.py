@@ -271,9 +271,6 @@ class User(me.Document, UserMixin):
         presentation = self.get_presentation(class_.id, round_grade.type)
         meeting_reports = self.get_meeting_reports(class_, round_grade.type)
 
-        # if grade incomplete
-        if len(average_grade) != 1:
-            return average_grade, caused
 
         if presentation:
             delta_time = presentation.submission.ended_date - presentation.updated_date
