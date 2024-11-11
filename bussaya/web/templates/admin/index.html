@@ -34,7 +34,11 @@
     {% for project in projects %}
     <tr>
       <td>{{ loop.index }}</td>
-      <td>{{ project.name }}</td>
+      <td>
+        <a target="_blank" href="{{ url_for('projects.view', project_id=project.id) }}">
+          {{ project.name }}
+        </a>
+      </td>
       <td>
         {%- for s in project.students %}
         <a target="_blank" href="{{ url_for('accounts.profile', user_id=s.id) }}">
@@ -43,22 +47,28 @@
         {% if not loop.last %}, {% endif %}
         {% endfor -%}
       </td>
-      <td>{{ project.advisors.first_name }} {{ project.advisors.last_name }}</td>
-      <td>{{ project.public.title() }}</td>
-      <td class="single line">
-        {{ pm_renderer.render_project_material(project) }}
+      <td>
+        {% for advisor in project.advisors %}
+        <a target="_blank" href="{{ url_for('accounts.profile', user_id=advisor.id) }}">
+          {{ advisor.first_name }} {{ advisor.last_name }}
+        </a>
       </td>
-      <td class="single line">
-        {% for committee in [project.advisors] + project.committees %}
-          {{ committee.first_name }}
-          {% if project.is_approval(committee) %}
-            <i class="large blue check icon"></i>
-          {% else %}
-            <i class="large check icon disabled"></i>
-          {% endif %}
-          <br>
+        <td>{{ project.public.title() }}</td>
+        <td class="single line">
+          {{ pm_renderer.render_project_material(project) }}
+        </td>
+        <td class="single line">
+          {% for committee in project.advisors + project.committees %}
+            {{ committee.first_name }}
+            {% if project.is_approval(committee) %}
+              <i class="large blue check icon"></i>
+            {% else %}
+              <i class="large check icon disabled"></i>
+            {% endif %}
+            <br>
+          {% endfor %}
+        </td>
         {% endfor %}
-      </td>
     </tr>
   	{% endfor %}
 

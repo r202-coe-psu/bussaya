@@ -62,7 +62,8 @@
                 </td>
                 <td>
                     {% for advisor in student.get_project().advisors%}
-                    <a target="_blank" href="{{ url_for('admin.round_grades.view_advisor_students', round_grade_type=round_grade.type, class_id=class_.id, advisor_id=advisor.id) }}">  
+                    <a target="_blank" 
+                        href="{{ url_for('admin.round_grades.view_advisor_students', round_grade_type=round_grade.type, class_id=class_.id, advisor_id=advisor.id) }}">  
                         {{ advisor.get_fullname() }}
                     </a>
                     {% endfor %}
