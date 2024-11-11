@@ -310,7 +310,6 @@ class User(me.Document, UserMixin):
                         final_point -= 0.5
                 elif count > 2:
                     final_point = 0
-
                 caused.append(f"Missing {count} Meeting report")
 
         final_grade = self.get_point_to_grade(final_point)
