@@ -266,7 +266,7 @@
 					  	Upload
 					</a>
 
-					{% elif (submission.get_status() == "opened" or submission.get_status() == "lated") submissions[loop.index-2].get_progress_report_by_owner(user) and submission.get_type_display()=="Presentation" %}
+					{% elif (submission.get_status() == "opened" or submission.get_status() == "lated") and submissions[loop.index-2].get_progress_report_by_owner(user) and submission.get_type_display()=="Presentation" %}
 					
 					<a class="ui small fluid icon {{ 'primary' if current_user.get_permission_to_upload(submission) else 'disabled' }} button" href="{{ url_for('submissions.upload', submission_id=submission.id)}}">
 						<i class="upload icon"></i>
