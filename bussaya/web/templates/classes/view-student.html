@@ -260,12 +260,31 @@
 				</td>
 
 				<td>
-					{% if submission.get_status() == "opened" or submission.get_status() == "lated" %}
+					{% if (submission.get_status() == "opened" or submission.get_status() == "lated") and submission.get_type_display()=="Report" %}
 					<a class="ui small fluid icon {{ 'primary' if current_user.get_permission_to_upload(submission) else 'disabled' }} button" href="{{ url_for('submissions.upload', submission_id=submission.id)}}">
 						<i class="upload icon"></i>
 					  	Upload
 					</a>
+
+					
+					{% elif (not progress_report and submission.get_type_display()=="Presentation" and not submissions[loop.index-2].get_progress_report_by_owner(user) ) or (submission.get_status() == "upcoming" or submission.get_status() == "closed") %}
+					<a class="ui small fluid icon {{'disabled'}} button">
+						<i class="upload icon"></i>
+					  	Upload
+					</a>
+
+					{% elif submissions[loop.index-2].get_progress_report_by_owner(user) and submission.get_type_display()=="Presentation" %}
+					
+					<a class="ui small fluid icon {{ 'primary' if current_user.get_permission_to_upload(submission) else 'disabled' }} button" href="{{ url_for('submissions.upload', submission_id=submission.id)}}">
+						<i class="upload icon"></i>
+						Upload
+					</a>
+					
+				
+					
 					{% endif %}
+			
+
 				</td>
 			</tr>
 			{% endfor %}
