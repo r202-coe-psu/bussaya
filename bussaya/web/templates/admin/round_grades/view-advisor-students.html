@@ -95,7 +95,7 @@
           {{ loop.index }}
         </td>
         <td>
-          <a target="_blank" href="{{ url_for('accounts.profile', user_id=project_info['student'].id) }}">
+          <a target="_blank" href="{{ url_for('accounts.profile', project_info=project_info['student'].id) }}">
           {{ project_info["student"].username }}
           </a>
         </td>
@@ -108,7 +108,7 @@
         <td>
           <a href="{{ url_for('projects.view', project_id=project_info['project'].id) }}">
             {{ project_info["project"].name }}<br>{{ project_info["project"].name_th }}
-          </>
+          </a>
         </td>
       </tr>
       {% endfor %}
