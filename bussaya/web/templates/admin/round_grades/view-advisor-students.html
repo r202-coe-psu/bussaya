@@ -95,7 +95,7 @@
           {{ loop.index }}
         </td>
         <td>
-          <a target="_blank" href="{{ url_for('accounts.profile', project_info=project_info['student'].id) }}">
+          <a target="_blank" href="{{ url_for('accounts.profile', user_id=project_info['student'].id) }}">
           {{ project_info["student"].username }}
           </a>
         </td>
