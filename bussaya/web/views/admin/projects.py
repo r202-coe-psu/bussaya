@@ -52,6 +52,15 @@ def edit(project_id):
     return redirect(url_for("dashboard.index"))
 
 
+@module.route("/<project_id>/look", methods=["GET", "POST"])
+@acl.roles_required("admin")
+def view_info_project(project_id):
+    project = models.Project.objects.get(id=project_id)
+
+    return render_template("/projects/view-info-projects.html",
+                            project=project
+                            )
+
 @module.route("/<project_id>/delete")
 @acl.roles_required("admin")
 def delete(project_id):

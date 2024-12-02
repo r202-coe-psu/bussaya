@@ -33,7 +33,8 @@
       {{ renderer.render_multiple_select(form.committees) }}
 
       {{ renderer.render_multiple_select(form.mentors) }}
-      <button name="create" type="submit" class="ui button primary">{{ 'Create' if 'create' in request.path else 'Edit' }}</button>
+      
+      <button name="create" type="submit" class="ui button primary">{{ 'Create' if 'create' in request.path else 'Submit' }}</button>
     </form>
   </div>
 </div>

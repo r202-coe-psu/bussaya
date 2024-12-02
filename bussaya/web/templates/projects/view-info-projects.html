@@ -1,0 +1,98 @@
+{% extends '/projects/index.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+
+
+{% block dashboard_title %}
+  {{ 'Create' if 'create' in request.path else 'Edit' }} Project
+{% endblock %}
+
+{% block breadcrumbs %}
+  {{ super() }}
+  <a href="{{ url_for('projects.create') }}" class="breadcrumb">Create Project</a>
+{% endblock %}
+
+{% block content %}   
+
+<div class="row">
+  
+    <div class="ui segment">
+
+    <h5>English Name</h5>
+    <div class="ui segment">
+        {{ project.name }}
+    </div>
+
+    <h5>Thai Name</h5>
+    <div class="ui segment">
+        
+        {{ project.name_th }}
+    </div>
+
+    <h5>English Abstract</h5>
+    <div class="ui segment">
+        {{ project.abstract }}
+    </div>
+
+    <h5>Thai Abstract</h5>
+    <div class="ui segment">
+        {{ project.abstract_th }}
+    </div>
+
+    <h5>Contributors</h5>
+    <div class="ui segment">
+        {% for student in project.students  %}
+            <button class="ui label">
+                {{ student.username }} 
+                -{{ student.first_name }}
+                {{ student.last_name }}
+            </button>
+        {% endfor %}
+    </div>
+
+      {# 
+        {{ project.class_ }}
+      #}
+
+    <h5>Public</h5>
+    <div class="ui segment">
+        {{ project.public }}
+    </div>
+
+    <h5>Tags: divied by comma (,)</h5>
+        <div class="ui segment">
+            {% for tag in project.tags %}
+                {{ tag }},
+            {% endfor %}
+        </div>
+        
+    <h5>Project Advisor</h5>
+    <div class="ui segment">
+        {% for advisor in project.advisors %}
+            <button class="ui label">
+                {{ advisor.first_name }}
+                {{ advisor.last_name }}
+            </button>
+        {% endfor %}
+    </div>
+
+    <h5>Committees</h5>
+    <div class="ui segment">
+        {% for committee in project.committees %}
+            <button class="ui label">
+                {{ committee.first_name }}
+                {{ committee.last_name }}
+            </button>
+        {% endfor %}
+    </div>
+
+    <h5>Mentors, only coop project</h5>
+    <div class="ui segment">
+        {{ project.mentors }}
+    </div>
+      
+        <a href="{{ url_for('admin.projects.edit', project_id=project.id) }}" class="ui circular primary icon button">Edit</a>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
