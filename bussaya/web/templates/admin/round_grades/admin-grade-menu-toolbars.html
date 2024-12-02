@@ -5,6 +5,9 @@
     {{ 'Grading' if 'grading' in request.path}}
     {{ round_grade.get_type_display() }} Grade
 </h2>
+
+
+
 <div class="ui divider"></div>
 
 <div class="">
@@ -108,6 +111,11 @@
     }
 </script>
 {% endblock additional_js %}
+{% endmacro %}
 
-
+{% macro render_admin_approve_menu_toolbars(round_grade) %}
+<h2 class="ui header">
+    Veiw Approve
+    {{ round_grade.get_type_display() }} Report
+</h2>
 {% endmacro %}

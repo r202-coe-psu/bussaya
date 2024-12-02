@@ -1,0 +1,110 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/error-handler.html' as eh %}
+{% import '/admin/classes/project-renderer.html' as renderer %}
+{% import '/navbar/class-navbar.html' as renderer_navbar %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('classes.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
+        {{ round_grade.get_type_display() }}
+    </a>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+{{ renderer_navbar.render_class_navbar(class_, current_user) }}
+
+<h2 class="ui header">
+    {{ "View" if 'view' in request.path }}
+    {{ "Total" if 'total' in request.path }}
+    {{ round_grade.get_type_display() }} Grade</h2>
+<div class="ui divider"></div>
+
+<div class="ui segment">
+    <div class="ui large info message">
+        <b>Time off date:</b> {{ round_grade.natural_ended_date() }} <br>
+        <b>Remaining Time:</b> {{ round_grade.remain_time()[1]}} <br>
+        <b>Release Status:</b> {{ round_grade.get_release_status_display() }} <br>
+    </div>
+</div>
+
+<div class="ui attached segment">
+    <table class="ui celled structured single line table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Submissions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set index = namespace(value=1) %}
+            {% for student_grade in student_grades %}
+
+            {% set student = student_grade.student %}
+            {% if student_grade.get_grader() == current_user %}
+            <tr class="top aligned">
+                <td>{{index.value}}</td>
+                {% set index.value = index.value + 1 %}
+                <td>{{ student.username }}</td>
+                <td>{{ student.first_name }} {{ student.last_name }}</td>
+                
+
+                {% set student_report = student.get_report(class_, round_grade.type) %}
+                {% set student_presentation = student.get_presentation(class_, round_grade.type) %}
+                <td>
+                    {% if student_report %}
+                    <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
+                        target="_blank">
+                        <i class="large pdf file icon link pop" data-content="Report"></i>
+                    </a>
+                    {% else %}
+                    <i class="grey large pdf file icon disable"></i>
+                    {% endif %}
+                </td>
+
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+{% block additional_js %}
+<script type="text/javascript">
+    function accordion_show_hide(show_hide_id) {
+        $(document.getElementById(show_hide_id + " content")).transition('fade down')
+
+        if (document.getElementById(show_hide_id).textContent == "Hide") {
+            document.getElementById(show_hide_id).innerHTML = "See More"
+        } else {
+            document.getElementById(show_hide_id).innerHTML = "Hide"
+        }
+    }
+    $('.ui.accordion')
+        .accordion()
+        ;
+
+    function showSetTimeOff() {
+        $('.ui.time-off').transition('fade down')
+    }
+</script>
+<script type="text/javascript">
+    $('.icon.link.pop')
+        .popup({
+            delay: {
+                show: 50,
+                hide: 70
+            }
+        });
+</script>
+{% endblock additional_js %}

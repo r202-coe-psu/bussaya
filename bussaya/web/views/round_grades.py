@@ -59,6 +59,51 @@ def view(round_grade_type):
     )
 
 
+######################
+@module.route("/<round_grade_type>/view")
+@acl.roles_required("lecturer")
+def approve_report(round_grade_type):
+    class_id = request.args.get("class_id", None)
+    if not class_id:
+        return redirect(url_for("dashboard.index"))
+
+    class_ = models.Class.objects.get(id=class_id)
+    user = current_user._get_current_object()
+    round_grade = models.RoundGrade.objects(
+        type=round_grade_type, class_=class_
+    ).first()
+
+    if not round_grade:
+        return redirect(url_for("classes.view", class_id=class_.id))
+
+    if round_grade.is_in_time():
+        return redirect(url_for("round_grades.grading", round_grade_id=round_grade.id))
+
+    student_grades = models.StudentGrade.objects(
+        class_=class_, grader__lecturer=user, round_grade=round_grade
+    )
+
+    student_grades = sorted(
+        student_grades,
+        key=lambda s: (
+            [advisor.username for advisor in s.project.advisors],
+            s.student.username,
+        ),
+    )
+
+    return render_template(
+        "/round_grades/approve_report.html",
+        user=user,
+        class_=class_,
+        round_grade=round_grade,
+        round_grade_type=round_grade_type,
+        student_grades=student_grades,
+    )
+
+
+#####################
+
+
 @module.route("/<round_grade_id>/grading", methods=["GET", "POST"])
 @acl.roles_required("lecturer")
 def grading(round_grade_id):

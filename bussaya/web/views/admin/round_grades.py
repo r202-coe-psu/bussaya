@@ -200,6 +200,45 @@ def view(round_grade_type):
     )
 
 
+#########################
+@module.route("/<round_grade_type>/approve_report")
+@acl.roles_required("admin")
+def approve_report(round_grade_type):
+    class_id = request.args.get("class_id", None)
+    if not class_id:
+        return redirect(url_for("dashboard.index"))
+
+    class_ = models.Class.objects.get(id=class_id)
+    user = current_user._get_current_object()
+
+    round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
+    total_student_grades = models.StudentGrade.objects(
+        class_=class_, round_grade=round_grade
+    )
+
+    total_student_grades = sorted(
+        total_student_grades, key=lambda s: s.student.username
+    )
+
+    student_grades = []
+    if total_student_grades:
+        student_grades = [total_student_grades[0]]
+        for student_grade in total_student_grades:
+            if student_grades[-1].student.username != student_grade.student.username:
+                student_grades.append(student_grade)
+    return render_template(
+        "/admin/round_grades/approve_report.html",
+        user=current_user,
+        class_=class_,
+        round_grade=round_grade,
+        round_grade_type=round_grade_type,
+        student_grades=student_grades,
+    )
+
+
+###########################
+
+
 @module.route("/<round_grade_type>/view_total")
 @acl.roles_required("admin")
 def view_total(round_grade_type):
@@ -536,9 +575,12 @@ def change_release_status(round_grade_id):
     )
 
 
-@module.route("/<class_id>/<round_grade_type>/view_advisor_students/<advisor_id>",methods=["GET", "POST"])
+@module.route(
+    "/<class_id>/<round_grade_type>/view_advisor_students/<advisor_id>",
+    methods=["GET", "POST"],
+)
 @acl.roles_required("admin")
-def view_advisor_students(round_grade_type,class_id,advisor_id):
+def view_advisor_students(round_grade_type, class_id, advisor_id):
     advisor = models.User.objects.get(id=advisor_id)
 
     class_ = models.Class.objects.get(id=class_id)
@@ -561,24 +603,22 @@ def view_advisor_students(round_grade_type,class_id,advisor_id):
 
     project_infos = []
 
-
-
     for student_grade in student_grades:
         student = student_grade.student
-        if  advisor in student.get_project().advisors :
-            project_infos.append({"project":student.get_project(),
-                                        "student":student,
-                                        })
-        
+        if advisor in student.get_project().advisors:
+            project_infos.append(
+                {
+                    "project": student.get_project(),
+                    "student": student,
+                }
+            )
 
-
-    return render_template("admin/round_grades/view-advisor-students.html",
+    return render_template(
+        "admin/round_grades/view-advisor-students.html",
         advisor=advisor,
         round_grade_type=round_grade_type,
         round_grade=round_grade,
         class_=class_,
         student_grades=student_grades,
-        project_infos = project_infos,
-        )
-
-
+        project_infos=project_infos,
+    )
