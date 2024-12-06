@@ -1,0 +1,14 @@
+{% extends '/base/default-dashboard.html' %}
+{% import '/base/html-renderer.html' as renderer %}
+{% import '/navbar/class-navbar.html' as renderer_navbar %}
+
+{% block dashboard_title %}
+	{% if 'admin.classes.create' == request.endpoint %}
+		Create
+	{% elif 'admin.classes.edit' == request.endpoint %}
+		Edit
+	{% elif 'admin.classes.copy' == request.endpoint %}
+		Copy
+	{% endif %}
+	Classes
+{% endblock %}

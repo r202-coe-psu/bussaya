@@ -222,3 +222,10 @@ def view(project_id):
         "/projects/view.html",
         project=project,
     )
+
+
+@module.route("/<project_id>/view-project-info", methods=["GET", "POST"])
+def view_info_project(project_id):
+    project = models.Project.objects.get(id=project_id)
+
+    return render_template("/projects/view-info-projects.html", project=project)

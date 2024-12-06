@@ -30,7 +30,7 @@ Dashboard
             {#
             <a class="ui primary button" href="{{ url_for('projects.upload', project_id=project.id) }}">Upload</a>}
             #}
-            <a href="{{ url_for('admin.projects.view_info_project', project_id=project.id) }}" class="ui circular primary icon button"></i>View</a>
+            <a href="{{ url_for('projects.view_info_project', project_id=project.id) }}" class="ui circular primary icon button"></i>View</a>
           </div>
           <i class="laptop large icon avatar"></i>
           <div class="content">
