@@ -52,7 +52,7 @@
                     </a>
                 </td>
                 <td>
-                  <a href="{{ url_for('admin.projects.edit', project_id=student.get_project().id) }}" class="ui circular primary icon button"><i class="code desktop icon"></i> project</a>
+                    <a href="{{ url_for('admin.projects.view_info_project', project_id=student.get_project().id) }}" class="ui circular primary icon button"><i class="code desktop icon"></i> project</a> 
                     <a target="_blank"
                         href="{{ url_for('accounts.profile', user_id=student.id) }}">
                         {{ student.first_name }} {{ student.last_name }}
