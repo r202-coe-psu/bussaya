@@ -25,7 +25,8 @@
 {% block content %}
 {{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
-{{ render_toolbars.render_admin_approve_menu_toolbars(round_grade) }}
+<div class="ui header big">
+    Veiw Approve {{round_grade.type}} Report </div>
 
 <div class="ui attached segment">
     <table class="ui celled table">
@@ -153,3 +154,4 @@
         });
 </script>
 {% endblock additional_js %}
+

@@ -20,11 +20,9 @@
 
 {{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
-<h2 class="ui header">
-    {{ "View" if 'view' in request.path }}
-    {{ "Total" if 'total' in request.path }}
-    {{ round_grade.get_type_display() }} Grade</h2>
-<div class="ui divider"></div>
+
+<div class="ui header big">
+    Veiw Approve {{round_grade.type}} Report </div>
 
 <div class="ui segment">
     <div class="ui large info message">

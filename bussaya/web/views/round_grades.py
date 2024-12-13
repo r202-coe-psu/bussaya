@@ -59,8 +59,7 @@ def view(round_grade_type):
     )
 
 
-######################
-@module.route("/<round_grade_type>/view")
+@module.route("/<round_grade_type>/approve_report")
 @acl.roles_required("lecturer")
 def approve_report(round_grade_type):
     class_id = request.args.get("class_id", None)
@@ -92,16 +91,13 @@ def approve_report(round_grade_type):
     )
 
     return render_template(
-        "/round_grades/approve_report.html",
+        "/round_grades/approve-report.html",
         user=user,
         class_=class_,
         round_grade=round_grade,
         round_grade_type=round_grade_type,
         student_grades=student_grades,
     )
-
-
-#####################
 
 
 @module.route("/<round_grade_id>/grading", methods=["GET", "POST"])

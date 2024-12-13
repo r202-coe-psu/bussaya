@@ -200,7 +200,6 @@ def view(round_grade_type):
     )
 
 
-#########################
 @module.route("/<round_grade_type>/approve_report")
 @acl.roles_required("admin")
 def approve_report(round_grade_type):
@@ -227,16 +226,13 @@ def approve_report(round_grade_type):
             if student_grades[-1].student.username != student_grade.student.username:
                 student_grades.append(student_grade)
     return render_template(
-        "/admin/round_grades/approve_report.html",
+        "/admin/round_grades/approve-report.html",
         user=current_user,
         class_=class_,
         round_grade=round_grade,
         round_grade_type=round_grade_type,
         student_grades=student_grades,
     )
-
-
-###########################
 
 
 @module.route("/<round_grade_type>/view_total")
@@ -267,6 +263,42 @@ def view_total(round_grade_type):
 
     return render_template(
         "/admin/round_grades/view-total.html",
+        user=user,
+        class_=class_,
+        round_grade=round_grade,
+        round_grade_type=round_grade_type,
+        student_grades=student_grades,
+    )
+
+
+@module.route("/<round_grade_type>/view_grade_summary")
+@acl.roles_required("admin")
+def view_grade_summary(round_grade_type):
+    class_id = request.args.get("class_id", None)
+    if not class_id:
+        return redirect(url_for("dashboard.index"))
+
+    class_ = models.Class.objects.get(id=class_id)
+    user = current_user._get_current_object()
+
+    round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
+    total_student_grades = models.StudentGrade.objects(
+        class_=class_, round_grade=round_grade
+    )
+
+    total_student_grades = sorted(
+        total_student_grades, key=lambda s: s.student.username
+    )
+
+    student_grades = []
+    if total_student_grades:
+        student_grades = [total_student_grades[0]]
+        for student_grade in total_student_grades:
+            if student_grades[-1].student.username != student_grade.student.username:
+                student_grades.append(student_grade)
+
+    return render_template(
+        "/admin/round_grades/view-grade-summary.html",
         user=user,
         class_=class_,
         round_grade=round_grade,

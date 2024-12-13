@@ -1,0 +1,122 @@
+{% extends '/admin/classes/index.html' %}
+{% import '/base/error-handler.html' as eh %}
+{% import '/base/html-renderer.html' as renderer %}
+{% import '/navbar/class-navbar.html' as renderer_navbar %}
+{% import '/admin/round_grades/admin-grade-menu-toolbars.html' as render_toolbars %}
+
+{% block breadcrumbs %}
+<div class="ui breadcrumb">
+    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
+        {{ round_grade.get_type_display() }}
+    </a>
+    <div class="divider"> / </div>
+    <a href="{{ url_for('admin.round_grades.view_total', class_id=class_.id, round_grade_type=round_grade.type) }}">View
+        Total
+        Grade</a>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{{ renderer_navbar.render_class_navbar(class_, current_user) }}
+
+{{ render_toolbars.render_admin_grade_menu_toolbars(round_grade) }}
+
+<div class="ui attached segment">
+    <table class="ui celled table">
+        <thead>
+            <tr class="top aligned">
+                <th></th>
+                <th>Grade</th>
+                <th>Total</th>
+                <th>Student ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set grades = class_.count_grade(round_grade) %}
+            {% for grade in grades %}
+            <tr class="top aligned">
+                <td>{{ loop.index }}</td>
+                <td>
+                    {{ grade }}
+                </td>
+                <td>
+                    {{ grades[grade][0] }}
+                </td>
+                <td>
+                    <div class="title">
+                        <a id="toggle-{{ loop.index }}" style="cursor: pointer"
+                           onclick="accordion_show_hide('content-{{ loop.index }}', 'toggle-{{ loop.index }}')">
+                            See More
+                        </a>
+                    </div>
+                    <div class="ui relaxed divided list" id="content-{{ loop.index }}" style="display: none;">
+                        {% for student in grades[grade][1] %}
+                        <div class="content">
+                            <div class="description">                    
+                                <a target="_blank"
+                                href="{{ url_for('accounts.profile', user_id=student.id) }}">
+                                {{ student.username }}
+                                </a></div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+
+{% block additional_js %}
+<script type="text/javascript">
+    function accordion_show_hide(content_id, toggle_id) {
+        const contentElement = document.getElementById(content_id);
+        const toggleElement = document.getElementById(toggle_id);
+
+        if (contentElement.style.display === "none" || contentElement.style.display === "") {
+            contentElement.style.display = "block";
+            toggleElement.textContent = "Hide";
+        } else {
+            contentElement.style.display = "none";
+            toggleElement.textContent = "See More";
+        }
+    }
+
+    // Semantic UI Popup Initialization
+    $('.icon.link.pop').popup({
+        delay: {
+            show: 50,
+            hide: 70
+        }
+    });
+
+    // Semantic UI Calendar Initialization
+    const datetime_formatter = {
+        datetime: function (datetime) {
+            if (!datetime) return '';
+            const day = datetime.getDate();
+            const month = datetime.getMonth() + 1;
+            const year = datetime.getFullYear();
+            const hour = datetime.getHours();
+            const minute = datetime.getMinutes();
+            return `${year}-${("0" + month).slice(-2)}-${("0" + day).slice(-2)} ${("0" + hour).slice(-2)}:${("0" + minute).slice(-2)}`;
+        }
+    };
+    $('#rangestart').calendar({
+        formatter: datetime_formatter,
+        endCalendar: $('#rangeend')
+    });
+    $('#rangeend').calendar({
+        formatter: datetime_formatter,
+        startCalendar: $('#rangestart')
+    });
+</script>
+{% endblock %}

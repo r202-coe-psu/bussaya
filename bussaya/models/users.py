@@ -271,7 +271,6 @@ class User(me.Document, UserMixin):
         presentation = self.get_presentation(class_.id, round_grade.type)
         meeting_reports = self.get_meeting_reports(class_, round_grade.type)
 
-
         if presentation:
             delta_time = presentation.submission.ended_date - presentation.updated_date
             if delta_time.days <= -1:

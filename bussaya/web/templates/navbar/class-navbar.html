@@ -21,9 +21,7 @@
   <div class="item ui floating labeled dropdown">
     <i class="font icon"></i>
     <span class="text">
-      {{'Midterm' if 'midterm' in request.path}}
-      {{'Final' if 'final' in request.path}}
-      {{'Grading' if 'midterm' not in request.path and 'final' not in request.path}}
+      {{'Grading'}}
     </span>
     <div class="menu">
       {% if 'admin' in request.path %}
@@ -77,9 +75,7 @@
   <div class="item ui floating labeled dropdown">
     <i class="check icon"></i>
     <span class="text">
-      {{'Midterm' if 'midterm' in request.path}}
-      {{'Final' if 'final' in request.path}}
-      {{'Aprove Report' if 'midterm' not in request.path and 'final' not in request.path}}
+      {{'Aprove Report'}}
     </span>
     <div class="menu">
       {% if 'admin' in request.path %}

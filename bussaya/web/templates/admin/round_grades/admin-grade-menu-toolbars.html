@@ -31,6 +31,11 @@
         View Total Grade
     </a>
     <a class="ui primary icon button"
+        href="{{ url_for('admin.round_grades.view_grade_summary', class_id=round_grade.class_.id, round_grade_type=round_grade.type) }}">
+        <i class="portrait icon"></i>
+        Veiw Grade Summary
+    </a>
+    <a class="ui primary icon button"
         href="{{ url_for('admin.round_grades.view_advisor_grade', class_id=round_grade.class_.id, round_grade_type=round_grade.type) }}">
         <i class="portrait icon"></i>
         View Lecturer Grade

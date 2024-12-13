@@ -34,5 +34,5 @@ def index():
 @module.route("/lecturers")
 def list_lecturers():
     lecturers = models.User.objects(roles="lecturer")
-    lecturers = sorted(lecturers, key=lambda l: (l.title, l.first_name))
+    lecturers = sorted(lecturers, key=lambda l: (l.title or "", l.first_name or ""))
     return render_template("/site/lecturers.html", lecturers=lecturers)
