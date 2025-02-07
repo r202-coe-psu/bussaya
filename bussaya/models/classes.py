@@ -62,6 +62,7 @@ class Class(me.Document):
 
     def count_grade(self, round_grade):
         student_ids = self.student_ids
+
         grades = {
             "A": [0, []],
             "B+": [0, []],
@@ -74,6 +75,7 @@ class Class(me.Document):
             "I": [0, []],
             "W": [0, []],
         }
+
         for i in student_ids:
             user = users.User.objects.get(username=i)
 
@@ -81,35 +83,10 @@ class Class(me.Document):
                 self=user, round_grade=round_grade
             )
 
-            if grade == "A":
-                grades["A"][0] += 1
-                grades["A"][1].append(user)
-            elif grade == "B+":
-                grades["B+"][0] += 1
-                grades["B+"][1].append(user)
-            elif grade == "B":
-                grades["B"][0] += 1
-                grades["B"][1].append(user)
-            elif grade == "C+":
-                grades["C+"][0] += 1
-                grades["C+"][1].append(user)
-            elif grade == "C":
-                grades["C"][0] += 1
-                grades["C"][1].append(user)
-            elif grade == "D+":
-                grades["D+"][0] += 1
-                grades["D+"][1].append(user)
-            elif grade == "D":
-                grades["D"][0] += 1
-                grades["D"][1].append(user)
-            elif grade == "E":
-                grades["E"][0] += 1
-                grades["E"][1].append(user)
-            elif grade == "I":
-                grades["I"][0] += 1
-                grades["I"][1].append(user)
-            elif grade == "W":
-                grades["W"][0] += 1
-                grades["W"][1].append(user)
+            if grade in grades:
+                grades[grade][0] += 1
+                grades[grade][1].append(user)
+            else:
+                grades[grade] = [1, [user]]
 
         return grades
