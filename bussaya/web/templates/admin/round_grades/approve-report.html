@@ -60,7 +60,7 @@
                     </a>
                 </td>
                 <td>
-                    {% for advisor in student.get_project().advisors%}
+                    {% for advisor in student.get_project().advisors %}
                     <a target="_blank" 
                         href="{{ url_for('admin.round_grades.view_advisor_students', round_grade_type=round_grade.type, class_id=class_.id, advisor_id=advisor.id) }}">  
                         {{ advisor.get_fullname() }}
@@ -81,7 +81,28 @@
                     {% endif %}
                 </td>
                 <td>
-                    wait kim code
+                    {% set signature_list = signatures[loop.index0] %}
+                    {% if not student_report %}
+                        <span style="color: red; font-weight: bold;">ไม่มีไฟล์</span>
+                    {% elif not signature_list %}
+                        <span style="color: orange; font-weight: bold;">ไม่มีลายเซ็น</span>
+                    {% else %}
+                        <div class="ui dropdown">
+                            <div class="text">รายชื่อผู้เซ็น</div>
+                            <i class="dropdown icon"></i>
+                            <div class="menu">
+                                {% for signature in signature_list %}
+                                    <div class="item">{{ signature }}</div>
+                                {% endfor %}
+                            </div>
+                            {% for advisor in student.get_project().advisors %}
+                            <a target="_blank" 
+                                href="{{ url_for('admin.round_grades.view_advisor_students', round_grade_type=round_grade.type, class_id=class_.id, advisor_id=advisor.id) }}">  
+                                {{ advisor.get_fullname() }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </td>
                
                 

@@ -2,11 +2,18 @@ import datetime
 import markdown
 from flask import Blueprint, render_template, redirect, url_for, send_file, request
 from flask_login import login_required, current_user
+from PyPDF2 import PdfReader, PdfWriter
+import io
+import tempfile
+import os
+
 
 import mongoengine as me
 
 from bussaya import models
 from bussaya.web import forms, acl
+from bussaya import utils
+
 
 module = Blueprint("round_grades", __name__, url_prefix="/round_grades")
 
@@ -225,6 +232,41 @@ def approve_report(round_grade_type):
         for student_grade in total_student_grades:
             if student_grades[-1].student.username != student_grade.student.username:
                 student_grades.append(student_grade)
+
+    signatures = []
+
+    for student_grade in student_grades:
+        report = student_grade.student.get_report(class_, round_grade.type)
+        if report and report.file:
+            try:
+                # ดึงเนื้อหาของไฟล์จาก GridFS
+                file_content = report.file.read()  # ใช้ read() เพื่อดึงเนื้อหาของไฟล์
+                
+                # ตรวจสอบใบรับรองในไฟล์ PDF
+                signature = utils.verrify_pdf.extract_certificates(file_content, 'bussaya/certificate/certificate_key.pem')
+                signatures.append(signature)
+
+            except Exception as e:
+
+                '''   
+                debug code
+
+                print(f"❌ ไม่สามารถอ่านไฟล์ PDF: {e}")   
+                '''
+
+                signatures.append(None)
+        else:
+
+            '''  
+            debug code
+
+            print("❌ ไม่พบไฟล์ในรายงาน")  
+            '''
+            
+            signatures.append(None)
+
+    # print(signatures)
+    # print(user)
     return render_template(
         "/admin/round_grades/approve-report.html",
         user=current_user,
@@ -232,6 +274,7 @@ def approve_report(round_grade_type):
         round_grade=round_grade,
         round_grade_type=round_grade_type,
         student_grades=student_grades,
+        signatures=signatures,
     )
 
 

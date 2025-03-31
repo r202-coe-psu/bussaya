@@ -71,7 +71,7 @@ def approve_report(round_grade_type):
     round_grade = models.RoundGrade.objects(
         type=round_grade_type, class_=class_
     ).first()
-
+  
     if not round_grade:
         return redirect(url_for("classes.view", class_id=class_.id))
 
@@ -82,7 +82,7 @@ def approve_report(round_grade_type):
         class_=class_, grader__lecturer=user, round_grade=round_grade
     )
 
-    student_grades = sorted(
+    c = sorted(
         student_grades,
         key=lambda s: (
             [advisor.username for advisor in s.project.advisors],

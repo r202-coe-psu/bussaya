@@ -2,6 +2,7 @@ from email.policy import default
 import resource
 from telnetlib import STATUS
 import mongoengine as me
+import gridfs
 
 import datetime
 import humanize
@@ -185,6 +186,10 @@ class ProgressReport(me.Document):
 
     def get_uploaded_date(self):
         return self.updated_date.strftime("%d %B %Y, %H:%M:%S")
+    
+    def get_file_content(self):
+        """ดึงเนื้อหาของไฟล์จาก progress_report_fs โดยใช้ file_id"""
+        return self.file.read()
 
 
 class MeetingReport(me.Document):
