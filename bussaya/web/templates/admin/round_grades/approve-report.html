@@ -63,7 +63,7 @@
                     {% for advisor in student.get_project().advisors %}
                     <a target="_blank" 
                         href="{{ url_for('admin.round_grades.view_advisor_students', round_grade_type=round_grade.type, class_id=class_.id, advisor_id=advisor.id) }}">  
-                        {{ advisor.get_fullname() }}
+                        {{ advisor.get_fullname() }},
                     </a>
                     {% endfor %}
                 </td>
@@ -82,25 +82,50 @@
                 </td>
                 <td>
                     {% set signature_list = signatures[loop.index0] %}
+                    {% set advisors = student.get_project().advisors %}
                     {% if not student_report %}
-                        <span style="color: red; font-weight: bold;">ไม่มีไฟล์</span>
+                        <div class="ui circular label grey" style="min-width: 120px; text-align: center;">
+                            No file
+                        </div>
                     {% elif not signature_list %}
-                        <span style="color: orange; font-weight: bold;">ไม่มีลายเซ็น</span>
+                        <div class="ui circular label orange" style="min-width: 120px; text-align: center;">
+                            No signatures
+                        </div>
                     {% else %}
-                        <div class="ui dropdown">
-                            <div class="text">รายชื่อผู้เซ็น</div>
-                            <i class="dropdown icon"></i>
-                            <div class="menu">
-                                {% for signature in signature_list %}
-                                    <div class="item">{{ signature }}</div>
-                                {% endfor %}
+                        {% set signed_count = advisors|selectattr('username', 'in', signature_list)|list|length %}
+                        {% set all_advisors_signed = signed_count == advisors|length %}
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="ui circular label {{ 'green' if all_advisors_signed else 'red' }}" style="min-width: 120px; text-align: center;">
+                                {{ 'Verify Success' if all_advisors_signed else 'Verify Failed' }} ({{ signed_count }}/{{ advisors|length }})
                             </div>
-                            {% for advisor in student.get_project().advisors %}
-                            <a target="_blank" 
-                                href="{{ url_for('admin.round_grades.view_advisor_students', round_grade_type=round_grade.type, class_id=class_.id, advisor_id=advisor.id) }}">  
-                                {{ advisor.get_fullname() }}
-                            </a>
-                            {% endfor %}
+                            <button id="toggle-{{ loop.index0 }}" class="ui icon button tiny" style="padding: 5px;"
+                                onclick="accordion_show_hide('toggle-{{ loop.index0 }}')">
+                                <i class="eye icon"></i>
+                            </button>
+                        </div>
+                        <div id="toggle-{{ loop.index0 }} content" class="content" style="display: none; margin-top: 10px;">
+                            <table class="ui celled table">
+                                <thead>
+                                    <tr>
+                                        <th>Advisor</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for advisor in advisors %}
+                                    <tr>
+                                        <td>{{ advisor.get_fullname() }}</td>
+                                        <td>
+                                            {% if advisor.username in signature_list %}
+                                                <i class="green check circle icon"></i> Signed
+                                            {% else %}
+                                                <i class="red times circle icon"></i> Not Signed
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     {% endif %}
                 </td>
@@ -129,17 +154,11 @@
 </script>
 <script type="text/javascript">
     function accordion_show_hide(show_hide_id) {
-        $(document.getElementById(show_hide_id + " content")).transition('fade down')
-
-        if (document.getElementById(show_hide_id).textContent == "Hide") {
-            document.getElementById(show_hide_id).innerHTML = "See More"
-        } else {
-            document.getElementById(show_hide_id).innerHTML = "Hide"
-        }
+        $(document.getElementById(show_hide_id + " content")).transition('fade down');
     }
 
     function showSetTimeOff() {
-        $('.ui.time-off').transition('fade down')
+        $('.ui.time-off').transition('fade down');
     }
 </script>
 <script type="text/javascript">
