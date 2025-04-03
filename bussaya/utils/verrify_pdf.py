@@ -1,7 +1,5 @@
 import re
 import subprocess
-import tempfile
-import os
 
 
 
@@ -43,123 +41,126 @@ def run_openssl(command, input_data=None, text_output=True):
         return None
 
 
-def extract_certificate_from_signature(signature_binary, output_cert_path):
-    """ดึงใบรับรองจากลายเซ็น (PKCS#7) และบันทึกเป็น PEM"""
-    # กำหนดไดเรกทอรีสำหรับไฟล์ชั่วคราว
-    temp_dir = os.path.join(os.getcwd(), "bussaya/certificate")
-    os.makedirs(temp_dir, exist_ok=True)  # สร้างไดเรกทอรีหากยังไม่มี
+def extract_certificate_from_signature(signature_binary):
+    """ดึงใบรับรองทั้งหมดจากลายเซ็น (PKCS#7) โดยไม่ต้องใช้ไฟล์"""
+    command = ["openssl", "pkcs7", "-inform", "DER", "-print_certs"]
 
-    # สร้างไฟล์ชั่วคราวในไดเรกทอรีที่กำหนด
-    with tempfile.NamedTemporaryFile(delete=False, dir=temp_dir, suffix=".der") as temp_sig_file:
-        temp_sig_file.write(signature_binary)
-        temp_sig_file_path = temp_sig_file.name
+    # ใช้ subprocess เพื่อส่งข้อมูลเข้า OpenSSL ผ่าน stdin และรับผลลัพธ์จาก stdout
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate(input=signature_binary)
 
-    # ใช้ OpenSSL เพื่อดึงใบรับรอง
-    output_cert_path = os.path.join(temp_dir, output_cert_path)
-    command = ["openssl", "pkcs7", "-inform", "DER", "-print_certs", "-out", output_cert_path]
-    result = run_openssl(command, signature_binary, text_output=False)
+    if process.returncode != 0:
+        '''
+        #####debug code
+        print("OpenSSL Error:", stderr.decode())
+        '''
+        return None  # คืนค่า None ถ้าผิดพลาด
 
-    # ลบไฟล์ชั่วคราว
-    os.remove(temp_sig_file_path)
+    # แยกใบรับรองทั้งหมดในผลลัพธ์
+    certs = stdout.decode().split("-----END CERTIFICATE-----")
+    certs = [cert.strip() + "\n-----END CERTIFICATE-----" for cert in certs if "-----BEGIN CERTIFICATE-----" in cert]
+    return certs  # คืนค่าใบรับรองทั้งหมดในรูปแบบลิสต์
 
-    return os.path.exists(output_cert_path)
+def verify_certificate(ca_cert_path, cert_pem):
+    """ตรวจสอบใบรับรองกับ CA ที่กำหนด โดยไม่ต้องใช้ไฟล์ และไม่สนใจวันหมดอายุ"""
 
+    command = ["openssl", "verify", "-CAfile", ca_cert_path, "-no_check_time"]
+    # ใช้ subprocess เพื่อส่งข้อมูลใบรับรองเข้า OpenSSL ผ่าน stdin
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate(input=cert_pem.encode())
 
-def verify_certificate(ca_cert_path, cert_path):
-    """ตรวจสอบใบรับรองกับ CA ที่กำหนด"""
-    command = ["openssl", "verify", "-CAfile", ca_cert_path, cert_path]
-    result = run_openssl(command)
-    return result and "OK" in result
+    if process.returncode != 0:
+        '''
+        #####debug code
+        print("OpenSSL Verify Error:", stderr.decode())
+        '''
+        return False  # คืนค่า False ถ้าการตรวจสอบล้มเหลว
 
+    return "OK" in stdout.decode()  # คืนค่า True ถ้าการตรวจสอบสำเร็จ
 
 def extract_certificates(pdf_file, ca_cert_path):
-    """ดึงลายเซ็นจากไฟล์ PDF, ตรวจสอบ, และดึงชื่อผู้เซ็น"""
+    """ดึงลายเซ็นจากไฟล์ PDF, ตรวจสอบ, และดึงเฉพาะ CN จาก subject และ issuer"""
     try:
         data = pdf_file
         if isinstance(data, str):
             data = data.encode('utf-8')
     except Exception as e:
-        '''   
-            #####debug code
-        print(f"❌ ไม่สามารถอ่านไฟล์ PDF: {e}")
+        '''
+        #####debug code
+        # print(f"❌ ไม่สามารถอ่านไฟล์ PDF: {e}")
         '''
         return []
-    
+
     # ค้นหาลายเซ็นในไฟล์ PDF
     matches = re.findall(rb"/(?:Contents|ByteRange|Signature|Sig|Cert|SignedData|PKCS7)\s*<([0-9A-Fa-f]+)>", data)
     if not matches:
-        '''   
-            #####debug code
-        print("❌ ไม่พบลายเซ็นในไฟล์ PDF")
+        '''
+        #####debug code
+        # print("❌ ไม่พบลายเซ็นในไฟล์ PDF")
         '''
         return []
-    
-    verified_signer_names = []
-    temp_dir = os.path.join(os.getcwd(), "bussaya/certificate")
-    os.makedirs(temp_dir, exist_ok=True)  # สร้างไดเรกทอรีหากยังไม่มี
+
+    verified_signatures = []  # เก็บเฉพาะ CN ทั้งหมด
+    excluded_cns = ['Thai University Consortium Certification Authority', 'Prince of Songkla University Certification Authority']
 
     for i, hex_data in enumerate(matches):
         try:
             signature_binary = bytes.fromhex(hex_data.decode())
-            cert_path = os.path.join(temp_dir, f"cert_{i}.pem")
-            
-            # ดึงใบรับรองจากลายเซ็น
-            if not extract_certificate_from_signature(signature_binary, cert_path):
-                '''   
-                    #####debug code
-                    print(f"⚠️ ไม่สามารถดึงใบรับรองจากลายเซ็นที่ {i+1}")
+
+            # ดึงใบรับรองทั้งหมดจากลายเซ็น
+            certs = extract_certificate_from_signature(signature_binary)
+            if not certs:
                 '''
-                continue
-            '''   
                 #####debug code
-            print(f"🔹 พบลายเซ็นที่ {i+1}:")
-            '''
-            
-            # ตรวจสอบใบรับรองกับ CA
-            if not verify_certificate(ca_cert_path, cert_path):
-                '''   
-                    #####debug code
-                print(f"❌ ลายเซ็นที่ {i+1} ไม่ผ่านการตรวจสอบ")
+                # print(f"⚠️ ไม่สามารถดึงใบรับรองจากลายเซ็นที่ {i+1}")
                 '''
-                os.remove(cert_path)
                 continue
-            
-            #####print(f"✅ ลายเซ็นที่ {i+1} ผ่านการตรวจสอบ") debug code 
-            
-            # ใช้ OpenSSL เพื่อตรวจสอบลายเซ็นและดึงข้อมูล
-            with tempfile.NamedTemporaryFile(delete=False, dir=temp_dir, suffix=".der") as temp_sig_file:
-                temp_sig_file.write(signature_binary)
-                temp_sig_file_path = temp_sig_file.name
-            
-            output_text = run_openssl(["openssl", "pkcs7", "-inform", "DER", "-in", temp_sig_file_path, "-print_certs", "-noout", "-text"])
-            os.remove(temp_sig_file_path)
-            os.remove(cert_path)
-            
-            '''            
-            #####debug code
-            if not output_text:
-                print(f"⚠️ ไม่สามารถดึงข้อมูลลายเซ็นที่ {i+1}")
-                continue
+
+            for j, cert_pem in enumerate(certs):
+                # ตรวจสอบใบรับรองกับ CA
+                is_verified = verify_certificate(ca_cert_path, cert_pem)
+
+                '''      
+                #####debug code          
+                if not is_verified:
+                    print(f"❌ ใบรับรองที่ {j+1} ของลายเซ็นที่ {i+1} ไม่ผ่านการตรวจสอบ")
+
+                print(f"✅ ใบรับรองที่ {j+1} ของลายเซ็นที่ {i+1} {'ผ่านการตรวจสอบ' if is_verified else 'ไม่ผ่านการตรวจสอบ'}")
+                '''
+
+
+                # ดึงเฉพาะ CN จาก subject และ issuer
+                subject_cn_match = re.search(r"CN=([^,\n]+)", cert_pem)
+                issuer_cn_match = re.search(r"Issuer:.*?CN=([^,\n]+)", cert_pem)
+
+                subject_cn = subject_cn_match.group(1).strip() if subject_cn_match else None
+                issuer_cn = issuer_cn_match.group(1).strip() if issuer_cn_match else None
+
+                # เพิ่มเฉพาะ CN ลงในลิสต์ (ยกเว้น CN ที่ไม่ต้องการ)
+                if subject_cn and subject_cn not in excluded_cns and is_verified:
+                    verified_signatures.append(subject_cn)
+                if issuer_cn and issuer_cn not in excluded_cns and is_verified:
+                    verified_signatures.append(issuer_cn)
+
             '''
-            
-            # ดึง CN (Common Name) จากข้อมูลใบรับรอง
-            cn_matches = re.findall(r"CN=([^,\n]+)", output_text)
-            if cn_matches:
-                signer_name = cn_matches[-1].split('/')[0]
-                verified_signer_names.append(signer_name)
-                # print(f"   - เซ็นโดย: {signer_name}")
-            else:
-                pass
-                # print(f"⚠️ ไม่พบ CN ในลายเซ็นที่ {i+1}")
-        
+                # แสดงข้อมูลใบรับรอง
+                print(f"   - ข้อมูลใบรับรองที่ {j+1} ของลายเซ็นที่ {i+1}:")
+                print(f"       Subject CN: {subject_cn}")
+                print(f"       Issuer CN: {issuer_cn}")
+                print(f"       Verified: {'Yes' if is_verified else 'No'}")
+            print(verified_signatures)
+            '''
+
         except Exception as e:
+
             '''
             #####debug code
-            print(f"⚠️ เกิดข้อผิดพลาดในการประมวลผลลายเซ็นที่ {i+1}: {e}")
+            # print(f"⚠️ เกิดข้อผิดพลาดในการประมวลผลลายเซ็นที่ {i+1}: {e}")
             '''
+
             pass
-    
-    return verified_signer_names
+
+    return verified_signatures
 
 '''
     ตัวอย่างการใช้งาน:
