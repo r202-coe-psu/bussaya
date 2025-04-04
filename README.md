@@ -8,4 +8,6 @@
 
 โปรดสร้างโฟลเดอร์ `certificate` ในตำแหน่งดังนี้:
 
+และไฟล์ของใบรับองจะต้องตั้งชื่อว่า certificate_key.pem
+
 bussaya_project/bussaya/bussaya/certificate
