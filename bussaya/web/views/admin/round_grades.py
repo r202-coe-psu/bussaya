@@ -234,6 +234,7 @@ def approve_report(round_grade_type):
                 student_grades.append(student_grade)
 
     signatures = []
+    is_not_expireds = []
 
     for student_grade in student_grades:
         report = student_grade.student.get_report(class_, round_grade.type)
@@ -243,8 +244,9 @@ def approve_report(round_grade_type):
                 file_content = report.file.read()  # ใช้ read() เพื่อดึงเนื้อหาของไฟล์
                 
                 # ตรวจสอบใบรับรองในไฟล์ PDF
-                signature = utils.verrify_pdf.extract_certificates(file_content, 'bussaya/certificate/certificate_key.pem')
+                signature,is_not_expired = utils.verrify_pdf.extract_certificates(file_content, 'bussaya/certificate/certificate_key.pem')
                 signatures.append(signature)
+                is_not_expireds.append(is_not_expired)
 
             except Exception as e:
 
@@ -255,18 +257,17 @@ def approve_report(round_grade_type):
                 '''
 
                 signatures.append(None)
+                is_not_expireds.append(None)
         else:
 
             '''  
-            debug code
-
+            #####debug code
             print("❌ ไม่พบไฟล์ในรายงาน")  
             '''
             
             signatures.append(None)
+            is_not_expireds.append(None)
 
-    # print(signatures)
-    # print(user)
     return render_template(
         "/admin/round_grades/approve-report.html",
         user=current_user,
@@ -275,6 +276,7 @@ def approve_report(round_grade_type):
         round_grade_type=round_grade_type,
         student_grades=student_grades,
         signatures=signatures,
+        is_not_expireds=is_not_expireds,
     )
 
 

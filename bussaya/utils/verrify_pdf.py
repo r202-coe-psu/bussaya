@@ -63,20 +63,47 @@ def extract_certificate_from_signature(signature_binary):
 
 def verify_certificate(ca_cert_path, cert_pem):
     """ตรวจสอบใบรับรองกับ CA ที่กำหนด โดยไม่ต้องใช้ไฟล์ และไม่สนใจวันหมดอายุ"""
-
     command = ["openssl", "verify", "-CAfile", ca_cert_path, "-no_check_time"]
+
     # ใช้ subprocess เพื่อส่งข้อมูลใบรับรองเข้า OpenSSL ผ่าน stdin
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate(input=cert_pem.encode())
 
-    if process.returncode != 0:
+    is_verified = process.returncode == 0  # ตรวจสอบว่าใบรับรองผ่านการตรวจสอบหรือไม่
+
+    # ตรวจสอบวันหมดอายุของใบรับรอง
+    expiration_command = ["openssl", "x509", "-noout", "-checkend", "0"]
+    expiration_process = subprocess.Popen(expiration_command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    _, expiration_stderr = expiration_process.communicate(input=cert_pem.encode())
+
+    is_not_expired = expiration_process.returncode == 0   # True ถ้าใบรับรองยังไม่หมดอายุ, False ถ้าหมดอายุ
+    # print(is_not_expired)
+
+    if not is_verified:
         '''
         #####debug code
         print("OpenSSL Verify Error:", stderr.decode())
         '''
-        return False  # คืนค่า False ถ้าการตรวจสอบล้มเหลว
+        # print(is_not_expired)
+        # is_not_expired = False  # ถ้าใบรับรองไม่ผ่านการตรวจสอบ, สถานะวันหมดอายุจะเป็น False
+        return is_verified,is_not_expired  # คืนค่า False และสถานะวันหมดอายุ
+    
+    '''    
+    #####debug code
+    # ดึงวันหมดอายุของใบรับรอง
+    enddate_command = ["openssl", "x509", "-noout", "-enddate"]
+    enddate_process = subprocess.Popen(enddate_command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    enddate_stdout, enddate_stderr = enddate_process.communicate(input=cert_pem.encode())
 
-    return "OK" in stdout.decode()  # คืนค่า True ถ้าการตรวจสอบสำเร็จ
+    if enddate_process.returncode == 0:
+        expiration_date = enddate_stdout.decode().strip().replace("notAfter=", "")
+        print(f"📅 วันหมดอายุของใบรับรอง: {expiration_date}")
+    else:
+        expiration_date = "Unknown"
+        print(f"⚠️ ไม่สามารถดึงวันหมดอายุของใบรับรองได้: {enddate_stderr.decode().strip()}")
+    '''
+
+    return is_verified, is_not_expired   # คืนค่า True และสถานะวันหมดอายุ
 
 def extract_certificates(pdf_file, ca_cert_path):
     """ดึงลายเซ็นจากไฟล์ PDF, ตรวจสอบ, และดึงเฉพาะ CN จาก subject และ issuer"""
@@ -101,6 +128,7 @@ def extract_certificates(pdf_file, ca_cert_path):
         return []
 
     verified_signatures = []  # เก็บเฉพาะ CN ทั้งหมด
+    is_not_expireds =[]
     excluded_cns = ['Thai University Consortium Certification Authority', 'Prince of Songkla University Certification Authority']
 
     for i, hex_data in enumerate(matches):
@@ -118,7 +146,7 @@ def extract_certificates(pdf_file, ca_cert_path):
 
             for j, cert_pem in enumerate(certs):
                 # ตรวจสอบใบรับรองกับ CA
-                is_verified = verify_certificate(ca_cert_path, cert_pem)
+                is_verified,is_not_expired = verify_certificate(ca_cert_path, cert_pem)
 
                 '''      
                 #####debug code          
@@ -135,22 +163,37 @@ def extract_certificates(pdf_file, ca_cert_path):
 
                 subject_cn = subject_cn_match.group(1).strip() if subject_cn_match else None
                 issuer_cn = issuer_cn_match.group(1).strip() if issuer_cn_match else None
-
+                
+                '''        
+                #####debug code        
+                # is_not_expireds.append(is_not_expired)
                 # เพิ่มเฉพาะ CN ลงในลิสต์ (ยกเว้น CN ที่ไม่ต้องการ)
+                print(f"is_verified: {is_verified}")
+                print(f"is_not_expired: {is_not_expired}")
+                print(" "*10)
+                '''
+
+
                 if subject_cn and subject_cn not in excluded_cns and is_verified:
                     verified_signatures.append(subject_cn)
+                    is_not_expireds.append(is_not_expired)
+                    
                 if issuer_cn and issuer_cn not in excluded_cns and is_verified:
                     verified_signatures.append(issuer_cn)
+                    is_not_expireds.append(is_not_expired)
+                '''
+                #####debug code
 
-            '''
+                print(f"lst verified_signatures = {verified_signatures}")
+                print(f"lst is_not_expireds {is_not_expireds}")
+            
                 # แสดงข้อมูลใบรับรอง
                 print(f"   - ข้อมูลใบรับรองที่ {j+1} ของลายเซ็นที่ {i+1}:")
                 print(f"       Subject CN: {subject_cn}")
                 print(f"       Issuer CN: {issuer_cn}")
                 print(f"       Verified: {'Yes' if is_verified else 'No'}")
-            print(verified_signatures)
+            print(is_not_expireds)
             '''
-
         except Exception as e:
 
             '''
@@ -160,7 +203,13 @@ def extract_certificates(pdf_file, ca_cert_path):
 
             pass
 
-    return verified_signatures
+    '''    
+    #####debug code
+    # แสดงผลลัพธ์
+    print(f"ชื่อผู้เซ็นที่ผ่านการตรวจสอบ: {verified_signatures}")
+    print(f"หมดอายุไม {is_not_expireds}")
+    '''
+    return verified_signatures,is_not_expireds
 
 '''
     ตัวอย่างการใช้งาน:
