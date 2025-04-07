@@ -83,6 +83,7 @@
                 <td>
                     {% set signature_list = signatures[loop.index0] %}
                     {% set advisors = student.get_project().advisors %}
+                    {% set project_owner_username = student.username %} <!-- ดึง username ของเจ้าของโปรเจค -->
                     {% if not student_report %}
                         <div class="ui circular label grey" style="min-width: 120px; text-align: center;">
                             No file
@@ -92,30 +93,42 @@
                             No signatures
                         </div>
                     {% else %}
-                    {% set signed_count = advisors|selectattr('username', 'in', signature_list)|list|length %}
-                    {% set expired_signatures_count = advisors|selectattr('username', 'in', signature_list)
-                        |rejectattr('username', 'in', is_not_expireds[loop.index0])|list|length %}
-                    {% set all_advisors_signed = signed_count == advisors|length %}
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div class="ui circular label {{ 'green' if all_advisors_signed else 'red' }}" style="min-width: 120px; text-align: center;">
-                            {{ 'Verify Success' if all_advisors_signed else 'Verify Failed' }} 
-                            ({{ signed_count }}/{{ advisors|length }})
+                        {% set signed_count = advisors|selectattr('username', 'in', signature_list)|list|length %}
+                        {% set expired_signatures_count = advisors|selectattr('username', 'in', signature_list)
+                            |rejectattr('username', 'in', is_not_expireds[loop.index0])|list|length %}
+                        {% set all_advisors_signed = signed_count == advisors|length %}
+                        {% set owner_signed = project_owner_username in signature_list %} <!-- ตรวจสอบว่ามีลายเซ็นของเจ้าของโปรเจคหรือไม่ -->
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="ui circular label {{ 'green' if all_advisors_signed else 'red' }}" style="min-width: 120px; text-align: center;">
+                                {{ 'Verify Success' if all_advisors_signed else 'Verify Failed' }} 
+                                ({{ signed_count }}/{{ advisors|length }})
+                            </div>
+                            <div class="ui circular label {{ 'green' if not expired_signatures_count else 'red' }}" style="min-width: 120px; text-align: center;">
+                                (Expired: {{ expired_signatures_count }})
+                            </div>
+                            <div class="ui circular label {{ 'green' if owner_signed else 'red' }}" style="min-width: 120px; text-align: center;">
+                                {{ 'Owner Signed' if owner_signed else 'Owner Not Signed' }}
+                            </div>
+                            <button id="toggle-{{ loop.index0 }}" class="ui icon button tiny" style="padding: 5px;"
+                                onclick="accordion_show_hide('toggle-{{ loop.index0 }}')">
+                                <i class="eye icon"></i>
+                            </button>
                         </div>
-                        <div class="ui circular label {{ 'green' if not expired_signatures_count else 'red' }}" style="min-width: 120px; text-align: center;">
-                            (Expired: {{ expired_signatures_count }})
+                        <div style="margin-top: 10px;">
+                            <strong>Signatures Found:</strong>
+                            <ul>
+                                {% for signature in signature_list %}
+                                    <li>{{ signature }}</li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                        <button id="toggle-{{ loop.index0 }}" class="ui icon button tiny" style="padding: 5px;"
-                            onclick="accordion_show_hide('toggle-{{ loop.index0 }}')">
-                            <i class="eye icon"></i>
-                        </button>
-                    </div>
                         <div id="toggle-{{ loop.index0 }} content" class="content" style="display: none; margin-top: 10px;">
                             <table class="ui celled table">
                                 <thead>
                                     <tr>
                                         <th>Advisor</th>
                                         <th>Status</th>
-                                        <th>Expired</th> <!-- เพิ่มคอลัมน์ใหม่ -->
+                                        <th>Expired</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -131,7 +144,7 @@
                                         </td>
                                         <td>
                                             {% if advisor.username not in signature_list %}
-                                                <span style="color: gray;">Not-Signed</span> <!-- สีเทาจางๆ -->
+                                                <span style="color: gray;">Not-Signed</span>
                                             {% elif is_not_expireds[loop.index0] %}
                                                 <i class="green check circle icon"></i> Not-Expired
                                             {% else %}
