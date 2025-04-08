@@ -83,7 +83,7 @@
                 <td>
                     {% set signature_list = signatures[loop.index0] %}
                     {% set advisors = student.get_project().advisors %}
-                    {% set project_owner_username = student.username %} <!-- ดึง username ของเจ้าของโปรเจค -->
+                    {% set project_owner_username = student.username %}
                     {% if not student_report %}
                         <div class="ui circular label grey" style="min-width: 120px; text-align: center;">
                             No file
@@ -97,64 +97,121 @@
                         {% set expired_signatures_count = advisors|selectattr('username', 'in', signature_list)
                             |rejectattr('username', 'in', is_not_expireds[loop.index0])|list|length %}
                         {% set all_advisors_signed = signed_count == advisors|length %}
-                        {% set owner_signed = project_owner_username in signature_list %} <!-- ตรวจสอบว่ามีลายเซ็นของเจ้าของโปรเจคหรือไม่ -->
+                        {% set owner_signed = project_owner_username in signature_list %} 
+                
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <div class="ui circular label {{ 'green' if all_advisors_signed else 'red' }}" style="min-width: 120px; text-align: center;">
                                 {{ 'Verify Success' if all_advisors_signed else 'Verify Failed' }} 
                                 ({{ signed_count }}/{{ advisors|length }})
                             </div>
-                            <div class="ui circular label {{ 'green' if not expired_signatures_count else 'red' }}" style="min-width: 120px; text-align: center;">
-                                (Expired: {{ expired_signatures_count }})
-                            </div>
-                            <div class="ui circular label {{ 'green' if owner_signed else 'red' }}" style="min-width: 120px; text-align: center;">
-                                {{ 'Owner Signed' if owner_signed else 'Owner Not Signed' }}
-                            </div>
                             <button id="toggle-{{ loop.index0 }}" class="ui icon button tiny" style="padding: 5px;"
-                                onclick="accordion_show_hide('toggle-{{ loop.index0 }}')">
+                                onclick="$('#modal-{{ loop.index0 }}').modal('show')">
                                 <i class="eye icon"></i>
                             </button>
                         </div>
-                        <div style="margin-top: 10px;">
-                            <strong>Signatures Found:</strong>
-                            <ul>
-                                {% for signature in signature_list %}
-                                    <li>{{ signature }}</li>
-                                {% endfor %}
-                            </ul>
+                
+                        <div id="modal-{{ loop.index0 }}" class="ui modal">
+                            <div class="header">
+                                <h3 class="ui header">
+                                    <i class="user icon"></i>
+                                    Details for {{ student.username }}
+                                </h3>
+                            </div>
+                            <div class="content">
+                                <!-- Student Information -->
+                                <div class="ui segment">
+                                    <h4 class="ui dividing header">
+                                        <i class="info circle icon"></i>
+                                        Student Information
+                                    </h4>
+                                    <div class="ui list">
+                                        <div class="item">
+                                            <strong>Name:</strong> {{ student.fullname }}
+                                        </div>
+                                        <div class="item">
+                                            <strong>Username:</strong> {{ student.username }}
+                                        </div>
+                                    </div>
+                                </div>
+                        
+                                <!-- Signatures Found -->
+                                <div class="ui segment">
+                                    <h4 class="ui dividing header">
+                                        <i class="file signature icon"></i>
+                                        Signatures Found
+                                    </h4>
+                                    <ul class="ui list">
+                                        {% for signature in signature_list %}
+                                        <li>{{ signature }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                        
+                                <!-- Summary -->
+                                <div class="ui segment">
+                                    <h4 class="ui dividing header">
+                                        <i class="chart bar icon"></i>
+                                        Summary
+                                    </h4>
+                                    <div class="ui labels">
+                                        <div class="ui circular label {{ 'green' if signed_count > 0 else 'red' }}">
+                                            Verified: {{ signed_count }}/{{ advisors|length }}
+                                        </div>
+                                        <div class="ui circular label {{ 'green' if not expired_signatures_count else 'red' }}">
+                                            Expired: {{ expired_signatures_count }}
+                                        </div>
+                                        <div class="ui circular label {{ 'green' if owner_signed else 'red' }}">
+                                            {{ 'Owner Signed' if owner_signed else 'Owner Not Signed' }}
+                                        </div>
+                                    </div>
+                                </div>
+                        
+                                <!-- Advisor Status -->
+                                <div class="ui segment">
+                                    <h4 class="ui dividing header">
+                                        <i class="users icon"></i>
+                                        Advisor Status
+                                    </h4>
+                                    <table class="ui celled table">
+                                        <thead>
+                                            <tr>
+                                                <th>Advisor</th>
+                                                <th>Status</th>
+                                                <th>Expired</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for advisor in advisors %}
+                                            <tr>
+                                                <td>{{ advisor.get_fullname() }}</td>
+                                                <td>
+                                                    {% if advisor.username in signature_list %}
+                                                    <i class="green check circle icon"></i> Signed
+                                                    {% else %}
+                                                    <span style="color: gray;">Not-Signed</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if advisor.username not in signature_list %}
+                                                    <span style="color: gray;">Not-Signed</span>
+                                                    {% elif is_not_expireds[loop.index0] %}
+                                                    <i class="green check circle icon"></i> Not-Expired
+                                                    {% else %}
+                                                    <i class="red times circle icon"></i> Expired
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="ui button red" onclick="$('#modal-{{ loop.index0 }}').modal('hide')">
+                                    <i class="times icon"></i> Close
+                                </button>
+                            </div>
                         </div>
-                        <div id="toggle-{{ loop.index0 }} content" class="content" style="display: none; margin-top: 10px;">
-                            <table class="ui celled table">
-                                <thead>
-                                    <tr>
-                                        <th>Advisor</th>
-                                        <th>Status</th>
-                                        <th>Expired</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for advisor in advisors %}
-                                    <tr>
-                                        <td>{{ advisor.get_fullname() }}</td>
-                                        <td>
-                                            {% if advisor.username in signature_list %}
-                                                <i class="green check circle icon"></i> Signed
-                                            {% else %}
-                                                <i class="red times circle icon"></i> Not-Signed
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if advisor.username not in signature_list %}
-                                                <span style="color: gray;">Not-Signed</span>
-                                            {% elif is_not_expireds[loop.index0] %}
-                                                <i class="green check circle icon"></i> Not-Expired
-                                            {% else %}
-                                                <i class="red times circle icon"></i> Expired
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
                         </div>
                     {% endif %}
                 </td>
