@@ -17,6 +17,7 @@ services:
     volumes:
       # - .:/app
       - ../deployment:/deployment
+      - certificates:/app/certificates
       - /etc/localtime:/etc/localtime:ro
     ports:
       - 127.0.0.1:9080:8080
