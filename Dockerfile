@@ -11,7 +11,7 @@ ENV LANGUAGE th_TH:en
 RUN python3 -m venv /venv
 ENV PYTHON=/venv/bin/python3
 # RUN $PYTHON -m pip install wheel poetry gunicorn
-RUN $PYTHON -m pip install wheel poetry uwsgi
+RUN $PYTHON -m pip install wheel poetry gunicorn
 
 WORKDIR /app
 COPY poetry.lock pyproject.toml /app/
@@ -26,7 +26,4 @@ RUN npm install --prefix bussaya/web/static
 COPY . /app
 ENV BUSSAYA_SETTINGS=/app/bussaya-production.cfg 
 
-
-EXPOSE 9000
-CMD /venv/bin/uwsgi --lazy-apps --ini scripts/bussaya-uwsgi.ini
 

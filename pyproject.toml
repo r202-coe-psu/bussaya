@@ -27,7 +27,6 @@ endesive = "2.17.3"
 fpdf2 = "^2.8.2"
 pypdf2 = "^3.0.1"
 
-[tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
 bussaya-web = 'bussaya.cmd.web:main'
@@ -35,3 +34,8 @@ bussaya-web = 'bussaya.cmd.web:main'
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "livereload (>=2.7.1,<3.0.0)"
+]

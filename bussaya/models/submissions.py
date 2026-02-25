@@ -1,6 +1,5 @@
 from email.policy import default
 import resource
-from telnetlib import STATUS
 import mongoengine as me
 import gridfs
 
