@@ -14,10 +14,10 @@ ENV PYTHON=/venv/bin/python3
 RUN $PYTHON -m pip install wheel poetry gunicorn
 
 WORKDIR /app
-COPY poetry.lock pyproject.toml /app/
+COPY poetry.lock poetry.toml pyproject.toml README.md /app/
 RUN . /venv/bin/activate \
     && poetry config virtualenvs.create false \
-    && poetry install --no-interaction --only main
+    && poetry install --no-interaction --only main --no-root
 
 COPY bussaya/web/static/package.json bussaya/web/static/package-lock.json bussaya/web/static/
 RUN npm install --prefix bussaya/web/static
