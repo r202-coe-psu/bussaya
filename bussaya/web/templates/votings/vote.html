@@ -11,12 +11,6 @@
 
 
 {% block additional_js %}
-  <script type="text/javascript">
-    $('.ui.dropdown')
-      .dropdown()
-    ;
-  </script>
-
   <script type="text/javascript" src="{{ url_for('static', filename='node_modules/brython/brython.js') | add_date_url}}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='node_modules/brython/brython_stdlib.js') | add_date_url}}"></script>
   <script type="text/javascript">
@@ -26,29 +20,30 @@
 {% endblock %}
 
 {% block content %}
-  <div class="ui container">
-    <div class="ui placeholder segment">
+  <div class="container mx-auto px-4">
+    <div class="card bg-base-100 shadow my-4">
+      <div class="card-body">
       {# head #}
-      <div class="ui header center aligned">
-        <h1>
+      <div class="text-center">
+        <h1 class="text-3xl font-bold">
           {{ project.name }}
         </h1>
-        <h2>
-          {{ project.class_.name }} 
+        <h2 class="text-2xl font-bold">
+          {{ project.class_.name }}
         </h2>
-        <h3 class="middle aligned">
-          <i class="ui icon clock"></i> {{ election.started_date }} - {{ election.ended_date }}
+        <h3 class="text-xl font-semibold">
+          <i class="fa-solid fa-clock"></i> {{ election.started_date }} - {{ election.ended_date }}
         </h3>
       </div>
       {# end head#}
 
       {# content #}
-      <div style="margin-top: 1em;">
-        <div class="ui Huge primary">
-          <form method="POST" class="ui big form">
+      <div class="mt-4">
+        <div>
+          <form method="POST">
             {{ form.csrf_token }}
-            <div class="field">
-              <button id="vote" name="vote" type="submit" class="ui button big primary">Vote</button>
+            <div>
+              <button id="vote" name="vote" type="submit" class="btn btn-primary btn-lg">Vote</button>
             </div>
             {{ form.location }}
             {{ form.remark }}
@@ -60,36 +55,42 @@
 
       {# user profile #}
       <div>
-        <div class="ui segment">
-          <div class="ui centered stackable grid">
-            <div class="four wide column">
-              <div class="ui one column centered grid">
+        <div class="card bg-base-100 shadow my-4">
+          <div class="card-body">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <div class="grid grid-cols-1 gap-4">
                 {% for user in project.students %}
-                <div class="column center aligned">
-                  <div class="ui small image">
+                <div class="text-center">
+                  <div class="w-32 mx-auto">
                     <img src="{{ user.get_picture() }}">
                   </div>
-                  <h5>{{ user.first_name }} {{ user.last_name }}</h5>
+                  <h5 class="text-lg font-semibold">{{ user.first_name }} {{ user.last_name }}</h5>
                 </div>
               {% endfor %}
               {% set r = project.get_resource('poster') %}
               {% if r %}
                 <div>
-                  <a target="_blank" class="ui primary icon button big" href="{{ r.link }}"><i class="image file icon" data-content="Poster"></i> Poster</a>
+                  <a target="_blank" class="btn btn-primary btn-lg tooltip" data-tip="Poster" href="{{ r.link }}"><i class="fa-solid fa-file-image"></i> Poster</a>
                 </div>
               {% endif %}
 
               </div>
             </div>
 
-            <div class="twelve wide column">
-              <div class="ui segment large text">
+            <div class="md:col-span-3">
+              <div class="card bg-base-100 shadow my-4">
+                <div class="card-body p-4 text-lg">
                 {{ project.abstract_th }}
+                </div>
               </div>
-              <div class="ui segment large text">
+              <div class="card bg-base-100 shadow my-4">
+                <div class="card-body p-4 text-lg">
                 {{ project.abstract }}
+                </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>

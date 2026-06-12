@@ -4,13 +4,9 @@
 {% import '/navbar/class-navbar.html' as renderer_navbar %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view_students', class_id=class_.id) }}">View Students</a>
-</div>
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li><a href="{{ url_for('admin.classes.view_students', class_id=class_.id) }}">View Students</a></li>
 {% endblock %}
 
 
@@ -18,14 +14,15 @@
 
 {{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
-<h2 class="ui header">
+<h2 class="text-2xl font-bold">
     View Students
 </h2>
-<div class="ui divider"></div>
+<div class="divider"></div>
 <div>
-  <a href="{{ url_for('exports.export_students', class_id=class_.id) }}" class="ui icon primary large circular button"><i class="icon file excel"></i></a>
+  <a href="{{ url_for('exports.export_students', class_id=class_.id) }}" class="btn btn-primary btn-circle btn-lg"><i class="fa-solid fa-file-excel"></i></a>
 </div>
-<table class="ui celled tablet stackable table">
+<div class="overflow-x-auto">
+<table class="table table-zebra">
   <thead>
     <th>No. </th>
     <th>ID</th>
@@ -42,10 +39,10 @@
   <tbody>
     {% for student_id in class_.student_ids %}
       {% set student = get_student_by_id(student_id, students) %}
-      {% if student %} 
+      {% if student %}
         {% set project = student.get_project() %}
       {% endif %}
-    <tr class="top aligned">
+    <tr class="align-top">
       <td>
         {{ loop.index }}
       </td>
@@ -75,18 +72,18 @@
 
       <td>
         {% if student %}
-          {{ student.get_meeting_reports(class_, 'midterm', 'approved').count() }} 
+          {{ student.get_meeting_reports(class_, 'midterm', 'approved').count() }}
           /
-          {{ student.get_meeting_reports(class_, 'midterm').count() }} 
+          {{ student.get_meeting_reports(class_, 'midterm').count() }}
         {% endif %}
       </td>
       <td>
         {% if student %}
           {% set report=student.get_report(class_, 'midterm') %}
           {% if report %}
-            <a href="{{ url_for('submissions.download', progress_report_id=report.id, filename=report.file.filename) }}" target="_blank"><i class="file pdf icon large"></i></a>
+            <a href="{{ url_for('submissions.download', progress_report_id=report.id, filename=report.file.filename) }}" target="_blank"><i class="fa-solid fa-file-pdf fa-lg"></i></a>
           {% else %}
-            <i class="file pdf icon large disable" />
+            <i class="fa-solid fa-file-pdf fa-lg opacity-30"></i>
           {% endif %}
         {% endif %}
       </td>
@@ -94,9 +91,9 @@
         {% if student %}
           {% set report=student.get_presentation(class_, 'midterm') %}
           {% if report %}
-            <a href="{{ url_for('submissions.download', progress_report_id=report.id, filename=report.file.filename) }}" target="_blank"><i class="file powerpoint icon large"></i></a>
+            <a href="{{ url_for('submissions.download', progress_report_id=report.id, filename=report.file.filename) }}" target="_blank"><i class="fa-solid fa-file-powerpoint fa-lg"></i></a>
           {% else %}
-            <i class="file powerpoint icon large disable" />
+            <i class="fa-solid fa-file-powerpoint fa-lg opacity-30"></i>
           {% endif %}
 
         {% endif %}
@@ -104,18 +101,18 @@
 
       <td>
         {% if student %}
-          {{ student.get_meeting_reports(class_, 'final', 'approved').count() }} 
+          {{ student.get_meeting_reports(class_, 'final', 'approved').count() }}
           /
-          {{ student.get_meeting_reports(class_, 'final').count() }} 
+          {{ student.get_meeting_reports(class_, 'final').count() }}
         {% endif %}
       </td>
       <td>
         {% if student %}
           {% set report=student.get_report(class_, 'final') %}
           {% if report %}
-            <a href="{{ url_for('submissions.download', progress_report_id=report.id, filename=report.file.filename) }}" target="_blank"><i class="file pdf icon large"></i></a>
+            <a href="{{ url_for('submissions.download', progress_report_id=report.id, filename=report.file.filename) }}" target="_blank"><i class="fa-solid fa-file-pdf fa-lg"></i></a>
           {% else %}
-            <i class="file pdf icon large disable" />
+            <i class="fa-solid fa-file-pdf fa-lg opacity-30"></i>
           {% endif %}
         {% endif %}
       </td>
@@ -123,9 +120,9 @@
         {% if student %}
           {% set report=student.get_presentation(class_, 'final') %}
           {% if report %}
-            <a href="{{ url_for('submissions.download', progress_report_id=report.id, filename=report.file.filename) }}" target="_blank"><i class="file powerpoint icon large"></i></a>
+            <a href="{{ url_for('submissions.download', progress_report_id=report.id, filename=report.file.filename) }}" target="_blank"><i class="fa-solid fa-file-powerpoint fa-lg"></i></a>
           {% else %}
-            <i class="file powerpoint icon large disable" />
+            <i class="fa-solid fa-file-powerpoint fa-lg opacity-30"></i>
           {% endif %}
 
         {% endif %}
@@ -135,6 +132,7 @@
     {% endfor %}
   </tbody>
 </table>
+</div>
 
 
 

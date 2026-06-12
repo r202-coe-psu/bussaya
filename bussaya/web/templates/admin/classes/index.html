@@ -5,50 +5,54 @@ Classes
 {% endblock %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-	<a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
-</div>
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
 {% endblock %}
 
 {% block content %}
 
-<h1 class="ui horizontal divider header">
-	<i class="small icon chalkboard end"></i>
+<div class="divider text-xl font-bold">
+	<i class="fa-solid fa-chalkboard fa-sm"></i>
 	All Classes
-</h1>
+</div>
 
-<div class="ui segment">
-	{% if classes %}
-	<table class="ui celled table unstackable">
-		<thead>
-			<tr>
-				<th>Name</th>
-				<th>Description</th>
-				<th>Operation</th>
-			</tr>
-		</thead>
+<div class="card bg-base-100 shadow my-4">
+	<div class="card-body p-4">
+		{% if classes %}
+		<div class="overflow-x-auto">
+			<table class="table table-zebra">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Description</th>
+						<th>Operation</th>
+					</tr>
+				</thead>
 
-		<body>
-			{% for class_ in classes %}
-			<tr>
-				<td>
-					<a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-				</td>
-				<td>
-					{{ class_.description }}
-        </td>
-        <td>
-          <a href="{{ url_for('admin.classes.copy', class_id=class_.id) }}" class="ui icon primary circular button"><i class="copy icon"></i></a>
-        </td>
-			</tr>
-			{% endfor %}
-		</body>
-	</table>
-	{% endif %}
+				<body>
+					{% for class_ in classes %}
+					<tr>
+						<td>
+							<a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+						</td>
+						<td>
+							{{ class_.description }}
+						</td>
+						<td>
+							<a href="{{ url_for('admin.classes.copy', class_id=class_.id) }}" class="btn btn-primary btn-circle"><i class="fa-solid fa-copy"></i></a>
+						</td>
+					</tr>
+					{% endfor %}
+				</body>
+			</table>
+		</div>
+		{% endif %}
 
-	<a class="ui primary icon button" href="{{ url_for('admin.classes.create') }}">
-		Create Class
-	</a>
+		<div>
+			<a class="btn btn-primary" href="{{ url_for('admin.classes.create') }}">
+				Create Class
+			</a>
+		</div>
+	</div>
 </div>
 
 

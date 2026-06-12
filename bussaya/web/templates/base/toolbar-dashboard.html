@@ -1,40 +1,45 @@
-<div class="item">
-  <a href="{{ url_for('accounts.index') }}" class="ui image">
+<li class="mb-3">
+  <a href="{{ url_for('accounts.index') }}" class="flex items-center gap-3">
     {% if current_user.get_picture() %}
-    <img class="ui avatar image" src="{{ current_user.get_picture() }}">
+    <div class="avatar">
+      <div class="w-10 rounded-full">
+        <img src="{{ current_user.get_picture() }}" alt="">
+      </div>
+    </div>
     {% else %}
-    <i class="user icon"></i>
+    <i class="fa-solid fa-circle-user fa-2x"></i>
     {% endif %}
+    <span class="flex flex-col items-start">
+      <span class="name">{{ current_user.first_name }} {{ current_user.last_name }}</span>
+      <span class="email text-xs opacity-70">{{ current_user.email }}</span>
+    </span>
   </a>
-  <a href="{{ url_for('accounts.index') }}"><span class="white-text name">{{ current_user.first_name }} {{
-      current_user.last_name }}</span></a><br />
-  <a href="{{ url_for('accounts.index') }}"><span class="white-text email">{{ current_user.email }}</span></a>
-</div>
+</li>
 
-<a class="item" href="{{ url_for('dashboard.index') }}"><i class="icon dashboard"></i>Dashboard</a>
-<a class="item" href="{{ url_for('site.index') }}"><i class="icon world"></i>Home Page</a>
+<li><a href="{{ url_for('dashboard.index') }}"><i class="fa-solid fa-gauge"></i>Dashboard</a></li>
+<li><a href="{{ url_for('site.index') }}"><i class="fa-solid fa-globe"></i>Home Page</a></li>
 
 {% if current_user.has_roles('admin') %}
-<a class="item" href="{{ url_for('dashboard.index_admin') }}"><i class="icon dashboard"></i>Dashboard Admin</a>
-<a class="item" href="{{ url_for('admin.classes.index') }}"><i class="icon users"></i>Class</a>
+<li><a href="{{ url_for('dashboard.index_admin') }}"><i class="fa-solid fa-gauge-high"></i>Dashboard Admin</a></li>
+<li><a href="{{ url_for('admin.classes.index') }}"><i class="fa-solid fa-users"></i>Class</a></li>
 {% elif current_user.has_roles('lecturer') %}
-<a class="item" href="{{ url_for('classes.index') }}"><i class="icon users"></i>Class</a>
+<li><a href="{{ url_for('classes.index') }}"><i class="fa-solid fa-users"></i>Class</a></li>
 {% else %}
 {% endif %}
 
 {% if current_user.has_roles('admin') %}
-<a class="item" href="{{ url_for('admin.index') }}"><i class="icon users"></i>Admin</a>
-<a class="item" href="{{ url_for('admin.organizations.index') }}"><i class="icon building"></i>Organization</a>
-<a class="item" href="{{ url_for('admin.users.index') }}"><i class="icon award"></i>Users</a>
-<a class="item" href="{{ url_for('elections.index') }}"><i class="icon vote yea"></i>Manage Election</a>
+<li><a href="{{ url_for('admin.index') }}"><i class="fa-solid fa-user-gear"></i>Admin</a></li>
+<li><a href="{{ url_for('admin.organizations.index') }}"><i class="fa-solid fa-building"></i>Organization</a></li>
+<li><a href="{{ url_for('admin.users.index') }}"><i class="fa-solid fa-award"></i>Users</a></li>
+<li><a href="{{ url_for('elections.index') }}"><i class="fa-solid fa-check-to-slot"></i>Manage Election</a></li>
 {% endif %}
 
 {% if current_user.has_roles('lecturer', 'admin') %}
-<a class="item" href="{{ url_for('votings.index') }}"><i class="icon award"></i>View Vote</a>
+<li><a href="{{ url_for('votings.index') }}"><i class="fa-solid fa-award"></i>View Vote</a></li>
 {% else %}
 {% endif %}
 
 
-<a class="item" href="{{ url_for('accounts.index') }}"><i class="address book icon"></i>Account</a>
-<a class="item" href="{{ url_for('site.list_lecturers') }}"><i class="chalkboard teacher icon"></i>Lecturers</a>
-<a class="item" href="{{ url_for('accounts.logout') }}"><i class="sign out icon"></i>Logout</a>
+<li><a href="{{ url_for('accounts.index') }}"><i class="fa-solid fa-address-book"></i>Account</a></li>
+<li><a href="{{ url_for('site.list_lecturers') }}"><i class="fa-solid fa-chalkboard-user"></i>Lecturers</a></li>
+<li><a href="{{ url_for('accounts.logout') }}"><i class="fa-solid fa-right-from-bracket"></i>Logout</a></li>

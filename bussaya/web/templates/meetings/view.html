@@ -3,45 +3,42 @@
 {% import '/base/html-renderer.html' as renderer %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a class="section" href="{{ url_for('classes.index') }}">Classes</a>
-    <div class="divider"> / </div>
-    <a class="section" href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
-    <div class="section">Submission: {{ meeting.name }}
-    </div>
-</div>
+<li><a href="{{ url_for('classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li>Submission: {{ meeting.name }}</li>
 {% endblock %}
 
 
 {% block content %}
 
 
-<table class="ui definition table">
-    <tbody>
-        <tr>
-            <td class="two wide column">Name</td>
-            <td>{{ meeting.name }}</td>
-        </tr>
-        </tr>
-        <tr>
-            <td>Started Date</td>
-            <td>{{ meeting.started_date }}</td>
-        </tr>
-        <tr>
-            <td>Ended Date</td>
-            <td>{{ meeting.ended_date }}</td>
-        </tr>
-        <tr>
-            <td>Extended Date</td>
-            <td>{{ meeting.extended_date }}</td>
-        </tr>
+<div class="overflow-x-auto">
+    <table class="table table-zebra">
+        <tbody>
+            <tr>
+                <th class="font-medium">Name</th>
+                <td>{{ meeting.name }}</td>
+            </tr>
+            <tr>
+                <th class="font-medium">Started Date</th>
+                <td>{{ meeting.started_date }}</td>
+            </tr>
+            <tr>
+                <th class="font-medium">Ended Date</th>
+                <td>{{ meeting.ended_date }}</td>
+            </tr>
+            <tr>
+                <th class="font-medium">Extended Date</th>
+                <td>{{ meeting.extended_date }}</td>
+            </tr>
 
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
 
-<h2 class="ui header horizontal divider">{{meeting.name}}</h2>
-<table class="ui celled table">
+<div class="divider text-2xl font-bold">{{meeting.name}}</div>
+<div class="overflow-x-auto">
+<table class="table table-zebra">
     <thead>
         <tr>
             <th></th>
@@ -56,10 +53,10 @@
     </thead>
     <tbody>
         {% for meeting_report in meeting_reports %}
-        <tr class="top aligned">
+        <tr class="align-top">
             <td>{{ loop.index }}</td>
             <td>{{ meeting_report.project.name }}</td>
-            <td class="right aligned collapsing">
+            <td class="text-right whitespace-nowrap">
                 {% if not project %}
                 <a target="_blank" href="{{ url_for('accounts.profile', user_id=meeting_report.owner.id) }}">
                     {{ meeting_report.owner.get_fullname() }} ({{meeting_report.owner.username}})
@@ -75,7 +72,7 @@
                 {% endif %}
             </td>
             <td>
-                <h3>{{ meeting_report.title }}</h3>
+                <h3 class="text-xl font-semibold">{{ meeting_report.title }}</h3>
                 <div>{{ markdown.markdown(meeting_report.description)|safe }}</div>
                 {% if meeting_report.file %}
                   <div>
@@ -87,47 +84,46 @@
                   </div>
                 {% endif %}
                 <div><b>Submission Date:</b> {{ meeting_report.updated_date }}</div>
+            </td>
             <td>{{ meeting_report.meeting_date }}</td>
             <td
-                class="{{'green' if meeting_report.status == 'approved'}} {{'red' if meeting_report.status == 'disapproved'}}">
+                class="{{'bg-success/20' if meeting_report.status == 'approved'}} {{'bg-error/20' if meeting_report.status == 'disapproved'}}">
                 {{meeting_report.get_status_display() if meeting_report.status else 'Waiting for approval'}}
             </td>
             <td>
               {{ markdown.markdown(meeting_report.remark)|safe }}
               {% if meeting_report.late_reason %}
                 <div>
-                  <h3>Late Submition</h3>
+                  <h3 class="text-xl font-semibold">Late Submition</h3>
                   <div>
                     {{ markdown.markdown(meeting_report.late_reason)|safe }}
                   </div>
                 </div>
               {% endif %}
             </td>
-            <td class="single line">
+            <td class="whitespace-nowrap">
                 <div>
-                    <a class="ui primary popmsg icon button" href="{{ url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, action='approve')}}" data-content="Approve">
-                      <i class="check icon"></a>
-                    </a>
-                    <div class="ui accordion" style="width: fit-content; height: fit-content">
-                        <div class=" title">
-                            <button class="ui red popmsg icon button" data-content="Disapprove">
-                              <i class="times icon"></a>
-                            </button>
+                    <span class="tooltip" data-tip="Approve">
+                        <a class="btn btn-success btn-square" href="{{ url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, action='approve')}}">
+                            <i class="fa-solid fa-check"></i>
+                        </a>
+                    </span>
+                    <div class="collapse collapse-arrow bg-base-100 shadow w-fit">
+                        <input type="checkbox">
+                        <div class="collapse-title font-semibold">
+                            <span class="btn btn-error btn-square pointer-events-none">
+                                <i class="fa-solid fa-xmark"></i>
+                            </span>
+                            Disapprove
                         </div>
-                        <div class="content">
-                            <p class="transition hidden">
-                            <div class="disapprove remark">
-                                <div class="ui segment">
-                                    <form method="post" class="ui form">
-                                        {{ renderer.render_field(form.remark) }}
-                                        <input type="hidden" name="meeting_report_id" value="{{meeting_report.id}}">
-                                        <button type="submit" class="ui primary button" style="margin-top: 0.5em">
-                                            Submit
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                            </p>
+                        <div class="collapse-content whitespace-normal">
+                            <form method="post">
+                                {{ renderer.render_field(form.remark) }}
+                                <input type="hidden" name="meeting_report_id" value="{{meeting_report.id}}">
+                                <button type="submit" class="btn btn-primary mt-2">
+                                    Submit
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -136,18 +132,9 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 
 {% endblock %}
 
 {% block additional_js %}
-<script type="text/javascript">
-    function showDisapproveRemark() {
-        $(".disapprove.remark").transition('fade down')
-            ;
-    }
-
-    $(".ui.accordion").accordion()
-
-    $(".ui.popupmsg.button").popup();
-</script>
 {% endblock additional_js%}

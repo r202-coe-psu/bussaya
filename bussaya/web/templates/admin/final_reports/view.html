@@ -8,13 +8,9 @@ Classes
 {% endblock %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view_final_reports', class_id=class_.id) }}">View Final Report</a>
-</div>
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li><a href="{{ url_for('admin.classes.view_final_reports', class_id=class_.id) }}">View Final Report</a></li>
 {% endblock %}
 
 
@@ -22,12 +18,13 @@ Classes
 
 {{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
-<h2 class="ui header">
+<h2 class="text-2xl font-bold">
     View Final Report {{ class_.name }}
 </h2>
-<div class="ui divider"></div>
+<div class="divider"></div>
 
-<table class="ui celled table">
+<div class="overflow-x-auto">
+<table class="table table-zebra">
     <thead>
         <tr>
             <th></th>
@@ -43,22 +40,23 @@ Classes
         {% for project in projects %}
         {% set final_report = get_final_report_project(project) %}
         <tr>
-            <td class="one wide">{{ loop.index }}</td>
+            <td class="w-12">{{ loop.index }}</td>
             <td>{{ project.name }}</td>
-            <td class="right aligned collapsing">
+            <td class="text-right whitespace-nowrap">
                 {%- for s in project.students %}
                 {{ s.first_name }} {{ s.last_name }} ({{ s.username }})
                 {% if not loop.last %}<br>{% endif %}
                 {% endfor -%}
             </td>
-            <td class="right aligned collapsing">{{ project.advisors|selectattr("full_name")|join(', ') }}</td>
-            <td class="right aligned collapsing">{{ project.get_public_display() }}</td>
-            <td class="right aligned collapsing">
+            <td class="text-right whitespace-nowrap">{{ project.advisors|selectattr("full_name")|join(', ') }}</td>
+            <td class="text-right whitespace-nowrap">{{ project.get_public_display() }}</td>
+            <td class="text-right whitespace-nowrap">
                 {{ pm_renderer.render_project_material(project) }}
             </td>
-            <td class="collapsing">{{ final_report.natural_updated_date() if final_report else "-" }}</td>
+            <td class="whitespace-nowrap">{{ final_report.natural_updated_date() if final_report else "-" }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% endblock %}

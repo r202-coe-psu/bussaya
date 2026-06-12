@@ -7,59 +7,63 @@ Meeting Form
 {% endblock %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('dashboard.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
-    Form:<a href="{{ url_for('meetings.report', meeting_id=meeting.id) }}">
-        {{meeting.name}}</a>
-</div>
+<li><a href="{{ url_for('dashboard.index') }}">Classes</a></li>
+<li><a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li>Form:<a href="{{ url_for('meetings.report', meeting_id=meeting.id) }}">
+    {{meeting.name}}</a></li>
 {% endblock %}
 
 {% block content %}
 
-<table class="ui definition table">
+<div class="overflow-x-auto">
+<table class="table table-zebra">
     <tr>
-        <td class="two wide">
+        <th class="font-medium w-40">
             Meeting
-        </td>
+        </th>
         <td>
             {{ meeting.name }}
         </td>
     </tr>
     <tr>
-        <td class="two wide">
+        <th class="font-medium">
             Remaining time:
-        </td>
+        </th>
         <td>
             {{ meeting.get_remain_time()[1] }}
         </td>
     </tr>
 </table>
+</div>
 {% if projects | length == 0 %}
-<div class="ui message warning">
-    <div class="header">
-        Please, create project before report.
+<div class="alert alert-warning">
+    <div>
+        <div class="font-semibold">
+            Please, create project before report.
+        </div>
+        <p>
+            <a href="{{ url_for('projects.create') }}" class="btn btn-primary">Create Project</a>
+        </p>
     </div>
-    <p>
-        <a href="{{ url_for('projects.create') }}" class="ui primary button">Create Project</a>
-    </p>
 </div>
 {% endif %}
 
-<form method="POST" class="ui form" enctype="multipart/form-data">
-    <div class="ui segment">
+<form method="POST" enctype="multipart/form-data">
+    <div class="card bg-base-100 shadow my-4">
+      <div class="card-body space-y-1">
       {{ form.csrf_token }}
       {{ renderer.render_select(form.project) }}
       {{ renderer.render_select(form.student) }}
       {{ renderer.render_field(form.title) }}
       {{ renderer.render_field(form.description) }}
       {{ renderer.render_field(form.remark) }}
-      <div class="two fields">
-          {{ renderer.render_calendar(form.meeting_date, 'meeting_date_calendar') }}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>{{ renderer.render_calendar(form.meeting_date, 'meeting_date_calendar') }}</div>
       </div>
-        <button type="submit" class="ui button primary">{{ 'Edit' if 'edit' in request.path else 'Report' }}</button>
+        <div>
+        <button type="submit" class="btn btn-primary">{{ 'Edit' if 'edit' in request.path else 'Report' }}</button>
+        </div>
+      </div>
     </div>
 </form>
 
@@ -67,31 +71,4 @@ Meeting Form
 
 
 {% block additional_js %}
-  <script>
-    date_formatter = {
-      date: 'YYYY-MM-DD'
-    };
-
-    var calendar_setting = {
-      type: 'date',
-      monthFirst: false,
-      formatter: date_formatter,
-      today: true,
-      ampm: false,
-      {#
-      text: {
-        days: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
-        months: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤษจิกายน', 'ธันวาคม'],
-        monthsShort: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
-        today: 'วันนี้',
-        now: 'ปัจจุบัน',
-        am: 'AM',
-        pm: 'PM'
-      },
-      #}
-    };
-
-    $('#meeting_date_calendar').calendar(calendar_setting);
-
-  </script>
 {% endblock %}

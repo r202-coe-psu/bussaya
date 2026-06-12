@@ -102,7 +102,7 @@ def view():
 @acl.roles_required("admin")
 def index(class_id):
     class_ = models.Class.objects().get(id=class_id)
-    return render_template("/admin/grades/index.html", class_=class_)
+    return render_template("/admin/groups/index.html", class_=class_)
 
 
 def get_group_form(group=None):

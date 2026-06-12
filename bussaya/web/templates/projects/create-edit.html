@@ -8,14 +8,15 @@
 
 {% block breadcrumbs %}
   {{ super() }}
-  <a href="{{ url_for('projects.create') }}" class="breadcrumb">Create Project</a>
+  <li><a href="{{ url_for('projects.create') }}">Create Project</a></li>
 {% endblock %}
 
 {% block content %}
 
 <div class="row">
-  <div class="ui segment">
-    <form method="POST" class="ui form">
+  <div class="card bg-base-100 shadow my-4">
+    <div class="card-body">
+    <form method="POST" class="space-y-1">
       {{ form.csrf_token }}
       {{ renderer.render_field(form.name) }}
       {{ renderer.render_field(form.name_th) }}
@@ -34,8 +35,9 @@
 
       {{ renderer.render_multiple_select(form.mentors) }}
       
-      <button name="create" type="submit" class="ui button primary">{{ 'Create' if 'create' in request.path else 'Submit' }}</button>
+      <button name="create" type="submit" class="btn btn-primary">{{ 'Create' if 'create' in request.path else 'Submit' }}</button>
     </form>
+    </div>
   </div>
 </div>
 

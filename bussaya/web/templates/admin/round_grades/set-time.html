@@ -6,37 +6,38 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li>
     <a href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
         {{ round_grade.get_type_display() }}
     </a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.round_grades.set_time', round_grade_id=round_grade.id) }}">Set Time</a>
-</div>
+</li>
+<li><a href="{{ url_for('admin.round_grades.set_time', round_grade_id=round_grade.id) }}">Set Time</a></li>
 {% endblock %}
 
 
 {% block content %}
 
 
-<h3 class="ui header horizontal divider">
+<div class="divider text-xl font-semibold">
     Set Time
     {{ round_grade.get_type_display() }}
-</h3>
+</div>
 <div class="row">
-    <form method="POST" class="ui form">
-        <div class="ui segment">
+    <form method="POST">
+        <div class="card bg-base-100 shadow my-4">
+          <div class="card-body p-4">
           {{ form.csrf_token }}
             {{ renderer.render_calendar(form.started_date, calendar_id="rangestart") }}
             {{ renderer.render_calendar(form.ended_date, calendar_id="rangeend") }}
-            <button type="submit" class="ui large primary icon button" id="submit-button">
-                <i class="clock icon"></i>
-                Set Time
-            </button>
+            <div>
+                <button type="submit" class="btn btn-primary btn-lg" id="submit-button">
+                    <i class="fa-solid fa-clock"></i>
+                    Set Time
+                </button>
+            </div>
+          </div>
         </div>
     </form>
 </div>
@@ -44,20 +45,10 @@
 
 
 {% block additional_js %}
-<script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
 <script type="text/javascript">
-    datetime_formatter = {
-	    datetime: 'YYYY-MM-DD HH:mm'
-    };
-    $('#rangestart').calendar({
-        // type: 'date',
-        formatter: datetime_formatter,
-        endCalendar: $('#rangeend')
-    });
-    $('#rangeend').calendar({
-        // type: 'date',
-        formatter: datetime_formatter,
-        startCalendar: $('#rangestart')
-    });
+    const rangestart = document.getElementById('rangestart');
+    const rangeend = document.getElementById('rangeend');
+    rangestart.addEventListener('change', () => { rangeend.min = rangestart.value; });
+    rangeend.addEventListener('change', () => { rangestart.max = rangeend.value; });
 </script>
 {% endblock %}

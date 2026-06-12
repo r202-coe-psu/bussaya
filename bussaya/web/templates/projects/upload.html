@@ -8,14 +8,15 @@ Upload Project Resource
 
 {% block breadcrumbs %}
 {{ super() }}
-<a href="{{ url_for('projects.upload', project_id=project.id) }}" class="breadcrumb">Upload</a>
+<li><a href="{{ url_for('projects.upload', project_id=project.id) }}">Upload</a></li>
 {% endblock %}
 
 {% block content %}
 
 <div class="row">
-  <div class="ui segment">
-    <form method="POST" enctype="multipart/form-data" class="ui form">
+  <div class="card bg-base-100 shadow my-4">
+    <div class="card-body">
+    <form method="POST" enctype="multipart/form-data" class="space-y-1">
       {{ form.csrf_token }}
       {{ renderer.render_fileinput(form.report) }}
       {{ renderer.render_fileinput(form.presentation) }}
@@ -24,26 +25,13 @@ Upload Project Resource
       {{ renderer.render_fileinput(form.similarity) }}
       {{ renderer.render_field(form.video) }}
       {{ renderer.render_field(form.git) }}
-      <button name="create" type="submit" class="ui button primary">Upload</button>
+      <button name="create" type="submit" class="btn btn-primary">Upload</button>
     </form>
+    </div>
   </div>
 </div>
 
 {% endblock content %}
 
 {% block additional_js %}
-<script type="text/javascript">
-  {% for field in form if field.type == 'FileField' %}
-  $(".attach-file-{{ field.name }}").click(function () {
-    $(this).parent().find("#{{ field.name }}").click();
-  });
-
-  $('#{{ field.name }}')
-    .on('change', function (e) {
-      var name = e.target.files[0].name;
-      $('.attach-file-{{ field.name }}', $(e.target).parent()).val(name);
-    });
-  {% endfor %}
-</script>
-
 {% endblock additional_js %}

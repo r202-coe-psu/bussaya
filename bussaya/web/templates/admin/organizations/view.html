@@ -3,46 +3,46 @@
 
 {% block breadcrumbs %}
   {{ super() }}
-  <div class="divider"> / </div>
   {% if request.endpoint != 'admin.organizations.view' %}
-    <a class="section" href="{{ url_for('admin.organizations.view', organization_id=organization.id) }}">{{ organization.name }}</a>
+    <li><a href="{{ url_for('admin.organizations.view', organization_id=organization.id) }}">{{ organization.name }}</a></li>
   {% else %}
-    <div class="active section">{{ organization.name }}</div>
+    <li>{{ organization.name }}</li>
   {% endif %}
 {% endblock %}
 
 
 {% block content %}
 
-<h2 class="ui header">
+<h2 class="text-2xl font-bold">
   {{ organization.name }}
 </h2>
-<div class="ui divider"></div>
+<div class="divider"></div>
 
-<table class="ui single line table">
+<div class="overflow-x-auto">
+<table class="table">
 	<tbody>
 		<tr>
 			<td>
-				<div style="color: grey">Name</div>{{ organization.name }}
+				<div class="opacity-60">Name</div>{{ organization.name }}
 			</td>
 			<td>
-				<div style="color: grey">Web Site</div> {{ organization.website }}
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<div style="color: grey">Creator </div>{{ organization.creator.get_fullname() }}
-      </td>
-			<td>
-				<div style="color: grey">Last Updated By </div>{{ organization.last_updated_by.get_fullname() }}
+				<div class="opacity-60">Web Site</div> {{ organization.website }}
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<div style="color: grey">Created Date</div> {{ organization.created_date }}
+				<div class="opacity-60">Creator </div>{{ organization.creator.get_fullname() }}
       </td>
 			<td>
-				<div style="color: grey">Updated Date</div> {{ organization.updated_date }}
+				<div class="opacity-60">Last Updated By </div>{{ organization.last_updated_by.get_fullname() }}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="opacity-60">Created Date</div> {{ organization.created_date }}
+      </td>
+			<td>
+				<div class="opacity-60">Updated Date</div> {{ organization.updated_date }}
 			</td>
 
     </tr>
@@ -53,14 +53,16 @@
     </tr>
 	</tbody>
 </table>
+</div>
 
 
 <div>
-  <h3 class="ui header">Mentor</h3>
+  <h3 class="text-xl font-semibold">Mentor</h3>
   <div>
-    <a class="ui primary icon button" href="{{ url_for('admin.organizations.add_or_edit_mentor', organization_id=organization.id) }}"><i class="add icon"></i> เพิ่ม</a>
+    <a class="btn btn-primary" href="{{ url_for('admin.organizations.add_or_edit_mentor', organization_id=organization.id) }}"><i class="fa-solid fa-plus"></i> เพิ่ม</a>
   </div>
-  <table class="ui single line table">
+  <div class="overflow-x-auto">
+  <table class="table">
     <thead>
       <tr>
         <th>ชื่อ</th>
@@ -82,28 +84,15 @@
           </td>
           <td>{{ mentor.remark }}</td>
           <td>
-            <a href="{{ url_for('admin.organizations.add_or_edit_mentor', organization_id=organization.id, mentor_id=mentor.id) }}" class="ui primary circular icon button"><i class="edit icon"></i></a>
+            <a href="{{ url_for('admin.organizations.add_or_edit_mentor', organization_id=organization.id, mentor_id=mentor.id) }}" class="btn btn-circle btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
           </td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
+  </div>
 </div>
 {% endblock %}
 
 {% block additional_js %}
-<script>
-	function showDelete() {
-		$('.ui.modal.delete.class')
-			.modal('show')
-			;
-	}
-	function showCreateMeeting() {
-		$(".create.meeting").transition('fade down')
-			;
-	}
-
-</script>
-<script type="text/javascript">
-</script>
 {% endblock additional_js %}

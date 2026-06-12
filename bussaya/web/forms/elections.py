@@ -12,11 +12,11 @@ class ElectionForm(FlaskForm):
             )
     started_date = fields.DateTimeField(
             'Start Date',
-            format='%Y-%m-%d %H:%M',
-            widget=widgets.TextInput()
+            format=['%Y-%m-%dT%H:%M', '%Y-%m-%d %H:%M'],
+            widget=widgets.DateTimeLocalInput()
             )
     ended_date = fields.DateTimeField(
             'Update Date',
-            widget=widgets.TextInput(),
-            format='%Y-%m-%d %H:%M'
+            widget=widgets.DateTimeLocalInput(),
+            format=['%Y-%m-%dT%H:%M', '%Y-%m-%d %H:%M']
             )

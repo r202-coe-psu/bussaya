@@ -5,38 +5,38 @@
 {% import '/admin/round_grades/admin-grade-menu-toolbars.html' as render_toolbars %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li>
     <a href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
         {{ round_grade.get_type_display() }}
     </a>
-    <div class="divider"> / </div>
+</li>
+<li>
     <a href="{{ url_for('admin.round_grades.view_total', class_id=class_.id, round_grade_type=round_grade.type) }}">View
         Approve
         Report</a>
-</div>
-
+</li>
 {% endblock %}
 
 
 {% block content %}
 {{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
-<div class="ui header big">
-    Veiw Approve {{round_grade.type}} Report </div>
+<h2 class="text-2xl font-bold">
+    Veiw Approve {{round_grade.type}} Report</h2>
 
-<div class="ui attached segment">
-    <table class="ui celled table">
+<div class="card bg-base-100 shadow my-4">
+    <div class="card-body p-4">
+    <div class="overflow-x-auto">
+    <table class="table table-zebra">
         <thead>
-            <tr class="top aligned">
+            <tr>
                 <th></th>
                 <th>ID</th>
                 <th>Student</th>
                 <th>Advisor</th>
-                <th class="one wide">Submissions</th>
+                <th>Submissions</th>
                 <th>Approved Report</th>
 
             </tr>
@@ -44,7 +44,7 @@
         <tbody>
             {% for student_grade in student_grades %}
             {% set student = student_grade.student %}
-            <tr class="top aligned">
+            <tr class="align-top">
                 <td>{{ loop.index }}</td>
                 <td>
                     <a target="_blank"
@@ -53,7 +53,7 @@
                     </a>
                 </td>
                 <td>
-                    <a href="{{ url_for('admin.projects.view_info_project', project_id=student.get_project().id) }}" class="ui circular primary icon button"><i class="code desktop icon"></i> project</a> 
+                    <a href="{{ url_for('admin.projects.view_info_project', project_id=student.get_project().id) }}" class="btn btn-primary btn-sm rounded-full"><i class="fa-solid fa-laptop-code"></i> project</a>
                     <a target="_blank"
                         href="{{ url_for('accounts.profile', user_id=student.id) }}">
                         {{ student.first_name }} {{ student.last_name }}
@@ -61,8 +61,8 @@
                 </td>
                 <td>
                     {% for advisor in student.get_project().advisors %}
-                    <a target="_blank" 
-                        href="{{ url_for('admin.round_grades.view_advisor_students', round_grade_type=round_grade.type, class_id=class_.id, advisor_id=advisor.id) }}">  
+                    <a target="_blank"
+                        href="{{ url_for('admin.round_grades.view_advisor_students', round_grade_type=round_grade.type, class_id=class_.id, advisor_id=advisor.id) }}">
                         {{ advisor.get_fullname() }},
                     </a>
                     {% endfor %}
@@ -73,11 +73,11 @@
                 <td>
                     {% if student_report %}
                     <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
-                        target="_blank">
-                        <i class="large pdf file icon link pop" data-content="Report"></i>
+                        target="_blank" class="tooltip" data-tip="Report">
+                        <i class="fa-solid fa-file-pdf fa-lg"></i>
                     </a>
                     {% else %}
-                    <i class="grey large pdf file icon disable"></i>
+                    <i class="fa-solid fa-file-pdf fa-lg opacity-30"></i>
                     {% endif %}
                 </td>
                 <td>
@@ -85,11 +85,11 @@
                     {% set advisors = student.get_project().advisors %}
                     {% set project_owner_username = student.username %}
                     {% if not student_report %}
-                        <div class="ui circular label grey" style="min-width: 120px; text-align: center;">
+                        <div class="badge badge-neutral min-w-[120px] justify-center">
                             No file
                         </div>
                     {% elif not signature_list %}
-                        <div class="ui circular label orange" style="min-width: 120px; text-align: center;">
+                        <div class="badge badge-warning min-w-[120px] justify-center">
                             No signatures
                         </div>
                     {% else %}
@@ -97,187 +97,149 @@
                         {% set expired_signatures_count = advisors|selectattr('username', 'in', signature_list)
                             |rejectattr('username', 'in', is_not_expireds[loop.index0])|list|length %}
                         {% set all_advisors_signed = signed_count == advisors|length %}
-                        {% set owner_signed = project_owner_username in signature_list %} 
-                
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div class="ui circular label {{ 'green' if all_advisors_signed else 'red' }}" style="min-width: 120px; text-align: center;">
-                                {{ 'Verify Success' if all_advisors_signed else 'Verify Failed' }} 
+                        {% set owner_signed = project_owner_username in signature_list %}
+
+                        <div class="flex items-center gap-2">
+                            <div class="badge {{ 'badge-success' if all_advisors_signed else 'badge-error' }} min-w-[120px] justify-center">
+                                {{ 'Verify Success' if all_advisors_signed else 'Verify Failed' }}
                                 ({{ signed_count }}/{{ advisors|length }})
                             </div>
-                            <button id="toggle-{{ loop.index0 }}" class="ui icon button tiny" style="padding: 5px;"
-                                onclick="$('#modal-{{ loop.index0 }}').modal('show')">
-                                <i class="eye icon"></i>
+                            <button id="toggle-{{ loop.index0 }}" class="btn btn-square btn-xs"
+                                onclick="document.getElementById('modal-{{ loop.index0 }}').showModal()">
+                                <i class="fa-solid fa-eye"></i>
                             </button>
                         </div>
-                
-                        <div id="modal-{{ loop.index0 }}" class="ui modal">
-                            <div class="header">
-                                <h3 class="ui header">
-                                    <i class="user icon"></i>
+
+                        <dialog id="modal-{{ loop.index0 }}" class="modal">
+                            <div class="modal-box max-w-3xl">
+                                <h3 class="text-xl font-semibold">
+                                    <i class="fa-solid fa-user"></i>
                                     Details for {{ student.username }}
                                 </h3>
-                            </div>
-                            <div class="content">
                                 <!-- Student Information -->
-                                <div class="ui segment">
-                                    <h4 class="ui dividing header">
-                                        <i class="info circle icon"></i>
-                                        Student Information
-                                    </h4>
-                                    <div class="ui list">
-                                        <div class="item">
-                                            <strong>Name:</strong> {{ student.fullname }}
-                                        </div>
-                                        <div class="item">
-                                            <strong>Username:</strong> {{ student.username }}
-                                        </div>
+                                <div class="card bg-base-200 my-4">
+                                    <div class="card-body p-4">
+                                        <h4 class="text-lg font-semibold border-b border-base-300 pb-1">
+                                            <i class="fa-solid fa-circle-info"></i>
+                                            Student Information
+                                        </h4>
+                                        <ul class="space-y-1">
+                                            <li>
+                                                <strong>Name:</strong> {{ student.fullname }}
+                                            </li>
+                                            <li>
+                                                <strong>Username:</strong> {{ student.username }}
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                        
+
                                 <!-- Signatures Found -->
-                                <div class="ui segment">
-                                    <h4 class="ui dividing header">
-                                        <i class="file signature icon"></i>
-                                        Signatures Found
-                                    </h4>
-                                    <ul class="ui list">
-                                        {% for signature in signature_list %}
-                                        <li>{{ signature }}</li>
-                                        {% endfor %}
-                                    </ul>
+                                <div class="card bg-base-200 my-4">
+                                    <div class="card-body p-4">
+                                        <h4 class="text-lg font-semibold border-b border-base-300 pb-1">
+                                            <i class="fa-solid fa-file-signature"></i>
+                                            Signatures Found
+                                        </h4>
+                                        <ul class="space-y-1 list-disc list-inside">
+                                            {% for signature in signature_list %}
+                                            <li>{{ signature }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
                                 </div>
-                        
+
                                 <!-- Summary -->
-                                <div class="ui segment">
-                                    <h4 class="ui dividing header">
-                                        <i class="chart bar icon"></i>
-                                        Summary
-                                    </h4>
-                                    <div class="ui labels">
-                                        <div class="ui circular label {{ 'green' if signed_count > 0 else 'red' }}">
-                                            Verified: {{ signed_count }}/{{ advisors|length }}
-                                        </div>
-                                        <div class="ui circular label {{ 'green' if not expired_signatures_count else 'red' }}">
-                                            Expired: {{ expired_signatures_count }}
-                                        </div>
-                                        <div class="ui circular label {{ 'green' if owner_signed else 'red' }}">
-                                            {{ 'Owner Signed' if owner_signed else 'Owner Not Signed' }}
+                                <div class="card bg-base-200 my-4">
+                                    <div class="card-body p-4">
+                                        <h4 class="text-lg font-semibold border-b border-base-300 pb-1">
+                                            <i class="fa-solid fa-chart-bar"></i>
+                                            Summary
+                                        </h4>
+                                        <div class="flex flex-wrap gap-2">
+                                            <div class="badge {{ 'badge-success' if signed_count > 0 else 'badge-error' }}">
+                                                Verified: {{ signed_count }}/{{ advisors|length }}
+                                            </div>
+                                            <div class="badge {{ 'badge-success' if not expired_signatures_count else 'badge-error' }}">
+                                                Expired: {{ expired_signatures_count }}
+                                            </div>
+                                            <div class="badge {{ 'badge-success' if owner_signed else 'badge-error' }}">
+                                                {{ 'Owner Signed' if owner_signed else 'Owner Not Signed' }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- Advisor Status -->
-                                <div class="ui segment">
-                                    <h4 class="ui dividing header">
-                                        <i class="users icon"></i>
-                                        Advisor Status
-                                    </h4>
-                                    <table class="ui celled table">
-                                        <thead>
-                                            <tr>
-                                                <th>Advisor</th>
-                                                <th>Status</th>
-                                                <th>Expired</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for advisor in advisors %}
-                                            <tr>
-                                                <td>{{ advisor.get_fullname() }}</td>
-                                                <td>
-                                                    {% if advisor.username in signature_list %}
-                                                    <i class="green check circle icon"></i> Signed
-                                                    {% else %}
-                                                    <span style="color: gray;">Not-Signed</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td>
-                                                    {% if advisor.username not in signature_list %}
-                                                    <span style="color: gray;">Not-Signed</span>
-                                                    {% elif is_not_expireds[loop.index0] %}
-                                                    <i class="green check circle icon"></i> Not-Expired
-                                                    {% else %}
-                                                    <i class="red times circle icon"></i> Expired
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+                                <div class="card bg-base-200 my-4">
+                                    <div class="card-body p-4">
+                                        <h4 class="text-lg font-semibold border-b border-base-300 pb-1">
+                                            <i class="fa-solid fa-users"></i>
+                                            Advisor Status
+                                        </h4>
+                                        <div class="overflow-x-auto">
+                                        <table class="table table-zebra">
+                                            <thead>
+                                                <tr>
+                                                    <th>Advisor</th>
+                                                    <th>Status</th>
+                                                    <th>Expired</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for advisor in advisors %}
+                                                <tr>
+                                                    <td>{{ advisor.get_fullname() }}</td>
+                                                    <td>
+                                                        {% if advisor.username in signature_list %}
+                                                        <i class="fa-solid fa-circle-check text-success"></i> Signed
+                                                        {% else %}
+                                                        <span class="opacity-60">Not-Signed</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if advisor.username not in signature_list %}
+                                                        <span class="opacity-60">Not-Signed</span>
+                                                        {% elif is_not_expireds[loop.index0] %}
+                                                        <i class="fa-solid fa-circle-check text-success"></i> Not-Expired
+                                                        {% else %}
+                                                        <i class="fa-solid fa-circle-xmark text-error"></i> Expired
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-action">
+                                    <form method="dialog">
+                                        <button class="btn btn-error">
+                                            <i class="fa-solid fa-xmark"></i> Close
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
-                            <div class="actions">
-                                <button class="ui button red" onclick="$('#modal-{{ loop.index0 }}').modal('hide')">
-                                    <i class="times icon"></i> Close
-                                </button>
-                            </div>
-                        </div>
-                        </div>
+                            <form method="dialog" class="modal-backdrop">
+                                <button>close</button>
+                            </form>
+                        </dialog>
                     {% endif %}
                 </td>
-               
-                
-                
+
+
+
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    </div>
+    </div>
 </div>
 
 {% endblock %}
 
 
 {% block additional_js %}
-<script type="text/javascript">
-    function showRelease() {
-        $('.ui.modal.release.round_grade')
-            .modal('show')
-            ;
-    }
-    $('.ui.accordion')
-        .accordion()
-        ;
-</script>
-<script type="text/javascript">
-    function accordion_show_hide(show_hide_id) {
-        $(document.getElementById(show_hide_id + " content")).transition('fade down');
-    }
-
-    function showSetTimeOff() {
-        $('.ui.time-off').transition('fade down');
-    }
-</script>
-<script type="text/javascript">
-    datetime_formatter = {
-        datetime: function (datetime, settings) {
-            if (!datetime) return '';
-            var day = datetime.getDate();
-            var month = datetime.getMonth() + 1;
-            var year = datetime.getFullYear();
-            var hour = datetime.getHours();
-            var minute = datetime.getMinutes();
-            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
-        }
-    };
-    $('#rangestart').calendar({
-        // type: 'date',
-        formatter: datetime_formatter,
-        endCalendar: $('#rangeend')
-    });
-    $('#rangeend').calendar({
-        // type: 'date',
-        formatter: datetime_formatter,
-        startCalendar: $('#rangestart')
-    });
-</script>
-<script type="text/javascript">
-    $('.icon.link.pop')
-        .popup({
-            delay: {
-                show: 50,
-                hide: 70
-            }
-        });
-</script>
 {% endblock additional_js %}
-

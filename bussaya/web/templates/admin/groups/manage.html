@@ -3,13 +3,9 @@
 {% import 'navbar/class-navbar.html' as navbar_renderer %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.groups.manage', class_id=class_.id) }}">Group</a>
-</div>
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li><a href="{{ url_for('admin.groups.manage', class_id=class_.id) }}">Group</a></li>
 {% endblock %}
 
 
@@ -18,54 +14,51 @@
 
 {{ navbar_renderer.render_class_navbar(class_, current_user) }}
 
-<h2 class="ui header">Manage Groups</h2>
-<div class="ui divider"></div>
+<h2 class="text-2xl font-bold">Manage Groups</h2>
+<div class="divider"></div>
 
 
-<div class="ui segment">
-    <div class="ui accordion">
-        <div class="title">
-            <div class="ui primary labeled icon button">
-                <i class="plus icon"></i>
-                Create Group
-            </div>
+<div class="collapse collapse-arrow bg-base-100 shadow my-4">
+    <input type="checkbox">
+    <div class="collapse-title font-semibold">
+        <i class="fa-solid fa-plus"></i>
+        Create Group
+    </div>
+    <div class="collapse-content">
+        <div class="divider">
+            Group Form
         </div>
-        <div class="content">
-            <p class="transition hidden">
-            <div class="ui segment">
-                <div class="ui left aligned horizontal divider">
-                    Group Form
-                </div>
-                <form method="POST" class="ui form">
-                    {{ form.csrf_token }}
-                    {{ renderer.render_field(form.name) }}
-                    {{ renderer.render_multiple_select(form.committees) }}
-                    <button name="create" type="submit" class="ui small primary button">
-                        Create
-                    </button>
-                </form>
-            </div>
-            </p>
-        </div>
+        <form method="POST" class="space-y-1">
+            {{ form.csrf_token }}
+            {{ renderer.render_field(form.name) }}
+            {{ renderer.render_multiple_select(form.committees) }}
+            <button name="create" type="submit" class="btn btn-primary btn-sm">
+                Create
+            </button>
+        </form>
     </div>
 </div>
 
-<div class="ui segment">
-    <a class="ui labeled icon green button"
+<div class="card bg-base-100 shadow my-4">
+    <div class="card-body p-4">
+    <a class="btn btn-success"
         href="{{url_for('admin.groups.set_group_student_ids', class_id=class_.id)}}">
-        <i class="users icon"></i>
+        <i class="fa-solid fa-users"></i>
         Auto Set Student IDS from Project Advisor
     </a>
-    <div class="ui info message">
+    <div class="alert alert-info">
         This will automatic set the Student IDS in the Group from the Project
         that the lecturer is an Advisor.</div>
-    <table class="ui celled table">
+    <div class="overflow-x-auto">
+    <table class="table table-zebra">
         <thead>
+            <tr>
             <th>No.</th>
             <th>Group Name</th>
             <th>Lecturer</th>
             <th>Student IDS </th>
             <th>Edit/Delete</th>
+            </tr>
         </thead>
         <tbody>
             {% for group in groups %}
@@ -85,27 +78,22 @@
                     {{ get_student_ids(group) }}
                 </td>
                 <td>
-                    <a class="ui primary icon button"
+                    <a class="btn btn-primary btn-square"
                         href="{{url_for('admin.groups.edit', group_id=group.id, class_id=class_.id)}}">
-                        <i class="edit icon"></i>
+                        <i class="fa-solid fa-pen-to-square"></i>
                     </a>
-                    <a class="ui red icon button"
+                    <a class="btn btn-error btn-square"
                         href="{{url_for('admin.groups.delete', group_id=group.id, class_id=class_.id)}}">
-                        <i class="trash icon"></i>
+                        <i class="fa-solid fa-trash"></i>
                     </a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    </div>
+    </div>
 </div>
 
 
 {% endblock %}
-
-{% block additional_js %}
-<script type="text/javascript">
-    $(".ui.accordion").accordion()
-
-</script>
-{% endblock additional_js %}

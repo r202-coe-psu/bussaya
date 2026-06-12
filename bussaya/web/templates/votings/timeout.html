@@ -1,11 +1,13 @@
 {% extends '/base/default-dashboard.html' %}
 
 {% block content %}
-<div class="ui placeholder segment" style="height: 80vh;">
-  <div class="ui icon header">
-    <i class="icon hourglass end"></i>
-    Time Out
+<div class="card bg-base-100 shadow my-4 h-[80vh]">
+  <div class="card-body items-center justify-center text-center">
+    <div class="text-xl font-semibold">
+      <i class="fa-solid fa-hourglass-end fa-2x"></i>
+      <div>Time Out</div>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('dashboard.index') }}">Try Again</a>
   </div>
-  <a class="ui primary button" href="{{ url_for('dashboard.index') }}">Try Again</a>
 </div>
 {% endblock %}

@@ -1,5 +1,4 @@
-from email.policy import default
-import resource
+
 import mongoengine as me
 import gridfs
 

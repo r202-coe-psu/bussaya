@@ -4,13 +4,9 @@
 {% import '/navbar/class-navbar.html' as renderer_navbar %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view_projects', class_id=class_.id) }}">View Project</a>
-</div>
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li><a href="{{ url_for('admin.classes.view_projects', class_id=class_.id) }}">View Project</a></li>
 {% endblock %}
 
 
@@ -18,11 +14,12 @@
 
 {{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
-<h2 class="ui header">
+<h2 class="text-2xl font-bold">
     View Project
 </h2>
-<div class="ui divider"></div>
-<table class="ui celled table">
+<div class="divider"></div>
+<div class="overflow-x-auto">
+<table class="table table-zebra">
   <thead>
     <th>No. </th>
     <th>Project</th>
@@ -32,7 +29,7 @@
   </thead>
   <tbody>
     {% for project in projects %}
-    <tr class="top aligned">
+    <tr class="align-top">
       <td>
         {{ loop.index }}
       </td>
@@ -51,13 +48,14 @@
         {% endfor %}
       </td>
       <td>
-        <a href="{{ url_for('admin.projects.edit', project_id=project.id, class_id=class_.id) }}" class="ui primary icon circular button"><i class="edit icon"></i></a>
-        <a href="{{ url_for('admin.projects.delete', project_id=project.id, class_id=class_.id) }}" class="ui icon circular negative button"><i class="trash icon"></i></a>
+        <a href="{{ url_for('admin.projects.edit', project_id=project.id, class_id=class_.id) }}" class="btn btn-primary btn-circle"><i class="fa-solid fa-pen-to-square"></i></a>
+        <a href="{{ url_for('admin.projects.delete', project_id=project.id, class_id=class_.id) }}" class="btn btn-error btn-circle"><i class="fa-solid fa-trash"></i></a>
       </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+</div>
 
 
 

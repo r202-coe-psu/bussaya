@@ -1,80 +1,55 @@
 {% extends '/base/default-dashboard.html' %}
 
 {% block content %}
-<div class="ui segment" style="min-height: 80vh;">
-  <div class="ui icon header center aligned">
-    <i class="icon snowflake end"></i>
+<div class="card bg-base-100 shadow my-4 min-h-[80vh]">
+  <div class="card-body">
+  <div class="text-center">
+    <i class="fa-solid fa-snowflake fa-2x"></i>
     {% if election %}
-      <h1>Edit election for class: {{ election.class_.name }}</h1>
+      <h1 class="text-3xl font-bold">Edit election for class: {{ election.class_.name }}</h1>
     {% else %}
-      <h1>Create Election</h1>
+      <h1 class="text-3xl font-bold">Create Election</h1>
     {% endif %}
   </div>
-  <div style="padding-top: 20px;">
+  <div class="pt-5">
 
-  <form method="POST">
-    <div class="ui form">
-      <div class="field">
+  <form method="POST" class="space-y-4">
+      <div>
           {{ form.class_.label }}
-          {{ form.class_(class_='ui fluid dropdown') }}
+          {{ form.class_(class_='select w-full') }}
       </div>
-      <div class="two fields">
-        <div class="field">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
           {{ form.started_date.label }}
-          <div class="ui calendar" id="rangestart">
-            <div class="ui input left icon">
-              <i class="calendar icon"></i>
-              {{ form.started_date(autocomplete='off') }}
-              {# <input type="text" placeholder="Start"> #}
-            </div>
-          </div>
+          {{ form.started_date(autocomplete='off', class_='input w-full') }}
         </div>
-        <div class="field">
+        <div>
           {{ form.ended_date.label }}
-          <div class="ui calendar" id="rangeend">
-            <div class="ui input left icon">
-              <i class="calendar icon"></i>
-              {{ form.ended_date(autocomplete='off') }}
-              {# <input type="text" placeholder="End"> #}
-            </div>
-          </div>
+          {{ form.ended_date(autocomplete='off', class_='input w-full') }}
         </div>
       </div>
 
-      <div class="field">
+      <div>
         {{ form.csrf_token }}
-        <button class="ui button primary" type="submit">Submit</button>
+        <button class="btn btn-primary" type="submit">Submit</button>
       </div>
-    </div>
   </form>
 
   </div>
-<div>
+  </div>
+</div>
 
 {% endblock %}
 
 {% block additional_js %}
-  <script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
-  <script type="text/javascript">
-    datetime_formatter = {
-      datetime: function (datetime, settings) {
-        if (!datetime) return '';
-        var day = datetime.getDate();
-        var month = datetime.getMonth() + 1;
-        var year = datetime.getFullYear();
-        var hour = datetime.getHours();
-        var minute = datetime.getMinutes();
-        return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2)  ;
-      }};
-    $('#rangestart').calendar({
-      // type: 'date',
-      formatter: datetime_formatter,
-      endCalendar: $('#rangeend')
-    });
-    $('#rangeend').calendar({
-      // type: 'date',
-      formatter: datetime_formatter,
-      startCalendar: $('#rangestart')
-    });
-  </script>
-{% endblock %}
+<script type="text/javascript">
+  (function () {
+    var start = document.getElementById('started_date');
+    var end = document.getElementById('ended_date');
+    if (start && end) {
+      start.addEventListener('change', function () { end.min = start.value; });
+      end.addEventListener('change', function () { start.max = end.value; });
+    }
+  })();
+</script>
+{% endblock additional_js %}

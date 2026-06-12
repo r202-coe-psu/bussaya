@@ -2,61 +2,50 @@
 {% macro render_project_material(project) -%}
   {% set r = project.get_resource('report') %}
   {% if r %}
-    <a target="_blank" href="{{ r.link }}"><i class="large pdf file icon link pop" data-content="Report"></i></a>
+    <a target="_blank" href="{{ r.link }}" class="tooltip" data-tip="Report"><i class="fa-solid fa-file-pdf fa-lg"></i></a>
   {% else %}
-    <i class="large pdf file icon disabled"></i>
+    <i class="fa-solid fa-file-pdf fa-lg opacity-30"></i>
   {% endif %}
 
   {% set r = project.get_resource('similarity') %}
   {% if r %}
-    <a target="_blank" href="{{ r.link }}"><i class="large copy icon link pop" data-content="Similarity"></i></a>
+    <a target="_blank" href="{{ r.link }}" class="tooltip" data-tip="Similarity"><i class="fa-solid fa-copy fa-lg"></i></a>
   {% else %}
-    <i class="large copy icon disabled"></i>
+    <i class="fa-solid fa-copy fa-lg opacity-30"></i>
   {% endif %}
 
   {% set r = project.get_resource('poster') %}
   {% if r %}
-    <a target="_blank" href="{{ r.link }}"><i class="large file image icon link pop" data-content="Poster"></i></a>
+    <a target="_blank" href="{{ r.link }}" class="tooltip" data-tip="Poster"><i class="fa-solid fa-file-image fa-lg"></i></a>
   {% else %}
-    <i class="large file image icon disabled"></i>
+    <i class="fa-solid fa-file-image fa-lg opacity-30"></i>
   {% endif %}
 
   {% set r = project.get_resource('presentation') %}
   {% if r %}
-    <a target="_blank" href="{{ r.link }}"><i class="large file powerpoint icon link pop" data-content="Presentation"></i></a>
+    <a target="_blank" href="{{ r.link }}" class="tooltip" data-tip="Presentation"><i class="fa-solid fa-file-powerpoint fa-lg"></i></a>
   {% else %}
-    <i class="large file powerpoint icon disabled"></i>
+    <i class="fa-solid fa-file-powerpoint fa-lg opacity-30"></i>
   {% endif %}
 
   {% set r = project.get_resource('other') %}
   {% if r %}
-    <a target="_blank" href="{{ r.link }}"><i class="large archive icon link pop" data-content="Other Resorces"></i></a>
+    <a target="_blank" href="{{ r.link }}" class="tooltip" data-tip="Other Resorces"><i class="fa-solid fa-box-archive fa-lg"></i></a>
   {% else %}
-    <i class="large archive icon disabled"></i>
+    <i class="fa-solid fa-box-archive fa-lg opacity-30"></i>
   {% endif %}
 
   {% set r = project.get_resource('video') %}
   {% if r %}
-    <a target="_blank" href="{{ r.link }}"><i class="large video file icon link pop" data-content="Video"></i></a>
+    <a target="_blank" href="{{ r.link }}" class="tooltip" data-tip="Video"><i class="fa-solid fa-file-video fa-lg"></i></a>
   {% else %}
-    <i class="large video file icon disabled"></i>
+    <i class="fa-solid fa-file-video fa-lg opacity-30"></i>
   {% endif %}
 
   {% set r = project.get_resource('git') %}
   {% if r %}
-    <a target="_blank" href="{{ r.link }}"><i class="large git icon link pop" data-content="Git Repository"></i></a>
+    <a target="_blank" href="{{ r.link }}" class="tooltip" data-tip="Git Repository"><i class="fa-brands fa-git-alt fa-lg"></i></a>
   {% else %}
-    <i class="large git icon disabled"></i>
+    <i class="fa-brands fa-git-alt fa-lg opacity-30"></i>
   {% endif %}
-
-  <script type="text/javascript">
-  $('.icon.link.pop')
-  .popup({
-    delay: {
-    show: 50,
-    hide: 70
-    }
-  });
-  </script>
 {%- endmacro %}
-

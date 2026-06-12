@@ -1,34 +1,36 @@
 {% extends '/base/default-dashboard.html' %}
 
 {% block content %}
-<div class="ui segment" style="min-height: 80vh;">
+<div class="card bg-base-100 shadow my-4 min-h-[80vh]">
+  <div class="card-body">
   {# begin head #}
-  <div class="ui icon header center aligned">
-    <i class="icon qrcode"></i>
-    <h1>Project QRCode</h1>
-    <a class="ui primary icon button big" href="{{ request.url }}?print=true">
-      <i class="print icon"></i> Print
+  <div class="text-center">
+    <i class="fa-solid fa-qrcode fa-2x"></i>
+    <h1 class="text-3xl font-bold">Project QRCode</h1>
+    <a class="btn btn-primary btn-lg" href="{{ request.url }}?print=true">
+      <i class="fa-solid fa-print"></i> Print
     </a>
   </div>
   {# end head #}
   {# begin qr block #}
-  <div style="padding-top: 20px;">
-    <div class="ui two column grid">
+  <div class="pt-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     {% for project in projects %}
-      <div class="column">
+      <div>
         <div>
-          <img class="ui centered image" src="data:image/png;base64,{{ qr_images[project.id]['image'] }}">
+          <img class="mx-auto" src="data:image/png;base64,{{ qr_images[project.id]['image'] }}">
         </div>
-        <div style="text-align: center;">
+        <div class="text-center">
           {{ project.name_th }}
         </div>
-        <div style="text-align: center;">
-          {{ project.students|map(attribute='username')|join('/') }}                                                          
+        <div class="text-center">
+          {{ project.students|map(attribute='username')|join('/') }}
         </div>
       </div>
     {% endfor %}
     </div>
   </div>
   {# end qr block #}
-<div>
+  </div>
+</div>
 {% endblock %}

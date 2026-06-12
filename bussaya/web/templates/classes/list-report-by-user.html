@@ -6,11 +6,8 @@
 {% import '/dashboard/project-renderer.html' as renderer_project %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-  <a href="{{ url_for('classes.index') }}" class="section">Classes</a>
-  <div class="divider"> / </div>
-  <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-</div>
+<li><a href="{{ url_for('classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
 {% endblock %}
 
 
@@ -18,39 +15,41 @@
 
 {{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
-<h2 class="ui header">Class</h2>
-<div class="ui divider"></div>
+<h2 class="text-2xl font-bold">Class</h2>
+<div class="divider"></div>
 
-<table class="ui single line table">
+<div class="overflow-x-auto">
+<table class="table">
   <tbody>
     <tr>
       <td>
-        <div style="color: grey">NAME </div>{{ class_.name }}
+        <div class="text-sm opacity-70">NAME </div>{{ class_.name }}
       </td>
       <td>
-        <div style="color: grey">DESCRIPTION</div> {{ class_.description }}
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <div style="color: grey">TYPE</div> {{ class_.get_type_display() }}
-      </td>
-      <td>
-        <div style="color: grey">TAG</div> {{ class_.tags | join(', ') }}
+        <div class="text-sm opacity-70">DESCRIPTION</div> {{ class_.description }}
       </td>
     </tr>
     <tr>
       <td>
-        <div style="color: grey">STARTED DATE</div> {{ class_.started_date }}
+        <div class="text-sm opacity-70">TYPE</div> {{ class_.get_type_display() }}
       </td>
       <td>
-        <div style="color: grey">ENDED DATE</div> {{ class_.ended_date }}
+        <div class="text-sm opacity-70">TAG</div> {{ class_.tags | join(', ') }}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="text-sm opacity-70">STARTED DATE</div> {{ class_.started_date }}
+      </td>
+      <td>
+        <div class="text-sm opacity-70">ENDED DATE</div> {{ class_.ended_date }}
       </td>
     </tr>
   </tbody>
 </table>
+</div>
 
-<h3 class="ui header">
+<h3 class="text-xl font-semibold">
   {% if 'classes.approve_meeting_report' in request.endpoint %}
     Waiting Meeting Report Approval
   {% else %}
@@ -60,8 +59,9 @@
     <a href="{{ url_for('admin.classes.approve_meeting_report', class_id=class_.id, filter='late', admin_view='true') }}">Late Report</a>
   {% endif %}
 </h3>
-<div class="ui divider"></div>
-<table class="ui tablet stackable celled table">
+<div class="divider"></div>
+<div class="overflow-x-auto">
+<table class="table table-zebra">
   <thead>
     <tr>
       <th>Student</th>
@@ -77,11 +77,11 @@
 
   <tbody>
     {% for report in meeting_reports %}
-    {%- set tr_class='top aligned' %}
+    {%- set tr_class='align-top' %}
     {%- if report.status == 'late-report' %}
-      {% set tr_class='yellow' %}
+      {% set tr_class='bg-warning/20' %}
     {%- endif %}
-    <tr class="{{ tr_class }} top aligned">
+    <tr class="{{ tr_class }} align-top">
       <td>
         {{ report.owner.username }} <br />
         {{ report.owner.first_name }} {{ report.owner.last_name }}
@@ -95,21 +95,21 @@
         </a>
       </td>
       <td>
-        <div><h3>{{ report.title }}</h3></div>
+        <div><h3 class="text-xl font-semibold">{{ report.title }}</h3></div>
         <div>
           {{ markdown.markdown(report.description)|safe }}
         </div>
         {% if report.file %}
           <div>
             {%- if report.file.filename[-3:].lower() == 'png' %}
-              <img class="ui image" src="{{ url_for('meetings.download', meeting_report_id=report.id, filename=report.file.filename) }}">
+              <img class="max-w-full" src="{{ url_for('meetings.download', meeting_report_id=report.id, filename=report.file.filename) }}">
             {% else %}
               <a href="{{ url_for('meetings.download', meeting_report_id=report.id, filename=report.file.filename) }}">{{ report.file.filename }}</a>
             {%- endif %}
           </div>
         {% endif %}
         <div>
-          <b>Advisors: </b> {{ report.advisors|map(attribute="fullname")|join(', ') }} 
+          <b>Advisors: </b> {{ report.advisors|map(attribute="fullname")|join(', ') }}
 
           <br/>
           <b>Last Updated Date: </b>{{ report.updated_date.ctime() }}
@@ -118,7 +118,7 @@
       <td>
         {{ report.meeting_date }}
       </td>
-      <td class="{{'green' if report.status == 'approved'}}{{'red' if report.status == 'disapproved'}}">
+      <td class="{{'bg-success/20' if report.status == 'approved'}}{{'bg-error/20' if report.status == 'disapproved'}}">
         <b>{{ report.get_status_display() if report.status else 'Waiting for approval' }}</b><br/>
         {% if report.status == 'approved' and report.approved_date %}
           {{ report.approved_date.ctime() }}
@@ -138,18 +138,18 @@
           </div>
         {% endif %}
       </td>
-      <td class="single line">
-        <div style="margin-bottom: 0.5em">
+      <td class="whitespace-nowrap">
+        <div class="mb-2">
           <a href="{{ url_for('meetings.approval', meeting_report_id=report.id, meeting_id=report.meeting.id, action='approve') }}"
-            class="ui positive icon button"><i class="icon check"></i></a>
-          <a onclick="showDisapprove('{{report.id}}')" class="ui negative icon button"><i class="icon close"></i></a>
+            class="btn btn-success btn-square"><i class="fa-solid fa-check"></i></a>
+          <a onclick="showDisapprove('{{report.id}}')" class="btn btn-error btn-square"><i class="fa-solid fa-xmark"></i></a>
         </div>
-        <form class="ui form" method="POST" id="form-round_grade"
+        <form method="POST" id="form-round_grade"
           action="{{ url_for('meetings.approval', meeting_report_id=report.id, meeting_id=report.meeting.id, action='disapprove') }}">
           {{ form.csrf_token }}
-          <div id="disapprove form {{report.id}}" style="display: none">
+          <div id="disapprove form {{report.id}}" class="hidden">
             {{ renderer.render_field(form.remark) }}
-            <button class="ui small primary button" type="submit">Submit</button>
+            <button class="btn btn-primary btn-sm" type="submit">Submit</button>
           </div>
         </form>
       </td>
@@ -157,38 +157,16 @@
     {% endfor %}
   </tbody>
 </table>
+</div>
 
 
 {% endblock %}
 
 {% block additional_js %}
-<script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/calendar.js') }}"></script>
 <script type="text/javascript">
   function showDisapprove(report_id) {
     console.log("disapprove form " + report_id)
-    $(document.getElementById("disapprove form " + report_id)).transition('fade down')
+    document.getElementById("disapprove form " + report_id).classList.toggle('hidden')
   }
-
-  datetime_formatter = {
-    datetime: function (datetime, settings) {
-      if (!datetime) return '';
-      var day = datetime.getDate();
-      var month = datetime.getMonth() + 1;
-      var year = datetime.getFullYear();
-      var hour = datetime.getHours();
-      var minute = datetime.getMinutes();
-      return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
-    }
-  };
-  $('#rangestart').calendar({
-    // type: 'date',
-    formatter: datetime_formatter,
-    endCalendar: $('#rangeend')
-  });
-  $('#rangeend').calendar({
-    // type: 'date',
-    formatter: datetime_formatter,
-    startCalendar: $('#rangestart')
-  });
 </script>
 {% endblock additional_js %}

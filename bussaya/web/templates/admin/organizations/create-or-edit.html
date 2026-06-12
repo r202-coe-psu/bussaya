@@ -15,44 +15,44 @@
 {% block breadcrumbs %}
   {{ super() }}
 
-	<div class="active section">
+	<li>
     {% if 'edit' == request.path %}
       Edit
     {% else %}
       Create
     {% endif %}
     Organization
-  </div>
+  </li>
 {% endblock %}
 
 
 {% block content %}
-  <h2 class="ui header">
+  <h2 class="text-2xl font-bold">
     {% if organization %}
       Edit Organization
     {% else %}
       Create Organization
     {% endif %}
   </h2>
-  <div class="ui divider"></div>
+  <div class="divider"></div>
 
-  <div class="ui segment">
-    <form method="POST" class="ui form">
+  <div class="card bg-base-100 shadow my-4">
+    <div class="card-body">
+    <form method="POST">
       {{ form.csrf_token }}
       {{ renderer.render_field(form.name) }}
       {{ renderer.render_field(form.website) }}
       {{ renderer.render_field(form.address) }}
       {{ renderer.render_field(form.remark) }}
 
-      <button name="create" type="submit" class="ui button primary">
+      <button name="create" type="submit" class="btn btn-primary">
         {{ 'Create' if 'create' in request.path else 'Edit'}}
       </button>
     </form>
+    </div>
   </div>
 
 {% endblock %}
 
 {% block additional_js %}
-<script type="text/javascript">
-</script>
 {% endblock additional_js %}

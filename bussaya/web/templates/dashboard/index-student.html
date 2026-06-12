@@ -6,89 +6,88 @@ Dashboard
 {% endblock %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-  <a href="{{ url_for('dashboard.index') }}" class="section">Classes</a>
-</div>
+<li><a href="{{ url_for('dashboard.index') }}">Classes</a></li>
 {% endblock %}
 
 {% block content %}
 
-<div class="ui horizontal left aligned divider header">
+<div class="divider divider-start text-lg font-semibold">
   Project
 </div>
 {% if projects | count > 0 %}
-<div class="ui segment row">
-  <h4>Project</h4>
-  <div class="ui grid">
-    <div class="sixteen wide column">
-      <div class="ui middle aligned divided list">
-        {% for project in projects %}
-        <div class="item">
-          <div class="right floated content single line">
-            {{ pm_renderer.render_project_material(project) }}
+<div class="card bg-base-100 shadow my-4">
+  <div class="card-body p-4">
+  <h4 class="text-lg font-semibold">Project</h4>
+  <ul class="divide-y divide-base-300">
+    {% for project in projects %}
+    <li class="flex items-center gap-3 py-2">
+      <i class="fa-solid fa-laptop fa-lg"></i>
+      <div>
+        <div class="font-semibold">{{ project.name }}</div>
+        <div>
+          <i class="fa-solid fa-user"></i>
+          {% for s in project.students %}
+          {{ s.first_name }} {{ s.last_name }}
+          {% if not loop.last %}, {% endif %}
+          {% endfor %}
 
-            {#
-            <a class="ui primary button" href="{{ url_for('projects.upload', project_id=project.id) }}">Upload</a>}
-            #}
-            <a href="{{ url_for('projects.view_info_project', project_id=project.id) }}" class="ui circular primary icon button"></i>View</a>
-          </div>
-          <i class="laptop large icon avatar"></i>
-          <div class="content">
-            <div class="header">{{ project.name }}</div>
-            <div>
-              <i class="user icon"></i>
-              {% for s in project.students %}
-              {{ s.first_name }} {{ s.last_name }}
-              {% if not loop.last %}, {% endif %}
-              {% endfor %}
-
-              <i class="user tie icon"></i> {{ project.advisors|map(attribute='fullname')|join(', ') }}
-              {#
-              {% if project.is_approval(project.advisor) %}
-              <i class="large blue check icon"></i>
-              {% else %}
-              <i class="large check icon disabled"></i>
-              {% endif %}
-              #}
-            </div>
-            <div>
-
-              <i class="user cog icon"></i>
-              {% for committee in project.committees %}
-              {{ committee.first_name }} {{ committee.last_name }}
-              {#
-              {% if project.is_approval(committee) %}
-              <i class="large blue check icon"></i>
-              {% else %}
-              <i class="large check icon disabled"></i>
-              {% endif %}
-              #}
-              {% endfor %}
-            </div>
-          </div>
+          <i class="fa-solid fa-user-tie"></i> {{ project.advisors|map(attribute='fullname')|join(', ') }}
+          {#
+          {% if project.is_approval(project.advisor) %}
+          <i class="fa-solid fa-check fa-lg text-info"></i>
+          {% else %}
+          <i class="fa-solid fa-check fa-lg opacity-30"></i>
+          {% endif %}
+          #}
         </div>
-        {% endfor %}
+        <div>
+
+          <i class="fa-solid fa-user-gear"></i>
+          {% for committee in project.committees %}
+          {{ committee.first_name }} {{ committee.last_name }}
+          {#
+          {% if project.is_approval(committee) %}
+          <i class="fa-solid fa-check fa-lg text-info"></i>
+          {% else %}
+          <i class="fa-solid fa-check fa-lg opacity-30"></i>
+          {% endif %}
+          #}
+          {% endfor %}
+        </div>
       </div>
-    </div>
+      <div class="ml-auto whitespace-nowrap">
+        {{ pm_renderer.render_project_material(project) }}
+
+        {#
+        <a class="btn btn-primary" href="{{ url_for('projects.upload', project_id=project.id) }}">Upload</a>}
+        #}
+        <a href="{{ url_for('projects.view_info_project', project_id=project.id) }}" class="btn btn-primary">View</a>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
   </div>
 </div>
 {% else %}
-<div class="ui info message">No projects to display</div>
+<div class="alert alert-info">No projects to display</div>
 {% endif %}
 
-<div class="ui labeled icon menu">
-  <a class="item" href="{{ url_for('projects.create') }}">
-    <i class="add icon"></i>
-    Create Project
-  </a>
-</div>
+<ul class="menu menu-horizontal bg-base-100 rounded-box shadow gap-1">
+  <li>
+    <a href="{{ url_for('projects.create') }}">
+      <i class="fa-solid fa-plus"></i>
+      Create Project
+    </a>
+  </li>
+</ul>
 
-<div class="ui horizontal left aligned divider header">
+<div class="divider divider-start text-lg font-semibold">
   Classes
 </div>
 
 {% if available_class %}
-<table class="ui celled table">
+<div class="overflow-x-auto">
+<table class="table table-zebra">
   <thead>
     <tr>
       <th>Name</th>
@@ -98,7 +97,7 @@ Dashboard
     </tr>
   </thead>
 
-  <body>
+  <tbody>
     {% for class_ in available_class%}
     <tr>
       <td>
@@ -115,10 +114,11 @@ Dashboard
       </td>
     </tr>
     {% endfor %}
-  </body>
+  </tbody>
 </table>
+</div>
 {% else %}
-<div class="ui info message">
+<div class="alert alert-info">
   No opened classes to display
 </div>
 {% endif %}

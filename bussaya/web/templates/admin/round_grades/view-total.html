@@ -5,19 +5,18 @@
 {% import '/admin/round_grades/admin-grade-menu-toolbars.html' as render_toolbars %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li>
     <a href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
         {{ round_grade.get_type_display() }}
     </a>
-    <div class="divider"> / </div>
+</li>
+<li>
     <a href="{{ url_for('admin.round_grades.view_total', class_id=class_.id, round_grade_type=round_grade.type) }}">View
         Total
         Grade</a>
-</div>
+</li>
 {% endblock %}
 
 
@@ -27,16 +26,18 @@
 
 {{ render_toolbars.render_admin_grade_menu_toolbars(round_grade) }}
 
-<div class="ui attached segment">
-    <table class="ui celled table">
+<div class="card bg-base-100 shadow my-4">
+    <div class="card-body p-4">
+    <div class="overflow-x-auto">
+    <table class="table table-zebra">
         <thead>
-            <tr class="top aligned">
+            <tr class="align-top">
                 <th></th>
                 <th>ID</th>
                 <th>Student</th>
                 <th>Advisor</th>
-                <th class="one wide">Meeting Report</th>
-                <th class="one wide">Submissions</th>
+                <th>Meeting Report</th>
+                <th>Submissions</th>
                 <th>Average Grade</th>
                 <th>Actual Grade</th>
                 <th>Total Grade</th>
@@ -45,7 +46,7 @@
         <tbody>
             {% for student_grade in student_grades %}
             {% set student = student_grade.student %}
-            <tr class="top aligned">
+            <tr class="align-top">
                 <td>{{ loop.index }}</td>
                 <td>
                     <a target="_blank"
@@ -54,7 +55,7 @@
                     </a>
                 </td>
                 <td>
-                  <a href="{{ url_for('admin.projects.view_info_project', project_id=student.get_project().id) }}" class="ui circular primary icon button"><i class="code desktop icon"></i> project</a> 
+                  <a href="{{ url_for('admin.projects.view_info_project', project_id=student.get_project().id) }}" class="btn btn-primary btn-sm rounded-full"><i class="fa-solid fa-laptop-code"></i> project</a>
                     <a target="_blank"
                         href="{{ url_for('accounts.profile', user_id=student.id) }}">
                         {{ student.first_name }} {{ student.last_name }}
@@ -62,8 +63,8 @@
                 </td>
                 <td>
                     {% for advisor in student.get_project().advisors%}
-                    <a target="_blank" 
-                        href="{{ url_for('admin.round_grades.view_advisor_students', round_grade_type=round_grade.type, class_id=class_.id, advisor_id=advisor.id) }}">  
+                    <a target="_blank"
+                        href="{{ url_for('admin.round_grades.view_advisor_students', round_grade_type=round_grade.type, class_id=class_.id, advisor_id=advisor.id) }}">
                         {{ advisor.get_fullname() }}
                     </a>
                     {% endfor %}
@@ -79,19 +80,19 @@
                 <td>
                     {% if student_report %}
                     <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
-                        target="_blank">
-                        <i class="large pdf file icon link pop" data-content="Report"></i>
+                        target="_blank" class="tooltip" data-tip="Report">
+                        <i class="fa-solid fa-file-pdf fa-lg"></i>
                     </a>
                     {% else %}
-                    <i class="grey large pdf file icon disable"></i>
+                    <i class="fa-solid fa-file-pdf fa-lg opacity-30"></i>
                     {% endif %}
                     {% if student_presentation %}
                     <a href="{{ url_for('submissions.download', progress_report_id=student_presentation.id, filename=student_presentation.file.filename) }}"
-                        target="_blank">
-                        <i class="large file powerpoint icon link pop" data-content="Presentation"></i>
+                        target="_blank" class="tooltip" data-tip="Presentation">
+                        <i class="fa-solid fa-file-powerpoint fa-lg"></i>
                     </a>
                     {% else %}
-                    <i class="grey large file powerpoint icon disable"></i>
+                    <i class="fa-solid fa-file-powerpoint fa-lg opacity-30"></i>
                     {% endif %}
                 </td>
                 <td>
@@ -102,12 +103,12 @@
                     {% if not caused %}
                       {{ actual_grade }}
                     {% else %}
-                    <div class="ui accordion">
-                      <div class="title">
-                        {{ actual_grade }}
-                            <i class="blue dropdown icon"></i>
+                    <div class="collapse collapse-arrow bg-base-100">
+                        <input type="checkbox">
+                        <div class="collapse-title p-1 min-h-0">
+                            {{ actual_grade }}
                         </div>
-                        <div class="content" style="display: none; width: fit-content">
+                        <div class="collapse-content text-sm" style="width: fit-content">
                             {% for cause in caused %}
                             - {{ cause }}
                             {% if not loop.last %} <br> {% endif %}
@@ -123,29 +124,33 @@
                             See More
                         </a>
                     </div>
-                    <div id="{{student_grade.id}} content" class="content" style="display: none">
+                    <div id="{{student_grade.id}} content" class="content hidden">
                         <p />
                         {% for student_grade in student.get_total_student_grades(round_grade) %}
-                        <div class="ui relaxed divided list">
-                            <div class="item">
+                        <ul class="space-y-1">
+                            <li class="flex items-center gap-2">
                                 {% if student_grade.get_grader() and student_grade.get_grader().get_picture() %}
-                                <img class="ui avatar image" src="{{ student_grade.get_grader().get_picture() }}">
+                                <div class="avatar">
+                                    <div class="w-8 rounded-full">
+                                        <img src="{{ student_grade.get_grader().get_picture() }}">
+                                    </div>
+                                </div>
                                 {% else %}
-                                <i class="user icon"></i>
+                                <i class="fa-solid fa-user"></i>
                                 {% endif %}
-                                <div class="content">
-                                    <a class="header">
+                                <div>
+                                    <a class="font-semibold">
                                         {{ student_grade.get_grader().get_full_name() if student_grade.get_grader() else 'Mentor' }}
                                         {% if student_grade.get_grader() in student.get_project().advisors %}
-                                          <i class="red star icon"></i>
+                                          <i class="fa-solid fa-star text-error"></i>
                                         {% elif student_grade.grader.mentor %}
-                                          <i class="blue star icon"></i>
+                                          <i class="fa-solid fa-star text-info"></i>
                                         {% endif %}
                                     </a>
-                                    <div class="description">{{ student_grade.get_result_display() }}</div>
+                                    <div class="text-sm opacity-70">{{ student_grade.get_result_display() }}</div>
                                 </div>
-                            </div>
-                        </div>
+                            </li>
+                        </ul>
                         {% endfor %}
                     </div>
                 </td>
@@ -153,6 +158,8 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
+    </div>
 </div>
 
 {% endblock %}
@@ -160,18 +167,8 @@
 
 {% block additional_js %}
 <script type="text/javascript">
-    function showRelease() {
-        $('.ui.modal.release.round_grade')
-            .modal('show')
-            ;
-    }
-    $('.ui.accordion')
-        .accordion()
-        ;
-</script>
-<script type="text/javascript">
     function accordion_show_hide(show_hide_id) {
-        $(document.getElementById(show_hide_id + " content")).transition('fade down')
+        document.getElementById(show_hide_id + " content").classList.toggle('hidden')
 
         if (document.getElementById(show_hide_id).textContent == "Hide") {
             document.getElementById(show_hide_id).innerHTML = "See More"
@@ -179,41 +176,5 @@
             document.getElementById(show_hide_id).innerHTML = "Hide"
         }
     }
-
-    function showSetTimeOff() {
-        $('.ui.time-off').transition('fade down')
-    }
-</script>
-<script type="text/javascript">
-    datetime_formatter = {
-        datetime: function (datetime, settings) {
-            if (!datetime) return '';
-            var day = datetime.getDate();
-            var month = datetime.getMonth() + 1;
-            var year = datetime.getFullYear();
-            var hour = datetime.getHours();
-            var minute = datetime.getMinutes();
-            return year + '-' + ("0" + month).slice(-2) + '-' + ("0" + day).slice(-2) + " " + ("0" + hour).slice(-2) + ":" + ("0" + minute).slice(-2);
-        }
-    };
-    $('#rangestart').calendar({
-        // type: 'date',
-        formatter: datetime_formatter,
-        endCalendar: $('#rangeend')
-    });
-    $('#rangeend').calendar({
-        // type: 'date',
-        formatter: datetime_formatter,
-        startCalendar: $('#rangestart')
-    });
-</script>
-<script type="text/javascript">
-    $('.icon.link.pop')
-        .popup({
-            delay: {
-                show: 50,
-                hide: 70
-            }
-        });
 </script>
 {% endblock additional_js %}

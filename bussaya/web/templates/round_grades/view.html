@@ -4,15 +4,13 @@
 {% import '/navbar/class-navbar.html' as renderer_navbar %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('classes.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
+<li><a href="{{ url_for('classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li>
     <a href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
         {{ round_grade.get_type_display() }}
     </a>
-</div>
+</li>
 {% endblock %}
 
 
@@ -20,22 +18,26 @@
 
 {{ renderer_navbar.render_class_navbar(class_, current_user) }}
 
-<h2 class="ui header">
+<h2 class="text-2xl font-bold">
     {{ "View" if 'view' in request.path }}
     {{ "Total" if 'total' in request.path }}
     {{ round_grade.get_type_display() }} Grade</h2>
-<div class="ui divider"></div>
+<div class="divider"></div>
 
-<div class="ui segment">
-    <div class="ui large info message">
-        <b>Time off date:</b> {{ round_grade.natural_ended_date() }} <br>
-        <b>Remaining Time:</b> {{ round_grade.remain_time()[1]}} <br>
-        <b>Release Status:</b> {{ round_grade.get_release_status_display() }} <br>
+<div class="card bg-base-100 shadow my-4">
+    <div class="card-body p-4">
+        <div class="alert alert-info">
+            <div>
+                <b>Time off date:</b> {{ round_grade.natural_ended_date() }} <br>
+                <b>Remaining Time:</b> {{ round_grade.remain_time()[1]}} <br>
+                <b>Release Status:</b> {{ round_grade.get_release_status_display() }} <br>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="ui attached segment">
-    <table class="ui celled structured single line table">
+<div class="overflow-x-auto">
+    <table class="table table-zebra">
         <thead>
             <tr>
                 <th></th>
@@ -55,7 +57,7 @@
 
             {% set student = student_grade.student %}
             {% if student_grade.get_grader() == current_user %}
-            <tr class="top aligned">
+            <tr class="align-top">
                 <td>{{index.value}}</td>
                 {% set index.value = index.value + 1 %}
                 <td>{{ student.username }}</td>
@@ -73,12 +75,12 @@
                   {% if not caused %}
                     {{ actual_grade }}
                   {% else %}
-                    <div class="ui accordion">
-                        <div class="title">
+                    <div class="collapse collapse-arrow bg-base-100 shadow">
+                        <input type="checkbox">
+                        <div class="collapse-title font-semibold">
                             {{ actual_grade }}
-                            <i class="blue dropdown icon"></i>
                         </div>
-                        <div class="content" style="display: none; width: fit-content">
+                        <div class="collapse-content" style="width: fit-content">
                             {% for cause in caused %}
                             - {{ cause }}
                             {% if not loop.last %} <br> {% endif %}
@@ -89,32 +91,36 @@
                 </td>
                 <td>
                     <div class="title">
-                        <a id="{{student_grade.id}}" style="cursor: pointer"
+                        <a id="{{student_grade.id}}" class="link link-primary cursor-pointer"
                             onclick="accordion_show_hide('{{student_grade.id}}')">
                             See More
                         </a>
                     </div>
-                    <div id="{{student_grade.id}} content" class="content" style="display: none">
+                    <div id="{{student_grade.id}} content" class="content hidden">
                         <p />
                         {% for student_grade in student.get_total_student_grades(round_grade) %}
-                        <div class="ui relaxed divided list">
-                            <div class="item">
+                        <ul class="space-y-1 divide-y divide-base-300">
+                            <li class="flex items-center gap-2 py-1">
                                 {% if student_grade.get_grader() and student_grade.get_grader().get_picture() %}
-                                <img class="ui avatar image" src="{{ student_grade.get_grader().get_picture() }}">
+                                <div class="avatar">
+                                    <div class="w-8 rounded-full">
+                                        <img src="{{ student_grade.get_grader().get_picture() }}">
+                                    </div>
+                                </div>
                                 {% else %}
-                                <i class="user icon"></i>
+                                <i class="fa-solid fa-user"></i>
                                 {% endif %}
-                                <div class="content">
-                                    <a class="header">
+                                <div>
+                                    <a class="font-semibold">
                                         {{ student_grade.get_grader().get_full_name() }}
                                         {% if student_grade.get_grader() == student.get_project().advisor %}
-                                        <i class="red star icon"></i>
+                                        <i class="fa-solid fa-star text-error"></i>
                                         {% endif %}
                                     </a>
-                                    <div class="description">{{ student_grade.get_result_display() }}</div>
+                                    <div class="text-sm opacity-70">{{ student_grade.get_result_display() }}</div>
                                 </div>
-                            </div>
-                        </div>
+                            </li>
+                        </ul>
                         {% endfor %}
                     </div>
                 </td>
@@ -124,19 +130,19 @@
                 <td>
                     {% if student_report %}
                     <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
-                        target="_blank">
-                        <i class="large pdf file icon link pop" data-content="Report"></i>
+                        target="_blank" class="tooltip" data-tip="Report">
+                        <i class="fa-solid fa-file-pdf fa-lg"></i>
                     </a>
                     {% else %}
-                    <i class="grey large pdf file icon disable"></i>
+                    <i class="fa-solid fa-file-pdf fa-lg opacity-30"></i>
                     {% endif %}
                     {% if student_presentation %}
                     <a href="{{ url_for('submissions.download', progress_report_id=student_presentation.id, filename=student_presentation.file.filename) }}"
-                        target="_blank">
-                        <i class="large file powerpoint icon link pop" data-content="Presentation"></i>
+                        target="_blank" class="tooltip" data-tip="Presentation">
+                        <i class="fa-solid fa-file-powerpoint fa-lg"></i>
                     </a>
                     {% else %}
-                    <i class="grey large file powerpoint icon disable"></i>
+                    <i class="fa-solid fa-file-powerpoint fa-lg opacity-30"></i>
                     {% endif %}
                 </td>
 
@@ -152,29 +158,13 @@
 {% block additional_js %}
 <script type="text/javascript">
     function accordion_show_hide(show_hide_id) {
-        $(document.getElementById(show_hide_id + " content")).transition('fade down')
+        document.getElementById(show_hide_id + " content").classList.toggle('hidden')
 
-        if (document.getElementById(show_hide_id).textContent == "Hide") {
+        if (document.getElementById(show_hide_id).textContent.trim() == "Hide") {
             document.getElementById(show_hide_id).innerHTML = "See More"
         } else {
             document.getElementById(show_hide_id).innerHTML = "Hide"
         }
     }
-    $('.ui.accordion')
-        .accordion()
-        ;
-
-    function showSetTimeOff() {
-        $('.ui.time-off').transition('fade down')
-    }
-</script>
-<script type="text/javascript">
-    $('.icon.link.pop')
-        .popup({
-            delay: {
-                show: 50,
-                hide: 70
-            }
-        });
 </script>
 {% endblock additional_js %}

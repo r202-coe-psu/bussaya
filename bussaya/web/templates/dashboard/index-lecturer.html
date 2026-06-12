@@ -10,9 +10,10 @@ Dashboard
 
 {% block content %}
 
-<h2 class="ui header horizontal divider">Classes</h2>
+<h2 class="divider text-2xl font-bold">Classes</h2>
 {% if opened_classes %}
-<table class="ui celled table large">
+<div class="overflow-x-auto">
+<table class="table table-zebra">
   <thead>
     <tr>
       <th>Name</th>
@@ -29,27 +30,27 @@ Dashboard
     {% for class_ in opened_classes %}
     <tr>
       <td>
-        <i class="ui {{ class_attributes.class_icons[class_.type]['icon'] }} icon {{ class_attributes.class_icons[class_.type]['color'] }}"></i>
+        <i class="fa-solid fa-{{ class_attributes.class_icons[class_.type]['icon'] }} {{ class_attributes.class_icons[class_.type]['color'] }}"></i>
         <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
       </td>
       <td>
         {{ class_.description }}
       </td>
-      <td class="one wide">
+      <td class="whitespace-nowrap">
         {{ class_.ended_date }}
       </td>
-      <td class="one wide single line right aligned">
-        <a href="{{ url_for('classes.view', class_id=class_.id) }}" class="ui icon primary circular button">
-          <i class="icon eye link pop" data-content="View class"></i>
+      <td class="whitespace-nowrap text-right">
+        <a href="{{ url_for('classes.view', class_id=class_.id) }}" class="btn btn-primary btn-circle tooltip" data-tip="View class">
+          <i class="fa-solid fa-eye"></i>
         </a>
-        <a href="{{ url_for('classes.approve_meeting_report', class_id=class_.id) }}" class="ui icon primary circular button">
-          <i class="icon clipboard link pop" data-content="Approve waiting progress report"></i>
+        <a href="{{ url_for('classes.approve_meeting_report', class_id=class_.id) }}" class="btn btn-primary btn-circle tooltip" data-tip="Approve waiting progress report">
+          <i class="fa-solid fa-clipboard"></i>
         </a>
-        <a href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='midterm') }}" class="ui icon yellow circular button">
-          <i class="icon font link pop" data-content="Midterm grade"></i>
+        <a href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='midterm') }}" class="btn btn-warning btn-circle tooltip" data-tip="Midterm grade">
+          <i class="fa-solid fa-font"></i>
         </a>
-        <a href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='final') }}" class="ui icon red circular button">
-          <i class="icon font link pop" data-content="Final grade"></i>
+        <a href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='final') }}" class="btn btn-error btn-circle tooltip" data-tip="Final grade">
+          <i class="fa-solid fa-font"></i>
         </a>
 
       </td>
@@ -57,8 +58,9 @@ Dashboard
     {% endfor %}
   </tbody>
 </table>
+</div>
 {% else %}
-<div class="ui info message">
+<div class="alert alert-info">
   No opened classes to display
 </div>
 {% endif %}

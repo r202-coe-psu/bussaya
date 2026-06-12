@@ -5,16 +5,15 @@ Users
 {% endblock %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('admin.users.index') }}" class="section">Users</a>
-</div>
+<li><a href="{{ url_for('admin.users.index') }}">Users</a></li>
 {% endblock %}
 
 {% block content %}
 
 <div class="row">
     {% if users %}
-    <table class="ui celled table unstackable">
+    <div class="overflow-x-auto">
+    <table class="table table-zebra">
         <thead>
             <tr>
                 <th>Name</th>
@@ -43,6 +42,7 @@ Users
             {% endfor %}
         </body>
     </table>
+    </div>
     {% endif %}
 
 </div>

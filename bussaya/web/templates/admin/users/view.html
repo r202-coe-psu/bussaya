@@ -7,38 +7,37 @@ Edit User
 {% endblock %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    {{ super() }}
-    <i class="right angle icon divider"></i>
-    <div class="section">Edit User</div>
-</div>
+{{ super() }}
+<li>Edit User</li>
 {% endblock %}
 
 {% block content %}
-<div class="ui content">
-    <div class="ui segment">
-        <h2>Profile</h2>
-        <form method="POST" class="ui form">
+<div>
+    <div class="card bg-base-100 shadow my-4">
+        <div class="card-body">
+        <h2 class="text-2xl font-bold">Profile</h2>
+        <form method="POST">
             {{ form.hidden_tag() }}
 
             {{ renderer.render_field(form.username)}}
 
-            <div class="three fields">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
                 {{ renderer.render_field(form.title) }}
                 {{ renderer.render_field(form.first_name) }}
                 {{ renderer.render_field(form.last_name) }}
             </div>
-            <div class="three fields">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
                 {{ renderer.render_field(form.title_th) }}
                 {{ renderer.render_field(form.first_name_th) }}
                 {{ renderer.render_field(form.last_name_th) }}
             </div>
-            <div class="three fields">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
                 {{ renderer.render_field(form.email) }}
             </div>
             {{ renderer.render_field(form.roles) }}
-            <button name="create" type="submit" class="ui primary button">Change</button>
+            <button name="create" type="submit" class="btn btn-primary">Change</button>
         </form>
+        </div>
     </div>
 </div>
 

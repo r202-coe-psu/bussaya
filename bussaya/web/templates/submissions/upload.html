@@ -7,70 +7,59 @@ Submission Form
 {% endblock %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('dashboard.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
-    Form:<a href="{{ url_for('submissions.upload', class_id=class_.id, submission_id=submission.id) }}">
-        {{submission.get_type_display()}}</a>
-</div>
+<li><a href="{{ url_for('dashboard.index') }}">Classes</a></li>
+<li><a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li>Form:<a href="{{ url_for('submissions.upload', class_id=class_.id, submission_id=submission.id) }}">
+        {{submission.get_type_display()}}</a></li>
 {% endblock %}
 
 {% block content %}
 
-<table class="ui definition table">
-    <tr>
-        <td class="two wide">
-            Submission
-        </td>
-        <td>
-            {{ submission.get_type_display() }}
-        </td>
-    </tr>
-    <tr>
-        <td class="two wide">
-            Description:
-        </td>
-        <td>
-            {{ submission.description }}
-        </td>
-    </tr>
-    <tr>
-        <td class="two wide">
-            Remaining time:
-        </td>
-        <td>
-            {{ submission.get_remain_time()[1] }}
-        </td>
-    </tr>
-</table>
+<div class="overflow-x-auto">
+    <table class="table table-zebra">
+        <tr>
+            <th class="font-medium">
+                Submission
+            </th>
+            <td>
+                {{ submission.get_type_display() }}
+            </td>
+        </tr>
+        <tr>
+            <th class="font-medium">
+                Description:
+            </th>
+            <td>
+                {{ submission.description }}
+            </td>
+        </tr>
+        <tr>
+            <th class="font-medium">
+                Remaining time:
+            </th>
+            <td>
+                {{ submission.get_remain_time()[1] }}
+            </td>
+        </tr>
+    </table>
+</div>
 
-<form method="POST" class="ui form" enctype="multipart/form-data">
-    <div class="ui segment">
-        {{ form.csrf_token }}
-        {{ renderer.render_select(form.project) }}
-        {{ renderer.render_field(form.description) }}
-        {{ renderer.render_fileinput(form.uploaded_file) }}
-        <button type="submit" class="ui button primary">
-            {{ 'Edit' if 'edit' in request.path else 'Upload' }}
-            {{ "Late Upload" if submission.get_status() == "lated" }}
-        </button>
+<form method="POST" enctype="multipart/form-data">
+    <div class="card bg-base-100 shadow my-4">
+        <div class="card-body p-4">
+            {{ form.csrf_token }}
+            {{ renderer.render_select(form.project) }}
+            {{ renderer.render_field(form.description) }}
+            {{ renderer.render_fileinput(form.uploaded_file) }}
+            <button type="submit" class="btn btn-primary">
+                {{ 'Edit' if 'edit' in request.path else 'Upload' }}
+                {{ "Late Upload" if submission.get_status() == "lated" }}
+            </button>
+        </div>
     </div>
 </form>
 
 {% endblock content %}
 
 {% block additional_js %}
-<script type="text/javascript">
-    $(".attach-file-{{ form.uploaded_file.name }}").click(function () {
-        $("#{{ form.uploaded_file.name }}").click();
-    });
-
-    $('#{{ form.uploaded_file.name }}')
-        .on('change', function (e) {
-            var name = e.target.files[0].name;
-            $('.attach-file-{{ form.uploaded_file.name }}', $(e.target).parent()).val(name);
-        });
-</script>
 {% endblock additional_js %}

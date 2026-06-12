@@ -5,19 +5,18 @@
 {% import '/admin/round_grades/admin-grade-menu-toolbars.html' as render_toolbars %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li>
     <a href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
         {{ round_grade.get_type_display() }}
     </a>
-    <div class="divider"> / </div>
+</li>
+<li>
     <a href="{{ url_for('admin.round_grades.view_total', class_id=class_.id, round_grade_type=round_grade.type) }}">View
         Total
         Grade</a>
-</div>
+</li>
 {% endblock %}
 
 {% block content %}
@@ -26,10 +25,12 @@
 
 {{ render_toolbars.render_admin_grade_menu_toolbars(round_grade) }}
 
-<div class="ui attached segment">
-    <table class="ui celled table">
+<div class="card bg-base-100 shadow my-4">
+    <div class="card-body p-4">
+    <div class="overflow-x-auto">
+    <table class="table table-zebra">
         <thead>
-            <tr class="top aligned">
+            <tr class="align-top">
                 <th></th>
                 <th>Grade</th>
                 <th>Total</th>
@@ -39,7 +40,7 @@
         <tbody>
             {% set grades = class_.count_grade(round_grade) %}
             {% for grade in grades %}
-            <tr class="top aligned">
+            <tr class="align-top">
                 <td>{{ loop.index }}</td>
                 <td>
                     {{ grade }}
@@ -54,22 +55,24 @@
                             See More
                         </a>
                     </div>
-                    <div class="ui relaxed divided list" id="content-{{ loop.index }}" style="display: none;">
+                    <ul class="space-y-1" id="content-{{ loop.index }}" style="display: none;">
                         {% for student in grades[grade][1] %}
-                        <div class="content">
-                            <div class="description">                    
+                        <li>
+                            <div class="text-sm opacity-70">
                                 <a target="_blank"
                                 href="{{ url_for('accounts.profile', user_id=student.id) }}">
                                 {{ student.username }}
                                 </a></div>
-                        </div>
+                        </li>
                         {% endfor %}
-                    </div>
+                    </ul>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    </div>
+    </div>
 </div>
 
 {% endblock %}
@@ -89,34 +92,5 @@
             toggleElement.textContent = "See More";
         }
     }
-
-    // Semantic UI Popup Initialization
-    $('.icon.link.pop').popup({
-        delay: {
-            show: 50,
-            hide: 70
-        }
-    });
-
-    // Semantic UI Calendar Initialization
-    const datetime_formatter = {
-        datetime: function (datetime) {
-            if (!datetime) return '';
-            const day = datetime.getDate();
-            const month = datetime.getMonth() + 1;
-            const year = datetime.getFullYear();
-            const hour = datetime.getHours();
-            const minute = datetime.getMinutes();
-            return `${year}-${("0" + month).slice(-2)}-${("0" + day).slice(-2)} ${("0" + hour).slice(-2)}:${("0" + minute).slice(-2)}`;
-        }
-    };
-    $('#rangestart').calendar({
-        formatter: datetime_formatter,
-        endCalendar: $('#rangeend')
-    });
-    $('#rangeend').calendar({
-        formatter: datetime_formatter,
-        startCalendar: $('#rangestart')
-    });
 </script>
 {% endblock %}

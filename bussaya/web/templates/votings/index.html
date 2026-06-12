@@ -1,8 +1,9 @@
 {% extends '/base/default-dashboard.html' %}
 
 {% macro print_results(votings) -%}
-<table class="ui celled selectable table">
-  <thead class="center aligned">
+<div class="overflow-x-auto">
+<table class="table table-zebra">
+  <thead class="text-center">
     <th>Project</th>
     <th>Student</th>
     <th>Votes</th>
@@ -20,29 +21,32 @@
           {{ p.student_ids | join(', ') }}
         {% endif %}
       </td>
-      <td class="right aligned">{{ v }}</td>
+      <td class="text-right">{{ v }}</td>
     </tr>
   {% endfor %}
   </tbody>
 </table>
+</div>
 {%- endmacro %}
 
 {% block content %}
-<div class="ui segment" style="min-height: 80vh;">
-  <div class="ui icon header center aligned">
-    <i class="icon snowflake end"></i>
-    <h1>Student Result</h1>
-    <h2>Election: {{ election.started_date }} - {{ election.ended_date }}</h2>
+<div class="card bg-base-100 shadow my-4 min-h-[80vh]">
+  <div class="card-body">
+  <div class="text-center">
+    <i class="fa-solid fa-snowflake fa-2x"></i>
+    <h1 class="text-3xl font-bold">Student Result</h1>
+    <h2 class="text-2xl font-bold">Election: {{ election.started_date }} - {{ election.ended_date }}</h2>
 
   </div>
-  <div style="padding-top: 20px;">
-    <h3>CoE Lecturer & Staff</h3>
+  <div class="pt-5">
+    <h3 class="text-xl font-semibold">CoE Lecturer & Staff</h3>
     {{ print_results(lec_votings) }}
   </div>
-  <div style="padding-top: 20px;">
-    <h3>Participant</h3>
+  <div class="pt-5">
+    <h3 class="text-xl font-semibold">Participant</h3>
     {{ print_results(std_votings) }}
   </div>
-<div>
+  </div>
+</div>
 
 {% endblock %}

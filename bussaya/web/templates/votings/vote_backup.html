@@ -1,70 +1,44 @@
 {% extends '/base/default-dashboard.html' %}
 {% block content %}
-<div class="ui placeholder segment" style="padding-top:50px;">
-  <div class="ui icon header">
-    <i class="icon hourglass end"></i>
-    
-    <h1 class="header"> {{ election.class_.name }} </h1>
-    <div class="ui segment text container left aligned">
+<div class="card bg-base-100 shadow my-4 pt-12">
+  <div class="card-body text-center">
+    <i class="fa-solid fa-hourglass-end fa-2x"></i>
+
+    <h1 class="text-3xl font-bold"> {{ election.class_.name }} </h1>
+    <div class="card bg-base-100 shadow my-4 text-left">
+      <div class="card-body p-4">
       <p> Vote Start {{ election.started_date.strftime("%d/%m/%Y, %H:%M:%S")}} </p>
       <p> Vote Stop {{ election.ended_date.strftime("%d/%m/%Y, %H:%M:%S") }} </p>
       <p> Current Time {{ now.strftime("%d/%m/%Y, %H:%M:%S") }} </p>
+      </div>
     </div>
   </div>
 </div>
-<div class="ui container segment">
+<div class="card bg-base-100 shadow my-4 container mx-auto px-4">
+  <div class="card-body">
   {% if form.errors %}
-    <div class="ui error message">
+    <div class="alert alert-error">
       {{ form.errors }}
     </div>
   {% endif %}
-  <div class="ui info message">
+  <div class="alert alert-info">
+    <div>
     {% if 'CoE-lecturer' in current_user.roles %}
-      <h2>Hello Aj. {{ current_user.first_name }} {{ current_user.last_name }}</h2>
+      <h2 class="text-2xl font-bold">Hello Aj. {{ current_user.first_name }} {{ current_user.last_name }}</h2>
     {% endif %}
     <p>Click the selection box and select a project name; only three projects will be selected.</p>
+    </div>
   </div>
-  <form method="POST" class="ui form">
+  <form method="POST" class="space-y-4">
     {{ form.csrf_token }}
-      <div class="field">
+      <div>
         {{ form.projects.label }}
-        {{ form.projects(class_='ui dropdown') }}
+        {{ form.projects(class_='select w-full', required=true) }}
       </div>
-      <div class="ui vertical center aligned segment">
-        <div class="ui primary submit button">Vote</div>
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary">Vote</button>
       </div>
-      <div class="ui error message"></div>
     </form>
- </div>
-{% endblock %}
-
-{% block additional_js %}
-
-  <script src=" {{ url_for('static', filename='node_modules/fomantic-ui-css/components/form.js') }}"></script>
-  <script type="text/javascript">
-    $('.ui.dropdown').dropdown(
-      {
-        ignoreDiacritics: true,
-        sortSelect: true,
-        fullTextSearch:'exact'
-      }
-    );
-    $('.ui.form')
-      .form({
-        fields:{
-          projects: {
-            rules: [
-              {
-                type: 'minCount[1]',
-                prompt : 'Please select at least one project'
-              },
-              {
-                type: 'maxCount[3]',
-                prompt : 'Please select not over three projects'
-              }]
-          }
-        }
-      });
-
-  </script>
+  </div>
+</div>
 {% endblock %}

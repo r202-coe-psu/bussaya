@@ -1,144 +1,122 @@
 {% macro render_class_navbar(class_, current_user) %}
-<div class="ui labeled icon menu" style="margin: auto">
-  {% if "admin" in request.endpoint and current_user.has_roles('admin') %}
-    <a class="{{'active' if 'home' in request.path}} item" href="{{ url_for('admin.classes.view', class_id=class_.id) }}">
-      <i class="chalkboard icon"></i>
-      Class
-    </a>
-    <a href="{{ url_for('admin.classes.approve_meeting_report', class_id=class_.id, admin_view='true') }}" class="item">
-      <i class="clipboard icon"></i> Meeting Approval
-    </a>
-  {% else %}
-    <a class="{{'active' if 'home' in request.path}} item" href="{{ url_for('classes.view', class_id=class_.id) }}">
-      <i class="chalkboard icon"></i>
-      Class
-    </a>
-    <a href="{{ url_for('classes.approve_meeting_report', class_id=class_.id) }}" class="item">
-      <i class="clipboard icon"></i> Meeting Report Approval
-    </a>
-  {% endif %}
-
-  <div class="item ui floating labeled dropdown">
-    <i class="font icon"></i>
-    <span class="text">
-      {{'Grading'}}
-    </span>
-    <div class="menu">
-      {% if 'admin' in request.path %}
-      <a class="item" href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type='midterm') }}">
-        Midterm
+<div class="bg-base-100 rounded-box shadow mb-4">
+  <ul class="menu menu-horizontal flex-wrap gap-1 p-2">
+    {% if "admin" in request.endpoint and current_user.has_roles('admin') %}
+    <li>
+      <a class="{{'menu-active' if 'home' in request.path}}" href="{{ url_for('admin.classes.view', class_id=class_.id) }}">
+        <i class="fa-solid fa-chalkboard"></i> Class
       </a>
-      <a class="item" href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type='final') }}">
-        Final
+    </li>
+    <li>
+      <a href="{{ url_for('admin.classes.approve_meeting_report', class_id=class_.id, admin_view='true') }}">
+        <i class="fa-solid fa-clipboard"></i> Meeting Approval
       </a>
-      {% else %}
-      <a class="item" href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='midterm') }}">
-        Midterm
+    </li>
+    {% else %}
+    <li>
+      <a class="{{'menu-active' if 'home' in request.path}}" href="{{ url_for('classes.view', class_id=class_.id) }}">
+        <i class="fa-solid fa-chalkboard"></i> Class
       </a>
-      <a class="item" href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='final') }}">
-        Final
+    </li>
+    <li>
+      <a href="{{ url_for('classes.approve_meeting_report', class_id=class_.id) }}">
+        <i class="fa-solid fa-clipboard"></i> Meeting Report Approval
       </a>
-      {% endif %}
-    </div>
-  </div>
+    </li>
+    {% endif %}
 
-  {% if current_user.has_roles('admin', 'lecturer') %}
-    {% if 'admin' in current_user.roles and 'admin' in request.path %}
-  <a class="{{'active' if 'student_ids' in request.path}} item"
-    href="{{ url_for('admin.classes.view_students', class_id=class_.id) }}">
-    <i class="student icon"></i>
-    View Students
-  </a>
+    <li>
+      <details class="dropdown">
+        <summary><i class="fa-solid fa-font"></i> Grading</summary>
+        <ul class="menu dropdown-content bg-base-100 text-base-content rounded-box z-10 w-44 p-2 shadow">
+          {% if 'admin' in request.path %}
+          <li><a href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type='midterm') }}">Midterm</a></li>
+          <li><a href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type='final') }}">Final</a></li>
+          {% else %}
+          <li><a href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='midterm') }}">Midterm</a></li>
+          <li><a href="{{ url_for('round_grades.view', class_id=class_.id, round_grade_type='final') }}">Final</a></li>
+          {% endif %}
+        </ul>
+      </details>
+    </li>
 
-
-  <a class="{{ 'active' if 'classes.view_projects' == request.endpoint }} item"
-    href="{{ url_for('admin.classes.view_projects', class_id=class_.id) }}">
-    <i class="computer icon"></i>
-    View Projects
-  </a>
-
-  <a class="{{'active' if 'groups' in request.path}} item"
-    href="{{ url_for('admin.groups.view', class_id=class_.id) }}">
-    <i class="group icon"></i>
-    Manage Group
-  </a>
-  {#
-  {% else %}
-  <a class="{{'active' if 'groups' in request.path}} item" href="{{ url_for('groups.view', class_id=class_.id) }}">
-    <i class="group icon"></i>
-    Group
-  </a>
-  #}
-  {% endif %}
-  {% endif %}
-
-  <div class="item ui floating labeled dropdown">
-    <i class="check icon"></i>
-    <span class="text">
-      {{'Aprove Report'}}
-    </span>
-    <div class="menu">
-      {% if 'admin' in request.path %}
-      <a class="item" href="{{ url_for('admin.round_grades.approve_report', class_id=class_.id, round_grade_type='midterm') }}">
-        Midterm
+    {% if current_user.has_roles('admin', 'lecturer') %}
+      {% if 'admin' in current_user.roles and 'admin' in request.path %}
+    <li>
+      <a class="{{'menu-active' if 'student_ids' in request.path}}"
+        href="{{ url_for('admin.classes.view_students', class_id=class_.id) }}">
+        <i class="fa-solid fa-graduation-cap"></i> View Students
       </a>
-      <a class="item" href="{{ url_for('admin.round_grades.approve_report', class_id=class_.id, round_grade_type='final') }}">
-        Final
+    </li>
+    <li>
+      <a class="{{ 'menu-active' if 'classes.view_projects' == request.endpoint }}"
+        href="{{ url_for('admin.classes.view_projects', class_id=class_.id) }}">
+        <i class="fa-solid fa-computer"></i> View Projects
       </a>
-      {% else %}
-      <a class="item" href="{{ url_for('round_grades.approve_report', class_id=class_.id, round_grade_type='midterm') }}">
-        Midterm
+    </li>
+    <li>
+      <a class="{{'menu-active' if 'groups' in request.path}}"
+        href="{{ url_for('admin.groups.view', class_id=class_.id) }}">
+        <i class="fa-solid fa-users"></i> Manage Group
       </a>
-      <a class="item" href="{{ url_for('round_grades.approve_report', class_id=class_.id, round_grade_type='final') }}">
-        Final
-      </a>
-      {% endif %}
-    </div>
-  </div>
+    </li>
+    {% endif %}
+    {% endif %}
 
-  {% if current_user.has_roles("admin") and 'admin' in request.path %}
-  <a class="{{'active' if 'edit' in request.path and 'classes' in request.path}} item"
-    href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">
-    <i class="edit icon"></i>
-    Edit Class
-  </a>
-  <a class="item" onclick="showDelete()">
-    <i class="trash icon"></i>
-    Delete Class
-  </a>
-  {% endif %}
+    <li>
+      <details class="dropdown">
+        <summary><i class="fa-solid fa-check"></i> Aprove Report</summary>
+        <ul class="menu dropdown-content bg-base-100 text-base-content rounded-box z-10 w-44 p-2 shadow">
+          {% if 'admin' in request.path %}
+          <li><a href="{{ url_for('admin.round_grades.approve_report', class_id=class_.id, round_grade_type='midterm') }}">Midterm</a></li>
+          <li><a href="{{ url_for('admin.round_grades.approve_report', class_id=class_.id, round_grade_type='final') }}">Final</a></li>
+          {% else %}
+          <li><a href="{{ url_for('round_grades.approve_report', class_id=class_.id, round_grade_type='midterm') }}">Midterm</a></li>
+          <li><a href="{{ url_for('round_grades.approve_report', class_id=class_.id, round_grade_type='final') }}">Final</a></li>
+          {% endif %}
+        </ul>
+      </details>
+    </li>
 
-</div>
-<div class="ui modal delete class">
-  <i class="close icon"></i>
-  <div class="header">
-    Delete Class
-  </div>
-  <div class="image content">
-    <div class="description">
-      <div class="ui small header">Are you sure you want to delete <span class="ui blue text">{{class_.name}}</span>
-        class?</div>
-    </div>
-  </div>
-  <div class="actions">
-    <div class="ui black deny button">
-      No
-    </div>
-    <a class="ui very small red icon button" style="margin-top:0.5em"
-      href="{{ url_for('admin.classes.delete', class_id=class_.id) }}">
-      <i class="trash icon"></i> Delete
-    </a>
-  </div>
+    {% if current_user.has_roles("admin") and 'admin' in request.path %}
+    <li>
+      <a class="{{'menu-active' if 'edit' in request.path and 'classes' in request.path}}"
+        href="{{ url_for('admin.classes.edit', class_id=class_.id) }}">
+        <i class="fa-solid fa-pen-to-square"></i> Edit Class
+      </a>
+    </li>
+    <li>
+      <a onclick="showDelete()">
+        <i class="fa-solid fa-trash"></i> Delete Class
+      </a>
+    </li>
+    {% endif %}
+
+  </ul>
 </div>
 
-{% block additional_js %}
+<dialog id="delete-class-modal" class="modal">
+  <div class="modal-box">
+    <h3 class="text-lg font-bold">Delete Class</h3>
+    <p class="py-4">Are you sure you want to delete <span class="text-info font-semibold">{{ class_.name }}</span> class?</p>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn">No</button>
+      </form>
+      <a class="btn btn-error" href="{{ url_for('admin.classes.delete', class_id=class_.id) }}">
+        <i class="fa-solid fa-trash"></i> Delete
+      </a>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
 <script>
   function showDelete() {
-    $('.ui.modal.delete.class')
-      .modal('show')
-      ;
+    document.getElementById('delete-class-modal').showModal();
   }
 </script>
-{% endblock additional_js %}
 
 {% endmacro %}

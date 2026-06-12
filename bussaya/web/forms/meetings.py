@@ -22,18 +22,18 @@ BaseMeetingForm = model_form(
         "round": {"label": "Round"},
         "started_date": {
             "label": "Started Date",
-            "format": "%Y-%m-%d %H:%M",
-            "widget": widgets.TextInput(),
+            "format": ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"],
+            "widget": widgets.DateTimeLocalInput(),
         },
         "ended_date": {
             "label": "Ended Date",
-            "format": "%Y-%m-%d %H:%M",
-            "widget": widgets.TextInput(),
+            "format": ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"],
+            "widget": widgets.DateTimeLocalInput(),
         },
         "extended_date": {
             "label": "Extended Date",
-            "format": "%Y-%m-%d %H:%M",
-            "widget": widgets.TextInput(),
+            "format": ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"],
+            "widget": widgets.DateTimeLocalInput(),
         },
     },
 )
@@ -73,7 +73,7 @@ BaseMeetingReportForm = model_form(
         "meeting_date": {
             "label": "Meeting Date",
             "format": "%Y-%m-%d",
-            "widget": widgets.TextInput(),
+            "widget": widgets.DateInput(),
         },
     },
 )

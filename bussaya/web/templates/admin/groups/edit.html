@@ -3,15 +3,10 @@
 {% import 'navbar/class-navbar.html' as navbar_renderer %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.groups.index', class_id=class_.id) }}">Group</a>
-    <div class="divider"> / </div>
-    <div class="section">Edit</div>
-</div>
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li><a href="{{ url_for('admin.groups.index', class_id=class_.id) }}">Group</a></li>
+<li>Edit</li>
 {% endblock %}
 
 
@@ -20,21 +15,22 @@
 
 {{ navbar_renderer.render_class_navbar(class_, current_user) }}
 
-<h2 class="ui header">Edit Groups</h2>
-<div class="ui divider"></div>
+<h2 class="text-2xl font-bold">Edit Groups</h2>
+<div class="divider"></div>
 
-<div class="ui segment">
-    <form method="POST" class="ui form">
-        <div class="two field">
-            {{ form.csrf_token }}
-            {{ renderer.render_field(form.name) }}
-            {{ renderer.render_select(form.committees) }}
-        </div>
-        <button name="edit" type="submit" class="ui small primary button">
-            Submit
-        </button>
-    </form>
+<div class="card bg-base-100 shadow my-4">
+    <div class="card-body p-4">
+        <form method="POST" class="space-y-1">
+            <div>
+                {{ form.csrf_token }}
+                {{ renderer.render_field(form.name) }}
+                {{ renderer.render_select(form.committees) }}
+            </div>
+            <button name="edit" type="submit" class="btn btn-primary btn-sm">
+                Submit
+            </button>
+        </form>
+    </div>
 </div>
-</p>
 
 {% endblock %}

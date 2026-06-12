@@ -8,90 +8,111 @@
 
 {% block breadcrumbs %}
   {{ super() }}
-  <a href="{{ url_for('projects.create') }}" class="breadcrumb">Create Project</a>
+  <li><a href="{{ url_for('projects.create') }}">Create Project</a></li>
 {% endblock %}
 
-{% block content %}   
+{% block content %}
 
 <div class="row">
-  
-    <div class="ui segment">
 
-    <h5>English Name</h5>
-    <div class="ui segment">
+    <div class="card bg-base-100 shadow my-4">
+    <div class="card-body">
+
+    <h5 class="text-lg font-semibold">English Name</h5>
+    <div class="card bg-base-100 shadow my-2">
+        <div class="card-body p-4">
         {{ project.name }}
+        </div>
     </div>
 
-    <h5>Thai Name</h5>
-    <div class="ui segment">
-        
+    <h5 class="text-lg font-semibold">Thai Name</h5>
+    <div class="card bg-base-100 shadow my-2">
+        <div class="card-body p-4">
         {{ project.name_th }}
+        </div>
     </div>
 
-    <h5>English Abstract</h5>
-    <div class="ui segment">
+    <h5 class="text-lg font-semibold">English Abstract</h5>
+    <div class="card bg-base-100 shadow my-2">
+        <div class="card-body p-4">
         {{ project.abstract }}
+        </div>
     </div>
 
-    <h5>Thai Abstract</h5>
-    <div class="ui segment">
+    <h5 class="text-lg font-semibold">Thai Abstract</h5>
+    <div class="card bg-base-100 shadow my-2">
+        <div class="card-body p-4">
         {{ project.abstract_th }}
+        </div>
     </div>
 
-    <h5>Contributors</h5>
-    <div class="ui segment">
+    <h5 class="text-lg font-semibold">Contributors</h5>
+    <div class="card bg-base-100 shadow my-2">
+        <div class="card-body p-4">
         {% for student in project.students  %}
-            <button class="ui label">
-                {{ student.username }} 
+            <button class="badge">
+                {{ student.username }}
                 -{{ student.first_name }}
                 {{ student.last_name }}
             </button>
         {% endfor %}
+        </div>
     </div>
 
-      {# 
+      {#
         {{ project.class_ }}
       #}
 
-    <h5>Public</h5>
-    <div class="ui segment">
+    <h5 class="text-lg font-semibold">Public</h5>
+    <div class="card bg-base-100 shadow my-2">
+        <div class="card-body p-4">
         {{ project.public }}
+        </div>
     </div>
 
-    <h5>Tags: divied by comma (,)</h5>
-        <div class="ui segment">
+    <h5 class="text-lg font-semibold">Tags: divied by comma (,)</h5>
+        <div class="card bg-base-100 shadow my-2">
+            <div class="card-body p-4">
             {% for tag in project.tags %}
                 {{ tag }},
             {% endfor %}
+            </div>
         </div>
-        
-    <h5>Project Advisor</h5>
-    <div class="ui segment">
+
+    <h5 class="text-lg font-semibold">Project Advisor</h5>
+    <div class="card bg-base-100 shadow my-2">
+        <div class="card-body p-4">
         {% for advisor in project.advisors %}
-            <button class="ui label">
+            <button class="badge">
                 {{ advisor.first_name }}
                 {{ advisor.last_name }}
             </button>
         {% endfor %}
+        </div>
     </div>
 
-    <h5>Committees</h5>
-    <div class="ui segment">
+    <h5 class="text-lg font-semibold">Committees</h5>
+    <div class="card bg-base-100 shadow my-2">
+        <div class="card-body p-4">
         {% for committee in project.committees %}
-            <button class="ui label">
+            <button class="badge">
                 {{ committee.first_name }}
                 {{ committee.last_name }}
             </button>
         {% endfor %}
+        </div>
     </div>
 
-    <h5>Mentors, only coop project</h5>
-    <div class="ui segment">
+    <h5 class="text-lg font-semibold">Mentors, only coop project</h5>
+    <div class="card bg-base-100 shadow my-2">
+        <div class="card-body p-4">
         {{ project.mentors }}
+        </div>
     </div>
-      
-        <a href="{{ url_for('projects.edit', project_id=project.id) }}" class="ui circular primary icon button">Edit</a>
+
+        <a href="{{ url_for('projects.edit', project_id=project.id) }}" class="btn btn-primary">Edit</a>
     </form>
+    </div>
   </div>
 </div>
 

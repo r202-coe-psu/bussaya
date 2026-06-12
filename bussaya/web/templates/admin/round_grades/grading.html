@@ -5,17 +5,14 @@
 {% import '/admin/round_grades/admin-grade-menu-toolbars.html' as render_toolbars %}
 
 {% block breadcrumbs %}
-<div class="ui breadcrumb">
-    <a href="{{ url_for('admin.classes.index') }}" class="section">Classes</a>
-    <div class="divider"> / </div>
-    <a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
-    <div class="divider"> / </div>
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li>
     <a href="{{ url_for('admin.round_grades.view', class_id=class_.id, round_grade_type=round_grade.type) }}">
         {{ round_grade.get_type_display() }}
     </a>
-    <div class="divider"> / </div>
-    Grading
-</div>
+</li>
+<li>Grading</li>
 {% endblock %}
 
 
@@ -25,11 +22,12 @@
 
 {{ render_toolbars.render_admin_grade_menu_toolbars(round_grade) }}
 
-<form class="ui form" method="POST" id="form-round_grade"
+<form method="POST" id="form-round_grade"
     action="{{ url_for('admin.round_grades.submit_grade', round_grade_id=round_grade.id) }}">
     {{ form.csrf_token }}
-    <div class="" style="padding-top: 1em;">
-        <table class="ui celled table">
+    <div class="pt-4">
+        <div class="overflow-x-auto">
+        <table class="table table-zebra">
             <thead>
                 <tr>
                     <th></th>
@@ -47,7 +45,7 @@
             <tbody>
                 {% for student_grade in student_grades %}
                 {% set student = student_grade.student %}
-                <tr class="top aligned">
+                <tr class="align-top">
                   <td>{{ loop.index }}</td>
                   <td>{{ student.username }} <br/>
                     {{ student.first_name }} {{ student.last_name }}<br/>
@@ -72,26 +70,26 @@
                     <td>
                         {% if student_report %}
                         <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
-                            target="_blank">
-                            <i class="large pdf file icon link pop" data-content="Report"></i>
+                            target="_blank" class="tooltip" data-tip="Report">
+                            <i class="fa-solid fa-file-pdf fa-lg"></i>
                         </a>
                         {% else %}
-                        <i class="grey large pdf file icon disable"></i>
+                        <i class="fa-solid fa-file-pdf fa-lg opacity-30"></i>
                         {% endif %}
                         {% if student_presentation %}
                         <a href="{{ url_for('submissions.download', progress_report_id=student_presentation.id, filename=student_presentation.file.filename) }}"
-                            target="_blank">
-                            <i class="large file powerpoint icon link pop" data-content="Presentation"></i>
+                            target="_blank" class="tooltip" data-tip="Presentation">
+                            <i class="fa-solid fa-file-powerpoint fa-lg"></i>
                         </a>
                         {% else %}
-                        <i class="grey large file powerpoint icon disable"></i>
+                        <i class="fa-solid fa-file-powerpoint fa-lg opacity-30"></i>
                         {% endif %}
                     </td>
                     <td>
                         {% set grading = form.gradings[loop.index - 1] %}
                         <div id="{{ grading.id }}" style="width: auto">
                             {{ grading.student_id }}
-                            {{ grading.result(class_="ui fluid dropdown") }}
+                            {{ grading.result(class_="select w-full") }}
                         </div>
                     </td>
                     <td>{{ student.get_average_grade(student_grade.round_grade) }}</td>
@@ -100,12 +98,12 @@
                       {% if not caused %}
                         {{ actual_grade }}
                       {% else %}
-                        <div class="ui accordion">
-                            <div class="title">
+                        <div class="collapse collapse-arrow bg-base-100">
+                            <input type="checkbox">
+                            <div class="collapse-title p-1 min-h-0">
                                 {{ actual_grade }}
-                                <i class="blue dropdown icon"></i>
                             </div>
-                            <div class="content" style="display: none; width: fit-content">
+                            <div class="collapse-content text-sm" style="width: fit-content">
                                 {% for cause in caused %}
                                 - {{ cause }}
                                 {% if not loop.last %} <br> {% endif %}
@@ -121,31 +119,35 @@
                                 See More
                             </a>
                         </div>
-                        <div id="{{ student_grade.id }} content" class="content" style="display: none">
+                        <div id="{{ student_grade.id }} content" class="content hidden">
                             <p />
                             {% for student_grade in student.get_total_student_grades(round_grade) %}
-                            <div class="ui relaxed divided list">
-                                <div class="item">
+                            <ul class="space-y-1">
+                                <li class="flex items-center gap-2">
                                     {% if student_grade.get_grader() and student_grade.get_grader().get_picture() %}
-                                    <img class="ui avatar image" src="{{ student_grade.get_grader().get_picture() }}">
+                                    <div class="avatar">
+                                        <div class="w-8 rounded-full">
+                                            <img src="{{ student_grade.get_grader().get_picture() }}">
+                                        </div>
+                                    </div>
                                     {% else %}
-                                    <i class="user icon"></i>
+                                    <i class="fa-solid fa-user"></i>
                                     {% endif %}
-                                    <div class="content">
-                                      <a class="header">
+                                    <div>
+                                      <a class="font-semibold">
                                         {% if student_grade.get_grader() %}
                                           {{ student_grade.get_grader().get_full_name() }}
                                           {% if student_grade.get_grader() in student.get_project().advisors %}
-                                            <i class="red star icon"></i>
+                                            <i class="fa-solid fa-star text-error"></i>
                                           {% endif %}
                                         {% else %}
                                             Unknow Grader
                                         {% endif %}
                                       </a>
-                                      <div class="description">{{ student_grade.get_result_display() }}</div>
+                                      <div class="text-sm opacity-70">{{ student_grade.get_result_display() }}</div>
                                     </div>
-                                </div>
-                            </div>
+                                </li>
+                            </ul>
                             {% endfor %}
                         </div>
                     </td>
@@ -153,11 +155,11 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
     </div>
-    <div style="margin-bottom: 5em">
-        <button type="submit" style="margin-top: 1em; padding: 0.7em 2.5em 0.7em 2.5em"
-            class="ui right floated large primary icon button" id="submit-button">
-            <i class="save icon"></i> Save
+    <div class="mb-20">
+        <button type="submit" class="btn btn-primary btn-lg float-right mt-4" id="submit-button">
+            <i class="fa-solid fa-floppy-disk"></i> Save
         </button>
     </div>
 </form>
@@ -168,7 +170,7 @@
 {% block additional_js %}
 <script type="text/javascript">
     function accordion_show_hide(show_hide_id) {
-        $(document.getElementById(show_hide_id + " content")).transition('fade down')
+        document.getElementById(show_hide_id + " content").classList.toggle('hidden')
 
         if (document.getElementById(show_hide_id).textContent == "Hide") {
             document.getElementById(show_hide_id).innerHTML = "See More"
@@ -176,20 +178,5 @@
             document.getElementById(show_hide_id).innerHTML = "Hide"
         }
     }
-    $('.ui.accordion')
-        .accordion()
-        ;
-    function showSetTimeOff() {
-        $('.ui.time-off').transition('fade down')
-    }
-</script>
-<script type="text/javascript">
-    $('.icon.link.pop')
-        .popup({
-            delay: {
-                show: 50,
-                hide: 70
-            }
-        });
 </script>
 {% endblock additional_js %}
