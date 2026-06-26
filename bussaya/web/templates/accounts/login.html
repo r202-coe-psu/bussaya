@@ -18,7 +18,7 @@
 
       <div class="flex flex-col">
 {% if 'psu' in oauth_clients %}
-    	  <div class="row p-2">
+        <div class="row p-2">
           <div class="text-left">
             <h3 class="text-xl font-semibold">{{ "For PSU" }}</h3>
           </div>
@@ -29,19 +29,6 @@
             {{ "PSU Passport" }}
           </a>
         </div>
-{% endif %}
-{% if 'engpsu' in oauth_clients %}
-        <div class="row p-2">
-          <div class="text-left">
-            <h3 class="text-xl font-semibold">{{ "For PSU Engineering Faculty Member" }}</h3>
-          </div>
-        </div>
-        <div class="row pt-1">
-          <a class="btn btn-primary btn-lg" href="{{ url_for('accounts.login_oauth', name='engpsu') }}">
-            <i class="fa-solid fa-user"></i>
-            {{ "PSU Passport by Eng" }}
-          </a>
-	      </div>
 {% endif %}
 {% if 'google' in oauth_clients %}
         <div class="row p-2">
