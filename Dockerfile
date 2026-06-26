@@ -24,6 +24,10 @@ RUN npm install --prefix bussaya/web/static
 
 
 COPY . /app
-ENV BUSSAYA_SETTINGS=/app/bussaya-production.cfg 
+
+# Compile Tailwind CSS (needs the templates copied above + node_modules)
+RUN npm run build:css --prefix bussaya/web/static
+
+ENV BUSSAYA_SETTINGS=/app/bussaya-production.cfg
 
 

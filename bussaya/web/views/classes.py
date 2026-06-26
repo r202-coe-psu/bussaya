@@ -20,7 +20,7 @@ module = Blueprint(
 @acl.roles_required("lecturer")
 def index():
     classes = models.Class.objects().order_by("-id")
-    return render_template("/classes/index.html", classes=classes)
+    return render_template("/classes/index.html.j2", classes=classes)
 
 
 @module.route("/<class_id>")
@@ -73,7 +73,7 @@ def view_lecturer(class_id):
         current_advisees.extend(project.students)
 
     return render_template(
-        "/classes/view-lecturer.html",
+        "/classes/view-lecturer.html.j2",
         class_=class_,
         class_id=class_id,
         projects=projects,
@@ -107,7 +107,7 @@ def view_student(class_id):
         students=current_user._get_current_object(), class_=class_, status="active"
     ).first()
     return render_template(
-        "/classes/view-student.html",
+        "/classes/view-student.html.j2",
         user=user,
         class_=class_,
         project=project,
@@ -156,7 +156,7 @@ def list_report_by_user(class_id, user_id):
     form = forms.meetings.DisapproveForm()
 
     return render_template(
-        "/classes/list-report-by-user.html",
+        "/classes/list-report-by-user.html.j2",
         class_=class_,
         meeting_reports=meeting_reports,
         form=form,
@@ -199,7 +199,7 @@ def approve_meeting_report(class_id):
     form = forms.meetings.DisapproveForm()
 
     return render_template(
-        "/classes/list-report-by-user.html",
+        "/classes/list-report-by-user.html.j2",
         class_=class_,
         meeting_reports=meeting_reports,
         form=form,

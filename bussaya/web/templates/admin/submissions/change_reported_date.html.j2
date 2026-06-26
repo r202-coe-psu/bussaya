@@ -1,0 +1,86 @@
+{% extends '/base/default-dashboard.html.j2' %}
+{% import '/base/html-renderer.html.j2' as renderer %}
+
+{% block dashboard_title %}
+{{ 'Edit' if 'edit' in request.path else 'Create' }} Submission
+{% endblock %}
+
+{% block breadcrumbs %}
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li><a href=" {{ url_for('submissions.create', class_id=class_.id) }}">{{ 'Edit' if 'edit' in
+    request.path else 'Create' }} Submission</a></li>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="overflow-x-auto">
+<table class="table table-zebra">
+    <tbody>
+        <tr>
+          <th class="font-medium w-40">Name</th>
+          <td>{{ progress_report.owner.get_fullname() }}</td>
+        </tr>
+        <tr>
+          <th class="font-medium">Project</th>
+          <td>{{ progress_report.project.name }}</td>
+        </tr>
+
+        <tr>
+          <th class="font-medium">File</th>
+          <td>{{ progress_report.file.filename }}</td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <th class="font-medium">Created Date</th>
+          <td>{{ progress_report.created_date.strftime("%Y-%m-%d %H:%M") }}</td>
+        </tr>
+        <tr>
+          <th class="font-medium">Updated Date</th>
+          <td>{{ progress_report.updated_date.strftime("%Y-%m-%d %H:%M") }}</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+
+
+<div class="row">
+    <div class="card bg-base-100 shadow my-4">
+        <div class="card-body">
+        <form method="POST" class="space-y-1">
+            {{ form.csrf_token }}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    {{ renderer.render_datetime_picker(form.created_date, picker_id="rangestart") }}
+                </div>
+                <div>
+                    {{ renderer.render_datetime_picker(form.updated_date, picker_id="rangeend") }}
+                </div>
+            </div>
+            {{ renderer.render_field(form.remark) }}
+            <button class="btn btn-primary" type="submit">Change</button>
+        </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block additional_js %}
+<script type="text/javascript">
+    (function () {
+        var start = document.getElementById('rangestart');
+        var end = document.getElementById('rangeend');
+        function sync() {
+            if (start.value) end.min = start.value;
+            if (end.value) start.max = end.value;
+        }
+        start.addEventListener('change', sync);
+        end.addEventListener('change', sync);
+        sync();
+    })();
+</script>
+{% endblock %}

@@ -15,7 +15,7 @@ module = Blueprint("round_grades", __name__, url_prefix="/round_grades")
 @login_required
 def index(class_id):
     class_ = models.Class.objects.get(id=class_id)
-    return render_template("/round_grades/index.html", class_=class_)
+    return render_template("/round_grades/index.html.j2", class_=class_)
 
 
 @module.route("/<round_grade_type>/view")
@@ -50,7 +50,7 @@ def view(round_grade_type):
     )
 
     return render_template(
-        "/round_grades/view.html",
+        "/round_grades/view.html.j2",
         user=user,
         class_=class_,
         round_grade=round_grade,
@@ -91,7 +91,7 @@ def approve_report(round_grade_type):
     )
 
     return render_template(
-        "/round_grades/approve-report.html",
+        "/round_grades/approve-report.html.j2",
         user=user,
         class_=class_,
         round_grade=round_grade,
@@ -135,7 +135,7 @@ def grading(round_grade_id):
         )
 
     return render_template(
-        "round_grades/grading.html",
+        "round_grades/grading.html.j2",
         form=form,
         class_=class_,
         round_grade=round_grade,
@@ -219,7 +219,7 @@ def view_student_grades(class_id):
     average_total_grade = student.get_complete_grade(class_)
 
     return render_template(
-        "/round_grades/view-student.html",
+        "/round_grades/view-student.html.j2",
         student=student,
         class_=class_,
         project=project,

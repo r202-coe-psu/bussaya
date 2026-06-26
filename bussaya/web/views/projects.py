@@ -78,7 +78,7 @@ def get_project_form(project=None):
 def create():
     form = get_project_form()
     if not form.validate_on_submit():
-        return render_template("/projects/create-edit.html", form=form)
+        return render_template("/projects/create-edit.html.j2", form=form)
 
     project = models.Project()
     populate_obj(form, project)
@@ -94,7 +94,7 @@ def edit(project_id):
     form = get_project_form(project)
 
     if not form.validate_on_submit():
-        return render_template("/projects/create-edit.html", form=form)
+        return render_template("/projects/create-edit.html.j2", form=form)
 
     populate_obj(form, project)
     project.save()
@@ -127,7 +127,7 @@ def upload(project_id):
 
     form = forms.projects.ProjectResourceUploadForm()
     if not form.validate_on_submit():
-        return render_template("/projects/upload.html", form=form, project=project)
+        return render_template("/projects/upload.html.j2", form=form, project=project)
 
     files = [
         form.report.data,
@@ -219,7 +219,7 @@ def download(project_id, resource_id, filename):
 def view(project_id):
     project = models.Project.objects.get(id=project_id)
     return render_template(
-        "/projects/view.html",
+        "/projects/view.html.j2",
         project=project,
     )
 
@@ -228,4 +228,4 @@ def view(project_id):
 def view_info_project(project_id):
     project = models.Project.objects.get(id=project_id)
 
-    return render_template("/projects/view-info-projects.html", project=project)
+    return render_template("/projects/view-info-projects.html.j2", project=project)

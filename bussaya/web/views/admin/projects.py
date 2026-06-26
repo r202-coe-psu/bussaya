@@ -36,7 +36,7 @@ def edit(project_id):
     form.students.queryset = students
 
     if not form.validate_on_submit():
-        return render_template("/projects/create-edit.html", form=form)
+        return render_template("/projects/create-edit.html.j2", form=form)
 
     form.populate_obj(project)
     for advisor in project.advisors:
@@ -57,7 +57,7 @@ def edit(project_id):
 def view_info_project(project_id):
     project = models.Project.objects.get(id=project_id)
 
-    return render_template("/projects/view-info-projects.html", project=project)
+    return render_template("/projects/view-info-projects.html.j2", project=project)
 
 
 @module.route("/<project_id>/delete")

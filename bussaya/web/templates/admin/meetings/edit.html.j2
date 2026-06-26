@@ -1,0 +1,66 @@
+{% extends '/admin/classes/index.html.j2' %}
+{% import '/base/html-renderer.html.j2' as renderer %}
+{% import 'navbar/class-navbar.html.j2' as navbar_renderer %}
+
+{% block breadcrumbs %}
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li>Edit Meeting</li>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="divider text-3xl font-bold">
+    {{ class_.name }}
+</div>
+
+{{ navbar_renderer.render_class_navbar(class_, current_user) }}
+
+<h2 class="text-2xl font-bold">Edit Meeting</h2>
+<div class="divider"></div>
+
+<div class="card bg-base-100 shadow my-4">
+  <div class="card-body">
+  <form method="POST" class="space-y-1">
+    {{ form.csrf_token }}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>{{ renderer.render_field(form.name) }}</div>
+      <div>{{ renderer.render_select(form.round) }}</div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>{{ renderer.render_datetime_picker(form.started_date, picker_id="rangestart") }}</div>
+      <div>{{ renderer.render_datetime_picker(form.ended_date, picker_id="rangeend") }}</div>
+      <div>{{ renderer.render_datetime_picker(form.extended_date, picker_id="rangeextend") }}</div>
+    </div>
+    <button name="edit" type="submit" class="btn btn-primary btn-sm">
+        <i class="fa-solid fa-pen-to-square"></i>
+        Edit
+    </button>
+  </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block additional_js %}
+<script type="text/javascript">
+    (function () {
+        var start = document.getElementById('rangestart');
+        var end = document.getElementById('rangeend');
+        var extend = document.getElementById('rangeextend');
+        function sync() {
+            if (start.value) end.min = start.value;
+            if (end.value) {
+                start.max = end.value;
+                extend.min = end.value;
+            }
+            if (extend.value) end.max = extend.value;
+        }
+        start.addEventListener('change', sync);
+        end.addEventListener('change', sync);
+        extend.addEventListener('change', sync);
+        sync();
+    })();
+</script>
+{% endblock additional_js %}

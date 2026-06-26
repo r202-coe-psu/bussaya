@@ -60,7 +60,7 @@ def login():
 
     oauth_clients = current_app.extensions["authlib.integrations.flask_client"]._clients
 
-    return render_template("/accounts/login.html", oauth_clients=oauth_clients)
+    return render_template("/accounts/login.html.j2", oauth_clients=oauth_clients)
 
 
 @module.route("/login/<name>")
@@ -152,7 +152,7 @@ def profile(user_id):
     biography = ""
     if user.biography:
         biography = markdown.markdown(user.biography)
-    return render_template("/accounts/index.html", user=user, biography=biography)
+    return render_template("/accounts/index.html.j2", user=user, biography=biography)
 
 
 @module.route("/accounts")
@@ -162,7 +162,7 @@ def index():
     if current_user.biography:
         biography = markdown.markdown(current_user.biography)
     return render_template(
-        "/accounts/index.html", user=current_user, biography=biography
+        "/accounts/index.html.j2", user=current_user, biography=biography
     )
 
 
@@ -173,7 +173,7 @@ def edit_profile():
         obj=current_user,
     )
     if not form.validate_on_submit():
-        return render_template("/accounts/edit-profile.html", form=form)
+        return render_template("/accounts/edit-profile.html.j2", form=form)
 
     user = current_user._get_current_object()
     form.populate_obj(user)

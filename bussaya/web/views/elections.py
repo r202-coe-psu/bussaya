@@ -22,7 +22,7 @@ subviews = []
 @acl.roles_required("admin")
 def index():
     elections = models.Election.objects
-    return render_template("/elections/index.html", elections=elections)
+    return render_template("/elections/index.html.j2", elections=elections)
 
 
 @module.route("/create", methods=["GET", "POST"])
@@ -34,7 +34,7 @@ def create():
 
     if not form.validate_on_submit():
         return render_template(
-            "/elections/create-edit.html",
+            "/elections/create-edit.html.j2",
             form=form,
         )
     election = models.Election()
@@ -61,7 +61,7 @@ def edit(election_id):
     if not form.validate_on_submit():
         print("errors", form.errors, form.data)
         return render_template(
-            "/elections/create-edit.html", form=form, election=election
+            "/elections/create-edit.html.j2", form=form, election=election
         )
 
     election.started_date = form.started_date.data
@@ -133,7 +133,7 @@ def generate_qrcode(election_id):
     is_print = request.args.get("print", False)
     if is_print:
         return render_template(
-            "/elections/generate-qrcode-print.html",
+            "/elections/generate-qrcode-print.html.j2",
             election=election,
             class_=election.class_,
             projects=projects,
@@ -142,7 +142,7 @@ def generate_qrcode(election_id):
         )
 
     return render_template(
-        "/elections/generate-qrcode.html",
+        "/elections/generate-qrcode.html.j2",
         election=election,
         class_=election.class_,
         projects=projects,
@@ -167,7 +167,7 @@ def show_election(election_id):
     projects = election.class_.get_projects()
 
     return render_template(
-        "/elections/show_election.html",
+        "/elections/show_election.html.j2",
         election=election,
         projects=projects,
     )

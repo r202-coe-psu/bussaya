@@ -13,7 +13,7 @@ module = Blueprint("users", __name__, url_prefix="/users")
 @acl.roles_required("admin")
 def index():
     users = models.User.objects.all().order_by("-username")
-    return render_template("/admin/users/index.html", users=users)
+    return render_template("/admin/users/index.html.j2", users=users)
 
 
 @module.route("/<user_id>", methods=["GET", "POST"])
@@ -24,7 +24,7 @@ def view(user_id):
         obj=user,
     )
     if not form.validate_on_submit():
-        return render_template("/admin/users/view.html", form=form, user=user)
+        return render_template("/admin/users/view.html.j2", form=form, user=user)
 
     form.populate_obj(user)
 

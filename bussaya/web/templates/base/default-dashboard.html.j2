@@ -1,0 +1,60 @@
+{% extends "/base/base-layout.html.j2" %}
+
+{% block title %}{{ config.get('APP_TITLE') }} Dashboard{% endblock %}
+
+{% block default_head %}{% endblock default_head %}
+
+
+{% block body %}
+<div class="drawer lg:drawer-open">
+  <input id="dashboard-drawer" type="checkbox" class="drawer-toggle" />
+
+  <div class="drawer-content flex flex-col min-h-screen">
+
+    {# begin top bar mobile #}
+    <div class="navbar bg-neutral text-neutral-content lg:hidden">
+      <label for="dashboard-drawer" class="btn btn-square btn-ghost drawer-button" aria-label="open sidebar">
+        <i class="fa-solid fa-bars"></i>
+      </label>
+      <div class="px-2 font-semibold">
+        {% block dashboard_title %}Dashboard{% endblock %}
+      </div>
+    </div>
+    {# end top bar mobile #}
+
+    <header class="bg-base-100 border-b border-base-300">
+      <div class="px-6 py-5">
+        <h1 class="text-3xl font-bold">
+          {{ self.dashboard_title() }}
+        </h1>
+      </div>
+    </header>
+
+    <main class="flex-1 p-5 min-h-[75vh]">
+      {%- if request.endpoint not in ['dashboard.index', 'dashboard.index_admin'] %}
+      <div class="bg-base-100 rounded-box shadow px-4 mb-4">
+        <div class="breadcrumbs text-lg">
+          <ul>
+            {% block breadcrumbs %}{% endblock %}
+          </ul>
+        </div>
+      </div>
+      {% endif -%}
+{% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-base-100 border-t border-base-300 mt-8">
+{% include "/base/footer.html.j2" %}
+    </footer>
+
+  </div>
+
+  <div class="drawer-side">
+    <label for="dashboard-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+    <ul class="menu bg-neutral text-neutral-content min-h-full w-64 p-4 gap-1">
+      {% include "/base/toolbar-dashboard.html.j2" with context %}
+    </ul>
+  </div>
+</div>
+
+{% endblock body %}

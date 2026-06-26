@@ -25,7 +25,7 @@ def change_reported_date(submission_id, progress_report_id):
 
     if not form.validate_on_submit():
         return render_template(
-            "/admin/submissions/change_reported_date.html",
+            "/admin/submissions/change_reported_date.html.j2",
             form=form,
             submission=submission,
             class_=submission.class_,

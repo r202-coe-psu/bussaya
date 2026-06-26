@@ -1,0 +1,189 @@
+{% extends '/base/default-page.html.j2' %}
+{% import '/base/html-renderer.html.j2' as renderer %}
+
+{% block title %}Success Vote{% endblock %}
+
+{% block additional_head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/leaflet/dist/leaflet.css') | add_date_url}}" />
+  <script src="{{ url_for('static', filename='node_modules/leaflet/dist/leaflet.js') | add_date_url }}"></script>
+{% endblock %}
+
+
+{% block additional_js %}
+  <script type="text/javascript" src="{{ url_for('static', filename='node_modules/brython/brython.js') | add_date_url}}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='node_modules/brython/brython_stdlib.js') | add_date_url}}"></script>
+  <script type="text/javascript">
+    brython(1);
+  </script>
+
+{% endblock %}
+
+{% block content %}
+  <div class="container mx-auto px-4">
+    <div class="card bg-base-100 shadow my-4">
+      <div class="card-body">
+      {# head #}
+      <div class="text-center">
+        <h1 class="text-3xl font-bold">
+          {{ project.name }}
+        </h1>
+        <h2 class="text-2xl font-bold">
+          {{ project.class_.name }}
+        </h2>
+        <h3 class="text-xl font-semibold">
+          <i class="fa-solid fa-clock"></i> {{ election.started_date.strftime("%Y-%m-%d %H:%M") }} - {{ election.ended_date.strftime("%Y-%m-%d %H:%M") }}
+        </h3>
+      </div>
+      {# end head#}
+
+      {# content #}
+      <div class="mt-4">
+        <div>
+          <form method="POST">
+            {{ form.csrf_token }}
+            <div>
+              <button id="vote" name="vote" type="submit" class="btn btn-primary btn-lg">Vote</button>
+            </div>
+            {{ form.location }}
+            {{ form.remark }}
+          </form>
+        </div>
+
+      </div>
+      {# end content #}
+
+      {# user profile #}
+      <div>
+        <div class="card bg-base-100 shadow my-4">
+          <div class="card-body">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <div class="grid grid-cols-1 gap-4">
+                {% for user in project.students %}
+                <div class="text-center">
+                  <div class="w-32 mx-auto">
+                    <img src="{{ user.get_picture() }}">
+                  </div>
+                  <h5 class="text-lg font-semibold">{{ user.first_name }} {{ user.last_name }}</h5>
+                </div>
+              {% endfor %}
+              {% set r = project.get_resource('poster') %}
+              {% if r %}
+                <div>
+                  <a target="_blank" class="btn btn-primary btn-lg tooltip" data-tip="Poster" href="{{ r.link }}"><i class="fa-solid fa-file-image"></i> Poster</a>
+                </div>
+              {% endif %}
+
+              </div>
+            </div>
+
+            <div class="md:col-span-3">
+              <div class="card bg-base-100 shadow my-4">
+                <div class="card-body p-4 text-lg">
+                {{ project.abstract_th }}
+                </div>
+              </div>
+              <div class="card bg-base-100 shadow my-4">
+                <div class="card-body p-4 text-lg">
+                {{ project.abstract }}
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+      {# end user profile #}
+
+      {# map #}
+      <div style="width: 100%; height: 300px;">
+        <div id="color_status" style="text-align: center;"></div>
+        <div id="map_id" style="z-index:1;height:inherit;"></div>
+      </div>
+      {# end map #}
+
+    </div>
+  </div>
+<script type="text/python">
+  from browser import document, window
+  Marker = None
+  user_coord = None
+  leaflet = window.L
+  world_map = document["map_id"]
+
+  openstreet = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      "maxZoom": 30,
+    "attribution": '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  })
+
+  world_imagery = leaflet.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      "maxZoom": 17,
+    "attribution": 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+  })
+
+  world_topo = leaflet.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+    "attribution": 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+  })
+
+  base_maps = {
+      "<b><span style='color: blue'>OpenStreet Map</span></b>": openstreet,
+      "<b><span style='color: green'>World Map</span></b>": world_imagery,
+      "<b><span style='color: teal'>World Topo Map</span></b>": world_topo
+  }
+
+  # Create world map
+  center = [7.007530, 100.499003]
+  zoom = 17
+  map = leaflet.map('map_id', {
+      "center":center,
+      "zoom":zoom,
+      "layers":openstreet
+  })
+
+  leaflet.control.layers(base_maps).addTo(map) 
+
+  location_icon = None
+  user_mark = None
+
+  def navi(pos):
+      global user_coord
+      global user_mark
+      global location_icon
+
+      user_coord = (pos.coords.latitude, pos.coords.longitude)
+      if not location_icon:
+          location_icon = leaflet.icon(dict(
+              iconUrl= '{{ url_for("static", filename="images/marks/my_location.svg") }}',
+              iconSize=[46, 48],
+              iconAnchor=[22,40],
+              popupAnchor=[0,-26]
+          ))
+      if not user_mark:
+          user_mark = leaflet.marker(
+            user_coord,
+            {'icon': location_icon, 'zIndexOffset':1000}
+            ).addTo(map).bindPopup('ต่ำแหน่งของคุณ')
+
+          map.panTo( user_coord)
+
+      else:
+          user_mark.setLatLng(user_coord)
+          map.panTo( user_coord)
+
+
+      if Marker:
+          map.removeLayer(Marker)
+
+      document['location'].value = f'{user_coord[0]}, {user_coord[1]}'
+
+  def nonavi(error):
+      window.alert(f'เบาร์เซอร์ไม่สามารถเข้าถึงตำแหน่งของคุณได้ กรุณาให้รายละเอียดเพิ่มเติม, {error.message}')
+      document['remark'].value = f'{error.message}'
+
+
+  window.navigator.geolocation.getCurrentPosition(navi, nonavi)   # set user's current location on map(success, error)
+
+  window.navigator.geolocation.watchPosition(navi)
+</script>
+{% endblock %}

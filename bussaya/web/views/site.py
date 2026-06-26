@@ -28,11 +28,11 @@ def index():
         .order_by("-id")
         .limit(100)
     )
-    return render_template("/site/index.html", projects=projects)
+    return render_template("/site/index.html.j2", projects=projects)
 
 
 @module.route("/lecturers")
 def list_lecturers():
     lecturers = models.User.objects(roles="lecturer")
     lecturers = sorted(lecturers, key=lambda l: (l.title or "", l.first_name or ""))
-    return render_template("/site/lecturers.html", lecturers=lecturers)
+    return render_template("/site/lecturers.html.j2", lecturers=lecturers)

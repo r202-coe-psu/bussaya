@@ -55,10 +55,10 @@ class RoundGrade(me.Document):
             )
 
     def natural_started_date(self):
-        return self.started_date.strftime("%d %B %Y, %I:%M %p")
+        return self.started_date.strftime("%Y-%m-%d %H:%M")
 
     def natural_ended_date(self):
-        return self.ended_date.strftime("%d %B %Y, %I:%M %p")
+        return self.ended_date.strftime("%Y-%m-%d %H:%M")
 
 
 STUDENT_GRADE_CHOICES = [

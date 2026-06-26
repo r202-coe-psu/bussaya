@@ -1,0 +1,126 @@
+{% import '/base/error-handler.html.j2' as eh %}
+
+{% macro field_class(field, class_='') -%}
+{%- if field.type in ['SelectField', 'SelectMultipleField', 'QuerySelectField', 'ModelSelectField', 'ModelSelectMultipleField'] -%}
+{%- set base = 'select w-full' -%}
+{%- elif field.type == 'TextAreaField' -%}
+{%- set base = 'textarea w-full' -%}
+{%- elif field.type == 'BooleanField' -%}
+{%- set base = 'checkbox' -%}
+{%- elif field.type in ['FileField', 'MultipleFileField'] -%}
+{%- set base = 'file-input w-full' -%}
+{%- else -%}
+{%- set base = 'input w-full' -%}
+{%- endif -%}
+{{- base }}{% if class_ %} {{ class_ }}{% endif %}{% if field.errors %} {{ eh.get_validate_class(field.errors) }}{% endif -%}
+{%- endmacro %}
+
+{% macro render_field(field, class_='') -%}
+<div class="w-full mb-3">
+  {{ field.label(class_='label mb-1') }}
+  {{ field(class_=field_class(field, class_)) }}
+</div>
+{{ eh.get_error_messages(field.errors) }}
+{%- endmacro %}
+
+{% macro render_checkbox(field) -%}
+<div class="mb-3">
+  <label class="label cursor-pointer justify-start gap-2">
+    {{ field(class_='checkbox') }}
+    <span>{{ field.label.text }}</span>
+  </label>
+</div>
+{{ eh.get_error_messages(field.errors) }}
+{%- endmacro %}
+
+{% macro render_fileinput(field) -%}
+<div class="w-full mb-3">
+  {{ field.label(class_='label mb-1') }}
+  {{ field(class_='file-input w-full') }}
+</div>
+{{ eh.get_error_messages(field.errors) }}
+{%- endmacro %}
+
+{% macro render_select_disabled(field) -%}
+<div class="w-full mb-3">
+  {{ field.label(class_='label mb-1') }}
+  {{ field(class_=field_class(field), disabled=true) }}
+</div>
+{{ eh.get_error_messages(field.errors) }}
+{%- endmacro %}
+
+{% macro render_select(field) -%}
+{{ render_field(field) }}
+{%- endmacro %}
+
+{% macro render_select_no_search(field) -%}
+{{ render_field(field) }}
+{%- endmacro %}
+
+{% macro render_multiple_select(field) -%}
+{{ render_field(field) }}
+{%- endmacro %}
+
+{% macro render_calendar(field, calendar_id='calendar') -%}
+<div class="w-full mb-3">
+  {{ field.label(class_='label mb-1', for=calendar_id) }}
+  {{ field(class_=field_class(field), autocomplete='off', id=calendar_id) }}
+</div>
+{{ eh.get_error_messages(field.errors) }}
+{%- endmacro %}
+
+{% macro render_date_picker(field, picker_id='datepicker') -%}
+{# Text input (always renders the value as %Y-%m-%d) paired with a cally calendar
+   popover, so the displayed date is ISO regardless of the browser locale. #}
+<div class="w-full mb-3">
+  {{ field.label(class_='label mb-1', for=picker_id) }}
+  <div class="join w-full">
+    {{ field(class_=field_class(field, 'join-item'), id=picker_id, autocomplete='off', placeholder='YYYY-MM-DD', inputmode='numeric', data_date_picker=picker_id ~ '-pop') }}
+    <button type="button" class="btn join-item" popovertarget="{{ picker_id }}-pop" style="anchor-name:--{{ picker_id }}" tabindex="-1" aria-label="Open calendar">
+      <i class="fa-solid fa-calendar"></i>
+    </button>
+  </div>
+  <div popover id="{{ picker_id }}-pop" class="dropdown bg-base-100 rounded-box shadow-lg" style="position-anchor:--{{ picker_id }}">
+    <calendar-date class="cally p-2">
+      <svg aria-label="Previous" class="size-4" slot="previous" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+      <svg aria-label="Next" class="size-4" slot="next" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+      <calendar-month></calendar-month>
+    </calendar-date>
+  </div>
+</div>
+{{ eh.get_error_messages(field.errors) }}
+{%- endmacro %}
+
+{% macro render_datetime_picker(field, picker_id='datetimepicker') -%}
+{# Text input (renders the value as "%Y-%m-%d %H:%M") paired with a cally calendar
+   + time popover, so the displayed datetime is ISO regardless of the browser locale. #}
+<div class="w-full mb-3">
+  {{ field.label(class_='label mb-1', for=picker_id) }}
+  <div class="join w-full">
+    {{ field(class_=field_class(field, 'join-item'), id=picker_id, autocomplete='off', placeholder='YYYY-MM-DD HH:MM', data_datetime_picker=picker_id ~ '-pop') }}
+    <button type="button" class="btn join-item" popovertarget="{{ picker_id }}-pop" style="anchor-name:--{{ picker_id }}" tabindex="-1" aria-label="Open calendar">
+      <i class="fa-solid fa-calendar"></i>
+    </button>
+  </div>
+  <div popover id="{{ picker_id }}-pop" class="dropdown bg-base-100 rounded-box shadow-lg p-2" style="position-anchor:--{{ picker_id }}">
+    <calendar-date class="cally">
+      <svg aria-label="Previous" class="size-4" slot="previous" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+      <svg aria-label="Next" class="size-4" slot="next" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+      <calendar-month></calendar-month>
+    </calendar-date>
+    <label class="mt-2 flex items-center gap-2">
+      <span class="text-sm opacity-70">Time</span>
+      <input type="time" class="input input-sm flex-1" data-time>
+    </label>
+  </div>
+</div>
+{{ eh.get_error_messages(field.errors) }}
+{%- endmacro %}
+
+{% macro render_timepicker(field, timepicker_id='timepicker') -%}
+<div class="w-full mb-3">
+  {{ field.label(class_='label mb-1', for=timepicker_id) }}
+  {{ field(class_=field_class(field), id=timepicker_id) }}
+</div>
+{{ eh.get_error_messages(field.errors) }}
+{%- endmacro %}

@@ -1,0 +1,62 @@
+{% extends '/admin/classes/index.html.j2' %}
+{% import '/base/error-handler.html.j2' as eh %}
+{% import '/admin/classes/project-renderer.html.j2' as renderer %}
+{% import '/navbar/class-navbar.html.j2' as renderer_navbar %}
+
+{% block breadcrumbs %}
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li><a href="{{ url_for('admin.classes.view_projects', class_id=class_.id) }}">View Project</a></li>
+{% endblock %}
+
+
+{% block content %}
+
+{{ renderer_navbar.render_class_navbar(class_, current_user) }}
+
+<h2 class="text-2xl font-bold">
+    View Project
+</h2>
+<div class="divider"></div>
+<div class="overflow-x-auto">
+<table class="table table-zebra">
+  <thead>
+    <th>No. </th>
+    <th>Project</th>
+    <th>Students</th>
+    <th>Adivisor / Committees</th>
+    <th>Operation</th>
+  </thead>
+  <tbody>
+    {% for project in projects %}
+    <tr class="align-top">
+      <td>
+        {{ loop.index }}
+      </td>
+      <td>
+        {{ project.name }}
+      </td>
+      <td>
+        {% for student in project.students %}
+          <b>{{ student.username }}</b> - {{ student.get_fullname() }}<br/>
+        {% endfor %}
+      </td>
+      <td>
+        <b>{{ project.advisors|map(attribute='fullname')|join(', ') }}</b><br/>
+        {% for c in project.committees %}
+          {{ c.get_fullname() }}<br/>
+        {% endfor %}
+      </td>
+      <td>
+        <a href="{{ url_for('admin.projects.edit', project_id=project.id, class_id=class_.id) }}" class="btn btn-primary btn-circle"><i class="fa-solid fa-pen-to-square"></i></a>
+        <a href="{{ url_for('admin.projects.delete', project_id=project.id, class_id=class_.id) }}" class="btn btn-error btn-circle"><i class="fa-solid fa-trash"></i></a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+
+
+{% endblock %}

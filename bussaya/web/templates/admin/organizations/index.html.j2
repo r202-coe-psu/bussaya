@@ -1,0 +1,64 @@
+{% extends '/base/default-dashboard.html.j2' %}
+
+{% block dashboard_title %}
+Organizations
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ super() }}
+    {% if request.endpoint == 'admin.organizations.index' %}
+      <li>Organizations</li>
+    {% else %}
+      <li><a href="{{ url_for('admin.organizations.index') }}">Organizations</a></li>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<h1 class="divider text-2xl font-bold">
+	<i class="fa-solid fa-chalkboard fa-sm"></i>
+	All Organizations
+</h1>
+
+<div class="">
+	{% if organizations %}
+	<div class="overflow-x-auto">
+	<table class="table table-zebra">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Remark</th>
+				<th>Operation</th>
+			</tr>
+		</thead>
+
+		<body>
+			{% for organization in organizations %}
+        <tr>
+          <td>
+            <a href="{{ url_for('admin.organizations.view', organization_id=organization.id) }}">{{ organization.name }}</a>
+          </td>
+          <td>
+            <div>Website: {{ organization.website }}</div>
+            <div>
+              {{ organization.remark }}
+            </div>
+          </td>
+          <td>
+            <a href="{{ url_for('admin.organizations.view', organization_id=organization.id) }}" class="btn btn-circle btn-primary"><i class="fa-solid fa-eye"></i></a>
+            <a href="{{ url_for('admin.organizations.create_or_edit', organization_id=organization.id) }}" class="btn btn-circle btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
+          </td>
+  			</tr>
+			{% endfor %}
+		</body>
+	</table>
+	</div>
+	{% endif %}
+
+	<a class="btn btn-primary" href="{{ url_for('admin.organizations.create_or_edit') }}">
+		Create Organization
+	</a>
+</div>
+
+
+{% endblock %}

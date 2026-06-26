@@ -1,0 +1,44 @@
+{% extends '/base/default-dashboard.html.j2' %}
+{% block content %}
+<div class="card bg-base-100 shadow my-4 pt-12">
+  <div class="card-body text-center">
+    <i class="fa-solid fa-hourglass-end fa-2x"></i>
+
+    <h1 class="text-3xl font-bold"> {{ election.class_.name }} </h1>
+    <div class="card bg-base-100 shadow my-4 text-left">
+      <div class="card-body p-4">
+      <p> Vote Start {{ election.started_date.strftime("%Y-%m-%d %H:%M")}} </p>
+      <p> Vote Stop {{ election.ended_date.strftime("%Y-%m-%d %H:%M") }} </p>
+      <p> Current Time {{ now.strftime("%Y-%m-%d %H:%M") }} </p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card bg-base-100 shadow my-4 container mx-auto px-4">
+  <div class="card-body">
+  {% if form.errors %}
+    <div class="alert alert-error">
+      {{ form.errors }}
+    </div>
+  {% endif %}
+  <div class="alert alert-info">
+    <div>
+    {% if 'CoE-lecturer' in current_user.roles %}
+      <h2 class="text-2xl font-bold">Hello Aj. {{ current_user.first_name }} {{ current_user.last_name }}</h2>
+    {% endif %}
+    <p>Click the selection box and select a project name; only three projects will be selected.</p>
+    </div>
+  </div>
+  <form method="POST" class="space-y-4">
+    {{ form.csrf_token }}
+      <div>
+        {{ form.projects.label }}
+        {{ form.projects(class_='select w-full', required=true) }}
+      </div>
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary">Vote</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

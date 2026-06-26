@@ -80,13 +80,13 @@ class Submission(me.Document):
         return (extend - now).days, "Out of time"
 
     def natural_started_date(self):
-        return self.started_date.strftime("%d %B %Y, %I:%M %p")
+        return self.started_date.strftime("%Y-%m-%d %H:%M")
 
     def natural_ended_date(self):
-        return self.ended_date.strftime("%d %B %Y, %I:%M %p")
+        return self.ended_date.strftime("%Y-%m-%d %H:%M")
 
     def natural_extended_date(self):
-        return self.extended_date.strftime("%d %B %Y, %I:%M %p")
+        return self.extended_date.strftime("%Y-%m-%d %H:%M")
 
     def get_progress_report_by_owner(self, owner):
         progress_reports = ProgressReport.objects.all().filter(
@@ -150,10 +150,10 @@ class Meeting(me.Document):
             )
 
     def natural_started_date(self):
-        return self.started_date.strftime("%d %B %Y, %I:%M %p")
+        return self.started_date.strftime("%Y-%m-%d %H:%M")
 
     def natural_ended_date(self):
-        return self.ended_date.strftime("%d %B %Y, %I:%M %p")
+        return self.ended_date.strftime("%Y-%m-%d %H:%M")
 
     def get_meeting_report_by_owner(self, owner):
         meeting_reports = MeetingReport.objects.all().filter(meeting=self, owner=owner)
@@ -183,7 +183,7 @@ class ProgressReport(me.Document):
     )
 
     def get_uploaded_date(self):
-        return self.updated_date.strftime("%d %B %Y, %H:%M:%S")
+        return self.updated_date.strftime("%Y-%m-%d %H:%M")
     
     def get_file_content(self):
         """ดึงเนื้อหาของไฟล์จาก progress_report_fs โดยใช้ file_id"""
@@ -286,13 +286,13 @@ class FinalSubmission(me.Document):
             return (extend - now).days, "Out of time"
 
     def natural_started_date(self):
-        return self.started_date.strftime("%d %B %Y, %I:%M %p")
+        return self.started_date.strftime("%Y-%m-%d %H:%M")
 
     def natural_ended_date(self):
-        return self.ended_date.strftime("%d %B %Y, %I:%M %p")
+        return self.ended_date.strftime("%Y-%m-%d %H:%M")
 
     def natural_extended_date(self):
-        return self.extended_date.strftime("%d %B %Y, %I:%M %p")
+        return self.extended_date.strftime("%Y-%m-%d %H:%M")
 
 
 class FinalReport(me.Document):
@@ -313,4 +313,4 @@ class FinalReport(me.Document):
     )
 
     def natural_updated_date(self):
-        return self.updated_date.strftime("%d %B %Y, %I:%M %p")
+        return self.updated_date.strftime("%Y-%m-%d %H:%M")

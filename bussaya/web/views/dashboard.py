@@ -21,7 +21,7 @@ def index_admin():
             opened_classes.append(class_)
 
     return render_template(
-        "/dashboard/index-admin.html",
+        "/dashboard/index-admin.html.j2",
         classes=classes,
         opened_classes=opened_classes,
     )
@@ -76,7 +76,7 @@ def index_lecturer():
     )
 
     return render_template(
-        "/dashboard/index-lecturer.html",
+        "/dashboard/index-lecturer.html.j2",
         classes=classes,
         opened_classes=opened_classes,
         alumni_projects=alumni_projects,
@@ -99,14 +99,14 @@ def index_student():
             available_class.append(class_)
 
     return render_template(
-        "/dashboard/index-student.html",
+        "/dashboard/index-student.html.j2",
         projects=projects,
         available_class=available_class,
     )
 
 
 def index_user():
-    return render_template("/dashboard/index-user.html")
+    return render_template("/dashboard/index-user.html.j2")
 
 
 @module.route("/")
@@ -136,19 +136,19 @@ def index_voting():
 
     if not election:
         if "admin" in user.roles:
-            return render_template("/dashboard/index-admin.html")
+            return render_template("/dashboard/index-admin.html.j2")
         elif "CoE-lecturer" in user.roles:
-            return render_template("/dashboard/index-lecturer.html")
+            return render_template("/dashboard/index-lecturer.html.j2")
 
-        return render_template("/votings/timeout.html")
+        return render_template("/votings/timeout.html.j2")
 
     voting = models.Voting.objects(user=user, election=election)
 
     if voting:
         if "admin" in user.roles:
-            return render_template("/dashboard/index-admin.html")
+            return render_template("/dashboard/index-admin.html.j2")
         elif "CoE-lecturer" in user.roles:
-            return render_template("/dashboard/index-lecturer.html")
+            return render_template("/dashboard/index-lecturer.html.j2")
         return index_user()
 
     projects = models.Project.objects(class_=election.class_, status="active")
@@ -169,7 +169,7 @@ def index_voting():
 
     if not form.validate_on_submit():
         return render_template(
-            "/votings/vote.html",
+            "/votings/vote.html.j2",
             form=form,
             now=datetime.datetime.now(),
             election=election,
@@ -187,4 +187,4 @@ def index_voting():
             voting.projects.append(project)
     voting.save()
 
-    return render_template("/votings/waiting-results.html")
+    return render_template("/votings/waiting-results.html.j2")

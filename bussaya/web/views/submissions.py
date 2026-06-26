@@ -26,7 +26,7 @@ def create():
     class_ = models.Class.objects.get(id=class_id)
     if not form.validate_on_submit():
         return render_template(
-            "/admin/submissions/create-edit.html",
+            "/admin/submissions/create-edit.html.j2",
             form=form,
             class_=class_,
         )
@@ -60,7 +60,7 @@ def view_lecturer(submission_id):
         class_=class_, submission=submission
     )
     return render_template(
-        "/submissions/view.html",
+        "/submissions/view.html.j2",
         submission=submission,
         class_=class_,
         progress_reports=progress_reports,
@@ -76,7 +76,7 @@ def view_admin(submission_id):
         class_=class_, submission=submission
     )
     return render_template(
-        "/admin/submissions/view.html",
+        "/admin/submissions/view.html.j2",
         submission=submission,
         class_=class_,
         progress_reports=progress_reports,
@@ -92,7 +92,7 @@ def edit(submission_id):
     form = forms.submissions.SubmissionForm(obj=submission)
     if not form.validate_on_submit():
         return render_template(
-            "/admin/submissions/create-edit.html",
+            "/admin/submissions/create-edit.html.j2",
             form=form,
             class_=class_,
             submission=submission,
@@ -142,7 +142,7 @@ def upload(submission_id):
 
     if not form.validate_on_submit() or not form.uploaded_file.data:
         return render_template(
-            "/submissions/upload.html",
+            "/submissions/upload.html.j2",
             form=form,
             submission=submission,
             class_=class_,
@@ -211,7 +211,7 @@ def force_report(submission_id):
 
     if not form.validate_on_submit() or not form.uploaded_file.data:
         return render_template(
-            "/admin/submissions/upload.html",
+            "/admin/submissions/upload.html.j2",
             form=form,
             submission=submission,
             class_=class_,
@@ -284,7 +284,7 @@ def upload_final_report(class_id):
 
     if not form.validate_on_submit():
         return render_template(
-            "/submissions/upload-final-report.html", class_=class_, form=form
+            "/submissions/upload-final-report.html.j2", class_=class_, form=form
         )
 
     return redirect(url_for("classes.view", class_id=class_.id))

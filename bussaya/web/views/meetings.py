@@ -50,7 +50,7 @@ def view_admin(meeting_id):
     meeting_reports = list(meeting_reports)
     meeting_reports.sort(key=lambda r: r.owner.username)
     return render_template(
-        "/admin/meetings/view.html",
+        "/admin/meetings/view.html.j2",
         meeting=meeting,
         class_=meeting.class_,
         meeting_reports=meeting_reports,
@@ -91,7 +91,7 @@ def view_lecturer(meeting_id):
     meeting_reports = list(meeting_reports)
     meeting_reports.sort(key=lambda r: r.owner.username)
     return render_template(
-        "/meetings/view.html",
+        "/meetings/view.html.j2",
         meeting=meeting,
         class_=meeting.class_,
         meeting_reports=meeting_reports,
@@ -160,7 +160,7 @@ def edit(meeting_id):
 
     print("x", form.data)
     if request.method != "POST":
-        return render_template("/admin/meetings/edit.html", class_=class_, form=form)
+        return render_template("/admin/meetings/edit.html.j2", class_=class_, form=form)
 
     form.populate_obj(meeting)
     meeting.save()
@@ -217,7 +217,7 @@ def report(meeting_id, meeting_report_id):
             form.advisors.data = projects[0].advisors
 
         return render_template(
-            "/meetings/report.html",
+            "/meetings/report.html.j2",
             projects=projects,
             meeting=meeting,
             class_=class_,
@@ -318,7 +318,7 @@ def late_report(meeting_id, meeting_report_id):
             form.advisors.data = projects[0].advisors
 
         return render_template(
-            "/meetings/report.html",
+            "/meetings/report.html.j2",
             projects=projects,
             meeting=meeting,
             class_=class_,
@@ -382,7 +382,7 @@ def force_report(meeting_id, meeting_report_id):
         if request.method == "GET" and meeting_report:
             form.student.data = str(meeting_report.owner.id)
         return render_template(
-            "/admin/meetings/report.html",
+            "/admin/meetings/report.html.j2",
             projects=projects,
             meeting=meeting,
             class_=class_,

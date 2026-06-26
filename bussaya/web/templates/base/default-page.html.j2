@@ -1,0 +1,23 @@
+{% extends "/base/base-layout.html.j2" %}
+{% block body %}
+
+  <header>
+  {% block header %}
+    {% if request.path == '/' %}
+      {% include "/base/banner.html.j2" %}
+    {% else %}
+        {% include "/base/toolbar.html.j2" %}
+    {% endif %}
+  {% endblock %}
+  </header>
+
+  <div class="container mx-auto px-4">
+    <main>
+      {% block content %}{% endblock content %}
+    </main>
+    <footer>
+      {% include "/base/footer.html.j2" %}
+    </footer>
+
+  </div>
+{% endblock body %}

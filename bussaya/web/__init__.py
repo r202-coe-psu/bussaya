@@ -11,10 +11,23 @@ from . import oauth2
 from . import caches
 
 
+def _select_autoescape(filename):
+    """Flask only autoescapes .html/.htm/.xml/.xhtml/.svg by default, which would
+    silently disable escaping for our ``.html.j2`` templates. Keep escaping on for
+    Jinja extensions too."""
+    if filename is None:
+        return True
+    return filename.endswith(
+        (".html", ".htm", ".xml", ".xhtml", ".svg", ".j2", ".jinja", ".jinja2")
+    )
+
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object("bussaya.default_settings")
     app.config.from_envvar("BUSSAYA_SETTINGS", silent=True)
+
+    app.jinja_env.autoescape = _select_autoescape
 
     models.init_db(app)
     acl.init_acl(app)

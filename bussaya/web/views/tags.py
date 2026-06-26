@@ -24,7 +24,7 @@ def index():
 
     tags = {t["_id"]: t["count"] for t in tags}
 
-    return render_template("/tags/index.html", tags=tags)
+    return render_template("/tags/index.html.j2", tags=tags)
 
 
 @module.route("/<name>")
@@ -32,4 +32,4 @@ def view(name):
     projects = models.Project.objects(tags__iexact=name, public__ne="private").order_by(
         "-id"
     )
-    return render_template("/tags/view.html", name=name, projects=projects)
+    return render_template("/tags/view.html.j2", name=name, projects=projects)

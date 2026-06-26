@@ -37,7 +37,7 @@ def index():
     lec_votings.sort(key=lambda v: v[1], reverse=True)
 
     return render_template(
-        "/votings/index.html",
+        "/votings/index.html.j2",
         election=election,
         std_votings=std_votings,
         lec_votings=lec_votings,
@@ -61,7 +61,7 @@ def vote(election_id, project_id):
     ):
         message = f"ไม่อยู่ในช่วงเวลาลงโหวต"
         return render_template(
-            "/votings/vote-fail.html",
+            "/votings/vote-fail.html.j2",
             election=election,
             message=message,
             project=project,
@@ -85,7 +85,7 @@ def vote(election_id, project_id):
     form = forms.votings.VotingForm()
     if not form.validate_on_submit():
         return render_template(
-            "/votings/vote.html",
+            "/votings/vote.html.j2",
             project=project,
             election=election,
             form=form,
@@ -131,7 +131,7 @@ def vote_success(voting_id):
         user=current_user._get_current_object(),
     )
     return render_template(
-        "/votings/vote-success.html",
+        "/votings/vote-success.html.j2",
         voting=voting,
         project=voting.project,
         class_=voting.class_,

@@ -25,7 +25,7 @@ module = Blueprint(
 @acl.roles_required("admin")
 def index():
     classes = models.Class.objects().order_by("-id")
-    return render_template("/admin/classes/index.html", classes=classes)
+    return render_template("/admin/classes/index.html.j2", classes=classes)
 
 
 @module.route("/create", methods=["GET", "POST"])
@@ -33,7 +33,7 @@ def index():
 def create():
     form = forms.classes.ClassForm()
     if not form.validate_on_submit():
-        return render_template("/admin/classes/create-edit.html", form=form)
+        return render_template("/admin/classes/create-edit.html.j2", form=form)
 
     class_ = models.Class()
     form.populate_obj(class_)
@@ -57,7 +57,7 @@ def edit(class_id):
 
     if not form.validate_on_submit():
         return render_template(
-            "/admin/classes/create-edit.html", form=form, class_=class_
+            "/admin/classes/create-edit.html.j2", form=form, class_=class_
         )
 
     form.populate_obj(class_)
@@ -79,9 +79,12 @@ def copy(class_id):
     if not form.validate_on_submit():
         if request.method == "GET":
             form.name.data = f"Copy of {form.name.data}"
+            form.started_date.data = datetime.datetime.today()
+            form.ended_date.data = form.started_date.data + datetime.timedelta(weeks=18)
+
 
         return render_template(
-            "/admin/classes/create-edit.html", form=form, class_=old_class
+            "/admin/classes/create-edit.html.j2", form=form, class_=old_class
         )
 
     new_class = models.Class()
@@ -165,7 +168,7 @@ def view(class_id):
         )
 
     return render_template(
-        "/admin/classes/view.html",
+        "/admin/classes/view.html.j2",
         form=form,
         class_=class_,
         class_id=class_id,
@@ -202,7 +205,7 @@ def view_students(class_id):
     )
 
     return render_template(
-        "/classes/students.html",
+        "/classes/students.html.j2",
         class_=class_,
         students=students,
         get_student_by_id=get_student_by_id,
@@ -221,7 +224,7 @@ def view_projects(class_id):
     )
 
     return render_template(
-        "/classes/projects.html", class_=class_, students=students, projects=projects
+        "/classes/projects.html.j2", class_=class_, students=students, projects=projects
     )
 
 
@@ -238,7 +241,7 @@ def view_final_reports(class_id):
     projects = models.Project.objects(class_=class_, status="active")
 
     return render_template(
-        "/admin/final_reports/view.html",
+        "/admin/final_reports/view.html.j2",
         class_=class_,
         projects=projects,
         get_final_report_project=get_final_report_project,
@@ -252,7 +255,7 @@ def set_final_submission(class_id):
     form = forms.submissions.FinalSubmissionForm()
     if not form.validate_on_submit():
         return render_template(
-            "/admin/final_reports/set-edit.html", class_=class_, form=form
+            "/admin/final_reports/set-edit.html.j2", class_=class_, form=form
         )
 
     final_submission = models.submissions.FinalSubmission()
@@ -274,7 +277,7 @@ def edit_final_submission(class_id, final_submission_id):
     form = forms.submissions.FinalSubmissionForm(obj=final_submission)
     if not form.validate_on_submit():
         return render_template(
-            "/admin/final_reports/set-edit.html", class_=class_, form=form
+            "/admin/final_reports/set-edit.html.j2", class_=class_, form=form
         )
     form.populate_obj(final_submission)
     final_submission.class_ = class_

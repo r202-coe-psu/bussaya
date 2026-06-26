@@ -1,0 +1,62 @@
+{% extends '/base/default-dashboard.html.j2' %}
+{% import '/base/html-renderer.html.j2' as renderer %}
+
+{% block dashboard_title %}
+{{ 'Edit' if 'edit' in request.path else 'Create' }} Submission
+{% endblock %}
+
+{% block breadcrumbs %}
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li><a href=" {{ url_for('submissions.create', class_id=class_.id) }}">{{ 'Edit' if 'edit' in
+    request.path else 'Create' }} Submission</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="card bg-base-100 shadow my-4">
+        <div class="card-body">
+        <form method="POST" class="space-y-1">
+            {{ form.csrf_token }}
+            {{ renderer.render_select(form.type) }}
+            {{ renderer.render_select(form.round) }}
+            {{ renderer.render_field(form.description) }}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    {{ renderer.render_datetime_picker(form.started_date, picker_id="rangestart") }}
+                </div>
+                <div>
+                    {{ renderer.render_datetime_picker(form.ended_date, picker_id="rangeend") }}
+                </div>
+                <div>
+                    {{ renderer.render_datetime_picker(form.extended_date, picker_id="rangeextend") }}
+                </div>
+            </div>
+            <button class="btn btn-primary" type="submit">{{ 'Edit' if 'edit' in request.path else 'Create'
+                }}</button>
+        </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block additional_js %}
+<script type="text/javascript">
+    (function () {
+        var start = document.getElementById('rangestart');
+        var end = document.getElementById('rangeend');
+        var extend = document.getElementById('rangeextend');
+        function sync() {
+            if (start.value) end.min = start.value;
+            if (end.value) {
+                start.max = end.value;
+                extend.min = end.value;
+            }
+        }
+        start.addEventListener('change', sync);
+        end.addEventListener('change', sync);
+        sync();
+    })();
+</script>
+{% endblock %}

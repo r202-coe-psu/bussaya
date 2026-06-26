@@ -1,0 +1,168 @@
+{% extends '/admin/classes/index.html.j2' %}
+{% import '/base/error-handler.html.j2' as eh %}
+{% import '/base/html-renderer.html.j2' as renderer %}
+
+{% block breadcrumbs %}
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li>Submission: {{ meeting.name }}</li>
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="overflow-x-auto">
+<table class="table table-zebra">
+    <tbody>
+        <tr>
+            <th class="font-medium w-40">Name</th>
+            <td>{{ meeting.name }}</td>
+        </tr>
+        <tr>
+            <th class="font-medium">Started Date</th>
+            <td>{{ meeting.started_date.strftime("%Y-%m-%d %H:%M") }}</td>
+        </tr>
+        <tr>
+            <th class="font-medium">Ended Date</th>
+            <td>{{ meeting.ended_date.strftime("%Y-%m-%d %H:%M") }}</td>
+        </tr>
+        <tr>
+            <th class="font-medium">Extended Date</th>
+            <td>{{ meeting.extended_date.strftime("%Y-%m-%d %H:%M") }}</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<a class="btn btn-primary btn-xs mt-2"
+    href="{{url_for('meetings.edit', meeting_id=meeting.id)}}">
+    <i class="fa-solid fa-pen-to-square"></i> Edit
+</a>
+<button type="button" class="btn btn-error btn-xs mt-2"
+    onclick="document.getElementById('delete-meeting-modal').showModal()">
+    <i class="fa-solid fa-trash"></i> Delete
+</button>
+
+<a class="btn btn-primary btn-xs mt-2" href="{{ url_for('meetings.force_report', meeting_id=meeting.id) }}">
+    <i class="fa-solid fa-plus"></i> Force Add Student Report
+</a>
+
+<dialog id="delete-meeting-modal" class="modal">
+    <div class="modal-box">
+        <h3 class="text-lg font-semibold">Delete Meeting</h3>
+        <p class="py-4">Are you sure you want to delete meeting "{{ meeting.name }}"?</p>
+        <div class="modal-action">
+            <a class="btn btn-error" href="{{ url_for('meetings.delete', meeting_id=meeting.id) }}">
+                <i class="fa-solid fa-trash"></i> Delete
+            </a>
+            <form method="dialog">
+                <button class="btn">Cancel</button>
+            </form>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+</dialog>
+
+
+<div class="divider text-2xl font-bold">{{meeting.name}}</div>
+
+<div class="overflow-x-auto">
+<table class="table table-zebra">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Student</th>
+            <th>Advisor</th>
+            <th>Title / Description</th>
+            <th>Meeting Date</th>
+            <th>Status</th>
+            <th>Remark</th>
+            <th>Approval</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for meeting_report in meeting_reports if meeting_report.project %}
+        <tr>
+            <td>
+                {{ loop.index }}
+            </td>
+            <td>
+                {{ meeting_report.owner.username }} <br />
+                {{ meeting_report.owner.first_name }} {{ meeting_report.owner.last_name }}
+            </td>
+            <td>
+              {{ meeting_report.project.advisors|map(attribute='fullname')|join(', ') }}
+            </td>
+            <td>
+              <h3>{{ meeting_report.title }}</h3>
+              <div>{{ markdown.markdown(meeting_report.description)|safe }}</div>
+              {% if meeting_report.file %}
+                <div>
+                  {%- if meeting_report.file.filename[-3:].lower() == 'png' %}
+                    <img class="w-full max-w-lg rounded" src="{{ url_for('meetings.download', meeting_report_id=meeting_report.id, filename=meeting_report.file.filename) }}">
+                  {% else %}
+                    <a href="{{ url_for('meetings.download', meeting_report_id=meeting_report.id, filename=meeting_report.file.filename) }}">{{ meeting_report.file.filename }}</a>
+                  {%- endif %}
+                </div>
+              {% endif %}
+
+              <div><b>Submit Date</b> {{ meeting_report.updated_date.strftime("%Y-%m-%d %H:%M") }}</div>
+            </td>
+            <td>
+                {{meeting_report.meeting_date}}
+            </td>
+            <td class="{{'bg-success/20' if meeting_report.status == 'approved'}} {{'bg-error/20' if meeting_report.status == 'disapproved'}}">
+              {{ meeting_report.get_status_display() if meeting_report.status else 'Waiting for approval' }} <br>
+              {% if meeting_report.approver %}
+                {{ meeting_report.approver.get_fullname() }} <br>
+                {{ meeting_report.approved_date.strftime("%Y-%m-%d %H:%M") if meeting_report.approved_date }} <br>
+              {% endif %}
+            </td>
+            <td>
+              {{ markdown.markdown(meeting_report.remark)|safe }}
+            </td>
+            <td class="text-right">
+		          <div class="flex gap-1">
+
+			          <a class="btn btn-primary btn-square tooltip h-fit mt-2" data-tip="Edit Report" href="{{ url_for('meetings.force_report', meeting_id=meeting.id, meeting_report_id=meeting_report.id) }}">
+			            <i class="fa-solid fa-pen-to-square"></i>
+			          </a>
+
+                <a class="btn btn-success btn-square tooltip h-fit mt-2" data-tip="Approved" href="{{url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, action='approve')}}">
+                  <i class="fa-solid fa-check"></i>
+                </a>
+                <div class="collapse w-fit h-fit">
+                    <input type="checkbox">
+                    <div class="collapse-title p-0 min-h-0 mt-2">
+                        <span class="btn btn-error btn-square tooltip" data-tip="Disapprove">
+                          <i class="fa-solid fa-xmark"></i>
+                        </span>
+                    </div>
+                    <div class="collapse-content">
+                        <div class="card bg-base-100 shadow">
+                            <div class="card-body p-4">
+                                <form method="post">
+                                    {{renderer.render_field(form.remark)}}
+                                    <input type="hidden" name="meeting_report_id" value="{{meeting_report.id}}">
+                                    <button type="submit" class="btn btn-primary mt-2">
+                                        Submit
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+              </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}
+
+{% block additional_js %}
+{% endblock additional_js%}

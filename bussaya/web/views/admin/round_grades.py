@@ -161,7 +161,7 @@ def check_and_create_mentor_grade_profile(round_grade):
 @login_required
 def index(class_id):
     class_ = models.Class.objects.get(id=class_id)
-    return render_template("/round_grades/index.html", class_=class_)
+    return render_template("/round_grades/index.html.j2", class_=class_)
 
 
 @module.route("/<round_grade_type>/view")
@@ -198,7 +198,7 @@ def view(round_grade_type):
     )
 
     return render_template(
-        "/admin/round_grades/view.html",
+        "/admin/round_grades/view.html.j2",
         user=current_user,
         class_=class_,
         round_grade=round_grade,
@@ -269,7 +269,7 @@ def approve_report(round_grade_type):
             is_not_expireds.append(None)
 
     return render_template(
-        "/admin/round_grades/approve-report.html",
+        "/admin/round_grades/approve-report.html.j2",
         user=current_user,
         class_=class_,
         round_grade=round_grade,
@@ -307,7 +307,7 @@ def view_total(round_grade_type):
                 student_grades.append(student_grade)
 
     return render_template(
-        "/admin/round_grades/view-total.html",
+        "/admin/round_grades/view-total.html.j2",
         user=user,
         class_=class_,
         round_grade=round_grade,
@@ -343,7 +343,7 @@ def view_grade_summary(round_grade_type):
                 student_grades.append(student_grade)
 
     return render_template(
-        "/admin/round_grades/view-grade-summary.html",
+        "/admin/round_grades/view-grade-summary.html.j2",
         user=user,
         class_=class_,
         round_grade=round_grade,
@@ -392,7 +392,7 @@ def view_advisor_grade(round_grade_type):
                 student_grades.append(student_grade)
 
     return render_template(
-        "/admin/round_grades/view-advisor-grade.html",
+        "/admin/round_grades/view-advisor-grade.html.j2",
         user=user,
         class_=class_,
         round_grade=round_grade,
@@ -439,7 +439,7 @@ def grading(round_grade_id):
         )
 
     return render_template(
-        "/admin/round_grades/grading.html",
+        "/admin/round_grades/grading.html.j2",
         form=form,
         class_=class_,
         round_grade=round_grade,
@@ -539,7 +539,7 @@ def submit_mentor_grade(round_grade_id):
 
     if not form.validate_on_submit():
         return render_template(
-            "/admin/round_grades/submit-mentor-grade.html",
+            "/admin/round_grades/submit-mentor-grade.html.j2",
             class_=class_,
             round_grade=round_grade,
             form=form,
@@ -591,7 +591,7 @@ def set_time(round_grade_id):
     # print(round_grade.started_date)
     if not form.validate_on_submit():
         return render_template(
-            "admin/round_grades/set-time.html",
+            "admin/round_grades/set-time.html.j2",
             form=form,
             class_=class_,
             round_grade=round_grade,
@@ -691,7 +691,7 @@ def view_advisor_students(round_grade_type, class_id, advisor_id):
             )
 
     return render_template(
-        "admin/round_grades/view-advisor-students.html",
+        "admin/round_grades/view-advisor-students.html.j2",
         advisor=advisor,
         round_grade_type=round_grade_type,
         round_grade=round_grade,

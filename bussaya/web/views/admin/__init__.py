@@ -17,4 +17,4 @@ def index():
 
     projects = models.Project.objects(class_=class_)
 
-    return render_template("/admin/index.html", class_=class_, projects=projects)
+    return render_template("/admin/index.html.j2", class_=class_, projects=projects)

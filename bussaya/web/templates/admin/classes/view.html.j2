@@ -1,0 +1,290 @@
+{% extends '/admin/classes/index.html.j2' %}
+{% import '/base/error-handler.html.j2' as eh %}
+{% import '/admin/classes/project-renderer.html.j2' as renderer_project %}
+{% import '/navbar/class-navbar.html.j2' as renderer_navbar %}
+{% import '/base/html-renderer.html.j2' as renderer %}
+
+{% block breadcrumbs %}
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+{% endblock %}
+
+
+{% block content %}
+
+
+{{ renderer_navbar.render_class_navbar(class_, current_user) }}
+
+<h2 class="text-2xl font-bold">
+	Classes
+</h2>
+<div class="divider"></div>
+
+<div class="overflow-x-auto">
+	<table class="table">
+		<tbody>
+			<tr>
+				<td>
+					<div class="opacity-70">NAME </div>{{ class_.name }}
+				</td>
+				<td>
+					<div class="opacity-70">DESCRIPTION</div> {{ class_.description }}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="opacity-70">OWNER </div>{{ class_.owner.first_name }} {{ class_.owner.last_name }}
+				</td>
+				<td>
+					<div class="opacity-70">CODE </div>{{ class_.code }}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="opacity-70">TYPE</div> {{ class_.get_type_display() }}
+				</td>
+				<td>
+					<div class="opacity-70">TAG</div> {{ class_.tags | join(', ') }}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="opacity-70">STARTED DATE</div> {{ class_.started_date }}
+				</td>
+				<td>
+					<div class="opacity-70">ENDED DATE</div> {{ class_.ended_date }}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+{% if projects %}
+<div class="card bg-base-100 shadow my-4">
+	<div class="card-body p-4">
+		<h2 class="text-2xl font-bold">Final Report</h2>
+		{{ renderer_project.render_project_table(projects, current_user) }}
+	</div>
+</div>
+{% endif %}
+
+<div class="card bg-base-100 shadow my-4">
+	<div class="card-body p-4">
+	<h2 class="text-2xl font-bold">Submissions</h2>
+	<div class="divider"></div>
+	<h3 class="text-xl font-semibold">Meeting</h3>
+	<div class="overflow-x-auto">
+		<table class="table table-zebra">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Round</th>
+					<th>Started Date</th>
+					<th>Ended Date</th>
+					<th>Extended Date</th>
+					<th>Edit/Delete</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				{% for meeting in meetings %}
+				<tr class="align-top">
+					<td>
+						<a href="{{url_for('meetings.view', meeting_id=meeting.id)}}">
+							{{ meeting.name }}
+						</a>
+					</td>
+					<td>
+						{{ meeting.get_round_display() }}
+					</td>
+					<td>
+						{{ meeting.started_date.strftime("%Y-%m-%d %H:%M") }}
+					</td>
+					<td>
+						{{ meeting.ended_date.strftime("%Y-%m-%d %H:%M") }}
+					</td>
+					<td>
+						{{ meeting.extended_date.strftime("%Y-%m-%d %H:%M") }}
+					</td>
+					<td class="whitespace-nowrap text-right">
+						<a class="btn btn-primary btn-square" href="{{url_for('meetings.edit', meeting_id=meeting.id)}}">
+							<i class="fa-solid fa-pen-to-square"></i>
+						</a>
+						<a class="btn btn-error btn-square" href="{{url_for('meetings.delete', meeting_id=meeting.id)}}">
+							<i class="fa-solid fa-trash"></i>
+						</a>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<div>
+		<button type="button" class="btn btn-primary" onclick="showCreateMeeting()">
+			<i class="fa-solid fa-plus"></i>
+			Create Meeting
+		</button>
+	</div>
+	<p />
+	<div id="create-meeting-form" class="hidden">
+		<div class="card bg-base-100 shadow my-4">
+			<div class="card-body p-4">
+				<div class="divider">
+					Meeting Form
+				</div>
+				<br>
+				<form method="POST" class="space-y-1">
+					{{ form.csrf_token }}
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						{{ renderer.render_field(form.name) }}
+						{{ renderer.render_select(form.round) }}
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+						{{ renderer.render_datetime_picker(form.started_date, picker_id="rangestart") }}
+						{{ renderer.render_datetime_picker(form.ended_date, picker_id="rangeend") }}
+						{{ renderer.render_datetime_picker(form.extended_date, picker_id="rangeextend") }}
+					</div>
+
+					<button name="create" type="submit" class="btn btn-primary btn-sm">
+						Create
+					</button>
+					<div class="divider"></div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="divider"></div>
+
+	<h3 class="text-xl font-semibold">Report / Presentation</h3>
+	<div class="overflow-x-auto">
+		<table class="table table-zebra">
+			<thead>
+				<tr>
+					<th>Type</th>
+					<th>Round</th>
+					<th>Description</th>
+					<th>Started Date</th>
+					<th>Ended Date</th>
+					<th>Extended Date</th>
+					<th>Edit / Delete</th>
+				</tr>
+			</thead>
+
+			<body>
+				{% for submission in submissions %}
+				<tr class="align-top">
+					<td>
+						<a href="{{ url_for('submissions.view', submission_id=submission.id)}}">
+							{{ submission.get_type_display() }}
+						</a>
+					</td>
+					<td>
+						{{ submission.get_round_display() }}
+					</td>
+					<td>
+						{{ submission.description}}
+					</td>
+					<td>{{ submission.natural_started_date() }}</td>
+					<td>{{ submission.natural_ended_date() }}</td>
+					<td>{{ submission.natural_extended_date() }}</td>
+					<td class="whitespace-nowrap text-right">
+						<a class="btn btn-primary btn-square"
+							href="{{ url_for('submissions.edit', submission_id=submission.id) }}">
+							<i class="fa-solid fa-pen-to-square"></i>
+						</a>
+						<a class="btn btn-error btn-square"
+							href="{{ url_for('submissions.delete', submission_id=submission.id) }}">
+							<i class="fa-solid fa-trash"></i>
+						</a>
+					</td>
+				</tr>
+				{% endfor %}
+			</body>
+		</table>
+	</div>
+
+	<div>
+		<a class="btn btn-primary" href="{{ url_for('submissions.create', class_id=class_.id) }}">
+			<i class="fa-solid fa-plus"></i>
+			Create Submission
+		</a>
+	</div>
+
+	</div>
+</div>
+
+<div class="divider"></div>
+<div class="card bg-base-100 shadow my-4">
+	<div class="card-body p-4">
+	<h2 class="text-2xl font-bold">Final Submission</h2>
+	{% if not final_submission %}
+	<div class="alert alert-info">Final submission has not been set.</div>
+	{% else %}
+	<div class="overflow-x-auto">
+		<table class="table">
+			<tbody>
+				<tr>
+					<th class="font-medium">Started Date</th>
+					<td>{{ final_submission.natural_started_date() }}</td>
+				</tr>
+				<tr>
+					<th class="font-medium">Ended Date</th>
+					<td>{{ final_submission.natural_ended_date() }}</td>
+				</tr>
+				<tr>
+					<th class="font-medium">Extended Date</th>
+					<td>{{ final_submission.natural_extended_date() }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	{% endif %}
+	{% if final_submission %}
+	<div>
+		<a class="btn btn-primary" href="{{ url_for('admin.classes.view_final_reports', class_id=class_.id) }}">
+			<i class="fa-solid fa-eye"></i>
+			View
+		</a>
+		<a class="btn btn-accent" href="{{ url_for('admin.classes.edit_final_submission', class_id=class_.id, final_submission_id=final_submission.id) }}">
+			<i class="fa-solid fa-share-nodes"></i>
+			Edit Final Submission
+		</a>
+	</div>
+	{% else %}
+	<div>
+		<a class="btn btn-accent" href="{{ url_for('admin.classes.set_final_submission', class_id=class_.id) }}">
+			<i class="fa-solid fa-share-nodes"></i>
+			Set Final Submission
+		</a>
+	</div>
+	{% endif %}
+	</div>
+</div>
+
+{% endblock %}
+
+{% block additional_js %}
+<script>
+	function showCreateMeeting() {
+		document.getElementById('create-meeting-form').classList.toggle('hidden');
+	}
+</script>
+<script type="text/javascript">
+	(function () {
+		var start = document.getElementById('rangestart');
+		var end = document.getElementById('rangeend');
+		var extend = document.getElementById('rangeextend');
+		if (start && end) {
+			start.addEventListener('change', function () { end.min = start.value; });
+			end.addEventListener('change', function () {
+				start.max = end.value;
+				if (extend) extend.min = end.value;
+			});
+		}
+		if (end && extend) {
+			extend.addEventListener('change', function () { end.max = extend.value; });
+		}
+	})();
+</script>
+{% endblock additional_js %}

@@ -1,0 +1,44 @@
+{% extends '/admin/users/index.html.j2' %}
+{% import '/base/error-handler.html.j2' as eh %}
+{% import '/base/html-renderer.html.j2' as renderer %}
+
+{% block title %}
+Edit User
+{% endblock %}
+
+{% block breadcrumbs %}
+{{ super() }}
+<li>Edit User</li>
+{% endblock %}
+
+{% block content %}
+<div>
+    <div class="card bg-base-100 shadow my-4">
+        <div class="card-body">
+        <h2 class="text-2xl font-bold">Profile</h2>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            {{ renderer.render_field(form.username)}}
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
+                {{ renderer.render_field(form.title) }}
+                {{ renderer.render_field(form.first_name) }}
+                {{ renderer.render_field(form.last_name) }}
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
+                {{ renderer.render_field(form.title_th) }}
+                {{ renderer.render_field(form.first_name_th) }}
+                {{ renderer.render_field(form.last_name_th) }}
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
+                {{ renderer.render_field(form.email) }}
+            </div>
+            {{ renderer.render_field(form.roles) }}
+            <button name="create" type="submit" class="btn btn-primary">Change</button>
+        </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

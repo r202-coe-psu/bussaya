@@ -1,0 +1,69 @@
+{% extends "/base/default-page.html.j2" %}
+
+{% block content %}
+
+  <div class="container mx-auto px-4">
+    <div class="card bg-base-100 shadow my-4">
+      <div class="card-body p-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h3 class="text-xl font-semibold">Projectst</h3>
+        </div>
+        <div class="text-right">
+          <a class="btn btn-primary btn-sm" href="{{ url_for('site.list_lecturers') }}"><i class="fa-solid fa-chalkboard-user"></i>Lecturers</a>
+          <a class="btn btn-primary btn-sm" href="{{ url_for('tags.index') }}"><i class="fa-solid fa-tag"></i>Tags</a>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+      <table class="table">
+        <tbody>
+          {% for project in projects %}
+          <tr>
+            <td class="w-3/5">
+              <a href="{{ url_for('projects.view', project_id=project.id) }}">
+                <b>{{ project.name }}</b><br>
+                <b>{{ project.name_th }}</b>
+              </a>
+              <br>
+              {% for tag in project.tags %}
+                <a class="badge badge-sm" href="{{ url_for('tags.view', name=tag) }}">
+                  {{ tag }}
+                </a>
+              {% endfor %}
+            </td>
+            <td>
+              {%- for s in project.students %}
+              <i class="fa-solid fa-user"></i>
+              <a target="_blank" href="{{ url_for('accounts.profile', user_id=s.id) }}">
+                {{ s.first_name }} {{ s.last_name }}
+              </a>
+              {% if not loop.last %}<br>{% endif %}
+              {% endfor -%}
+            </td>
+            <td class="whitespace-nowrap">
+              {%- for type_ in ['report', 'poster', 'presentation', 'video', 'git'] %}
+                {% if type_ in project.public %}
+                  {% set r = project.get_resource(type_) %}
+                  {% if r and r.type == 'report' %}
+                    <a target="_blank" class="tooltip" data-tip="Report" href="{{ r.link }}"><i class="fa-solid fa-file-pdf fa-lg"></i></a>
+                  {% elif r and r.type == 'poster' %}
+                    <a target="_blank" class="tooltip" data-tip="Poster" href="{{ r.link }}"><i class="fa-solid fa-file-image fa-lg"></i></a>
+                  {% elif r and r.type == 'presentation' %}
+                    <a target="_blank" class="tooltip" data-tip="Rresentation" href="{{ r.link }}"><i class="fa-solid fa-file-powerpoint fa-lg"></i></a>
+                  {% elif r and r.type == 'video' %}
+                    <a target="_blank" class="tooltip" data-tip="Video" href="{{ r.link }}"><i class="fa-solid fa-file-video fa-lg"></i></a>
+                  {% elif r and r.type == 'git' %}
+                    <a target="_blank" class="tooltip" data-tip="Git" href="{{ r.link }}"><i class="fa-brands fa-git-alt fa-lg"></i></a>
+                  {% endif %}
+                {% endif %}
+              {%- endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

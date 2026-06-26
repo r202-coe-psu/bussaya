@@ -25,7 +25,7 @@ def index():
     organizations = models.Organization.objects(status="active")
 
     return render_template(
-        "admin/organizations/index.html", organizations=organizations
+        "admin/organizations/index.html.j2", organizations=organizations
     )
 
 
@@ -43,7 +43,7 @@ def create_or_edit(organization_id):
 
     if not form.validate_on_submit():
         return render_template(
-            "admin/organizations/create-or-edit.html",
+            "admin/organizations/create-or-edit.html.j2",
             form=form,
             organization=organization,
         )
@@ -74,7 +74,7 @@ def view(organization_id):
     if not organization:
         return redirect(url_for("admin.organizations.index"))
 
-    return render_template("admin/organizations/view.html", organization=organization)
+    return render_template("admin/organizations/view.html.j2", organization=organization)
 
 
 @module.route(
@@ -96,7 +96,7 @@ def add_or_edit_mentor(organization_id, mentor_id):
 
     if not form.validate_on_submit():
         return render_template(
-            "admin/organizations/add-or-edit-mentor.html",
+            "admin/organizations/add-or-edit-mentor.html.j2",
             form=form,
             mentor=mentor,
             organization=organization,

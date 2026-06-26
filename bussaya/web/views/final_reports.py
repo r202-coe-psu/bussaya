@@ -59,7 +59,7 @@ def upload(final_submission_id):
                     break
 
         return render_template(
-            "/final_reports/upload.html",
+            "/final_reports/upload.html.j2",
             form=form,
             final_submission=final_submission,
             class_=class_,

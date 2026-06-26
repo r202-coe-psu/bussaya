@@ -1,0 +1,59 @@
+{% extends '/base/default-dashboard.html.j2' %}
+
+{% block dashboard_title %}
+Classes
+{% endblock %}
+
+{% block breadcrumbs %}
+<li><a href="{{ url_for('admin.classes.index') }}">Classes</a></li>
+{% endblock %}
+
+{% block content %}
+
+<div class="divider text-xl font-bold">
+	<i class="fa-solid fa-chalkboard fa-sm"></i>
+	All Classes
+</div>
+
+<div class="card bg-base-100 shadow my-4">
+	<div class="card-body p-4">
+		{% if classes %}
+		<div class="overflow-x-auto">
+			<table class="table table-zebra">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Description</th>
+						<th>Operation</th>
+					</tr>
+				</thead>
+
+				<body>
+					{% for class_ in classes %}
+					<tr>
+						<td>
+							<a href="{{ url_for('admin.classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+						</td>
+						<td>
+							{{ class_.description }}
+						</td>
+						<td>
+							<a href="{{ url_for('admin.classes.copy', class_id=class_.id) }}" class="btn btn-primary btn-circle"><i class="fa-solid fa-copy"></i></a>
+						</td>
+					</tr>
+					{% endfor %}
+				</body>
+			</table>
+		</div>
+		{% endif %}
+
+		<div>
+			<a class="btn btn-primary" href="{{ url_for('admin.classes.create') }}">
+				Create Class
+			</a>
+		</div>
+	</div>
+</div>
+
+
+{% endblock %}

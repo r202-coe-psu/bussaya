@@ -30,7 +30,7 @@ def view(class_id):
     groups = models.Group.objects.all().filter(class_=class_)
 
     return render_template(
-        "/groups/view.html",
+        "/groups/view.html.j2",
         class_=class_,
         groups=groups,
         get_student_ids=get_student_ids,

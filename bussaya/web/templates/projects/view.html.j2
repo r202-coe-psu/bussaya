@@ -1,0 +1,118 @@
+{% if current_user.is_authenticated %}
+  {% extends '/base/default-dashboard.html.j2' %}
+{% else %}
+  {% extends '/base/default-page.html.j2' %}
+{% endif %}
+
+{% block title %}
+  {{ project.name }}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4"> {# start div container #}
+  <div class="card bg-base-100 shadow my-4">
+    <div class="card-body">
+    <h3 class="text-xl font-semibold">{{ project.name_th }}</h3>
+    <h3 class="text-xl font-semibold">{{ project.name }}</h3>
+    <div>
+      {% for t in project.tags %}
+        <a class="badge" href="{{ url_for('tags.view', name=t) }}">{{ t }}</a>
+      {% endfor %}
+    </div>
+
+
+    {% if 'abstract' in project.public %}
+      <div class="alert">
+        <div>
+          <div class="font-bold">Abstract</div>
+          <p>{{ project.abstract_th }}</p>
+          <p>{{ project.abstract }}</p>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if project.public not in ['only name', 'private', 'abstract'] %}
+    <div class="alert">
+      <div>
+        <div class="font-bold">Public</div>
+        <p>
+        {%- for type_, icon in [('report', 'fa-solid fa-file-pdf'), ('poster', 'fa-solid fa-file-image'), ('presentation', 'fa-solid fa-file-powerpoint'), ('video', 'fa-solid fa-file-video'), ('git', 'fa-brands fa-git-alt')] %}
+        {% if type_ in project.public %}
+          {% set r = project.get_resource(type_) %}
+          {% if r %}
+            <a target="_blank" href="{{ r.link }}" class="tooltip" data-tip="{{ type_.title() }}"><i class="{{ icon }} fa-xl"></i></a>
+          {% endif %}
+        {% endif %}
+        {%- endfor %}
+        </p>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if current_user.is_authenticated and current_user.has_roles('lecturer') %}
+    <div class="alert">
+      <div>
+        <div class="font-bold">Special for Lecturer</div>
+        <p>
+          {% for type_, icon in [('report', 'fa-solid fa-file-pdf'), ('poster', 'fa-solid fa-file-image'), ('presentation', 'fa-solid fa-file-powerpoint'),
+          ('video', 'fa-solid fa-file-video'), ('git', 'fa-brands fa-git-alt')] %}
+              {% set r = project.get_resource(type_) %}
+              {% if r %}
+                <a target="_blank" href="{{ r.link }}" class="tooltip" data-tip="{{ type_.title() }}"><i class="{{ icon }} fa-xl"></i></a>
+              {% endif %}
+          {% endfor %}
+        </p>
+      </div>
+    </div>
+    {% endif %}
+
+
+    <div class="card bg-base-100 shadow my-4">
+      <div class="card-body">
+      <h2 class="text-2xl font-bold">By</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+        {% for user in project.students %}
+        <div class="text-center">
+          <div class="w-36 rounded inline-block">
+            <img src="{{ user.get_picture() }}">
+          </div>
+        </div>
+
+        <div>
+          <div>
+            <a target="_blank"
+              href="{{ url_for('accounts.profile', user_id=user.id) }}">
+              <h3 class="text-xl font-semibold">{{ user.title }} {{ user.first_name }} {{ user.last_name }}</h3>
+              <h3 class="text-xl font-semibold">{{ user.title_th }} {{ user.first_name_th }} {{ user.last_name_th }}</h3>
+            </a>
+            <div class="badge badge-lg">
+              <i class="fa-solid fa-envelope"></i>
+              {{ user.email }}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      </div>
+    </div>
+
+    <div class="alert">
+      <div>
+        <div class="font-bold">Advisor</div>
+        {% for advisor in project.advisors %}
+          <a target="_blank" href="{{ url_for('accounts.profile', user_id=advisor.id) }}">
+            {{ advisor.title }} {{ advisor.first_name }} {{ advisor.last_name }}
+          </a><br>
+        {% endfor %}
+      </div>
+    </div>
+    </div>
+  </div>
+</div> {# end div container #}
+{% endblock %}
+
+
+{% block additional_js %}
+  {{ super() }}
+{% endblock %}

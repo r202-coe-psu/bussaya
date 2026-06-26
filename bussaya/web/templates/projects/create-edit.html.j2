@@ -1,0 +1,44 @@
+{% extends '/projects/index.html.j2' %}
+{% import '/base/html-renderer.html.j2' as renderer %}
+
+
+{% block dashboard_title %}
+  {{ 'Create' if 'create' in request.path else 'Edit' }} Project
+{% endblock %}
+
+{% block breadcrumbs %}
+  {{ super() }}
+  <li><a href="{{ url_for('projects.create') }}">Create Project</a></li>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="card bg-base-100 shadow my-4">
+    <div class="card-body">
+    <form method="POST" class="space-y-1">
+      {{ form.csrf_token }}
+      {{ renderer.render_field(form.name) }}
+      {{ renderer.render_field(form.name_th) }}
+      {{ renderer.render_field(form.abstract) }}
+      {{ renderer.render_field(form.abstract_th) }}
+
+      {{ renderer.render_select(form.students) }}
+      {# 
+      {{ renderer.render_select(form.class_) }}
+      #}
+      {{ renderer.render_select(form.public) }}
+      {{ renderer.render_field(form.tags) }}
+
+      {{ renderer.render_select(form.advisors) }}
+      {{ renderer.render_multiple_select(form.committees) }}
+
+      {{ renderer.render_multiple_select(form.mentors) }}
+      
+      <button name="create" type="submit" class="btn btn-primary">{{ 'Create' if 'create' in request.path else 'Submit' }}</button>
+    </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

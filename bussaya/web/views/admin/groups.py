@@ -90,7 +90,7 @@ def view():
             )
 
     return render_template(
-        "/admin/groups/view.html",
+        "/admin/groups/view.html.j2",
         class_=class_,
         students=students,
         groups=groups,
@@ -102,7 +102,7 @@ def view():
 @acl.roles_required("admin")
 def index(class_id):
     class_ = models.Class.objects().get(id=class_id)
-    return render_template("/admin/groups/index.html", class_=class_)
+    return render_template("/admin/groups/index.html.j2", class_=class_)
 
 
 def get_group_form(group=None):
@@ -170,7 +170,7 @@ def manage(class_id):
         return redirect(url_for("admin.groups.manage", class_id=class_.id))
 
     return render_template(
-        "/admin/groups/manage.html",
+        "/admin/groups/manage.html.j2",
         class_=class_,
         groups=groups,
         form=form,
@@ -189,7 +189,7 @@ def edit(class_id, group_id):
         form = get_group_form(group)
 
     if not form.validate_on_submit():
-        return render_template("/admin/groups/edit.html", class_=class_, form=form)
+        return render_template("/admin/groups/edit.html.j2", class_=class_, form=form)
 
     form.populate_obj(group)
     group.committees = [models.User.objects.get(id=uid) for uid in form.committees.data]

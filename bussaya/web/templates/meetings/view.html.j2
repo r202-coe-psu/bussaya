@@ -1,0 +1,140 @@
+{% extends '/classes/index.html.j2' %}
+{% import '/base/error-handler.html.j2' as eh %}
+{% import '/base/html-renderer.html.j2' as renderer %}
+
+{% block breadcrumbs %}
+<li><a href="{{ url_for('classes.index') }}">Classes</a></li>
+<li><a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a></li>
+<li>Submission: {{ meeting.name }}</li>
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="overflow-x-auto">
+    <table class="table table-zebra">
+        <tbody>
+            <tr>
+                <th class="font-medium">Name</th>
+                <td>{{ meeting.name }}</td>
+            </tr>
+            <tr>
+                <th class="font-medium">Started Date</th>
+                <td>{{ meeting.started_date.strftime("%Y-%m-%d %H:%M") }}</td>
+            </tr>
+            <tr>
+                <th class="font-medium">Ended Date</th>
+                <td>{{ meeting.ended_date.strftime("%Y-%m-%d %H:%M") }}</td>
+            </tr>
+            <tr>
+                <th class="font-medium">Extended Date</th>
+                <td>{{ meeting.extended_date.strftime("%Y-%m-%d %H:%M") }}</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+
+<div class="divider text-2xl font-bold">{{meeting.name}}</div>
+<div class="overflow-x-auto">
+<table class="table table-zebra">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Project</th>
+            <th>Student</th>
+            <th>Title / Description</th>
+            <th>Meeting Date</th>
+            <th>Status</th>
+            <th>Remark</th>
+            <th>Approval</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for meeting_report in meeting_reports %}
+        <tr class="align-top">
+            <td>{{ loop.index }}</td>
+            <td>{{ meeting_report.project.name }}</td>
+            <td class="text-right whitespace-nowrap">
+                {% if not project %}
+                <a target="_blank" href="{{ url_for('accounts.profile', user_id=meeting_report.owner.id) }}">
+                    {{ meeting_report.owner.get_fullname() }} ({{meeting_report.owner.username}})
+                </a>
+                {% else %}
+
+                {% for student in project.students %}
+                <a target="_blank" href="{{ url_for('accounts.profile', user_id=student.id) }}">
+                    {{ student.get_fullname() }} ({{ student.username }})
+                </a>
+                {% endfor %}
+
+                {% endif %}
+            </td>
+            <td>
+                <h3 class="text-xl font-semibold">{{ meeting_report.title }}</h3>
+                <div>{{ markdown.markdown(meeting_report.description)|safe }}</div>
+                {% if meeting_report.file %}
+                  <div>
+                    {%- if meeting_report.file.filename[-3:].lower() == 'png' %}
+                      <img src="{{ url_for('meetings.download', meeting_reoport_id=meeting_reoport.id, filename=meeting_reoport.file.filename) }}">
+                    {% else %}
+                      <a href="{{ url_for('meetings.download', meeting_reoport_id=meeting_reoport.id, filename=meeting_reoport.file.filename) }}">{{ meeting_reoport.file.filename }}</a>
+                    {%- endif %}
+                  </div>
+                {% endif %}
+                <div><b>Submission Date:</b> {{ meeting_report.updated_date.strftime("%Y-%m-%d %H:%M") }}</div>
+            </td>
+            <td>{{ meeting_report.meeting_date }}</td>
+            <td
+                class="{{'bg-success/20' if meeting_report.status == 'approved'}} {{'bg-error/20' if meeting_report.status == 'disapproved'}}">
+                {{meeting_report.get_status_display() if meeting_report.status else 'Waiting for approval'}}
+            </td>
+            <td>
+              {{ markdown.markdown(meeting_report.remark)|safe }}
+              {% if meeting_report.late_reason %}
+                <div>
+                  <h3 class="text-xl font-semibold">Late Submition</h3>
+                  <div>
+                    {{ markdown.markdown(meeting_report.late_reason)|safe }}
+                  </div>
+                </div>
+              {% endif %}
+            </td>
+            <td class="whitespace-nowrap">
+                <div>
+                    <span class="tooltip" data-tip="Approve">
+                        <a class="btn btn-success btn-square" href="{{ url_for('meetings.approval', meeting_id=meeting.id, meeting_report_id=meeting_report.id, action='approve')}}">
+                            <i class="fa-solid fa-check"></i>
+                        </a>
+                    </span>
+                    <div class="collapse collapse-arrow bg-base-100 shadow w-fit">
+                        <input type="checkbox">
+                        <div class="collapse-title font-semibold">
+                            <span class="btn btn-error btn-square pointer-events-none">
+                                <i class="fa-solid fa-xmark"></i>
+                            </span>
+                            Disapprove
+                        </div>
+                        <div class="collapse-content whitespace-normal">
+                            <form method="post">
+                                {{ renderer.render_field(form.remark) }}
+                                <input type="hidden" name="meeting_report_id" value="{{meeting_report.id}}">
+                                <button type="submit" class="btn btn-primary mt-2">
+                                    Submit
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}
+
+{% block additional_js %}
+{% endblock additional_js%}
