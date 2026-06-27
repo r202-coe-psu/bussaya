@@ -2,9 +2,10 @@
 
 {% macro field_class(field, class_='') -%}
 {%- if field.type in ['SelectMultipleField', 'QuerySelectMultipleField', 'ModelSelectMultipleField'] -%}
-{# native <select multiple>: DaisyUI .select forces a single-line height that clips
-   the options, so allow auto height and show several rows as a scrollable list box #}
-{%- set base = 'select w-full !h-auto min-h-40 py-2' -%}
+{# native <select multiple>: do NOT use DaisyUI .select — it is display:inline-flex and
+   lays each <option> out horizontally. Plain border utilities keep the native top-down,
+   one-option-per-row scrollable list box. #}
+{%- set base = 'w-full min-h-40 rounded-box border border-base-300 bg-base-100 p-2 text-sm' -%}
 {%- elif field.type in ['SelectField', 'QuerySelectField', 'ModelSelectField'] -%}
 {%- set base = 'select w-full' -%}
 {%- elif field.type == 'TextAreaField' -%}
