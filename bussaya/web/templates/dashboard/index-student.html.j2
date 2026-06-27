@@ -86,31 +86,35 @@ Dashboard
 </div>
 
 {% if available_class %}
-<div class="overflow-x-auto">
+<div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 shadow-sm">
 <table class="table table-zebra">
   <thead>
-    <tr>
+    <tr class="bg-base-200 text-sm uppercase tracking-wide text-base-content/70">
       <th>Name</th>
       <th>Description</th>
       <th>Type</th>
       <th>Ended Date</th>
+      <th class="text-right">Action</th>
     </tr>
   </thead>
 
   <tbody>
     {% for class_ in available_class%}
-    <tr>
-      <td>
-        <a href="{{ url_for('classes.view', class_id=class_.id) }}">{{ class_.name }}</a>
+    <tr class="hover">
+      <td class="font-semibold">
+        <a href="{{ url_for('classes.view', class_id=class_.id) }}" class="link link-primary link-hover">{{ class_.name }}</a>
       </td>
-      <td>
+      <td class="max-w-xs whitespace-normal text-base-content/80">
         {{ class_.description }}
       </td>
       <td>
-        {{ class_.get_type_display() }}
+        <span class="badge badge-ghost badge-sm">{{ class_.get_type_display() }}</span>
       </td>
-      <td>
+      <td class="whitespace-nowrap text-base-content/70">
         {{ class_.ended_date }}
+      </td>
+      <td class="text-right">
+        <a href="{{ url_for('classes.view', project_id=class_.id) }}" class="btn btn-primary btn-sm">View</a>
       </td>
     </tr>
     {% endfor %}
