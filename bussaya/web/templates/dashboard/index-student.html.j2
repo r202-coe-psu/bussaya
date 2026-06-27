@@ -114,7 +114,7 @@ Dashboard
         {{ class_.ended_date }}
       </td>
       <td class="text-right">
-        <a href="{{ url_for('classes.view', project_id=class_.id) }}" class="btn btn-primary btn-sm">View</a>
+        <a href="{{ url_for('classes.view', class_id=class_.id) }}" class="btn btn-primary btn-sm">View</a>
       </td>
     </tr>
     {% endfor %}

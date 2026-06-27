@@ -1,7 +1,11 @@
 {% import '/base/error-handler.html.j2' as eh %}
 
 {% macro field_class(field, class_='') -%}
-{%- if field.type in ['SelectField', 'SelectMultipleField', 'QuerySelectField', 'ModelSelectField', 'ModelSelectMultipleField'] -%}
+{%- if field.type in ['SelectMultipleField', 'QuerySelectMultipleField', 'ModelSelectMultipleField'] -%}
+{# native <select multiple>: DaisyUI .select forces a single-line height that clips
+   the options, so allow auto height and show several rows as a scrollable list box #}
+{%- set base = 'select w-full !h-auto min-h-40 py-2' -%}
+{%- elif field.type in ['SelectField', 'QuerySelectField', 'ModelSelectField'] -%}
 {%- set base = 'select w-full' -%}
 {%- elif field.type == 'TextAreaField' -%}
 {%- set base = 'textarea w-full' -%}
