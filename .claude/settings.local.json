@@ -5,8 +5,7 @@
       "Bash(npm install *)",
       "Bash(echo \"exit: $?\")",
       "Bash(git -C /home/tl/projects/r202/bussaya status --short)",
-      "Bash(git -C /home/tl/projects/r202/bussaya diff --stat)",
-      "Bash(xargs -I{} basename {})"
+      "Bash(git -C /home/tl/projects/r202/bussaya diff --stat)"
     ]
   }
 }
