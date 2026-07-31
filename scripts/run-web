@@ -1,3 +1,14 @@
 #!/bin/sh
+set -e
+
+# css/tailwind.css is a gitignored build artifact. Build it to completion BEFORE
+# starting the server: `watch:css` truncates the output file before rewriting it,
+# so backgrounding it alone leaves the first requests (and a previously killed
+# watcher) serving an empty stylesheet, which drops every utility class.
+npm run build:css --prefix bussaya/web/static/
+
+npm run watch:css --prefix bussaya/web/static/ &
+TAILWIND_PID=$!
+trap 'kill $TAILWIND_PID 2>/dev/null' EXIT INT TERM
 
 DEBUT=true BUSSAYA_SETTINGS=$(pwd)/bussaya-development.cfg poetry run bussaya-web -d

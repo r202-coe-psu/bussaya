@@ -2,13 +2,19 @@
  * Tailwind CSS source file — compiled to css/tailwind.css by `npm run build:css`.
  * Replaces the in-browser @tailwindcss/browser runtime build.
  *
- * daisyUI components (node_modules/daisyui/daisyui.css) and the theme variables
- * (css/liberation.css) are still loaded separately in base-layout.html.j2; this
- * file generates Tailwind's preflight + the utility classes used in templates.
+ * This is the ONLY stylesheet base-layout.html.j2 needs besides the theme
+ * (css/liberation.css): daisyUI is compiled in as a Tailwind plugin below, so
+ * preflight, daisyUI components and Tailwind utilities all end up in one file
+ * with the correct @layer order. Do NOT also <link> node_modules/daisyui/daisyui.css
+ * — that file bundles its own copy of preflight and, because a document's cascade
+ * layer order is fixed by first appearance, loading it first pushed Tailwind's
+ * `properties` layer above `utilities` and duplicated the reset.
  */
 @import "tailwindcss" source(none);
+@plugin "daisyui";
 
-/* Class names only appear in Jinja templates (.html.j2) and our small JS helpers. */
+/* Class names only appear in Jinja templates (.html.j2) and our small JS helpers.
+   Nothing generates class names in Python, so these two globs are the full set. */
 @source "../../templates/**/*.html.j2";
 @source "../js/**/*.js";
 
