@@ -14,6 +14,15 @@ from .submissions import (
 )
 from .grades import RoundGrade, StudentGrade, Grader
 from .organizations import Organization, Mentor
+from .curriculums import Curriculum, PLO
+from .rubrics import (
+    RubricCriterion,
+    RubricTemplate,
+    RubricCriterionSnapshot,
+    RoundGradeRubric,
+    CriterionScore,
+    RubricScore,
+)
 
 from flask_mongoengine import MongoEngine
 
@@ -37,6 +46,11 @@ __all__ = [
     MeetingReport,
     RoundGrade,
     StudentGrade,
+    Curriculum,
+    PLO,
+    RubricTemplate,
+    RoundGradeRubric,
+    RubricScore,
 ]
 
 

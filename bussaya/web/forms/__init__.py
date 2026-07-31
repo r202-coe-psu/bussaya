@@ -10,6 +10,8 @@ from . import round_grades
 from . import groups
 from . import meetings
 from . import organizations
+from . import curriculums
+from . import rubrics
 
 __all__ = [
     accounts,
@@ -20,4 +22,6 @@ __all__ = [
     groups,
     meetings,
     organizations,
+    curriculums,
+    rubrics,
 ]
