@@ -22,6 +22,12 @@
 
 {{ render_toolbars.render_admin_grade_menu_toolbars(round_grade) }}
 
+{% if not round_grade_rubric %}
+<div class="alert alert-warning my-4">
+    No active rubric template configured for the "{{ class_.get_type_display() }}" class type yet.
+    <a class="link" href="{{ url_for('admin.rubrics.index') }}">Manage rubric templates</a>
+</div>
+{% else %}
 <form method="POST" id="form-round_grade">
     {{ form.csrf_token }}
     <div class="pt-4">
@@ -34,7 +40,10 @@
 		                <th>Advisors</th>
 		                <th>Project</th>
                     <th>Mentor</th>
-                    <th>Grading</th>
+                    {% for criterion in round_grade_rubric.get_sorted_criteria() %}
+                    <th class="tooltip" data-tip="{{ criterion.description }}">{{ criterion.name }}<br><span class="opacity-60 text-xs">/ {{ criterion.max_score }}</span></th>
+                    {% endfor %}
+                    <th>This Grade</th>
                     <th>Average Grade</th>
                     <th>Final Grade</th>
                     <th>Total Grade</th>
@@ -63,13 +72,14 @@
                         </div>
 
                     </td>
+                    {{ grading.student_id }}
+                    {% for criterion_score in grading.criterion_scores %}
                     <td>
-                        {% set grading = form.gradings[loop.index - 1] %}
-                        <div id="{{ grading.id }}" style="width: auto">
-                            {{ grading.student_id }}
-                            {{ grading.result(class_="select w-full") }}
-                        </div>
+                        {{ criterion_score.criterion_id }}
+                        {{ criterion_score.score(class_="input input-sm w-20") }}
                     </td>
+                    {% endfor %}
+                    <td><span class="badge">{{ student_grade.get_result_display() }}</span></td>
                     <td>{{ student.get_average_grade(student_grade.round_grade) }}</td>
                     {% set actual_grade, caused = student.get_actual_grade(student_grade.round_grade) %}
                     <td>
@@ -125,6 +135,18 @@
                                         {% endif %}
                                       </a>
                                       <div class="text-sm opacity-70">{{ student_grade.get_result_display() }}</div>
+                                      {% set rubric_score = student_grade.get_rubric_score() %}
+                                      {% if rubric_score %}
+                                      <div class="text-xs opacity-70 mt-1 space-y-0.5">
+                                        {% for criterion in rubric_score.round_grade_rubric.get_sorted_criteria() %}
+                                        {% set cs = rubric_score.get_score_for(criterion.id) %}
+                                        <div>
+                                          {{ criterion.name }}: {{ cs.score if cs and cs.score is not none else '-' }} / {{ criterion.max_score }}
+                                          {% if criterion.plos %}({{ criterion.plos|map(attribute='code')|join(', ') }}){% endif %}
+                                        </div>
+                                        {% endfor %}
+                                      </div>
+                                      {% endif %}
                                     </div>
                                 </li>
                             </ul>
@@ -143,6 +165,7 @@
         </button>
     </div>
 </form>
+{% endif %}
 
 {% endblock %}
 

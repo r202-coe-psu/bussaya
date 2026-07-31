@@ -1,0 +1,82 @@
+{% extends '/admin/curriculums/index.html.j2' %}
+{% import '/base/html-renderer.html.j2' as renderer %}
+
+{% block breadcrumbs %}
+  {{ super() }}
+  {% if request.endpoint != 'admin.curriculums.view' %}
+    <li><a href="{{ url_for('admin.curriculums.view', curriculum_id=curriculum.id) }}">{{ curriculum.name }}</a></li>
+  {% else %}
+    <li>{{ curriculum.name }}</li>
+  {% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+<h2 class="text-2xl font-bold">
+  {{ curriculum.name }} ({{ curriculum.code }})
+</h2>
+<div class="divider"></div>
+
+<div class="overflow-x-auto">
+<table class="table">
+	<tbody>
+		<tr>
+			<td>
+				<div class="opacity-60">Name</div>{{ curriculum.name }}
+			</td>
+			<td>
+				<div class="opacity-60">Name (Thai)</div>{{ curriculum.name_th }}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="opacity-60">Code</div>{{ curriculum.code }}
+			</td>
+			<td>
+				<div class="opacity-60">Created Date</div> {{ curriculum.created_date.strftime("%Y-%m-%d %H:%M") }}
+			</td>
+    </tr>
+	</tbody>
+</table>
+</div>
+
+<a class="btn btn-primary" href="{{ url_for('admin.curriculums.create_or_edit', curriculum_id=curriculum.id) }}">
+  <i class="fa-solid fa-pen-to-square"></i> Edit Curriculum
+</a>
+
+<div class="mt-6">
+  <h3 class="text-xl font-semibold">Program Learning Outcomes (PLOs)</h3>
+  <div class="my-2">
+    <a class="btn btn-primary" href="{{ url_for('admin.curriculums.add_or_edit_plo', curriculum_id=curriculum.id) }}"><i class="fa-solid fa-plus"></i> Add PLO</a>
+  </div>
+  <div class="overflow-x-auto">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Description</th>
+        <th>Order</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for plo in curriculum.get_plos() %}
+        <tr>
+          <td>{{ plo.code }}</td>
+          <td>
+            <div>{{ plo.description }}</div>
+            <div class="opacity-60">{{ plo.description_th }}</div>
+          </td>
+          <td>{{ plo.order }}</td>
+          <td>
+            <a href="{{ url_for('admin.curriculums.add_or_edit_plo', curriculum_id=curriculum.id, plo_id=plo.id) }}" class="btn btn-circle btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}

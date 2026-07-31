@@ -4,6 +4,7 @@ import mongoengine as me
 import datetime
 
 from bussaya import models
+from bussaya.models import rubrics as rubric_models
 
 from .admin import round_grades as admin_round_grades
 from .. import forms, acl
@@ -128,17 +129,21 @@ def grading(round_grade_id):
         ),
     )
 
-    form = forms.round_grades.GroupGradingForm()
-    for s in student_grades:
-        form.gradings.append_entry(
-            {"student_id": str(s.student.id), "result": s.result}
+    round_grade_rubric = rubric_models.get_or_create_round_grade_rubric(round_grade)
+    form = (
+        admin_round_grades.build_rubric_grading_form(
+            forms.round_grades.GroupRubricGradingForm, student_grades, round_grade_rubric
         )
+        if round_grade_rubric
+        else forms.round_grades.GroupRubricGradingForm()
+    )
 
     return render_template(
         "round_grades/grading.html.j2",
         form=form,
         class_=class_,
         round_grade=round_grade,
+        round_grade_rubric=round_grade_rubric,
         user=user,
         student_grades=student_grades,
     )
@@ -154,9 +159,10 @@ def submit_grade(round_grade_id):
     if not round_grade.is_in_time():
         return redirect(url_for("round_grades.grading", round_grade_id=round_grade_id))
 
-    form = forms.round_grades.GroupGradingForm()
+    round_grade_rubric = rubric_models.get_or_create_round_grade_rubric(round_grade)
+    form = forms.round_grades.GroupRubricGradingForm()
 
-    if not form.validate_on_submit():
+    if not round_grade_rubric or not form.validate_on_submit():
         return redirect(url_for("round_grades.grading", round_grade_id=round_grade_id))
 
     for grading in form.gradings.data:
@@ -178,13 +184,18 @@ def submit_grade(round_grade_id):
             # project=project,
         ).first()
 
-        student_grade.result = grading["result"]
+        if not student_grade:
+            continue
+
+        admin_round_grades.save_rubric_score(
+            student_grade, round_grade_rubric, grading["criterion_scores"]
+        )
         student_grade.updated_date = datetime.datetime.now()
         student_grade.save()
 
         if (
             current_user._get_current_object() in project.advisors
-            and grading["result"] != "-"
+            and student_grade.result != "-"
         ):
             meetings = models.MeetingReport.objects(
                 class_=class_, owner=student_grade.student, status__in=[None, "wait"]

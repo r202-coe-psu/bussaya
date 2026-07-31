@@ -109,6 +109,11 @@ class StudentGrade(me.Document):
     def get_result_choice(self):
         return StudentGrade.result.choices
 
+    def get_rubric_score(self):
+        from .rubrics import RubricScore
+
+        return RubricScore.objects(student_grade=self).first()
+
     def get_grade_point(self):
         GRADE_POINTS = {
             "A": 4,

@@ -1,0 +1,50 @@
+{% extends '/admin/curriculums/view.html.j2' %}
+{% import '/base/html-renderer.html.j2' as renderer %}
+
+{% block dashboard_title %}
+	{% if plo %}
+		Edit
+	{% else %}
+		Create
+	{% endif %}
+	PLO
+{% endblock %}
+
+{% block breadcrumbs %}
+  {{ super() }}
+  {% if plo %}
+    <li>Edit PLO</li>
+  {% else %}
+    <li>Create PLO</li>
+  {% endif %}
+{% endblock %}
+
+
+{% block content %}
+  <h2 class="text-2xl font-bold">
+    {% if plo %}
+      Edit PLO
+    {% else %}
+      Create PLO
+    {% endif %}
+    for {{ curriculum.name }}
+  </h2>
+  <div class="divider"></div>
+
+  <div class="card bg-base-100 shadow my-4">
+    <div class="card-body">
+    <form method="POST">
+      {{ form.csrf_token }}
+      {{ renderer.render_field(form.code) }}
+      {{ renderer.render_field(form.description) }}
+      {{ renderer.render_field(form.description_th) }}
+      {{ renderer.render_field(form.order) }}
+
+      <button name="create" type="submit" class="btn btn-primary">
+        {{ 'Edit' if plo else 'Create' }}
+      </button>
+    </form>
+    </div>
+  </div>
+
+{% endblock %}

@@ -13,6 +13,7 @@ import mongoengine as me
 from bussaya import models
 from bussaya.web import forms, acl
 from bussaya import utils
+from bussaya.models import rubrics as rubric_models
 
 
 module = Blueprint("round_grades", __name__, url_prefix="/round_grades")
@@ -155,6 +156,64 @@ def check_and_create_mentor_grade_profile(round_grade):
                 round_grade=round_grade,
             )
             student_grade.save()
+
+
+def get_criterion_scores_map(student_grade):
+    rubric_score = models.RubricScore.objects(student_grade=student_grade).first()
+    if not rubric_score:
+        return {}
+    return {str(cs.criterion_id): cs.score for cs in rubric_score.criterion_scores}
+
+
+def build_rubric_grading_form(form_class, student_grades, round_grade_rubric):
+    form = form_class()
+    for student_grade in student_grades:
+        scores_map = get_criterion_scores_map(student_grade)
+        criterion_scores = [
+            {"criterion_id": str(c.id), "score": scores_map.get(str(c.id))}
+            for c in round_grade_rubric.get_sorted_criteria()
+        ]
+        form.gradings.append_entry(
+            {
+                "student_id": str(student_grade.student.id),
+                "criterion_scores": criterion_scores,
+            }
+        )
+    return form
+
+
+def save_rubric_score(student_grade, round_grade_rubric, criterion_scores_data):
+    """Upsert the RubricScore for student_grade from submitted per-criterion
+    scores, clamp each into [0, criterion.max_score], then recompute and set
+    student_grade.result from the rubric total (or "-" if not fully scored)."""
+
+    rubric_score = models.RubricScore.objects(student_grade=student_grade).first()
+    if not rubric_score:
+        rubric_score = models.RubricScore(
+            student_grade=student_grade, round_grade_rubric=round_grade_rubric
+        )
+    else:
+        rubric_score.round_grade_rubric = round_grade_rubric
+
+    criterion_scores = []
+    for entry in criterion_scores_data:
+        criterion = round_grade_rubric.get_criterion(entry["criterion_id"])
+        score = entry.get("score")
+        if criterion and score is not None:
+            score = max(0, min(score, criterion.max_score))
+        criterion_scores.append(
+            models.CriterionScore(criterion_id=entry["criterion_id"], score=score)
+        )
+    rubric_score.criterion_scores = criterion_scores
+    rubric_score.save()
+
+    if rubric_score.is_complete():
+        point = rubric_score.get_point()
+        student_grade.result = student_grade.student.get_point_to_grade(point)
+    else:
+        student_grade.result = "-"
+
+    return rubric_score
 
 
 @module.route("/<class_id>")
@@ -432,17 +491,17 @@ def grading(round_grade_id):
         ),
     )
 
-    form = forms.round_grades.GroupGradingForm()
-    for s in student_grades:
-        form.gradings.append_entry(
-            {"student_id": str(s.student.id), "result": s.result}
-        )
+    round_grade_rubric = rubric_models.get_or_create_round_grade_rubric(round_grade)
+    form = build_rubric_grading_form(
+        forms.round_grades.GroupRubricGradingForm, student_grades, round_grade_rubric
+    ) if round_grade_rubric else forms.round_grades.GroupRubricGradingForm()
 
     return render_template(
         "/admin/round_grades/grading.html.j2",
         form=form,
         class_=class_,
         round_grade=round_grade,
+        round_grade_rubric=round_grade_rubric,
         user=user,
         student_grades=student_grades,
     )
@@ -456,8 +515,9 @@ def submit_grade(round_grade_id):
     user = current_user._get_current_object()
     # student_grades = models.StudentGrade.objects(round_grade=round_grade, lecturer=user)
 
-    form = forms.round_grades.GroupGradingForm()
-    if not form.validate_on_submit():
+    round_grade_rubric = rubric_models.get_or_create_round_grade_rubric(round_grade)
+    form = forms.round_grades.GroupRubricGradingForm()
+    if not round_grade_rubric or not form.validate_on_submit():
         return redirect(
             url_for("admin.round_grades.grading", round_grade_id=round_grade_id)
         )
@@ -471,11 +531,13 @@ def submit_grade(round_grade_id):
             grader__lecturer=user,
         ).first()
 
-        student_grade.result = grading["result"]
+        if not student_grade:
+            continue
 
+        save_rubric_score(student_grade, round_grade_rubric, grading["criterion_scores"])
         student_grade.save()
 
-        if grading["result"] != "-":
+        if student_grade.result != "-":
             meetings = models.MeetingReport.objects(
                 class_=class_, owner=student_grade.student, status=None
             )
@@ -515,7 +577,10 @@ def submit_mentor_grade(round_grade_id):
         student_grades,
         key=lambda s: (s.student.username,),
     )
-    form = forms.round_grades.GroupMentorGradingForm()
+
+    round_grade_rubric = rubric_models.get_or_create_round_grade_rubric(round_grade)
+
+    form = forms.round_grades.GroupMentorRubricGradingForm()
 
     mentors = models.Mentor.objects(status="active")
     mentor_choices = [
@@ -524,24 +589,31 @@ def submit_mentor_grade(round_grade_id):
     ]
     mentor_choices = [("-", "-")] + mentor_choices
 
-    for i, s in enumerate(student_grades):
-        if request.method == "GET":
+    if request.method == "GET" and round_grade_rubric:
+        for s in student_grades:
+            scores_map = get_criterion_scores_map(s)
+            criterion_scores = [
+                {"criterion_id": str(c.id), "score": scores_map.get(str(c.id))}
+                for c in round_grade_rubric.get_sorted_criteria()
+            ]
             form.gradings.append_entry(
                 {
                     "student_id": str(s.student.id),
-                    "result": s.result,
+                    "criterion_scores": criterion_scores,
                     "mentor_id": (
                         str(s.grader.mentor.id) if s.grader and s.grader.mentor else ""
                     ),
                 }
             )
+    for i in range(len(form.gradings)):
         form.gradings[i].mentor_id.choices = mentor_choices
 
-    if not form.validate_on_submit():
+    if not round_grade_rubric or not form.validate_on_submit():
         return render_template(
             "/admin/round_grades/submit-mentor-grade.html.j2",
             class_=class_,
             round_grade=round_grade,
+            round_grade_rubric=round_grade_rubric,
             form=form,
             student_grades=student_grades,
         )
@@ -565,8 +637,8 @@ def submit_mentor_grade(round_grade_id):
         if not student_grade:
             continue
 
-        student_grade.result = grading["result"]
         student_grade.grader.mentor = mentor
+        save_rubric_score(student_grade, round_grade_rubric, grading["criterion_scores"])
         student_grade.updated_date = datetime.datetime.now()
 
         student_grade.save()

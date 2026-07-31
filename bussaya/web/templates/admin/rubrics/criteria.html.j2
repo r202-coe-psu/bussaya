@@ -1,0 +1,86 @@
+{% extends '/admin/rubrics/index.html.j2' %}
+{% import '/base/html-renderer.html.j2' as renderer %}
+
+{% block breadcrumbs %}
+  {{ super() }}
+  <li>{{ template.name }}</li>
+{% endblock %}
+
+
+{% block content %}
+
+<h2 class="text-2xl font-bold">
+  {{ template.name }} <span class="badge">{{ template.get_class_type_display() }}</span>
+  <span class="badge {{ 'badge-success' if template.status == 'active' else 'badge-ghost' if template.status == 'archived' else 'badge-warning' }}">
+    {{ template.status }} v{{ template.version }}
+  </span>
+</h2>
+<div class="divider"></div>
+
+<div class="overflow-x-auto">
+<table class="table table-zebra">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Criterion</th>
+      <th>Max Score</th>
+      <th>PLOs</th>
+      {% if template.is_editable() %}<th>Operation</th>{% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for criterion in template.get_sorted_criteria() %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>
+          <div class="font-semibold">{{ criterion.name }}</div>
+          <div class="opacity-60">{{ criterion.description }}</div>
+        </td>
+        <td>{{ criterion.max_score }}</td>
+        <td>
+          {% for plo in criterion.plos %}
+            <span class="badge badge-outline">{{ plo.code }}</span>
+          {% endfor %}
+        </td>
+        {% if template.is_editable() %}
+        <td>
+          <a href="{{ url_for('admin.rubrics.edit_criterion', template_id=template.id, criterion_id=criterion.id) }}" class="btn btn-circle btn-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i></a>
+          <a href="{{ url_for('admin.rubrics.move_criterion', template_id=template.id, criterion_id=criterion.id, direction='up') }}" class="btn btn-circle btn-sm"><i class="fa-solid fa-arrow-up"></i></a>
+          <a href="{{ url_for('admin.rubrics.move_criterion', template_id=template.id, criterion_id=criterion.id, direction='down') }}" class="btn btn-circle btn-sm"><i class="fa-solid fa-arrow-down"></i></a>
+          <a href="{{ url_for('admin.rubrics.remove_criterion', template_id=template.id, criterion_id=criterion.id) }}" class="btn btn-circle btn-error btn-sm"><i class="fa-solid fa-trash"></i></a>
+        </td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    <tr class="font-semibold">
+      <td colspan="2">Total</td>
+      <td>{{ template.get_total_max_score() }}</td>
+      <td colspan="{{ 2 if template.is_editable() else 1 }}"></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+{% if template.is_editable() %}
+<div class="card bg-base-100 shadow my-4">
+  <div class="card-body">
+    <h3 class="text-xl font-semibold">Add Criterion</h3>
+    <form method="POST">
+      {{ form.csrf_token }}
+      {{ renderer.render_field(form.name) }}
+      {{ renderer.render_field(form.description) }}
+      {{ renderer.render_field(form.max_score) }}
+      {{ renderer.render_field(form.plos) }}
+
+      <button type="submit" class="btn btn-primary">Add Criterion</button>
+    </form>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info mt-4">
+  This template is {{ template.status }} and cannot be edited. Use "Clone" from the
+  <a class="link" href="{{ url_for('admin.rubrics.index') }}">template list</a> to make changes.
+</div>
+{% endif %}
+
+{% endblock %}

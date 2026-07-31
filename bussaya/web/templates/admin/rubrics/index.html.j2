@@ -1,0 +1,74 @@
+{% extends '/base/default-dashboard.html.j2' %}
+
+{% block dashboard_title %}
+Rubric Templates
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ super() }}
+    {% if request.endpoint == 'admin.rubrics.index' %}
+      <li>Rubric Templates</li>
+    {% else %}
+      <li><a href="{{ url_for('admin.rubrics.index') }}">Rubric Templates</a></li>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<h1 class="divider text-2xl font-bold">
+	<i class="fa-solid fa-list-check fa-sm"></i>
+	All Rubric Templates
+</h1>
+
+<div class="">
+	{% if templates %}
+	<div class="overflow-x-auto">
+	<table class="table table-zebra">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Class Type</th>
+				<th>Version</th>
+				<th>Status</th>
+				<th>Criteria</th>
+				<th>Operation</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			{% for template in templates %}
+        <tr>
+          <td>{{ template.name }}</td>
+          <td>{{ template.get_class_type_display() }}</td>
+          <td>v{{ template.version }}</td>
+          <td>
+            <span class="badge {{ 'badge-success' if template.status == 'active' else 'badge-ghost' if template.status == 'archived' else 'badge-warning' }}">
+              {{ template.status }}
+            </span>
+          </td>
+          <td>{{ template.criteria|length }} ({{ template.get_total_max_score() }} pts)</td>
+          <td>
+            <a href="{{ url_for('admin.rubrics.criteria', template_id=template.id) }}" class="btn btn-circle btn-primary" data-tip="Criteria"><i class="fa-solid fa-eye"></i></a>
+            {% if template.is_editable() %}
+              <a href="{{ url_for('admin.rubrics.create_or_edit', template_id=template.id) }}" class="btn btn-circle btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
+              <a href="{{ url_for('admin.rubrics.activate', template_id=template.id) }}" class="btn btn-primary">Activate</a>
+            {% else %}
+              <a href="{{ url_for('admin.rubrics.clone', template_id=template.id) }}" class="btn btn-secondary">Clone</a>
+              {% if template.status == 'active' %}
+                <a href="{{ url_for('admin.rubrics.archive', template_id=template.id) }}" class="btn btn-ghost">Archive</a>
+              {% endif %}
+            {% endif %}
+          </td>
+  			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	</div>
+	{% endif %}
+
+	<a class="btn btn-primary" href="{{ url_for('admin.rubrics.create_or_edit') }}">
+		Create Rubric Template
+	</a>
+</div>
+
+{% endblock %}

@@ -30,6 +30,8 @@
 {% if current_user.has_roles('admin') %}
 <li><a href="{{ url_for('admin.index') }}"><i class="fa-solid fa-user-gear"></i>Admin</a></li>
 <li><a href="{{ url_for('admin.organizations.index') }}"><i class="fa-solid fa-building"></i>Organization</a></li>
+<li><a href="{{ url_for('admin.curriculums.index') }}"><i class="fa-solid fa-book"></i>Curriculums</a></li>
+<li><a href="{{ url_for('admin.rubrics.index') }}"><i class="fa-solid fa-list-check"></i>Rubric Templates</a></li>
 <li><a href="{{ url_for('admin.users.index') }}"><i class="fa-solid fa-award"></i>Users</a></li>
 <li><a href="{{ url_for('elections.index') }}"><i class="fa-solid fa-check-to-slot"></i>Manage Election</a></li>
 {% endif %}

@@ -1,0 +1,60 @@
+{% extends '/base/default-dashboard.html.j2' %}
+
+{% block dashboard_title %}
+Curriculums
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ super() }}
+    {% if request.endpoint == 'admin.curriculums.index' %}
+      <li>Curriculums</li>
+    {% else %}
+      <li><a href="{{ url_for('admin.curriculums.index') }}">Curriculums</a></li>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<h1 class="divider text-2xl font-bold">
+	<i class="fa-solid fa-book fa-sm"></i>
+	All Curriculums
+</h1>
+
+<div class="">
+	{% if curriculums %}
+	<div class="overflow-x-auto">
+	<table class="table table-zebra">
+		<thead>
+			<tr>
+				<th>Code</th>
+				<th>Name</th>
+				<th>PLOs</th>
+				<th>Operation</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			{% for curriculum in curriculums %}
+        <tr>
+          <td>{{ curriculum.code }}</td>
+          <td>
+            <a href="{{ url_for('admin.curriculums.view', curriculum_id=curriculum.id) }}">{{ curriculum.name }}</a>
+          </td>
+          <td>{{ curriculum.get_plos()|length }}</td>
+          <td>
+            <a href="{{ url_for('admin.curriculums.view', curriculum_id=curriculum.id) }}" class="btn btn-circle btn-primary"><i class="fa-solid fa-eye"></i></a>
+            <a href="{{ url_for('admin.curriculums.create_or_edit', curriculum_id=curriculum.id) }}" class="btn btn-circle btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
+          </td>
+  			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	</div>
+	{% endif %}
+
+	<a class="btn btn-primary" href="{{ url_for('admin.curriculums.create_or_edit') }}">
+		Create Curriculum
+	</a>
+</div>
+
+{% endblock %}

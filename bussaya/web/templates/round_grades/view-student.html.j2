@@ -83,6 +83,39 @@
                         </tbody>
                     </table>
                 </div>
+
+                {% for graded in student.get_total_student_grades(round_grade) %}
+                {% set rubric_score = graded.get_rubric_score() %}
+                {% if rubric_score %}
+                <div class="mt-4">
+                    <div class="font-medium">
+                        {{ graded.get_grader().get_fullname() if graded.get_grader() else "Grader" }}
+                        - {{ graded.get_result_display() }}
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Criterion</th>
+                                    <th>PLOs</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for criterion in rubric_score.round_grade_rubric.get_sorted_criteria() %}
+                                {% set cs = rubric_score.get_score_for(criterion.id) %}
+                                <tr>
+                                    <td>{{ criterion.name }}</td>
+                                    <td>{{ criterion.plos|map(attribute='code')|join(', ') }}</td>
+                                    <td>{{ cs.score if cs and cs.score is not none else '-' }} / {{ criterion.max_score }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
             </div>
         </div>
     {% endif %}

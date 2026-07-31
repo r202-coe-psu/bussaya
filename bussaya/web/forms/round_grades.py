@@ -35,27 +35,23 @@ class RoundGradeForm(BaseRoundGradeForm):
     )
 
 
-BaseStudentGradeForm = model_form(
-    models.StudentGrade,
-    Form,
-    only=["result"],
-    field_args={
-        "result": {"label": ""},
-    },
-)
+class CriterionScoreForm(Form):
+    criterion_id = fields.HiddenField()
+    score = fields.FloatField(validators=[validators.Optional()])
 
 
-class GradingForm(BaseStudentGradeForm):
+class RubricGradingEntryForm(Form):
     student_id = fields.HiddenField()
+    criterion_scores = fields.FieldList(fields.FormField(CriterionScoreForm))
 
 
-class MentorGradingForm(GradingForm):
+class MentorRubricGradingEntryForm(RubricGradingEntryForm):
     mentor_id = fields.SelectField("Mentor", validators=[validators.Optional()])
 
 
-class GroupGradingForm(FlaskForm):
-    gradings = fields.FieldList(fields.FormField(GradingForm))
+class GroupRubricGradingForm(FlaskForm):
+    gradings = fields.FieldList(fields.FormField(RubricGradingEntryForm))
 
 
-class GroupMentorGradingForm(FlaskForm):
-    gradings = fields.FieldList(fields.FormField(MentorGradingForm))
+class GroupMentorRubricGradingForm(FlaskForm):
+    gradings = fields.FieldList(fields.FormField(MentorRubricGradingEntryForm))
