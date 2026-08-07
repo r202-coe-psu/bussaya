@@ -70,11 +70,11 @@
         </div>
     </div>
 
-    <h5 class="text-lg font-semibold">Tags: divied by comma (,)</h5>
+    <h5 class="text-lg font-semibold">Tags</h5>
         <div class="card bg-base-100 shadow my-2">
-            <div class="card-body p-4">
+            <div class="card-body p-4 flex flex-wrap gap-1">
             {% for tag in project.tags %}
-                {{ tag }},
+                <span class="badge max-w-full truncate">{{ tag }}</span>
             {% endfor %}
             </div>
         </div>

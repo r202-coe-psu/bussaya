@@ -276,7 +276,12 @@ def approve_report(round_grade_type):
     class_ = models.Class.objects.get(id=class_id)
     user = current_user._get_current_object()
 
-    round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
+    round_grade = models.RoundGrade.objects(
+        type=round_grade_type, class_=class_
+    ).first()
+    if not round_grade:
+        round_grade = models.RoundGrade(type=round_grade_type, class_=class_)
+        round_grade.save()
     total_student_grades = models.StudentGrade.objects(
         class_=class_, round_grade=round_grade
     )
@@ -349,7 +354,12 @@ def view_total(round_grade_type):
     class_ = models.Class.objects.get(id=class_id)
     user = current_user._get_current_object()
 
-    round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
+    round_grade = models.RoundGrade.objects(
+        type=round_grade_type, class_=class_
+    ).first()
+    if not round_grade:
+        round_grade = models.RoundGrade(type=round_grade_type, class_=class_)
+        round_grade.save()
     total_student_grades = models.StudentGrade.objects(
         class_=class_, round_grade=round_grade
     )
@@ -385,7 +395,12 @@ def view_grade_summary(round_grade_type):
     class_ = models.Class.objects.get(id=class_id)
     user = current_user._get_current_object()
 
-    round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
+    round_grade = models.RoundGrade.objects(
+        type=round_grade_type, class_=class_
+    ).first()
+    if not round_grade:
+        round_grade = models.RoundGrade(type=round_grade_type, class_=class_)
+        round_grade.save()
     total_student_grades = models.StudentGrade.objects(
         class_=class_, round_grade=round_grade
     )
@@ -430,7 +445,12 @@ def view_advisor_grade(round_grade_type):
     class_ = models.Class.objects.get(id=class_id)
     user = current_user._get_current_object()
 
-    round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
+    round_grade = models.RoundGrade.objects(
+        type=round_grade_type, class_=class_
+    ).first()
+    if not round_grade:
+        round_grade = models.RoundGrade(type=round_grade_type, class_=class_)
+        round_grade.save()
     total_student_grades = models.StudentGrade.objects(
         class_=class_, round_grade=round_grade, grader__lecturer__ne=None
     )
@@ -734,7 +754,12 @@ def view_advisor_students(round_grade_type, class_id, advisor_id):
 
     class_ = models.Class.objects.get(id=class_id)
     student_ids = class_.student_ids
-    round_grade = models.RoundGrade.objects.get(type=round_grade_type, class_=class_)
+    round_grade = models.RoundGrade.objects(
+        type=round_grade_type, class_=class_
+    ).first()
+    if not round_grade:
+        round_grade = models.RoundGrade(type=round_grade_type, class_=class_)
+        round_grade.save()
     total_student_grades = models.StudentGrade.objects(
         class_=class_, round_grade=round_grade
     )
