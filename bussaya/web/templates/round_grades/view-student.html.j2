@@ -208,7 +208,20 @@
                                         </div>
                                       </div>
                                     </td>
-                                    <td>{{ criterion.clos|map(attribute='code')|join(', ') }}</td>
+                                    <td>
+                                      <div class="flex flex-wrap gap-1">
+                                        {% for clo in criterion.clos %}
+                                          {% set cur_code = clo.curriculum.code if clo.curriculum else '' %}
+                                          {% set badge_style = 'badge-primary' if loop.index0 % 4 == 0 else 'badge-secondary' if loop.index0 % 4 == 1 else 'badge-accent' if loop.index0 % 4 == 2 else 'badge-info' %}
+                                          <span class="badge {{ badge_style }} text-xs font-semibold gap-1" title="{{ clo.curriculum.name if clo.curriculum else '' }}">
+                                            {% if cur_code %}
+                                              <span class="font-bold opacity-90">[{{ cur_code }}]</span>
+                                            {% endif %}
+                                            {{ clo.code }}
+                                          </span>
+                                        {% endfor %}
+                                      </div>
+                                    </td>
                                     <td>{{ cs.score if cs and cs.score is not none else '-' }} / {{ criterion.max_score }}</td>
                                 </tr>
                                 {% endfor %}
