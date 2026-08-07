@@ -101,3 +101,43 @@ def add_or_edit_plo(curriculum_id, plo_id):
     plo.save()
 
     return redirect(url_for("admin.curriculums.view", curriculum_id=curriculum.id))
+
+
+@module.route(
+    "/<curriculum_id>/clos/add",
+    methods=["GET", "POST"],
+    defaults=dict(clo_id=None),
+)
+@module.route("/<curriculum_id>/clos/<clo_id>/edit", methods=["GET", "POST"])
+@acl.roles_required("admin")
+def add_or_edit_clo(curriculum_id, clo_id):
+    curriculum = models.Curriculum.objects.get(id=curriculum_id)
+
+    form = forms.curriculums.CLOForm()
+    clo = None
+
+    if clo_id:
+        clo = models.CLO.objects.get(id=clo_id)
+        form = forms.curriculums.CLOForm(obj=clo)
+
+    form.plos.queryset = curriculum.get_plos()
+
+    if not form.validate_on_submit():
+        return render_template(
+            "admin/curriculums/add-or-edit-clo.html.j2",
+            form=form,
+            clo=clo,
+            curriculum=curriculum,
+        )
+
+    if not clo:
+        clo = models.CLO()
+        clo.created_date = datetime.datetime.now()
+        clo.status = "active"
+        clo.curriculum = curriculum
+
+    form.populate_obj(clo)
+    clo.updated_date = datetime.datetime.now()
+    clo.save()
+
+    return redirect(url_for("admin.curriculums.view", curriculum_id=curriculum.id))

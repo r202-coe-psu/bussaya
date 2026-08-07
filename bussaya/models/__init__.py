@@ -14,7 +14,7 @@ from .submissions import (
 )
 from .grades import RoundGrade, StudentGrade, Grader
 from .organizations import Organization, Mentor
-from .curriculums import Curriculum, PLO
+from .curriculums import Curriculum, PLO, CLO
 from .rubrics import (
     RubricCriterion,
     RubricTemplate,
@@ -48,6 +48,7 @@ __all__ = [
     StudentGrade,
     Curriculum,
     PLO,
+    CLO,
     RubricTemplate,
     RoundGradeRubric,
     RubricScore,

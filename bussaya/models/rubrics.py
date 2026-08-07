@@ -15,6 +15,7 @@ class RubricCriterion(me.EmbeddedDocument):
     description = me.StringField(default="")
     max_score = me.FloatField(required=True, default=10)
     plos = me.ListField(me.ReferenceField("PLO", dbref=True))
+    clos = me.ListField(me.ReferenceField("CLO", dbref=True))
     order = me.IntField(default=0)
 
 
@@ -22,6 +23,7 @@ class RubricTemplate(me.Document):
     meta = {"collection": "rubric_templates"}
 
     name = me.StringField(required=True, max_length=255)
+    curriculum = me.ReferenceField("Curriculum", dbref=True, required=True)
     class_type = me.StringField(required=True, choices=TYPE_CHOICE)
     description = me.StringField(default="")
 
@@ -51,7 +53,10 @@ class RubricTemplate(me.Document):
 
     def activate(self):
         RubricTemplate.objects(
-            class_type=self.class_type, status="active", id__ne=self.id
+            curriculum=self.curriculum,
+            class_type=self.class_type,
+            status="active",
+            id__ne=self.id,
         ).update(set__status="archived")
         self.status = "active"
         self.save()
@@ -63,6 +68,7 @@ class RubricTemplate(me.Document):
     def clone(self, creator=None):
         clone = RubricTemplate(
             name=self.name,
+            curriculum=self.curriculum,
             class_type=self.class_type,
             description=self.description,
             status="draft",
@@ -77,6 +83,7 @@ class RubricTemplate(me.Document):
                     description=criterion.description,
                     max_score=criterion.max_score,
                     plos=criterion.plos,
+                    clos=criterion.clos,
                     order=criterion.order,
                 )
             )
@@ -84,8 +91,10 @@ class RubricTemplate(me.Document):
         return clone
 
     @classmethod
-    def get_active(cls, class_type):
-        return cls.objects(class_type=class_type, status="active").first()
+    def get_active(cls, curriculum, class_type):
+        return cls.objects(
+            curriculum=curriculum, class_type=class_type, status="active"
+        ).first()
 
 
 class RubricCriterionSnapshot(me.EmbeddedDocument):
@@ -95,6 +104,7 @@ class RubricCriterionSnapshot(me.EmbeddedDocument):
     description = me.StringField(default="")
     max_score = me.FloatField(required=True, default=10)
     plos = me.ListField(me.ReferenceField("PLO", dbref=True))
+    clos = me.ListField(me.ReferenceField("CLO", dbref=True))
     order = me.IntField(default=0)
 
 
@@ -129,7 +139,11 @@ def get_or_create_round_grade_rubric(round_grade):
     if existing:
         return existing
 
-    template = RubricTemplate.get_active(round_grade.class_.type)
+    class_ = round_grade.class_
+    if not class_.curriculum:
+        return None
+
+    template = RubricTemplate.get_active(class_.curriculum, class_.type)
     if not template:
         return None
 
@@ -141,6 +155,7 @@ def get_or_create_round_grade_rubric(round_grade):
                 description=criterion.description,
                 max_score=criterion.max_score,
                 plos=criterion.plos,
+                clos=criterion.clos,
                 order=criterion.order,
             )
         )

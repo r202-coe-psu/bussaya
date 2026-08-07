@@ -16,6 +16,12 @@ BaseClassForm = model_form(
         "code": {"label": "Code"},
         "description": {"label": "Desctiption"},
         "type": {"label": "Type"},
+        "curriculum": {
+            "label": "Curriculum",
+            "label_modifier": lambda c: c.name,
+            "allow_blank": True,
+            "blank_text": "No curriculum",
+        },
         "started_date": {
             "label": "Start Date",
             "format": "%Y-%m-%d",

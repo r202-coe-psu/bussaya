@@ -79,4 +79,45 @@
   </table>
   </div>
 </div>
+
+<div class="mt-6">
+  <h3 class="text-xl font-semibold">Course Learning Outcomes (CLOs)</h3>
+  <div class="my-2">
+    <a class="btn btn-primary" href="{{ url_for('admin.curriculums.add_or_edit_clo', curriculum_id=curriculum.id) }}"><i class="fa-solid fa-plus"></i> Add CLO</a>
+  </div>
+  <div class="overflow-x-auto">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Description</th>
+        <th>PLOs</th>
+        <th>Order</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for clo in curriculum.get_clos() %}
+        <tr>
+          <td>{{ clo.code }}</td>
+          <td>
+            <div>{{ clo.description }}</div>
+            <div class="opacity-60">{{ clo.description_th }}</div>
+          </td>
+          <td>
+            {% for plo in clo.plos %}
+              <span class="badge badge-outline">{{ plo.code }}</span>
+            {% endfor %}
+          </td>
+          <td>{{ clo.order }}</td>
+          <td>
+            <a href="{{ url_for('admin.curriculums.add_or_edit_clo', curriculum_id=curriculum.id, clo_id=clo.id) }}" class="btn btn-circle btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
 {% endblock %}

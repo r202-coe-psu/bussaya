@@ -40,3 +40,21 @@ BasePLOForm = model_form(
 
 class PLOForm(BasePLOForm):
     pass
+
+
+BaseCLOForm = model_form(
+    models.CLO,
+    FlaskForm,
+    exclude=["curriculum", "status", "created_date", "updated_date"],
+    field_args={
+        "code": {"label": "Code"},
+        "description": {"label": "Description"},
+        "description_th": {"label": "Description (Thai)"},
+        "order": {"label": "Order"},
+        "plos": {"label": "Mapped PLOs"},
+    },
+)
+
+
+class CLOForm(BaseCLOForm):
+    pass

@@ -32,6 +32,7 @@ def index():
 @acl.roles_required("admin")
 def create():
     form = forms.classes.ClassForm()
+    form.curriculum.queryset = models.Curriculum.objects(status="active").order_by("name")
     if not form.validate_on_submit():
         return render_template("/admin/classes/create-edit.html.j2", form=form)
 
@@ -54,6 +55,7 @@ def edit(class_id):
     form = forms.classes.ClassForm()
     if request.method == "GET":
         form = forms.classes.ClassForm(obj=class_)
+    form.curriculum.queryset = models.Curriculum.objects(status="active").order_by("name")
 
     if not form.validate_on_submit():
         return render_template(
@@ -76,6 +78,7 @@ def copy(class_id):
     old_class = models.Class.objects.get(id=class_id)
 
     form = forms.classes.ClassForm(obj=old_class)
+    form.curriculum.queryset = models.Curriculum.objects(status="active").order_by("name")
     if not form.validate_on_submit():
         if request.method == "GET":
             form.name.data = f"Copy of {form.name.data}"

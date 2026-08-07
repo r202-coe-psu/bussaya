@@ -97,7 +97,7 @@
                             <thead>
                                 <tr>
                                     <th>Criterion</th>
-                                    <th>PLOs</th>
+                                    <th>CLOs</th>
                                     <th>Score</th>
                                 </tr>
                             </thead>
@@ -106,7 +106,7 @@
                                 {% set cs = rubric_score.get_score_for(criterion.id) %}
                                 <tr>
                                     <td>{{ criterion.name }}</td>
-                                    <td>{{ criterion.plos|map(attribute='code')|join(', ') }}</td>
+                                    <td>{{ criterion.clos|map(attribute='code')|join(', ') }}</td>
                                     <td>{{ cs.score if cs and cs.score is not none else '-' }} / {{ criterion.max_score }}</td>
                                 </tr>
                                 {% endfor %}

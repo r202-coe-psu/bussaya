@@ -7,9 +7,10 @@ from bussaya import models
 BaseRubricTemplateForm = model_form(
     models.RubricTemplate,
     FlaskForm,
-    only=["name", "class_type", "description"],
+    only=["name", "curriculum", "class_type", "description"],
     field_args={
         "name": {"label": "Name"},
+        "curriculum": {"label": "Curriculum", "label_modifier": lambda c: c.name},
         "class_type": {"label": "Class Type"},
         "description": {"label": "Description"},
     },
@@ -26,4 +27,4 @@ class RubricCriterionForm(FlaskForm):
     max_score = fields.FloatField(
         "Max Score", validators=[validators.DataRequired(), validators.NumberRange(min=0)]
     )
-    plos = fields.SelectMultipleField("PLOs", validators=[validators.Optional()])
+    clos = fields.SelectMultipleField("CLOs", validators=[validators.Optional()])

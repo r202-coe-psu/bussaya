@@ -15,6 +15,7 @@
     {{ template.status }} v{{ template.version }}
   </span>
 </h2>
+<div class="opacity-60">{{ template.curriculum.name if template.curriculum else '' }}</div>
 <div class="divider"></div>
 
 <div class="overflow-x-auto">
@@ -24,7 +25,7 @@
       <th>#</th>
       <th>Criterion</th>
       <th>Max Score</th>
-      <th>PLOs</th>
+      <th>CLOs</th>
       {% if template.is_editable() %}<th>Operation</th>{% endif %}
     </tr>
   </thead>
@@ -38,8 +39,8 @@
         </td>
         <td>{{ criterion.max_score }}</td>
         <td>
-          {% for plo in criterion.plos %}
-            <span class="badge badge-outline">{{ plo.code }}</span>
+          {% for clo in criterion.clos %}
+            <span class="badge badge-outline">{{ clo.code }}</span>
           {% endfor %}
         </td>
         {% if template.is_editable() %}
@@ -70,7 +71,7 @@
       {{ renderer.render_field(form.name) }}
       {{ renderer.render_field(form.description) }}
       {{ renderer.render_field(form.max_score) }}
-      {{ renderer.render_field(form.plos) }}
+      {{ renderer.render_field(form.clos) }}
 
       <button type="submit" class="btn btn-primary">Add Criterion</button>
     </form>

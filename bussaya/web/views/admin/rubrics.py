@@ -8,9 +8,9 @@ from bussaya.web import forms, acl
 module = Blueprint("rubrics", __name__, url_prefix="/rubrics")
 
 
-def get_plo_choices():
-    plos = models.PLO.objects(status="active").order_by("curriculum", "order")
-    return [(str(plo.id), plo.get_label()) for plo in plos]
+def get_clo_choices(curriculum):
+    clos = models.CLO.objects(curriculum=curriculum, status="active").order_by("order")
+    return [(str(clo.id), clo.get_label()) for clo in clos]
 
 
 @module.route("")
@@ -34,6 +34,7 @@ def create_or_edit(template_id):
             return redirect(url_for("admin.rubrics.index"))
 
     form = forms.rubrics.RubricTemplateForm(obj=template)
+    form.curriculum.queryset = models.Curriculum.objects(status="active").order_by("name")
 
     if not form.validate_on_submit():
         return render_template(
@@ -56,7 +57,7 @@ def criteria(template_id):
     template = models.RubricTemplate.objects.get(id=template_id)
 
     form = forms.rubrics.RubricCriterionForm()
-    form.plos.choices = get_plo_choices()
+    form.clos.choices = get_clo_choices(template.curriculum)
 
     if not form.validate_on_submit():
         return render_template(
@@ -67,13 +68,13 @@ def criteria(template_id):
         flash("Only draft templates can be edited.")
         return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
 
-    plos = models.PLO.objects(id__in=form.plos.data)
+    clos = models.CLO.objects(id__in=form.clos.data)
     template.criteria.append(
         models.RubricCriterion(
             name=form.name.data,
             description=form.description.data,
             max_score=form.max_score.data,
-            plos=list(plos),
+            clos=list(clos),
             order=len(template.criteria),
         )
     )
@@ -92,10 +93,10 @@ def edit_criterion(template_id, criterion_id):
         return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
 
     form = forms.rubrics.RubricCriterionForm(obj=criterion)
-    form.plos.choices = get_plo_choices()
+    form.clos.choices = get_clo_choices(template.curriculum)
 
     if request.method == "GET":
-        form.plos.data = [str(plo.id) for plo in criterion.plos]
+        form.clos.data = [str(clo.id) for clo in criterion.clos]
 
     if not form.validate_on_submit():
         return render_template(
@@ -109,11 +110,11 @@ def edit_criterion(template_id, criterion_id):
         flash("Only draft templates can be edited.")
         return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
 
-    plos = models.PLO.objects(id__in=form.plos.data)
+    clos = models.CLO.objects(id__in=form.clos.data)
     criterion.name = form.name.data
     criterion.description = form.description.data
     criterion.max_score = form.max_score.data
-    criterion.plos = list(plos)
+    criterion.clos = list(clos)
     template.save()
 
     return redirect(url_for("admin.rubrics.criteria", template_id=template.id))

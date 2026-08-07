@@ -8,7 +8,12 @@
       "Bash(git -C /home/tl/projects/r202/bussaya diff --stat)",
       "Bash(git rm *)",
       "Bash(sh -n scripts/run-web)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(python3 -c \"import flask_mongoengine_3; print\\(flask_mongoengine_3.__file__\\)\")",
+      "Bash(pip show *)",
+      "Bash(python3 -c \"import flask_mongoengine; print\\(flask_mongoengine.__file__\\)\")",
+      "Bash(find / -iname \"*.py\" -path \"*flask_mongoengine*wtf*\")",
+      "Bash(python3 -m py_compile bussaya/models/curriculums.py bussaya/models/classes.py bussaya/models/rubrics.py bussaya/models/__init__.py bussaya/web/forms/curriculums.py bussaya/web/forms/rubrics.py bussaya/web/forms/classes.py bussaya/web/views/admin/curriculums.py bussaya/web/views/admin/rubrics.py bussaya/web/views/admin/classes.py)"
     ]
   }
 }
