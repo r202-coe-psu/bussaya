@@ -63,12 +63,14 @@
         {{'Release' if round_grade.release_status == 'unreleased' else "Unrelease"}}
         {{ round_grade.get_type_display() }} Grade
     </a>
-    <div class="alert alert-info">
-        <div>
-            <b>Time off date:</b> {{ round_grade.natural_ended_date() }} <br>
-            <b>Remaining Time:</b> {{ round_grade.remain_time()[1] }} <br>
-            <b>Release Status:</b> {{ round_grade.get_release_status_display() }} <br>
-        </div>
+</div>
+
+<div class="alert alert-info mt-4">
+    <div class="space-y-1">
+        <div><b>Started Date:</b> {{ round_grade.natural_started_date() }}</div>
+        <div><b>Time Off Date:</b> {{ round_grade.natural_ended_date() }}</div>
+        <div><b>Remaining Time:</b> {{ round_grade.remain_time()[1] }}</div>
+        <div><b>Release Status:</b> {{ round_grade.get_release_status_display() }}</div>
     </div>
 </div>
 
