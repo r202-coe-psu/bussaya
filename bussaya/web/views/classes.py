@@ -198,10 +198,20 @@ def approve_meeting_report(class_id):
 
     form = forms.meetings.DisapproveForm()
 
+    force_add_form = None
+    if current_user.has_roles("admin"):
+        force_add_form = forms.meetings.ForceAddMeetingReportForm()
+        all_students = class_.get_students()
+        force_add_form.student.choices = [
+            (str(s.id), f"{s.username} - {s.first_name} {s.last_name}")
+            for s in sorted(all_students, key=lambda s: s.username)
+        ]
+
     return render_template(
         "/classes/list-report-by-user.html.j2",
         class_=class_,
         meeting_reports=meeting_reports,
         form=form,
+        force_add_form=force_add_form,
         markdown=markdown,
     )

@@ -27,6 +27,7 @@ Rubric Templates
 		<thead>
 			<tr>
 				<th>Name</th>
+				<th>Curriculums</th>
 				<th>Class Type</th>
 				<th>Version</th>
 				<th>Status</th>
@@ -39,6 +40,7 @@ Rubric Templates
 			{% for template in templates %}
         <tr>
           <td>{{ template.name }}</td>
+          <td>{{ template.curriculums|map(attribute='name')|join(', ') }}</td>
           <td>{{ template.get_class_type_display() }}</td>
           <td>v{{ template.version }}</td>
           <td>
@@ -46,18 +48,17 @@ Rubric Templates
               {{ template.status }}
             </span>
           </td>
-          <td>{{ template.criteria|length }} ({{ template.get_total_max_score() }} pts)</td>
+          <td>{{ template.criteria|length }} criteria ({{ template.get_total_max_score() }} / 100 pts)</td>
           <td>
             <a href="{{ url_for('admin.rubrics.criteria', template_id=template.id) }}" class="btn btn-circle btn-primary" data-tip="Criteria"><i class="fa-solid fa-eye"></i></a>
-            {% if template.is_editable() %}
-              <a href="{{ url_for('admin.rubrics.create_or_edit', template_id=template.id) }}" class="btn btn-circle btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
+            <a href="{{ url_for('admin.rubrics.create_or_edit', template_id=template.id) }}" class="btn btn-circle btn-primary" data-tip="Edit Template"><i class="fa-solid fa-pen-to-square"></i></a>
+            {% if template.status != 'active' %}
               <a href="{{ url_for('admin.rubrics.activate', template_id=template.id) }}" class="btn btn-primary">Activate</a>
-            {% else %}
-              <a href="{{ url_for('admin.rubrics.clone', template_id=template.id) }}" class="btn btn-secondary">Clone</a>
-              {% if template.status == 'active' %}
-                <a href="{{ url_for('admin.rubrics.archive', template_id=template.id) }}" class="btn btn-ghost">Archive</a>
-              {% endif %}
             {% endif %}
+            {% if template.status == 'active' %}
+              <a href="{{ url_for('admin.rubrics.archive', template_id=template.id) }}" class="btn btn-ghost">Archive</a>
+            {% endif %}
+            <a href="{{ url_for('admin.rubrics.clone', template_id=template.id) }}" class="btn btn-secondary">Clone</a>
           </td>
   			</tr>
 			{% endfor %}

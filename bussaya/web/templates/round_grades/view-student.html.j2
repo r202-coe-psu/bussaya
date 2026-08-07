@@ -84,6 +84,89 @@
                     </table>
                 </div>
 
+                {% set radar_summary = student.get_rubric_summary(round_grade) %}
+                {% if radar_summary and radar_summary.labels %}
+                <div class="card bg-base-200 shadow-sm border border-base-300 mt-4">
+                    <div class="card-body p-4">
+                        <h4 class="text-md font-bold text-primary flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie"></i> Criteria Performance Radar Graph
+                        </h4>
+                        <div class="flex flex-col md:flex-row items-center justify-around gap-4 mt-2">
+                            <div class="w-full md:w-1/2 max-w-sm">
+                                <canvas id="radar_chart_{{ round_grade.id }}"></canvas>
+                            </div>
+                            <div class="w-full md:w-1/2 overflow-x-auto">
+                                <table class="table table-sm border">
+                                    <thead>
+                                        <tr class="bg-base-300">
+                                            <th>Criterion</th>
+                                            <th>Average Score</th>
+                                            <th>Achievement</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for info in radar_summary.scores_info %}
+                                        <tr>
+                                            <td class="font-medium">{{ info.name }}</td>
+                                            <td>{{ info.avg_score }} / {{ info.max_score }}</td>
+                                            <td>
+                                                <span class="badge badge-sm {{ 'badge-success' if info.percentage >= 80 else 'badge-info' if info.percentage >= 65 else 'badge-warning' }}">
+                                                    {{ info.percentage }}%
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script type="text/javascript">
+                document.addEventListener("DOMContentLoaded", function() {
+                    const ctx = document.getElementById('radar_chart_{{ round_grade.id }}');
+                    if (!ctx) return;
+                    new Chart(ctx.getContext('2d'), {
+                        type: 'radar',
+                        data: {
+                            labels: {{ radar_summary.labels | tojson }},
+                            datasets: [{
+                                label: 'Achievement (%)',
+                                data: {{ radar_summary.percentages | tojson }},
+                                backgroundColor: 'rgba(79, 70, 229, 0.25)',
+                                borderColor: 'rgba(79, 70, 229, 1)',
+                                pointBackgroundColor: 'rgba(79, 70, 229, 1)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgba(79, 70, 229, 1)',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            scales: {
+                                r: {
+                                    angleLines: { display: true },
+                                    suggestedMin: 0,
+                                    suggestedMax: 100,
+                                    ticks: {
+                                        stepSize: 20,
+                                        callback: function(value) { return value + '%'; }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: { display: false }
+                            }
+                        }
+                    });
+                });
+                </script>
+                {% endif %}
+
                 {% for graded in student.get_total_student_grades(round_grade) %}
                 {% set rubric_score = graded.get_rubric_score() %}
                 {% if rubric_score %}
@@ -105,7 +188,26 @@
                                 {% for criterion in rubric_score.round_grade_rubric.get_sorted_criteria() %}
                                 {% set cs = rubric_score.get_score_for(criterion.id) %}
                                 <tr>
-                                    <td>{{ criterion.name }}</td>
+                                    <td>
+                                      <div class="font-semibold">{{ criterion.name }}</div>
+                                      <div class="text-xs opacity-60">{{ criterion.description }}</div>
+                                      <div class="collapse collapse-arrow bg-base-200 mt-1">
+                                        <input type="checkbox" />
+                                        <div class="collapse-title text-xs font-medium py-1 min-h-0">
+                                          Grade Level Explanations (A - W)
+                                        </div>
+                                        <div class="collapse-content text-xs">
+                                          <div class="grid grid-cols-1 md:grid-cols-2 gap-1 pt-1">
+                                            {% for lvl in ["A", "B+", "B", "C+", "C", "D+", "D", "E", "I", "W"] %}
+                                              <div class="border rounded p-1 bg-base-100">
+                                                <span class="font-bold text-primary">{{ lvl }}:</span>
+                                                {{ criterion.get_level_explanation(lvl) or '-' }}
+                                              </div>
+                                            {% endfor %}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </td>
                                     <td>{{ criterion.clos|map(attribute='code')|join(', ') }}</td>
                                     <td>{{ cs.score if cs and cs.score is not none else '-' }} / {{ criterion.max_score }}</td>
                                 </tr>

@@ -200,7 +200,8 @@ def save_rubric_score(student_grade, round_grade_rubric, criterion_scores_data):
         criterion = round_grade_rubric.get_criterion(entry["criterion_id"])
         score = entry.get("score")
         if criterion and score is not None:
-            score = max(0, min(score, criterion.max_score))
+            max_s = criterion.max_score if criterion.max_score > 0 else 100.0
+            score = max(0, min(score, max_s))
         criterion_scores.append(
             models.CriterionScore(criterion_id=entry["criterion_id"], score=score)
         )
@@ -213,6 +214,7 @@ def save_rubric_score(student_grade, round_grade_rubric, criterion_scores_data):
     else:
         student_grade.result = "-"
 
+    student_grade.save()
     return rubric_score
 
 

@@ -8,9 +8,17 @@ from bussaya.web import forms, acl
 module = Blueprint("rubrics", __name__, url_prefix="/rubrics")
 
 
-def get_clo_choices(curriculum):
-    clos = models.CLO.objects(curriculum=curriculum, status="active").order_by("order")
-    return [(str(clo.id), clo.get_label()) for clo in clos]
+def get_clo_choices(curriculums):
+    clos = models.CLO.objects(curriculum__in=curriculums, status="active").order_by(
+        "curriculum", "order"
+    )
+    return [
+        (
+            str(clo.id),
+            f"[{clo.curriculum.code if clo.curriculum else ''}] {clo.get_label()}",
+        )
+        for clo in clos
+    ]
 
 
 @module.route("")
@@ -29,12 +37,16 @@ def create_or_edit(template_id):
 
     if template_id:
         template = models.RubricTemplate.objects.get(id=template_id)
-        if not template.is_editable():
-            flash("Only draft templates can be edited.")
-            return redirect(url_for("admin.rubrics.index"))
 
-    form = forms.rubrics.RubricTemplateForm(obj=template)
-    form.curriculum.queryset = models.Curriculum.objects(status="active").order_by("name")
+    form = forms.rubrics.RubricTemplateForm()
+    curriculums = models.Curriculum.objects(status="active").order_by("name")
+    form.curriculums.choices = [(str(c.id), c.name) for c in curriculums]
+
+    if request.method == "GET" and template:
+        form.name.data = template.name
+        form.class_type.data = template.class_type
+        form.description.data = template.description
+        form.curriculums.data = [str(c.id) for c in template.curriculums]
 
     if not form.validate_on_submit():
         return render_template(
@@ -45,7 +57,12 @@ def create_or_edit(template_id):
         template = models.RubricTemplate()
         template.creator = current_user._get_current_object()
 
-    form.populate_obj(template)
+    template.name = form.name.data
+    template.class_type = form.class_type.data
+    template.description = form.description.data
+    template.curriculums = list(
+        models.Curriculum.objects(id__in=form.curriculums.data)
+    )
     template.save()
 
     return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
@@ -57,18 +74,21 @@ def criteria(template_id):
     template = models.RubricTemplate.objects.get(id=template_id)
 
     form = forms.rubrics.RubricCriterionForm()
-    form.clos.choices = get_clo_choices(template.curriculum)
+    form.clos.choices = get_clo_choices(template.curriculums)
 
     if not form.validate_on_submit():
         return render_template(
             "admin/rubrics/criteria.html.j2", template=template, form=form
         )
 
-    if not template.is_editable():
-        flash("Only draft templates can be edited.")
-        return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
-
     clos = models.CLO.objects(id__in=form.clos.data)
+    level_explanations = []
+    for level, field_name in forms.rubrics.LEVEL_FIELD_MAP:
+        exp = getattr(form, field_name).data or ""
+        level_explanations.append(
+            models.RubricLevelExplanation(level=level, explanation=exp)
+        )
+
     template.criteria.append(
         models.RubricCriterion(
             name=form.name.data,
@@ -76,6 +96,7 @@ def criteria(template_id):
             max_score=form.max_score.data,
             clos=list(clos),
             order=len(template.criteria),
+            level_explanations=level_explanations,
         )
     )
     template.save()
@@ -93,10 +114,12 @@ def edit_criterion(template_id, criterion_id):
         return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
 
     form = forms.rubrics.RubricCriterionForm(obj=criterion)
-    form.clos.choices = get_clo_choices(template.curriculum)
+    form.clos.choices = get_clo_choices(template.curriculums)
 
     if request.method == "GET":
         form.clos.data = [str(clo.id) for clo in criterion.clos]
+        for level, field_name in forms.rubrics.LEVEL_FIELD_MAP:
+            getattr(form, field_name).data = criterion.get_level_explanation(level)
 
     if not form.validate_on_submit():
         return render_template(
@@ -106,15 +129,20 @@ def edit_criterion(template_id, criterion_id):
             form=form,
         )
 
-    if not template.is_editable():
-        flash("Only draft templates can be edited.")
-        return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
-
     clos = models.CLO.objects(id__in=form.clos.data)
     criterion.name = form.name.data
     criterion.description = form.description.data
     criterion.max_score = form.max_score.data
     criterion.clos = list(clos)
+
+    level_explanations = []
+    for level, field_name in forms.rubrics.LEVEL_FIELD_MAP:
+        exp = getattr(form, field_name).data or ""
+        level_explanations.append(
+            models.RubricLevelExplanation(level=level, explanation=exp)
+        )
+    criterion.level_explanations = level_explanations
+
     template.save()
 
     return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
@@ -124,15 +152,11 @@ def edit_criterion(template_id, criterion_id):
 @acl.roles_required("admin")
 def remove_criterion(template_id, criterion_id):
     template = models.RubricTemplate.objects.get(id=template_id)
-
-    if not template.is_editable():
-        flash("Only draft templates can be edited.")
-        return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
-
-    template.criteria = [c for c in template.criteria if str(c.id) != criterion_id]
-    for index, criterion in enumerate(template.get_sorted_criteria()):
-        criterion.order = index
-    template.save()
+    if template.is_editable():
+        template.criteria = [
+            c for c in template.criteria if str(c.id) != criterion_id
+        ]
+        template.save()
 
     return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
 
@@ -141,22 +165,19 @@ def remove_criterion(template_id, criterion_id):
 @acl.roles_required("admin")
 def move_criterion(template_id, criterion_id, direction):
     template = models.RubricTemplate.objects.get(id=template_id)
-
-    if not template.is_editable():
-        flash("Only draft templates can be edited.")
-        return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
-
-    ordered = template.get_sorted_criteria()
-    index = next((i for i, c in enumerate(ordered) if str(c.id) == criterion_id), None)
-
-    if index is not None:
-        swap_with = index - 1 if direction == "up" else index + 1
-        if 0 <= swap_with < len(ordered):
-            ordered[index].order, ordered[swap_with].order = (
-                ordered[swap_with].order,
-                ordered[index].order,
-            )
-            template.save()
+    if template.is_editable():
+        ordered = template.get_sorted_criteria()
+        index = next(
+            (i for i, c in enumerate(ordered) if str(c.id) == criterion_id), None
+        )
+        if index is not None:
+            swap_with = index - 1 if direction == "up" else index + 1
+            if 0 <= swap_with < len(ordered):
+                ordered[index].order, ordered[swap_with].order = (
+                    ordered[swap_with].order,
+                    ordered[index].order,
+                )
+                template.save()
 
     return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
 
@@ -165,6 +186,13 @@ def move_criterion(template_id, criterion_id, direction):
 @acl.roles_required("admin")
 def activate(template_id):
     template = models.RubricTemplate.objects.get(id=template_id)
+    if template.get_total_max_score() != 100:
+        flash(
+            f"Cannot activate rubric template. The sum of criteria max scores must be 100 (current total: {template.get_total_max_score()}).",
+            "warning",
+        )
+        return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
+
     template.activate()
 
     return redirect(url_for("admin.rubrics.index"))

@@ -6,6 +6,12 @@ from bson.objectid import ObjectId
 from .classes import TYPE_CHOICE
 
 RUBRIC_STATUS_CHOICES = ["draft", "active", "archived"]
+RUBRIC_GRADE_LEVELS = ["A", "B+", "B", "C+", "C", "D+", "D", "E", "I", "W"]
+
+
+class RubricLevelExplanation(me.EmbeddedDocument):
+    level = me.StringField(required=True)
+    explanation = me.StringField(default="")
 
 
 class RubricCriterion(me.EmbeddedDocument):
@@ -13,17 +19,29 @@ class RubricCriterion(me.EmbeddedDocument):
 
     name = me.StringField(required=True, max_length=255)
     description = me.StringField(default="")
-    max_score = me.FloatField(required=True, default=10)
+    max_score = me.FloatField(required=True, default=0)
     plos = me.ListField(me.ReferenceField("PLO", dbref=True))
     clos = me.ListField(me.ReferenceField("CLO", dbref=True))
     order = me.IntField(default=0)
+    level_explanations = me.EmbeddedDocumentListField(RubricLevelExplanation)
+
+    def get_level_explanation(self, level_name):
+        for le in self.level_explanations:
+            if le.level == level_name:
+                return le.explanation
+        return ""
+
+    def get_level_explanations_dict(self):
+        return {le.level: le.explanation for le in self.level_explanations}
 
 
 class RubricTemplate(me.Document):
     meta = {"collection": "rubric_templates"}
 
     name = me.StringField(required=True, max_length=255)
-    curriculum = me.ReferenceField("Curriculum", dbref=True, required=True)
+    curriculums = me.ListField(
+        me.ReferenceField("Curriculum", dbref=True), required=True
+    )
     class_type = me.StringField(required=True, choices=TYPE_CHOICE)
     description = me.StringField(default="")
 
@@ -43,7 +61,7 @@ class RubricTemplate(me.Document):
     )
 
     def is_editable(self):
-        return self.status == "draft"
+        return True
 
     def get_total_max_score(self):
         return sum(c.max_score for c in self.criteria)
@@ -53,7 +71,7 @@ class RubricTemplate(me.Document):
 
     def activate(self):
         RubricTemplate.objects(
-            curriculum=self.curriculum,
+            curriculums__in=self.curriculums,
             class_type=self.class_type,
             status="active",
             id__ne=self.id,
@@ -68,7 +86,7 @@ class RubricTemplate(me.Document):
     def clone(self, creator=None):
         clone = RubricTemplate(
             name=self.name,
-            curriculum=self.curriculum,
+            curriculums=list(self.curriculums),
             class_type=self.class_type,
             description=self.description,
             status="draft",
@@ -77,6 +95,10 @@ class RubricTemplate(me.Document):
             creator=creator or self.creator,
         )
         for criterion in self.criteria:
+            level_exps = [
+                RubricLevelExplanation(level=le.level, explanation=le.explanation)
+                for le in criterion.level_explanations
+            ]
             clone.criteria.append(
                 RubricCriterion(
                     name=criterion.name,
@@ -85,6 +107,7 @@ class RubricTemplate(me.Document):
                     plos=criterion.plos,
                     clos=criterion.clos,
                     order=criterion.order,
+                    level_explanations=level_exps,
                 )
             )
         clone.save()
@@ -93,7 +116,7 @@ class RubricTemplate(me.Document):
     @classmethod
     def get_active(cls, curriculum, class_type):
         return cls.objects(
-            curriculum=curriculum, class_type=class_type, status="active"
+            curriculums=curriculum, class_type=class_type, status="active"
         ).first()
 
 
@@ -102,10 +125,20 @@ class RubricCriterionSnapshot(me.EmbeddedDocument):
 
     name = me.StringField(required=True, max_length=255)
     description = me.StringField(default="")
-    max_score = me.FloatField(required=True, default=10)
+    max_score = me.FloatField(required=True, default=0)
     plos = me.ListField(me.ReferenceField("PLO", dbref=True))
     clos = me.ListField(me.ReferenceField("CLO", dbref=True))
     order = me.IntField(default=0)
+    level_explanations = me.EmbeddedDocumentListField(RubricLevelExplanation)
+
+    def get_level_explanation(self, level_name):
+        for le in self.level_explanations:
+            if le.level == level_name:
+                return le.explanation
+        return ""
+
+    def get_level_explanations_dict(self):
+        return {le.level: le.explanation for le in self.level_explanations}
 
 
 class RoundGradeRubric(me.Document):
@@ -149,6 +182,10 @@ def get_or_create_round_grade_rubric(round_grade):
 
     round_grade_rubric = RoundGradeRubric(round_grade=round_grade, template=template)
     for criterion in template.get_sorted_criteria():
+        level_exps = [
+            RubricLevelExplanation(level=le.level, explanation=le.explanation)
+            for le in criterion.level_explanations
+        ]
         round_grade_rubric.criteria.append(
             RubricCriterionSnapshot(
                 name=criterion.name,
@@ -157,6 +194,7 @@ def get_or_create_round_grade_rubric(round_grade):
                 plos=criterion.plos,
                 clos=criterion.clos,
                 order=criterion.order,
+                level_explanations=level_exps,
             )
         )
     round_grade_rubric.save()
@@ -214,10 +252,10 @@ class RubricScore(me.Document):
         if total_max == 0:
             return None
 
-        return total_score / total_max * 100
+        return (total_score / total_max) * 100
 
     def get_point(self):
         percentage = self.get_percentage()
         if percentage is None:
             return None
-        return percentage / 100 * 4
+        return (percentage / 100) * 4.0

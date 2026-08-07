@@ -49,17 +49,63 @@
 </table>
 </div>
 
-<h3 class="text-xl font-semibold">
-  {% if 'classes.approve_meeting_report' in request.endpoint %}
-    Waiting Meeting Report Approval
-  {% else %}
-    Meeting Report
+<div class="flex items-center justify-between mb-2">
+  <h3 class="text-xl font-semibold">
+    {% if 'classes.approve_meeting_report' in request.endpoint %}
+      Waiting Meeting Report Approval
+    {% else %}
+      Meeting Report
+    {% endif %}
+    {% if current_user.has_roles('admin') and 'admin' in request.endpoint %}
+      <a class="badge badge-warning ml-2" href="{{ url_for('admin.classes.approve_meeting_report', class_id=class_.id, filter='late', admin_view='true') }}">Late Report</a>
+    {% endif %}
+  </h3>
+
+  {% if current_user.has_roles('admin') and force_add_form %}
+    <button type="button" class="btn btn-primary btn-sm gap-2" onclick="document.getElementById('force_add_modal').showModal()">
+      <i class="fa-solid fa-plus"></i> Force Add Meeting Report
+    </button>
   {% endif %}
-  {% if current_user.has_roles('admin') and 'admin' in request.endpoint %}
-    <a href="{{ url_for('admin.classes.approve_meeting_report', class_id=class_.id, filter='late', admin_view='true') }}">Late Report</a>
-  {% endif %}
-</h3>
-<div class="divider"></div>
+</div>
+<div class="divider my-1"></div>
+
+{% if current_user.has_roles('admin') and force_add_form %}
+<dialog id="force_add_modal" class="modal text-left">
+  <div class="modal-box max-w-lg">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    </form>
+    <h3 class="font-bold text-lg text-primary flex items-center gap-2 mb-1">
+      <i class="fa-solid fa-file-circle-plus"></i> Force Add Meeting Report
+    </h3>
+    <p class="text-xs opacity-70 mb-4">
+      Select a student and meeting date. The system will automatically find and match the meeting schedule by date and mark it as approved.
+    </p>
+
+    <form method="POST" action="{{ url_for('admin.classes.force_add_meeting_report', class_id=class_.id) }}" enctype="multipart/form-data" class="space-y-3">
+      {{ force_add_form.csrf_token }}
+
+      {{ renderer.render_field(force_add_form.student) }}
+      {{ renderer.render_field(force_add_form.title) }}
+      <div class="w-full mb-3">
+        {{ force_add_form.meeting_date.label(class_='label mb-1') }}
+        {{ force_add_form.meeting_date(class_='input input-bordered w-full', type='date') }}
+      </div>
+      {{ eh.get_error_messages(force_add_form.meeting_date.errors) }}
+      {{ renderer.render_field(force_add_form.description) }}
+      {{ renderer.render_field(force_add_form.remark) }}
+      {{ renderer.render_field(force_add_form.uploaded_file) }}
+
+      <div class="modal-action mt-4">
+        <button type="submit" class="btn btn-primary">Save & Auto-Match Meeting</button>
+      </div>
+    </form>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+{% endif %}
 <div class="overflow-x-auto">
 <table class="table table-zebra">
   <thead>

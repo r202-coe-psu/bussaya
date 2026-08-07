@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from flask_mongoengine.wtf import model_form
 import mongoengine as me
+import datetime
 
 from bussaya import models
 
@@ -104,3 +105,24 @@ class AdminMeetingReportForm(MeetingReportForm):
 
 class DisapproveForm(BaseMeetingReportForm):
     pass
+
+
+class ForceAddMeetingReportForm(FlaskForm):
+    student = fields.SelectField("Student", validators=[validators.DataRequired()])
+    title = fields.StringField("Title", validators=[validators.DataRequired()])
+    description = fields.TextAreaField("Description", validators=[validators.Optional()])
+    meeting_date = fields.DateField(
+        "Meeting Date",
+        default=datetime.date.today,
+        format="%Y-%m-%d",
+        validators=[validators.DataRequired()],
+    )
+    remark = fields.StringField("Remark", validators=[validators.Optional()])
+    uploaded_file = fields.FileField(
+        "Upload File: PDF, PNG, JPG (Optional)",
+        validators=[
+            FileAllowed(
+                ["pdf", "png", "jpg", "jpeg", "webp"], "File extension not allowed"
+            )
+        ],
+    )

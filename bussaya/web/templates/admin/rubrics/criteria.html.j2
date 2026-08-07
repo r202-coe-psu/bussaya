@@ -15,7 +15,7 @@
     {{ template.status }} v{{ template.version }}
   </span>
 </h2>
-<div class="opacity-60">{{ template.curriculum.name if template.curriculum else '' }}</div>
+<div class="opacity-60">Curriculums: {{ template.curriculums|map(attribute='name')|join(', ') }}</div>
 <div class="divider"></div>
 
 <div class="overflow-x-auto">
@@ -36,8 +36,24 @@
         <td>
           <div class="font-semibold">{{ criterion.name }}</div>
           <div class="opacity-60">{{ criterion.description }}</div>
+          <div class="collapse collapse-arrow bg-base-200 mt-2">
+            <input type="checkbox" />
+            <div class="collapse-title text-xs font-medium py-1 min-h-0">
+              Grade Level Explanations (A, B+, B, C+, C, D+, D, E, I, W)
+            </div>
+            <div class="collapse-content text-xs">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2">
+                {% for lvl in ["A", "B+", "B", "C+", "C", "D+", "D", "E", "I", "W"] %}
+                  <div class="border rounded p-2 bg-base-100">
+                    <span class="font-bold text-primary">{{ lvl }}:</span>
+                    {{ criterion.get_level_explanation(lvl) or '(No explanation provided)' }}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
         </td>
-        <td>{{ criterion.max_score }}</td>
+        <td class="font-semibold">{{ criterion.max_score }}</td>
         <td>
           {% for clo in criterion.clos %}
             <span class="badge badge-outline">{{ clo.code }}</span>
@@ -53,9 +69,13 @@
         {% endif %}
       </tr>
     {% endfor %}
-    <tr class="font-semibold">
-      <td colspan="2">Total</td>
-      <td>{{ template.get_total_max_score() }}</td>
+    <tr class="font-bold bg-base-200">
+      <td colspan="2" class="text-right">Total Max Score:</td>
+      <td>
+        <span class="badge {{ 'badge-success' if template.get_total_max_score() == 100 else 'badge-warning' }} text-sm font-bold">
+          {{ template.get_total_max_score() }} / 100 pts
+        </span>
+      </td>
       <td colspan="{{ 2 if template.is_editable() else 1 }}"></td>
     </tr>
   </tbody>
@@ -73,14 +93,23 @@
       {{ renderer.render_field(form.max_score) }}
       {{ renderer.render_field(form.clos) }}
 
-      <button type="submit" class="btn btn-primary">Add Criterion</button>
+      <div class="divider text-sm font-semibold">Grade Level Explanations (A, B+, B, C+, C, D+, D, E, I, W)</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {{ renderer.render_field(form.level_A) }}
+        {{ renderer.render_field(form.level_B_plus) }}
+        {{ renderer.render_field(form.level_B) }}
+        {{ renderer.render_field(form.level_C_plus) }}
+        {{ renderer.render_field(form.level_C) }}
+        {{ renderer.render_field(form.level_D_plus) }}
+        {{ renderer.render_field(form.level_D) }}
+        {{ renderer.render_field(form.level_E) }}
+        {{ renderer.render_field(form.level_I) }}
+        {{ renderer.render_field(form.level_W) }}
+      </div>
+
+      <button type="submit" class="btn btn-primary mt-4">Add Criterion</button>
     </form>
   </div>
-</div>
-{% else %}
-<div class="alert alert-info mt-4">
-  This template is {{ template.status }} and cannot be edited. Use "Clone" from the
-  <a class="link" href="{{ url_for('admin.rubrics.index') }}">template list</a> to make changes.
 </div>
 {% endif %}
 

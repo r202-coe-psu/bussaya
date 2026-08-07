@@ -16,6 +16,8 @@ from .grades import RoundGrade, StudentGrade, Grader
 from .organizations import Organization, Mentor
 from .curriculums import Curriculum, PLO, CLO
 from .rubrics import (
+    RUBRIC_GRADE_LEVELS,
+    RubricLevelExplanation,
     RubricCriterion,
     RubricTemplate,
     RubricCriterionSnapshot,
@@ -49,6 +51,8 @@ __all__ = [
     Curriculum,
     PLO,
     CLO,
+    RubricLevelExplanation,
+    RubricCriterion,
     RubricTemplate,
     RoundGradeRubric,
     RubricScore,

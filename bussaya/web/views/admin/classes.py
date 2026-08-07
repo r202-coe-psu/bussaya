@@ -4,6 +4,7 @@ from flask import (
     url_for,
     redirect,
     request,
+    flash,
 )
 from flask_login import current_user, login_required
 import mongoengine as me
@@ -293,3 +294,84 @@ def edit_final_submission(class_id, final_submission_id):
 @acl.roles_required("admin")
 def approve_meeting_report(class_id):
     return classes.approve_meeting_report(class_id)
+
+
+@module.route("/<class_id>/force-add-meeting-report", methods=["GET", "POST"])
+@acl.roles_required("admin")
+def force_add_meeting_report(class_id):
+    class_ = models.Class.objects.get(id=class_id)
+    students = class_.get_students()
+
+    form = forms.meetings.ForceAddMeetingReportForm()
+    form.student.choices = [
+        (str(s.id), f"{s.username} - {s.first_name} {s.last_name}")
+        for s in sorted(students, key=lambda s: s.username)
+    ]
+
+    if not form.validate_on_submit():
+        flash("Failed to force add meeting report. Please check input.", "error")
+        return redirect(
+            url_for(
+                "admin.classes.approve_meeting_report",
+                class_id=class_.id,
+                admin_view="true",
+            )
+        )
+
+    student = models.User.objects.get(id=form.student.data)
+    project = student.get_project()
+    meeting_date = form.meeting_date.data
+
+    # Automatic meeting schedule matching by date
+    matched_meeting = None
+    meetings = models.Meeting.objects(class_=class_).order_by("started_date")
+    for m in meetings:
+        start_d = m.started_date.date()
+        end_d = m.extended_date.date() if m.extended_date else m.ended_date.date()
+        if start_d <= meeting_date <= end_d:
+            matched_meeting = m
+            break
+
+    if not matched_meeting and meetings:
+        matched_meeting = min(
+            meetings, key=lambda m: abs((m.started_date.date() - meeting_date).days)
+        )
+
+    meeting_report = models.MeetingReport(
+        owner=student,
+        class_=class_,
+        project=project,
+        meeting=matched_meeting,
+        title=form.title.data,
+        description=form.description.data or "",
+        meeting_date=meeting_date,
+        status="approved",
+        approver=current_user._get_current_object(),
+        approved_date=datetime.datetime.now(),
+        remark=form.remark.data or "Force added by admin",
+        advisors=project.advisors if project else [],
+        ip_address=request.headers.get("X-Forwarded-For", request.remote_addr),
+    )
+
+    if form.uploaded_file.data:
+        meeting_report.file.put(
+            form.uploaded_file.data,
+            filename=form.uploaded_file.data.filename,
+            content_type=form.uploaded_file.data.content_type,
+        )
+
+    meeting_report.save()
+
+    meeting_name = matched_meeting.name if matched_meeting else "N/A"
+    flash(
+        f"Meeting report '{meeting_report.title}' force added for {student.first_name} {student.last_name} and automatically matched to meeting '{meeting_name}'.",
+        "success",
+    )
+
+    return redirect(
+        url_for(
+            "admin.classes.approve_meeting_report",
+            class_id=class_.id,
+            admin_view="true",
+        )
+    )

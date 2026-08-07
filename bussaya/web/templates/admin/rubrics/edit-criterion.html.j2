@@ -19,7 +19,21 @@
       {{ renderer.render_field(form.max_score) }}
       {{ renderer.render_field(form.clos) }}
 
-      <button type="submit" class="btn btn-primary">Save</button>
+      <div class="divider text-sm font-semibold">Grade Level Explanations (A, B+, B, C+, C, D+, D, E, I, W)</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {{ renderer.render_field(form.level_A) }}
+        {{ renderer.render_field(form.level_B_plus) }}
+        {{ renderer.render_field(form.level_B) }}
+        {{ renderer.render_field(form.level_C_plus) }}
+        {{ renderer.render_field(form.level_C) }}
+        {{ renderer.render_field(form.level_D_plus) }}
+        {{ renderer.render_field(form.level_D) }}
+        {{ renderer.render_field(form.level_E) }}
+        {{ renderer.render_field(form.level_I) }}
+        {{ renderer.render_field(form.level_W) }}
+      </div>
+
+      <button type="submit" class="btn btn-primary mt-4">Save</button>
     </form>
     </div>
   </div>

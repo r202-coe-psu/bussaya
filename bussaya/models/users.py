@@ -350,3 +350,54 @@ class User(me.Document, UserMixin):
             average_total_grade = self.get_point_to_grade(total_grade)
 
         return average_total_grade
+
+    def get_rubric_summary(self, round_grade):
+        total_student_grades = self.get_total_student_grades(round_grade)
+        rubric_scores = []
+        for sg in total_student_grades:
+            rs = sg.get_rubric_score()
+            if rs:
+                rubric_scores.append(rs)
+
+        if not rubric_scores:
+            return None
+
+        round_grade_rubric = rubric_scores[0].round_grade_rubric
+        if not round_grade_rubric:
+            return None
+
+        criteria = round_grade_rubric.get_sorted_criteria()
+        labels = []
+        percentages = []
+        scores_info = []
+
+        for criterion in criteria:
+            scores = []
+            for rs in rubric_scores:
+                cs = rs.get_score_for(criterion.id)
+                if cs and cs.score is not None:
+                    scores.append(cs.score)
+
+            avg_score = sum(scores) / len(scores) if scores else 0
+            pct = (
+                round((avg_score / criterion.max_score) * 100, 1)
+                if criterion.max_score > 0
+                else 0
+            )
+
+            labels.append(criterion.name)
+            percentages.append(pct)
+            scores_info.append(
+                {
+                    "name": criterion.name,
+                    "avg_score": round(avg_score, 2),
+                    "max_score": criterion.max_score,
+                    "percentage": pct,
+                }
+            )
+
+        return {
+            "labels": labels,
+            "percentages": percentages,
+            "scores_info": scores_info,
+        }
