@@ -2,10 +2,7 @@
 
 {% macro field_class(field, class_='') -%}
 {%- if field.type in ['SelectMultipleField', 'QuerySelectMultipleField', 'ModelSelectMultipleField'] -%}
-{# native <select multiple>: do NOT use DaisyUI .select — it is display:inline-flex and
-   lays each <option> out horizontally. Plain border utilities keep the native top-down,
-   one-option-per-row scrollable list box. #}
-{%- set base = 'w-full min-h-40 rounded-box border border-base-300 bg-base-100 p-2 text-sm' -%}
+{%- set base = 'w-full min-h-40 rounded-box bg-base-100 p-2 text-sm' -%}
 {%- elif field.type in ['SelectField', 'QuerySelectField', 'ModelSelectField'] -%}
 {%- set base = 'select w-full' -%}
 {%- elif field.type == 'TextAreaField' -%}
@@ -23,7 +20,13 @@
 {% macro render_field(field, class_='') -%}
 <div class="w-full mb-3">
   {{ field.label(class_='label mb-1') }}
+  {%- if field.type in ['SelectMultipleField', 'QuerySelectMultipleField', 'ModelSelectMultipleField'] -%}
+  {{ field(class_=field_class(field, class_), data_tomselect='multiple') }}
+  {%- elif field.type in ['TagListField'] -%}
+  {{ field(class_=field_class(field, class_), data_tomselect='tags') }}
+  {%- else -%}
   {{ field(class_=field_class(field, class_)) }}
+  {%- endif -%}
 </div>
 {{ eh.get_error_messages(field.errors) }}
 {%- endmacro %}

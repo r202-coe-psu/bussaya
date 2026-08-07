@@ -7,10 +7,13 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='node_modules/daisyui/daisyui.css') | add_date_url }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/liberation.css') | add_date_url }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/css/all.min.css') | add_date_url }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='node_modules/tom-select/dist/css/tom-select.default.min.css') | add_date_url }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tailwind.css') | add_date_url }}">
     <script type="module" src="{{ url_for('static', filename='node_modules/cally/dist/cally.js') | add_date_url }}"></script>
+    <script src="{{ url_for('static', filename='node_modules/tom-select/dist/js/tom-select.complete.min.js') | add_date_url }}"></script>
     <script src="{{ url_for('static', filename='js/date-picker.js') | add_date_url }}"></script>
     <script src="{{ url_for('static', filename='js/datetime-picker.js') | add_date_url }}"></script>
+    <script src="{{ url_for('static', filename='js/multiselect.js') | add_date_url }}"></script>
 
     {% block default_head %}{% endblock %}
     {% block additional_head %}{% endblock %}
