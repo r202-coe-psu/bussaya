@@ -40,6 +40,16 @@
         </div>
       </div>
       {% endif -%}
+      {%- set flashed_messages = get_flashed_messages(with_categories=true) %}
+      {%- if flashed_messages %}
+      <div class="space-y-2 mb-4">
+        {%- for category, message in flashed_messages %}
+        <div class="alert {{ 'alert-success' if category == 'success' else 'alert-error' if category in ['error', 'danger'] else 'alert-warning' if category == 'warning' else 'alert-info' }}">
+          <span>{{ message }}</span>
+        </div>
+        {%- endfor %}
+      </div>
+      {%- endif %}
 {% block content %}{% endblock %}
     </main>
 

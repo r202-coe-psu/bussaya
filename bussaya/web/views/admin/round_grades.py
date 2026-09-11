@@ -8,6 +8,7 @@ from flask import (
     send_file,
     request,
     jsonify,
+    flash,
 )
 from flask_login import login_required, current_user
 from PyPDF2 import PdfReader, PdfWriter
@@ -542,16 +543,49 @@ def grading(round_grade_id):
         forms.round_grades.GroupRubricGradingForm, student_grades, round_grade_rubric
     ) if round_grade_rubric else forms.round_grades.GroupRubricGradingForm()
 
+    rubric_templates = models.RubricTemplate.objects(class_type=class_.type).order_by(
+        "-status", "name"
+    )
+    rubric_has_scores = bool(
+        round_grade_rubric
+        and models.RubricScore.objects(round_grade_rubric=round_grade_rubric).first()
+    )
+
     return render_template(
         "/admin/round_grades/grading.html.j2",
         form=form,
         class_=class_,
         round_grade=round_grade,
         round_grade_rubric=round_grade_rubric,
+        rubric_templates=rubric_templates,
+        rubric_has_scores=rubric_has_scores,
         user=user,
         student_grades=student_grades,
         final_grade_scale=get_final_grade_scale(user),
     )
+
+
+@module.route("/<round_grade_id>/select-rubric", methods=["POST"])
+@acl.roles_required("admin")
+def select_rubric(round_grade_id):
+    round_grade = models.RoundGrade.objects.get(id=round_grade_id)
+
+    template = models.RubricTemplate.objects(id=request.form.get("template_id")).first()
+    if not template:
+        flash("Rubric template not found.", "error")
+        return redirect(url_for("admin.round_grades.grading", round_grade_id=round_grade.id))
+
+    existing = models.RoundGradeRubric.objects(round_grade=round_grade).first()
+    if existing and models.RubricScore.objects(round_grade_rubric=existing).first():
+        flash(
+            "Cannot change the rubric: scores have already been entered for this round.",
+            "warning",
+        )
+        return redirect(url_for("admin.round_grades.grading", round_grade_id=round_grade.id))
+
+    rubric_models.set_round_grade_rubric(round_grade, template)
+    flash(f'Rubric set to "{template.name}".', "success")
+    return redirect(url_for("admin.round_grades.grading", round_grade_id=round_grade.id))
 
 
 @module.route("/<round_grade_id>/submit-grade", methods=["GET", "POST"])

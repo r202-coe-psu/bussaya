@@ -163,10 +163,51 @@ class RoundGradeRubric(me.Document):
         return None
 
 
+def _snapshot_criteria(template):
+    criteria = []
+    for criterion in template.get_sorted_criteria():
+        level_exps = [
+            RubricLevelExplanation(level=le.level, explanation=le.explanation)
+            for le in criterion.level_explanations
+        ]
+        criteria.append(
+            RubricCriterionSnapshot(
+                name=criterion.name,
+                description=criterion.description,
+                max_score=criterion.max_score,
+                plos=criterion.plos,
+                clos=criterion.clos,
+                order=criterion.order,
+                level_explanations=level_exps,
+            )
+        )
+    return criteria
+
+
+def set_round_grade_rubric(round_grade, template):
+    """Explicitly assign (or re-assign) the RubricTemplate a round_grade uses,
+    snapshotting its current criteria. Overwrites any existing snapshot for
+    this round_grade, so callers should confirm no RubricScore already
+    references it before calling this for a round_grade that already has
+    one (see admin.round_grades.select_rubric)."""
+
+    round_grade_rubric = RoundGradeRubric.objects(round_grade=round_grade).first()
+    if not round_grade_rubric:
+        round_grade_rubric = RoundGradeRubric(round_grade=round_grade, template=template)
+    else:
+        round_grade_rubric.template = template
+
+    round_grade_rubric.criteria = _snapshot_criteria(template)
+    round_grade_rubric.save()
+    return round_grade_rubric
+
+
 def get_or_create_round_grade_rubric(round_grade):
     """Lazily snapshot the active RubricTemplate for round_grade.class_.type
     into a RoundGradeRubric, mirroring check_and_create_student_grade_profile's
-    lazy-creation pattern. Returns None if no active template exists yet."""
+    lazy-creation pattern. Returns None if no active template exists yet.
+    Does not override a rubric already explicitly assigned via
+    set_round_grade_rubric."""
 
     existing = RoundGradeRubric.objects(round_grade=round_grade).first()
     if existing:
@@ -180,25 +221,7 @@ def get_or_create_round_grade_rubric(round_grade):
     if not template:
         return None
 
-    round_grade_rubric = RoundGradeRubric(round_grade=round_grade, template=template)
-    for criterion in template.get_sorted_criteria():
-        level_exps = [
-            RubricLevelExplanation(level=le.level, explanation=le.explanation)
-            for le in criterion.level_explanations
-        ]
-        round_grade_rubric.criteria.append(
-            RubricCriterionSnapshot(
-                name=criterion.name,
-                description=criterion.description,
-                max_score=criterion.max_score,
-                plos=criterion.plos,
-                clos=criterion.clos,
-                order=criterion.order,
-                level_explanations=level_exps,
-            )
-        )
-    round_grade_rubric.save()
-    return round_grade_rubric
+    return set_round_grade_rubric(round_grade, template)
 
 
 class CriterionScore(me.EmbeddedDocument):

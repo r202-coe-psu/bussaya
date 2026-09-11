@@ -24,18 +24,76 @@
 
 {% if not round_grade_rubric %}
 <div class="alert alert-warning my-4">
-    No active rubric template configured for the "{{ class_.get_type_display() }}" class type yet.
-    <a class="link" href="{{ url_for('admin.rubrics.index') }}">Manage rubric templates</a>
+  <div class="w-full">
+    <div>
+      No active rubric template configured for the "{{ class_.get_type_display() }}" class type yet.
+      <a class="link" href="{{ url_for('admin.rubrics.index') }}">Manage rubric templates</a>
+    </div>
+    {% if rubric_templates %}
+    <form method="POST" action="{{ url_for('admin.round_grades.select_rubric', round_grade_id=round_grade.id) }}"
+          class="flex flex-wrap items-center gap-2 mt-2">
+      {{ form.csrf_token }}
+      <select name="template_id" class="select select-bordered select-sm" required>
+        <option value="" disabled selected>Select a rubric template&hellip;</option>
+        {% for template in rubric_templates %}
+        <option value="{{ template.id }}">{{ template.name }} ({{ template.status }})</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-sm btn-primary">Use this rubric</button>
+    </form>
+    {% endif %}
+  </div>
 </div>
 {% else %}
 
 <div class="flex flex-wrap items-center justify-between gap-2 mb-4 mt-4">
   <div class="text-sm opacity-70">Total Max Score: {{ round_grade_rubric.get_total_max_score() }} / 100 pts</div>
-  <button type="button" class="btn btn-outline btn-primary btn-sm gap-2"
-          onclick="document.getElementById('rubric_info_modal').showModal()">
-    <i class="fa-solid fa-clipboard-list"></i> View Rubric & Criteria Level Explanations
-  </button>
+  <div class="flex flex-wrap gap-2">
+    <button type="button" class="btn btn-outline btn-primary btn-sm gap-2"
+            onclick="document.getElementById('rubric_info_modal').showModal()">
+      <i class="fa-solid fa-clipboard-list"></i> View Rubric & Criteria Level Explanations
+    </button>
+    {% if rubric_templates %}
+    <button type="button" class="btn btn-outline btn-sm gap-2"
+            onclick="document.getElementById('select_rubric_modal').showModal()">
+      <i class="fa-solid fa-arrows-rotate"></i> Change Rubric
+    </button>
+    {% endif %}
+  </div>
 </div>
+
+<dialog id="select_rubric_modal" class="modal" onclick="if (event.target === this) this.close()">
+  <div class="modal-box max-w-md">
+    <button type="button" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            onclick="this.closest('dialog').close()">✕</button>
+    <h3 class="font-bold text-lg text-primary flex items-center gap-2">
+      <i class="fa-solid fa-arrows-rotate"></i>
+      Change Rubric for {{ round_grade.get_type_display() }}
+    </h3>
+    <p class="text-sm opacity-70 mb-2">
+      Current: <span class="font-semibold">{{ round_grade_rubric.template.name }}</span>
+    </p>
+    {% if rubric_has_scores %}
+    <div class="alert alert-warning">
+      Scores have already been entered for this round. The rubric cannot be changed until those scores are cleared.
+    </div>
+    {% else %}
+    <form method="POST" action="{{ url_for('admin.round_grades.select_rubric', round_grade_id=round_grade.id) }}"
+          class="flex flex-col gap-2">
+      {{ form.csrf_token }}
+      <select name="template_id" class="select select-bordered select-sm w-full" required>
+        <option value="" disabled selected>Select a rubric template&hellip;</option>
+        {% for template in rubric_templates %}
+        <option value="{{ template.id }}" {{ 'selected' if round_grade_rubric.template.id == template.id else '' }}>
+          {{ template.name }} ({{ template.status }})
+        </option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-sm btn-primary self-end">Save</button>
+    </form>
+    {% endif %}
+  </div>
+</dialog>
 
 <dialog id="rubric_info_modal" class="modal">
   <div class="modal-box max-w-[95vw] w-full">
