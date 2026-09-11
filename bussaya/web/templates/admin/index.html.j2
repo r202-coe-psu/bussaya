@@ -1,80 +1,40 @@
 {% extends '/base/default-dashboard.html.j2' %}
-{% import '/base/project-material-renderer.html.j2' as pm_renderer %}
+
+{% block dashboard_title %}
+Admin
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ super() }}
+    <li>Admin</li>
+{% endblock %}
 
 {% block content %}
-{#
-<div class="card bg-base-100 shadow min-h-[80vh] pt-[10vh]">
-  <div class="text-center">
-    <i class="fa-solid fa-building-columns"></i>
-    <h3>Hello, {{ current_user.first_name }} {{ current_user.last_name }} </p>
-    <div>
-      <a class="btn btn-primary" href="{{ url_for('classes.index') }}">Class</a>
-      <a class="btn btn-primary" href="{{ url_for('votings.index') }}">View Vote</a>
-      <a class="btn btn-primary" href="{{ url_for('elections.index') }}">Manage Election</a>
-    </div>
-  </div>
-</div>
-#}
 
-<h4 class="text-lg font-semibold">Class: {{ class_.name }}</h4>
-<div class="overflow-x-auto">
-<table class="table table-zebra">
-  <thead>
-    <tr>
-      <th>No.</th>
-      <th>Name</th>
-      <th>Students</th>
-      <th>Advisor</th>
-      <th>Public</th>
-      <th>Document</th>
-      <th>Approve</th>
-    </tr>
-  </thead>
-  <tbody>
+<h1 class="divider text-2xl font-bold">
+	<i class="fa-solid fa-user-gear fa-sm"></i>
+	Admin Dashboard
+</h1>
 
-    {% for project in projects %}
-    <tr>
-      <td>{{ loop.index }}</td>
-      <td>
-        <a target="_blank" href="{{ url_for('projects.view', project_id=project.id) }}">
-          {{ project.name }}
-        </a>
-      </td>
-      <td>
-        {%- for s in project.students %}
-        <a target="_blank" href="{{ url_for('accounts.profile', user_id=s.id) }}">
-          {{ s.first_name }} {{ s.last_name }}
-        </a>
-        {% if not loop.last %}, {% endif %}
-        {% endfor -%}
-      </td>
-      <td>
-        {% for advisor in project.advisors %}
-        <a target="_blank" href="{{ url_for('accounts.profile', user_id=advisor.id) }}">
-          {{ advisor.first_name }} {{ advisor.last_name }}
-        </a>
-      </td>
-        <td>{{ project.public.title() }}</td>
-        <td class="whitespace-nowrap">
-          {{ pm_renderer.render_project_material(project) }}
-        </td>
-        <td class="whitespace-nowrap">
-          {% for committee in project.advisors + project.committees %}
-            {{ committee.first_name }}
-            {% if project.is_approval(committee) %}
-              <i class="fa-solid fa-check fa-lg text-info"></i>
-            {% else %}
-              <i class="fa-solid fa-check fa-lg opacity-30"></i>
-            {% endif %}
-            <br>
-          {% endfor %}
-        </td>
-        {% endfor %}
-    </tr>
-  	{% endfor %}
-
-  </tbody>
-</table>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+	{% for item in menu %}
+	<a href="{{ url_for(item.endpoint) }}" class="card bg-base-100 shadow hover:shadow-lg transition-shadow border border-base-200">
+		<div class="card-body">
+			<div class="flex items-start justify-between gap-2">
+				<div class="flex items-center gap-3">
+					<i class="{{ item.icon }} fa-lg text-primary"></i>
+					<h2 class="card-title text-base">{{ item.label }}</h2>
+				</div>
+				{% if item.count is not none %}
+				<span class="badge badge-primary badge-lg">
+					{{ item.count }}{% if item.count_label %} {{ item.count_label }}{% endif %}
+				</span>
+				{% endif %}
+			</div>
+			<p class="text-sm opacity-70">{{ item.description }}</p>
+		</div>
+	</a>
+	{% endfor %}
 </div>
 
 {% endblock %}
