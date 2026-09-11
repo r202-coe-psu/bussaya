@@ -26,6 +26,7 @@ from .rubrics import (
     RubricScore,
 )
 from .notifications import DeadlineNotification
+from .email_templates import EmailTemplate, EMAIL_TEMPLATE_TYPE, EMAIL_TEMPLATE_VARIABLES
 
 from flask_mongoengine import MongoEngine
 

@@ -1,0 +1,63 @@
+{% extends '/base/default-dashboard.html.j2' %}
+
+{% block dashboard_title %}
+Email Templates
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ super() }}
+    {% if request.endpoint == 'admin.email_templates.index' %}
+      <li>Email Templates</li>
+    {% else %}
+      <li><a href="{{ url_for('admin.email_templates.index') }}">Email Templates</a></li>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<h1 class="divider text-2xl font-bold">
+	<i class="fa-solid fa-envelope fa-sm"></i>
+	Deadline Reminder Email Templates
+</h1>
+
+<div class="">
+	<div class="overflow-x-auto">
+	<table class="table table-zebra">
+		<thead>
+			<tr>
+				<th>Reminder</th>
+				<th>Subject</th>
+				<th>Status</th>
+				<th>Operation</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			{% for row in templates %}
+			<tr>
+				<td>{{ row.label }}</td>
+				<td>
+					{% if row.template %}
+						{{ row.template.subject }}
+					{% else %}
+						<span class="opacity-60">Using default text</span>
+					{% endif %}
+				</td>
+				<td>
+					{% if row.template %}
+						<span class="badge badge-success">Customized</span>
+					{% else %}
+						<span class="badge badge-ghost">Default</span>
+					{% endif %}
+				</td>
+				<td>
+					<a href="{{ url_for('admin.email_templates.edit', template_type=row.type) }}" class="btn btn-circle btn-primary" data-tip="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	</div>
+</div>
+
+{% endblock %}

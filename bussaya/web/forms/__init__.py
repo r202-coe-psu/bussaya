@@ -12,6 +12,7 @@ from . import meetings
 from . import organizations
 from . import curriculums
 from . import rubrics
+from . import email_templates
 
 __all__ = [
     accounts,
@@ -24,4 +25,5 @@ __all__ = [
     organizations,
     curriculums,
     rubrics,
+    email_templates,
 ]

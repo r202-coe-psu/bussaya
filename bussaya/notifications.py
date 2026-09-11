@@ -62,6 +62,7 @@ def send_round_grade_reminders(mailer, base_url=""):
     RoundGrade whose grading window closes in 2 or 1 day(s)."""
 
     counts = {"sent": 0, "failed": 0, "skipped": 0}
+    template = models.EmailTemplate.get_or_create_default("round_grade_reminder")
 
     round_grades = models.RoundGrade.objects(release_status__ne="released")
     for round_grade in round_grades:
@@ -86,28 +87,16 @@ def send_round_grade_reminders(mailer, base_url=""):
             if not lecturer:
                 continue
 
-            subject = (
-                f"[Bussaya] {round_grade.get_type_display()} grading for "
-                f"{class_.name} closes in {days_before} day"
-                f"{'s' if days_before != 1 else ''}"
+            link = f"{base_url}/round_grades/{round_grade.id}/grading" if base_url else ""
+            subject, body = template.render(
+                lecturer_name=lecturer.fullname,
+                class_name=class_.name,
+                round_display=round_grade.get_type_display(),
+                deadline=round_grade.natural_ended_date(),
+                days_before=days_before,
+                pending_count=pending_count,
+                link=link,
             )
-            body_lines = [
-                f"Dear {lecturer.fullname},",
-                "",
-                f'The grading window for "{class_.name}" '
-                f"({round_grade.get_type_display()}) closes on "
-                f"{round_grade.natural_ended_date()} "
-                f"({days_before} day{'s' if days_before != 1 else ''} from now).",
-                "",
-                f"You still have {pending_count} student grade"
-                f"{'s' if pending_count != 1 else ''} pending.",
-            ]
-            if base_url:
-                body_lines += [
-                    "",
-                    f"{base_url}/round_grades/{round_grade.id}/grading",
-                ]
-            body = "\n".join(body_lines)
 
             result = _send_reminder(
                 mailer, "round_grade", round_grade.id, lecturer, days_before, subject, body
@@ -122,6 +111,7 @@ def send_meeting_report_reminders(mailer, base_url=""):
     yet for a Meeting whose window closes in 2 or 1 day(s)."""
 
     counts = {"sent": 0, "failed": 0, "skipped": 0}
+    template = models.EmailTemplate.get_or_create_default("meeting_reminder")
 
     for meeting in models.Meeting.objects:
         days_before = _days_until(meeting.ended_date)
@@ -133,22 +123,15 @@ def send_meeting_report_reminders(mailer, base_url=""):
             if meeting.get_meeting_report_by_owner(student):
                 continue
 
-            subject = (
-                f"[Bussaya] Meeting report for {class_.name} "
-                f"closes in {days_before} day{'s' if days_before != 1 else ''}"
+            link = f"{base_url}/classes/{class_.id}" if base_url else ""
+            subject, body = template.render(
+                student_name=student.fullname,
+                class_name=class_.name,
+                round_display=meeting.get_round_display(),
+                deadline=meeting.natural_ended_date(),
+                days_before=days_before,
+                link=link,
             )
-            body_lines = [
-                f"Dear {student.fullname},",
-                "",
-                f'The meeting report window for "{class_.name}" '
-                f"({meeting.get_round_display()}) closes on "
-                f"{meeting.natural_ended_date()} "
-                f"({days_before} day{'s' if days_before != 1 else ''} from now), "
-                "and you have not submitted one yet.",
-            ]
-            if base_url:
-                body_lines += ["", f"{base_url}/classes/{class_.id}"]
-            body = "\n".join(body_lines)
 
             result = _send_reminder(
                 mailer, "meeting", meeting.id, student, days_before, subject, body
@@ -160,6 +143,7 @@ def send_meeting_report_reminders(mailer, base_url=""):
 
 def _send_submission_reminders(mailer, submission_type, base_url):
     counts = {"sent": 0, "failed": 0, "skipped": 0}
+    template = models.EmailTemplate.get_or_create_default(f"{submission_type}_reminder")
 
     submissions = models.Submission.objects(type=submission_type)
     for submission in submissions:
@@ -172,22 +156,15 @@ def _send_submission_reminders(mailer, submission_type, base_url):
             if submission.get_progress_report_by_owner(student):
                 continue
 
-            subject = (
-                f"[Bussaya] {submission.get_type_display()} for {class_.name} "
-                f"closes in {days_before} day{'s' if days_before != 1 else ''}"
+            link = f"{base_url}/classes/{class_.id}" if base_url else ""
+            subject, body = template.render(
+                student_name=student.fullname,
+                class_name=class_.name,
+                round_display=submission.get_round_display(),
+                deadline=submission.natural_ended_date(),
+                days_before=days_before,
+                link=link,
             )
-            body_lines = [
-                f"Dear {student.fullname},",
-                "",
-                f'The {submission.get_type_display().lower()} submission window for '
-                f'"{class_.name}" ({submission.get_round_display()}) closes on '
-                f"{submission.natural_ended_date()} "
-                f"({days_before} day{'s' if days_before != 1 else ''} from now), "
-                "and you have not submitted one yet.",
-            ]
-            if base_url:
-                body_lines += ["", f"{base_url}/classes/{class_.id}"]
-            body = "\n".join(body_lines)
 
             result = _send_reminder(
                 mailer, submission_type, submission.id, student, days_before, subject, body

@@ -33,6 +33,7 @@ class DeadlineReminderTest(unittest.TestCase):
             models.Submission,
             models.ProgressReport,
             models.DeadlineNotification,
+            models.EmailTemplate,
         ]:
             coll.drop_collection()
 
