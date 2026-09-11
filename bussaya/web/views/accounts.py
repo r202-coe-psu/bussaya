@@ -159,14 +159,29 @@ def profile(user_id):
 
     skill_summary = None
     plo_achievement = None
+    combined_result = None
+    round_results = []
     if "student" in user.roles and can_view_academic:
         skill_summary = user.get_skill_summary()
         plo_achievement = user.get_plo_achievement()
+
+        project = user.get_project()
+        if project and project.class_:
+            combined_result = user.get_complete_grade(project.class_)
+            for round_type in ["midterm", "final"]:
+                round_grade = models.RoundGrade.objects(
+                    class_=project.class_, type=round_type
+                ).first()
+                if round_grade:
+                    actual_grade, _ = user.get_actual_grade(round_grade)
+                    round_results.append({"type": round_type, "grade": actual_grade})
 
     return render_template(
         "/accounts/index.html.j2",
         user=user,
         biography=biography,
+        combined_result=combined_result,
+        round_results=round_results,
         skill_summary=skill_summary,
         plo_achievement=plo_achievement,
     )
