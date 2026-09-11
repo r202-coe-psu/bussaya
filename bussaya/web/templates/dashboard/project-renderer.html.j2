@@ -2,7 +2,7 @@
 {% import '/dashboard/class-attributes.html.j2' as class_attributes %}
 
 
-{% macro render_project_section(projects, current_user, advisee_projects, committee_projects) -%}
+{% macro render_project_section(current_user, advisee_projects, committee_projects) -%}
 <div class="card bg-base-100 shadow my-4">
   <div class="card-body p-4">
   {%- if advisee_projects | count > 0 %}
@@ -13,14 +13,36 @@
   <h4 class="text-lg font-semibold">Examination Project</h4>
   {{ render_current_project_table(committee_projects, current_user) }}
   {%- endif %}
-  {%- if projects | count > 0 %}
-  <h4 class="text-lg font-semibold">Alumni Project</h4>
-  {{ render_project_table(projects, current_user) }}
-  {%- endif %}
   </div>
 </div>
 
 {% endmacro -%}
+
+{% macro render_alumni_summary(alumni_projects_count, alumni_project_tags) -%}
+{%- if alumni_projects_count > 0 %}
+<div class="card bg-base-100 shadow my-4">
+  <div class="card-body p-4">
+    <div class="flex items-center justify-between flex-wrap gap-2">
+      <h4 class="text-lg font-semibold">Alumni Project</h4>
+      <a href="{{ url_for('dashboard.alumni_projects') }}" class="btn btn-sm btn-outline btn-primary">
+        View all {{ alumni_projects_count }} project{{ 's' if alumni_projects_count != 1 else '' }}
+      </a>
+    </div>
+    {%- if alumni_project_tags %}
+    <div class="flex flex-wrap gap-1 mt-2">
+      {%- for tag, count in alumni_project_tags %}
+      <a href="{{ url_for('dashboard.alumni_projects', tag=tag) }}" class="badge badge-outline gap-1 hover:badge-primary">
+        {{ tag }} <span class="opacity-60">{{ count }}</span>
+      </a>
+      {%- endfor %}
+    </div>
+    {%- else %}
+    <p class="text-sm opacity-60 mt-1">No tags recorded for these projects.</p>
+    {%- endif %}
+  </div>
+</div>
+{%- endif %}
+{%- endmacro -%}
 
 {% macro render_current_project_table(projects, current_user=None) -%}
 <div class="overflow-x-auto">
@@ -33,6 +55,7 @@
       <th>Advisor</th>
       <th>Midterm</th>
       <th>Final</th>
+      <th>Meetings (Midterm/Final)</th>
     </tr>
   </thead>
   <tbody>
@@ -41,7 +64,9 @@
       <td>{{ project.name }}</td>
       <td class="text-right whitespace-nowrap">
         {%- for s in project.students %}
-        {{ s.first_name }} {{ s.last_name }}
+        <a target="_blank" href="{{ url_for('accounts.profile', user_id=s.id) }}">
+          {{ s.first_name }} {{ s.last_name }}
+        </a>
         {% if not loop.last %}<br>{% endif %}
         {% endfor -%}
       </td>
@@ -116,6 +141,12 @@
         {% endif %}
         {% endfor %}
 
+      </td>
+      <td class="text-right whitespace-nowrap">
+        {% for student in project.students %}
+        {{ student.get_meeting_reports(class_, 'midterm').count() }} / {{ student.get_meeting_reports(class_, 'final').count() }}
+        {% if not loop.last %}<br>{% endif %}
+        {% endfor %}
       </td>
     </tr>
     {% endfor %}

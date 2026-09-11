@@ -10,6 +10,61 @@ Dashboard
 
 {% block content %}
 
+{% if pending_meeting_reports_count > 0 %}
+<div class="card bg-base-100 shadow my-4 border border-warning/40">
+  <div class="card-body p-4">
+    <div class="flex items-center justify-between flex-wrap gap-2">
+      <h4 class="text-lg font-semibold flex items-center gap-2">
+        <i class="fa-solid fa-clipboard-check text-warning"></i>
+        Meeting Reports Awaiting Approval
+      </h4>
+      <span class="badge badge-warning badge-lg">{{ pending_meeting_reports_count }}</span>
+    </div>
+    <div class="overflow-x-auto mt-2">
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Class</th>
+            <th>Meeting</th>
+            <th>Title</th>
+            <th>Submitted</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for report in pending_meeting_reports %}
+          <tr>
+            <td><a target="_blank" href="{{ url_for('accounts.profile', user_id=report.owner.id) }}">{{ report.owner.fullname }}</a></td>
+            <td>{{ report.class_.name }}</td>
+            <td>{{ report.meeting.name }} ({{ report.meeting.get_round_display() }})</td>
+            <td>{{ report.title }}</td>
+            <td class="whitespace-nowrap">{{ report.created_date.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>
+              <span class="badge badge-sm {{ 'badge-error' if report.status == 'late-report' else 'badge-warning' }}">
+                {{ report.get_status_display() if report.status else 'Wait' }}
+              </span>
+            </td>
+            <td class="text-right whitespace-nowrap">
+              <a href="{{ url_for('classes.approve_meeting_report', class_id=report.class_.id) }}" class="btn btn-xs btn-primary">
+                Review
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if pending_meeting_reports_count > pending_meeting_reports|length %}
+    <div class="text-xs opacity-60 mt-1">
+      Showing {{ pending_meeting_reports|length }} of {{ pending_meeting_reports_count }}. Open a class's approval page to see the rest.
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
 <h2 class="divider text-2xl font-bold">Classes</h2>
 {% if opened_classes %}
 <div class="overflow-x-auto">
@@ -72,6 +127,8 @@ Dashboard
 </div>
 {% endif %}
 
-{{ renderer.render_project_section(alumni_projects, current_user, advisee_projects, committee_projects) }}
+{{ renderer.render_project_section(current_user, advisee_projects, committee_projects) }}
+
+{{ renderer.render_alumni_summary(alumni_projects_count, alumni_project_tags) }}
 
 {% endblock %}

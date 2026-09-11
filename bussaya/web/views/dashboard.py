@@ -27,6 +27,49 @@ def index_admin():
     )
 
 
+def get_alumni_projects(user, tag=None):
+    now = datetime.date.today()
+    opened_classes = models.Class.objects(started_date__lte=now, ended_date__gte=now)
+
+    projects = models.Project.objects(
+        advisors=user,
+        class___nin=opened_classes,
+        status="active",
+    ).order_by("-id")
+
+    if tag:
+        projects = projects.filter(tags=tag)
+
+    return projects
+
+
+def get_alumni_project_tags(projects):
+    tag_counts = {}
+    for project in projects:
+        for tag in project.tags:
+            tag_counts[tag] = tag_counts.get(tag, 0) + 1
+
+    return sorted(tag_counts.items(), key=lambda item: (-item[1], item[0]))
+
+
+@module.route("/alumni-projects")
+@login_required
+def alumni_projects():
+    user = current_user._get_current_object()
+    selected_tag = request.args.get("tag", "").strip()
+
+    all_alumni_projects = get_alumni_projects(user)
+    projects = get_alumni_projects(user, tag=selected_tag or None)
+    tags = get_alumni_project_tags(all_alumni_projects)
+
+    return render_template(
+        "/dashboard/alumni-projects.html.j2",
+        projects=projects,
+        tags=tags,
+        selected_tag=selected_tag,
+    )
+
+
 def index_lecturer():
     now = datetime.date.today()
     opened_classes = models.Class.objects(
@@ -52,11 +95,9 @@ def index_lecturer():
         status="active",
     )
 
-    alumni_projects = models.Project.objects(
-        advisors=current_user._get_current_object(),
-        class___nin=opened_classes,
-        status="active",
-    ).order_by("-id")
+    alumni_projects_qs = get_alumni_projects(user)
+    alumni_projects_count = alumni_projects_qs.count()
+    alumni_project_tags = get_alumni_project_tags(alumni_projects_qs)
 
     advisee_projects = sorted(
         advisee_projects,
@@ -75,13 +116,35 @@ def index_lecturer():
         ),
     )
 
+    pending_meeting_reports = []
+    for oc in opened_classes:
+        advisees = oc.get_advisees_by_advisors(user)
+        if not advisees:
+            continue
+
+        meetings = models.Meeting.objects(class_=oc)
+        pending_meeting_reports.extend(
+            models.MeetingReport.objects(
+                meeting__in=meetings,
+                owner__in=advisees,
+                status__in=["wait", "late-report", None],
+            )
+        )
+
+    pending_meeting_reports.sort(key=lambda r: r.created_date)
+    pending_meeting_reports_count = len(pending_meeting_reports)
+    pending_meeting_reports = pending_meeting_reports[:10]
+
     return render_template(
         "/dashboard/index-lecturer.html.j2",
         classes=classes,
         opened_classes=opened_classes,
-        alumni_projects=alumni_projects,
+        alumni_projects_count=alumni_projects_count,
+        alumni_project_tags=alumni_project_tags,
         advisee_projects=advisee_projects,
         committee_projects=committee_projects,
+        pending_meeting_reports=pending_meeting_reports,
+        pending_meeting_reports_count=pending_meeting_reports_count,
     )
 
 

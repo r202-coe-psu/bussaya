@@ -1,0 +1,42 @@
+{% extends '/base/default-dashboard.html.j2' %}
+{% import '/dashboard/project-renderer.html.j2' as renderer %}
+
+{% block dashboard_title %}
+Alumni Projects
+{% endblock %}
+
+{% block breadcrumbs %}
+<li><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+<li>Alumni Projects</li>
+{% endblock %}
+
+{% block content %}
+
+<h1 class="divider text-2xl font-bold">
+	<i class="fa-solid fa-user-graduate fa-sm"></i>
+	Alumni Projects
+</h1>
+
+{% if tags %}
+<div class="flex flex-wrap items-center gap-1 mb-4">
+	<a href="{{ url_for('dashboard.alumni_projects') }}" class="badge {{ 'badge-primary' if not selected_tag else 'badge-outline' }}">
+		All
+	</a>
+	{% for tag, count in tags %}
+	<a href="{{ url_for('dashboard.alumni_projects', tag=tag) }}"
+	   class="badge gap-1 {{ 'badge-primary' if tag == selected_tag else 'badge-outline' }}">
+		{{ tag }} <span class="opacity-60">{{ count }}</span>
+	</a>
+	{% endfor %}
+</div>
+{% endif %}
+
+{% if projects %}
+{{ renderer.render_project_table(projects, current_user) }}
+{% else %}
+<div class="alert alert-info">
+	{% if selected_tag %}No alumni projects tagged "{{ selected_tag }}".{% else %}No alumni projects yet.{% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
