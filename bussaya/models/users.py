@@ -261,7 +261,7 @@ class User(me.Document, UserMixin):
         class_ = round_grade.class_
 
         average_grade = self.get_average_grade(round_grade)
-        if average_grade in ["I", "W"]:
+        if average_grade not in ["A", "B+", "B", "C+", "C", "D+", "D", "E"]:
             return average_grade, [average_grade]
 
         final_point = self.get_grade_to_point(average_grade)

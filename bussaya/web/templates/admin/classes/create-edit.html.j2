@@ -54,7 +54,7 @@
 
         {{ renderer.render_field(form.tags) }}
         {{ renderer.render_select(form.type) }}
-        {{ renderer.render_select(form.curriculum) }}
+        {{ renderer.render_select(form.curriculums) }}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           {{ renderer.render_date_picker(form.started_date, 'rangestart') }}
           {{ renderer.render_date_picker(form.ended_date, 'rangeend') }}

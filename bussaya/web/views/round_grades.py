@@ -45,7 +45,11 @@ def view(round_grade_type):
     student_grades = sorted(
         student_grades,
         key=lambda s: (
-            [advisor.username for advisor in s.project.advisors],
+            [
+                advisor.username
+                for advisor in s.project.advisors
+                if s.project.status == "active"
+            ],
             s.student.username,
         ),
     )
@@ -72,7 +76,7 @@ def approve_report(round_grade_type):
     round_grade = models.RoundGrade.objects(
         type=round_grade_type, class_=class_
     ).first()
-  
+
     if not round_grade:
         return redirect(url_for("classes.view", class_id=class_.id))
 
@@ -83,7 +87,7 @@ def approve_report(round_grade_type):
         class_=class_, grader__lecturer=user, round_grade=round_grade
     )
 
-    c = sorted(
+    student_grades = sorted(
         student_grades,
         key=lambda s: (
             [advisor.username for advisor in s.project.advisors],
@@ -132,7 +136,9 @@ def grading(round_grade_id):
     round_grade_rubric = rubric_models.get_or_create_round_grade_rubric(round_grade)
     form = (
         admin_round_grades.build_rubric_grading_form(
-            forms.round_grades.GroupRubricGradingForm, student_grades, round_grade_rubric
+            forms.round_grades.GroupRubricGradingForm,
+            student_grades,
+            round_grade_rubric,
         )
         if round_grade_rubric
         else forms.round_grades.GroupRubricGradingForm()

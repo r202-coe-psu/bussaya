@@ -5,7 +5,7 @@
 {%- set base = 'w-full min-h-40 rounded-box bg-base-100 p-2 text-sm' -%}
 {%- elif field.type in ['SelectField', 'QuerySelectField', 'ModelSelectField'] -%}
 {%- set base = 'select w-full' -%}
-{%- elif field.type == 'TextAreaField' -%}
+{%- elif field.type in ['TextAreaField', 'TextListField'] -%}
 {%- set base = 'textarea w-full' -%}
 {%- elif field.type == 'BooleanField' -%}
 {%- set base = 'checkbox' -%}

@@ -29,13 +29,36 @@
 </div>
 {% else %}
 
-<div class="collapse collapse-arrow bg-base-100 shadow mb-4 border border-base-200 mt-4">
-  <input type="checkbox" />
-  <div class="collapse-title text-lg font-bold flex items-center gap-2">
-    <i class="fa-solid fa-clipboard-list text-primary"></i>
-    Rubric & Criteria Level Explanations (Total Max Score: {{ round_grade_rubric.get_total_max_score() }} / 100 pts)
-  </div>
-  <div class="collapse-content">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-4 mt-4">
+  <div class="text-sm opacity-70">Total Max Score: {{ round_grade_rubric.get_total_max_score() }} / 100 pts</div>
+  <button type="button" class="btn btn-outline btn-primary btn-sm gap-2"
+          onclick="document.getElementById('rubric_info_modal').showModal()">
+    <i class="fa-solid fa-clipboard-list"></i> View Rubric & Criteria Level Explanations
+  </button>
+</div>
+
+<dialog id="rubric_info_modal" class="modal">
+  <div class="modal-box max-w-[95vw] w-full">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    </form>
+    <h3 class="font-bold text-lg text-primary flex items-center gap-2">
+      <i class="fa-solid fa-clipboard-list"></i>
+      Rubric & Criteria Level Explanations
+    </h3>
+    <p class="text-sm opacity-70 mb-2">Total Max Score: {{ round_grade_rubric.get_total_max_score() }} / 100 pts</p>
+
+    {% if final_grade_scale %}
+    <div class="mb-3">
+      <h4 class="font-semibold text-sm mb-1">Final Grade Scoring</h4>
+      <div class="flex flex-wrap gap-2 text-xs">
+        {% for grade, min_percent in final_grade_scale %}
+          <span class="badge badge-outline">{{ grade }} &ge; {{ '%.2f'|format(min_percent) }}%</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
     <div class="overflow-x-auto">
       <table class="table table-sm border">
         <thead>
@@ -43,23 +66,25 @@
             <th>Criterion</th>
             <th>Max Score</th>
             <th>CLOs</th>
-            <th>Grade Level Explanations</th>
+            {% for lvl in ["A", "B+", "B", "C+", "C", "D+", "D", "E", "I", "W"] %}
+            <th class="text-center text-primary">{{ lvl }}</th>
+            {% endfor %}
           </tr>
         </thead>
         <tbody>
           {% for criterion in round_grade_rubric.get_sorted_criteria() %}
           <tr>
-            <td class="font-semibold">
+            <td class="font-semibold align-top min-w-[14rem] whitespace-normal">
               {{ criterion.name }}
               <div class="text-xs font-normal opacity-70">{{ criterion.description }}</div>
             </td>
-            <td class="font-semibold">{{ criterion.max_score }}</td>
-            <td>
+            <td class="font-semibold align-top">{{ criterion.max_score }}</td>
+            <td class="align-top min-w-[14rem]">
               <div class="flex flex-wrap gap-1">
                 {% for clo in criterion.clos %}
                   {% set cur_code = clo.curriculum.code if clo.curriculum else '' %}
                   {% set badge_style = 'badge-primary' if loop.index0 % 4 == 0 else 'badge-secondary' if loop.index0 % 4 == 1 else 'badge-accent' if loop.index0 % 4 == 2 else 'badge-info' %}
-                  <span class="badge {{ badge_style }} text-xs font-semibold gap-1" title="{{ clo.curriculum.name if clo.curriculum else '' }}">
+                  <span class="badge {{ badge_style }} text-xs font-semibold gap-1 h-auto whitespace-normal py-1 text-left" title="{{ clo.curriculum.name if clo.curriculum else '' }}">
                     {% if cur_code %}
                       <span class="font-bold opacity-90">[{{ cur_code }}]</span>
                     {% endif %}
@@ -68,61 +93,39 @@
                 {% endfor %}
               </div>
             </td>
-            <td>
-              <div class="grid grid-cols-2 md:grid-cols-5 gap-1 text-xs">
-                {% for lvl in ["A", "B+", "B", "C+", "C", "D+", "D", "E", "I", "W"] %}
-                  <div class="border rounded p-1 bg-base-100" title="{{ criterion.get_level_explanation(lvl) }}">
-                    <span class="font-bold text-primary">{{ lvl }}:</span>
-                    <span class="truncate block opacity-80">{{ criterion.get_level_explanation(lvl) or '-' }}</span>
-                  </div>
-                {% endfor %}
-              </div>
-            </td>
+            {% for lvl in ["A", "B+", "B", "C+", "C", "D+", "D", "E", "I", "W"] %}
+            <td class="align-top text-xs min-w-[10rem] whitespace-normal">{{ criterion.get_level_explanation(lvl) or '-' }}</td>
+            {% endfor %}
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn btn-sm">Close</button>
+      </form>
+    </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
 
 <form method="POST" id="form-round_grade"
-    action="{{ url_for('admin.round_grades.submit_grade', round_grade_id=round_grade.id) }}">
+    action="{{ url_for('admin.round_grades.submit_grade', round_grade_id=round_grade.id) }}"
+    data-submit-one-url="{{ url_for('admin.round_grades.submit_grade_one', round_grade_id=round_grade.id) }}">
     {{ form.csrf_token }}
     <div class="pt-4">
-        <div class="overflow-x-auto">
-        <table class="table table-zebra">
+        <div class="text-xs opacity-70 mb-1">
+          <i class="fa-solid fa-circle-info"></i> Click "Grade" to score a student against each rubric criterion.
+        </div>
+        <div class="overflow-x-auto border border-base-200 rounded-box">
+        <table class="table table-zebra table-sm table-pin-rows table-pin-cols">
             <thead>
                 <tr>
-                    <th></th>
-		                <th>Student</th>
-                    {% for criterion in round_grade_rubric.get_sorted_criteria() %}
-                    <th>
-                      <div>
-                        <span>{{ criterion.name }}</span>
-                        <div class="dropdown dropdown-bottom dropdown-end inline-block">
-                          <label tabindex="0" class="btn btn-ghost btn-xs text-info p-0 min-h-0 h-auto cursor-pointer" title="View Grade Level Explanations">
-                            <i class="fa-solid fa-circle-info"></i>
-                          </label>
-                          <div tabindex="0" class="dropdown-content z-[1] card card-compact w-72 p-2 shadow bg-base-100 text-base-content border">
-                            <div class="card-body">
-                              <h4 class="card-title text-xs font-bold">{{ criterion.name }} Level Explanations</h4>
-                              <p class="text-xs opacity-70 mb-1">{{ criterion.description }}</p>
-                              <div class="space-y-1 text-xs max-h-48 overflow-y-auto">
-                                {% for lvl in ["A", "B+", "B", "C+", "C", "D+", "D", "E", "I", "W"] %}
-                                  <div>
-                                    <span class="font-bold text-primary">{{ lvl }}:</span>
-                                    {{ criterion.get_level_explanation(lvl) or '-' }}
-                                  </div>
-                                {% endfor %}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <span class="opacity-60 text-xs">/ {{ criterion.max_score }}</span>
-                    </th>
-                    {% endfor %}
+                    <th>Student</th>
+                    <th>Grade Entry</th>
                     <th>This Grade</th>
                     <th>Average Grade</th>
                     <th>Final Grade</th>
@@ -135,8 +138,10 @@
                 {% set student_presentation = student.get_presentation(class_, round_grade.type) %}
 
                 <tr class="align-top">
-                    <td>{{ loop.index }}</td>
-                    <td>
+                    <th class="align-top">
+                      <div class="flex items-start gap-2">
+                        <span class="badge badge-neutral badge-sm shrink-0 mt-0.5">{{ loop.index }}</span>
+                        <div class="min-w-[9rem]">
                       <div class="font-semibold">{{ student.first_name }} {{ student.last_name }}</div>
                       <div class="text-xs opacity-70 font-mono">{{ student.username }}</div>
                       <div class="text-xs text-primary font-medium mt-0.5 truncate max-w-xs">{{ student_grade.project.name }}</div>
@@ -146,11 +151,11 @@
                         <i class="fa-solid fa-circle-info"></i> Info & Submissions
                       </button>
 
-                      <dialog id="student_details_modal_{{ student_grade.id }}" class="modal text-left">
+                      <dialog id="student_details_modal_{{ student_grade.id }}" class="modal text-left"
+                              onclick="if (event.target === this) this.close()">
                         <div class="modal-box max-w-2xl whitespace-normal">
-                          <form method="dialog">
-                            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                          </form>
+                          <button type="button" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                                  onclick="this.closest('dialog').close()">✕</button>
                           <h3 class="font-bold text-lg text-primary flex items-center gap-2">
                             <i class="fa-solid fa-user-graduate"></i>
                             {{ student.first_name }} {{ student.last_name }} ({{ student.username }})
@@ -229,6 +234,13 @@
                                   </div>
                                   {% set r_score = sg.get_rubric_score() %}
                                   {% if r_score %}
+                                  {% set total_max = r_score.round_grade_rubric.get_total_max_score() %}
+                                  {% set score_ns = namespace(total=0) %}
+                                  {% for cs in r_score.criterion_scores %}
+                                    {% if cs.score is not none %}
+                                      {% set score_ns.total = score_ns.total + cs.score %}
+                                    {% endif %}
+                                  {% endfor %}
                                   <div class="grid grid-cols-2 gap-1 text-xs opacity-80 mt-1 pl-2 border-l-2 border-primary/30">
                                     {% for criterion in r_score.round_grade_rubric.get_sorted_criteria() %}
                                     {% set cs = r_score.get_score_for(criterion.id) %}
@@ -236,6 +248,10 @@
                                       <span class="font-medium">{{ criterion.name }}:</span> {{ cs.score if cs and cs.score is not none else '-' }} / {{ criterion.max_score }}
                                     </div>
                                     {% endfor %}
+                                  </div>
+                                  <div class="text-xs font-semibold mt-1 pl-2 text-primary">
+                                    Total Score: {{ '%.2f'|format(score_ns.total) }} / {{ '%.2f'|format(total_max) }}
+                                    {% if total_max %}({{ '%.2f'|format((score_ns.total / total_max) * 100) }}%){% endif %}
                                   </div>
                                   {% endif %}
                                 </li>
@@ -247,46 +263,111 @@
                           </div>
 
                           <div class="modal-action">
-                            <form method="dialog">
-                              <button class="btn btn-sm">Close</button>
-                            </form>
+                            <button type="button" class="btn btn-sm" onclick="this.closest('dialog').close()">Close</button>
                           </div>
                         </div>
-                        <form method="dialog" class="modal-backdrop">
-                          <button>close</button>
-                        </form>
                       </dialog>
-                    </td>
+                        </div>
+                      </div>
+                    </th>
                     {% set grading = form.gradings[loop.index - 1] %}
                     {{ grading.student_id }}
+                    {% set ns = namespace(scored=0) %}
                     {% for criterion_score in grading.criterion_scores %}
-                    {% set criterion = round_grade_rubric.get_sorted_criteria()[loop.index0] %}
-                    <td>
-                        {{ criterion_score.criterion_id }}
-                        <div class="flex flex-col items-center gap-1">
-                          <select class="select select-bordered select-xs w-28 grade-level-select"
-                                  data-max-score="{{ criterion.max_score }}"
-                                  onchange="onGradeLevelChange(this)">
-                            <option value="">Select Level</option>
-                            <option value="A" data-ratio="1.0" title="{{ criterion.get_level_explanation('A') }}">A (100%)</option>
-                            <option value="B+" data-ratio="0.875" title="{{ criterion.get_level_explanation('B+') }}">B+ (87.5%)</option>
-                            <option value="B" data-ratio="0.75" title="{{ criterion.get_level_explanation('B') }}">B (75%)</option>
-                            <option value="C+" data-ratio="0.625" title="{{ criterion.get_level_explanation('C+') }}">C+ (62.5%)</option>
-                            <option value="C" data-ratio="0.50" title="{{ criterion.get_level_explanation('C') }}">C (50%)</option>
-                            <option value="D+" data-ratio="0.375" title="{{ criterion.get_level_explanation('D+') }}">D+ (37.5%)</option>
-                            <option value="D" data-ratio="0.25" title="{{ criterion.get_level_explanation('D') }}">D (25%)</option>
-                            <option value="E" data-ratio="0.125" title="{{ criterion.get_level_explanation('E') }}">E (12.5%)</option>
-                            <option value="I" data-ratio="0.0" title="{{ criterion.get_level_explanation('I') }}">I (0%)</option>
-                            <option value="W" data-ratio="0.0" title="{{ criterion.get_level_explanation('W') }}">W (0%)</option>
-                          </select>
-                          {{ criterion_score.score(class_="input input-sm input-bordered w-20 text-center criterion-score-input", oninput="onScoreInputChange(this)", placeholder="Score") }}
-                        </div>
-                    </td>
+                      {% if criterion_score.score.data is not none %}
+                        {% set ns.scored = ns.scored + 1 %}
+                      {% endif %}
                     {% endfor %}
-                    <td><span class="badge">{{ student_grade.get_result_display() }}</span></td>
-                    <td>{{ student.get_average_grade(student_grade.round_grade) }}</td>
+                    {% set total_criteria = grading.criterion_scores|length %}
+                    <td class="text-center">
+                      <button type="button" class="btn btn-sm btn-primary gap-1"
+                              onclick="document.getElementById('grading_modal_{{ student_grade.id }}').showModal()">
+                        <i class="fa-solid fa-pen-to-square"></i> Grade
+                      </button>
+                      <div class="mt-1" id="grading_status_{{ student_grade.id }}">
+                        <span class="badge badge-sm {{ 'badge-success' if ns.scored == total_criteria and total_criteria > 0 else 'badge-warning' }}">
+                          {{ ns.scored }}/{{ total_criteria }} scored
+                        </span>
+                      </div>
+
+                      <dialog id="grading_modal_{{ student_grade.id }}" class="modal"
+                              data-user-id="{{ student.id }}"
+                              onclick="if (event.target === this) this.close()">
+                        <div class="modal-box max-w-2xl text-left">
+                          <button type="button" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                                  onclick="this.closest('dialog').close()">✕</button>
+                          <h3 class="font-bold text-lg text-primary flex items-center gap-2">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            Rubric Scoring &mdash; {{ student.first_name }} {{ student.last_name }}
+                          </h3>
+                          <p class="text-xs opacity-70 font-mono mb-2">{{ student.username }}</p>
+
+                          <div class="space-y-3">
+                            {% for criterion_score in grading.criterion_scores %}
+                            {% set criterion = round_grade_rubric.get_sorted_criteria()[loop.index0] %}
+                            <div class="border rounded-box p-3 criterion-row">
+                              {{ criterion_score.criterion_id(class_="criterion-id-input") }}
+                              <div class="flex items-center justify-between mb-2 gap-2">
+                                <div>
+                                  <span class="font-semibold">{{ criterion.name }}</span>
+                                  <span class="opacity-60 text-xs">/ {{ criterion.max_score }}</span>
+                                </div>
+                                <div class="dropdown dropdown-bottom dropdown-end">
+                                  <label tabindex="0" class="btn btn-ghost btn-xs text-info p-0 min-h-0 h-auto cursor-pointer" title="View Grade Level Explanations">
+                                    <i class="fa-solid fa-circle-info"></i>
+                                  </label>
+                                  <div tabindex="0" class="dropdown-content z-[1] card card-compact w-72 p-2 shadow bg-base-100 text-base-content border">
+                                    <div class="card-body">
+                                      <h4 class="card-title text-xs font-bold">{{ criterion.name }} Level Explanations</h4>
+                                      <p class="text-xs opacity-70 mb-1">{{ criterion.description }}</p>
+                                      <div class="space-y-1 text-xs max-h-48 overflow-y-auto">
+                                        {% for lvl in ["A", "B+", "B", "C+", "C", "D+", "D", "E", "I", "W"] %}
+                                          <div>
+                                            <span class="font-bold text-primary">{{ lvl }}:</span>
+                                            {{ criterion.get_level_explanation(lvl) or '-' }}
+                                          </div>
+                                        {% endfor %}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="flex items-center gap-2">
+                                <select class="select select-bordered select-sm flex-1 grade-level-select"
+                                        data-max-score="{{ criterion.max_score }}"
+                                        onchange="onGradeLevelChange(this)">
+                                  <option value="">Select Level</option>
+                                  <option value="A" data-ratio="1.0" title="{{ criterion.get_level_explanation('A') }}">A (100%)</option>
+                                  <option value="B+" data-ratio="0.875" title="{{ criterion.get_level_explanation('B+') }}">B+ (87.5%)</option>
+                                  <option value="B" data-ratio="0.75" title="{{ criterion.get_level_explanation('B') }}">B (75%)</option>
+                                  <option value="C+" data-ratio="0.625" title="{{ criterion.get_level_explanation('C+') }}">C+ (62.5%)</option>
+                                  <option value="C" data-ratio="0.50" title="{{ criterion.get_level_explanation('C') }}">C (50%)</option>
+                                  <option value="D+" data-ratio="0.375" title="{{ criterion.get_level_explanation('D+') }}">D+ (37.5%)</option>
+                                  <option value="D" data-ratio="0.25" title="{{ criterion.get_level_explanation('D') }}">D (25%)</option>
+                                  <option value="E" data-ratio="0.125" title="{{ criterion.get_level_explanation('E') }}">E (12.5%)</option>
+                                  <option value="I" data-ratio="0.0" title="{{ criterion.get_level_explanation('I') }}">I (0%)</option>
+                                  <option value="W" data-ratio="0.0" title="{{ criterion.get_level_explanation('W') }}">W (0%)</option>
+                                </select>
+                                {{ criterion_score.score(class_="input input-sm input-bordered w-20 text-center criterion-score-input", oninput="onScoreInputChange(this)", placeholder="Score") }}
+                              </div>
+                            </div>
+                            {% endfor %}
+                          </div>
+
+                          <div class="modal-action items-center">
+                            <span class="grading-save-status text-xs opacity-70 mr-auto"></span>
+                            <button type="button" class="btn btn-sm" onclick="this.closest('dialog').close()">Close</button>
+                            <button type="button" class="btn btn-primary btn-sm gap-1" onclick="saveGrading(this)">
+                              <i class="fa-solid fa-floppy-disk"></i> Save
+                            </button>
+                          </div>
+                        </div>
+                      </dialog>
+                    </td>
+                    <td><span class="badge" id="this_grade_{{ student_grade.id }}">{{ student_grade.get_result_display() }}</span></td>
+                    <td id="average_grade_{{ student_grade.id }}">{{ student.get_average_grade(student_grade.round_grade) }}</td>
                     {% set actual_grade, caused = student.get_actual_grade(student_grade.round_grade) %}
-                    <td>
+                    <td id="final_grade_{{ student_grade.id }}">
                       {% if not caused %}
                         {{ actual_grade }}
                       {% else %}
@@ -333,40 +414,60 @@
         }
     }
 
+    function refreshGradingStatus(el) {
+        const dialog = el.closest('dialog');
+        if (!dialog || !dialog.id.startsWith('grading_modal_')) return;
+        const statusEl = document.getElementById(dialog.id.replace('grading_modal_', 'grading_status_'));
+        if (!statusEl) return;
+        const inputs = dialog.querySelectorAll('.criterion-score-input');
+        let scored = 0;
+        inputs.forEach(function(input) { if (input.value !== "") scored++; });
+        const total = inputs.length;
+        const badge = statusEl.querySelector('span');
+        if (badge) {
+            badge.textContent = scored + '/' + total + ' scored';
+            badge.classList.toggle('badge-success', scored === total && total > 0);
+            badge.classList.toggle('badge-warning', !(scored === total && total > 0));
+        }
+    }
+
     function onGradeLevelChange(selectElem) {
         const option = selectElem.options[selectElem.selectedIndex];
         const ratioStr = option ? option.getAttribute('data-ratio') : null;
         if (ratioStr === null || ratioStr === "") return;
         const ratio = parseFloat(ratioStr);
         const maxScore = parseFloat(selectElem.getAttribute('data-max-score'));
-        const container = selectElem.closest('td');
+        const container = selectElem.closest('.criterion-row');
         const input = container.querySelector('.criterion-score-input');
         if (!isNaN(ratio) && !isNaN(maxScore) && input) {
             const calculatedScore = Math.round((ratio * maxScore) * 100) / 100;
             input.value = calculatedScore;
         }
+        refreshGradingStatus(selectElem);
     }
 
     function onScoreInputChange(inputElem) {
-        const container = inputElem.closest('td');
+        const container = inputElem.closest('.criterion-row');
         const selectElem = container.querySelector('.grade-level-select');
-        if (!selectElem) return;
-        const score = parseFloat(inputElem.value);
-        const maxScore = parseFloat(selectElem.getAttribute('data-max-score'));
-        if (isNaN(score) || isNaN(maxScore) || maxScore === 0) {
-            selectElem.value = "";
-            return;
+        if (selectElem) {
+            const score = parseFloat(inputElem.value);
+            const maxScore = parseFloat(selectElem.getAttribute('data-max-score'));
+            if (isNaN(score) || isNaN(maxScore) || maxScore === 0) {
+                selectElem.value = "";
+            } else {
+                const ratio = score / maxScore;
+                if (ratio >= 0.9375) selectElem.value = "A";
+                else if (ratio >= 0.8125) selectElem.value = "B+";
+                else if (ratio >= 0.6875) selectElem.value = "B";
+                else if (ratio >= 0.5625) selectElem.value = "C+";
+                else if (ratio >= 0.4375) selectElem.value = "C";
+                else if (ratio >= 0.3125) selectElem.value = "D+";
+                else if (ratio >= 0.1875) selectElem.value = "D";
+                else if (ratio > 0) selectElem.value = "E";
+                else selectElem.value = "I";
+            }
         }
-        const ratio = score / maxScore;
-        if (ratio >= 0.9375) selectElem.value = "A";
-        else if (ratio >= 0.8125) selectElem.value = "B+";
-        else if (ratio >= 0.6875) selectElem.value = "B";
-        else if (ratio >= 0.5625) selectElem.value = "C+";
-        else if (ratio >= 0.4375) selectElem.value = "C";
-        else if (ratio >= 0.3125) selectElem.value = "D+";
-        else if (ratio >= 0.1875) selectElem.value = "D";
-        else if (ratio > 0) selectElem.value = "E";
-        else selectElem.value = "I";
+        refreshGradingStatus(inputElem);
     }
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -376,5 +477,85 @@
             }
         });
     });
+
+    function saveGrading(button) {
+        const dialog = button.closest('dialog');
+        const statusMsg = dialog.querySelector('.grading-save-status');
+        const form = document.getElementById('form-round_grade');
+        const csrfInput = form.querySelector('input[name="csrf_token"]');
+        const dialogSuffix = dialog.id.replace('grading_modal_', '');
+
+        const criterionScores = [];
+        dialog.querySelectorAll('.criterion-row').forEach(function(row) {
+            const idInput = row.querySelector('.criterion-id-input');
+            const scoreInput = row.querySelector('.criterion-score-input');
+            criterionScores.push({
+                criterion_id: idInput ? idInput.value : null,
+                score: scoreInput && scoreInput.value !== "" ? scoreInput.value : null
+            });
+        });
+
+        button.disabled = true;
+        if (statusMsg) {
+            statusMsg.textContent = "Saving...";
+            statusMsg.className = "grading-save-status text-xs opacity-70 mr-auto";
+        }
+
+        fetch(form.dataset.submitOneUrl, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                csrf_token: csrfInput ? csrfInput.value : "",
+                student_id: dialog.dataset.userId,
+                criterion_scores: criterionScores
+            })
+        })
+        .then(function(resp) { return resp.json(); })
+        .then(function(data) {
+            button.disabled = false;
+            if (!data.ok) {
+                if (statusMsg) {
+                    statusMsg.textContent = data.error || "Save failed.";
+                    statusMsg.className = "grading-save-status text-xs text-error mr-auto";
+                }
+                return;
+            }
+
+            if (statusMsg) {
+                statusMsg.textContent = "Saved";
+                statusMsg.className = "grading-save-status text-xs text-success mr-auto";
+            }
+
+            const statusWrap = document.getElementById('grading_status_' + dialogSuffix);
+            if (statusWrap) {
+                const badge = statusWrap.querySelector('span');
+                if (badge) {
+                    const fullyScored = data.scored === data.total && data.total > 0;
+                    badge.textContent = data.scored + '/' + data.total + ' scored';
+                    badge.classList.toggle('badge-success', fullyScored);
+                    badge.classList.toggle('badge-warning', !fullyScored);
+                }
+            }
+
+            const thisGradeEl = document.getElementById('this_grade_' + dialogSuffix);
+            if (thisGradeEl) thisGradeEl.textContent = data.result_display;
+
+            const avgEl = document.getElementById('average_grade_' + dialogSuffix);
+            if (avgEl) avgEl.textContent = data.average_grade;
+
+            const finalEl = document.getElementById('final_grade_' + dialogSuffix);
+            if (finalEl) {
+                finalEl.textContent = data.actual_grade;
+                finalEl.title = (data.caused || []).join('\n');
+            }
+        })
+        .catch(function() {
+            button.disabled = false;
+            if (statusMsg) {
+                statusMsg.textContent = "Network error.";
+                statusMsg.className = "grading-save-status text-xs text-error mr-auto";
+            }
+        });
+    }
 </script>
 {% endblock additional_js %}

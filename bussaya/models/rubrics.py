@@ -114,9 +114,9 @@ class RubricTemplate(me.Document):
         return clone
 
     @classmethod
-    def get_active(cls, curriculum, class_type):
+    def get_active(cls, curriculums, class_type):
         return cls.objects(
-            curriculums=curriculum, class_type=class_type, status="active"
+            curriculums__in=curriculums, class_type=class_type, status="active"
         ).first()
 
 
@@ -173,10 +173,10 @@ def get_or_create_round_grade_rubric(round_grade):
         return existing
 
     class_ = round_grade.class_
-    if not class_.curriculum:
+    if not class_.curriculums:
         return None
 
-    template = RubricTemplate.get_active(class_.curriculum, class_.type)
+    template = RubricTemplate.get_active(class_.curriculums, class_.type)
     if not template:
         return None
 

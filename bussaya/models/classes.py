@@ -22,7 +22,7 @@ class Class(me.Document):
 
     tags = me.ListField(me.StringField(required=True))
     type = me.StringField(choices=TYPE_CHOICE)
-    curriculum = me.ReferenceField("Curriculum", dbref=True)
+    curriculums = me.ListField(me.ReferenceField("Curriculum", dbref=True))
 
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
     updated_date = me.DateTimeField(

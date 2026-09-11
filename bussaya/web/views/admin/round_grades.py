@@ -1,6 +1,14 @@
 import datetime
 import markdown
-from flask import Blueprint, render_template, redirect, url_for, send_file, request
+from flask import (
+    Blueprint,
+    render_template,
+    redirect,
+    url_for,
+    send_file,
+    request,
+    jsonify,
+)
 from flask_login import login_required, current_user
 from PyPDF2 import PdfReader, PdfWriter
 import io
@@ -163,6 +171,18 @@ def get_criterion_scores_map(student_grade):
     if not rubric_score:
         return {}
     return {str(cs.criterion_id): cs.score for cs in rubric_score.criterion_scores}
+
+
+def get_final_grade_scale(user):
+    """Minimum total-score percentage required for each final grade, derived
+    from User.get_point_to_grade's own thresholds so this stays in sync with
+    the actual grade computation instead of duplicating the numbers."""
+
+    point_boundaries = [3.75, 3.25, 2.75, 2.25, 1.75, 1.25, 0.75, 0]
+    return [
+        (user.get_point_to_grade(point), (point / 4.0) * 100)
+        for point in point_boundaries
+    ]
 
 
 def build_rubric_grading_form(form_class, student_grades, round_grade_rubric):
@@ -526,6 +546,7 @@ def grading(round_grade_id):
         round_grade_rubric=round_grade_rubric,
         user=user,
         student_grades=student_grades,
+        final_grade_scale=get_final_grade_scale(user),
     )
 
 
@@ -578,6 +599,86 @@ def submit_grade(round_grade_id):
             class_id=class_.id,
             round_grade_type=round_grade.type,
         )
+    )
+
+
+@module.route("/<round_grade_id>/submit-grade-one", methods=["POST"])
+@acl.roles_required("admin")
+def submit_grade_one(round_grade_id):
+    from flask_wtf.csrf import validate_csrf
+    from wtforms import ValidationError
+
+    round_grade = models.RoundGrade.objects.get(id=round_grade_id)
+    class_ = round_grade.class_
+    user = current_user._get_current_object()
+
+    if not round_grade.is_in_time():
+        return jsonify({"ok": False, "error": "Grading window is closed."}), 400
+
+    payload = request.get_json(silent=True) or {}
+
+    try:
+        validate_csrf(payload.get("csrf_token"))
+    except ValidationError:
+        return jsonify({"ok": False, "error": "Invalid CSRF token."}), 400
+
+    round_grade_rubric = rubric_models.get_or_create_round_grade_rubric(round_grade)
+    if not round_grade_rubric:
+        return jsonify({"ok": False, "error": "No active rubric."}), 400
+
+    student = models.User.objects(id=payload.get("student_id")).first()
+    if not student:
+        return jsonify({"ok": False, "error": "Student not found."}), 404
+
+    student_grade = models.StudentGrade.objects(
+        student=student,
+        class_=class_,
+        round_grade=round_grade,
+        grader__lecturer=user,
+    ).first()
+    if not student_grade:
+        return jsonify({"ok": False, "error": "Grading record not found."}), 404
+
+    criterion_scores_data = []
+    for entry in payload.get("criterion_scores", []):
+        score = entry.get("score")
+        try:
+            score = float(score) if score not in (None, "") else None
+        except (TypeError, ValueError):
+            score = None
+        criterion_scores_data.append(
+            {"criterion_id": entry.get("criterion_id"), "score": score}
+        )
+
+    save_rubric_score(student_grade, round_grade_rubric, criterion_scores_data)
+    student_grade.save()
+
+    if student_grade.result != "-":
+        meetings = models.MeetingReport.objects(
+            class_=class_, owner=student_grade.student, status=None
+        )
+        for meeting in meetings:
+            meeting.status = "approved"
+            meeting.approver = user
+            meeting.approver_ip_address = request.headers.get(
+                "X-Forwarded-For", request.remote_addr
+            )
+            meeting.remark += "\n\n-> approve by admin"
+            meeting.save()
+
+    scored = sum(1 for c in criterion_scores_data if c["score"] is not None)
+    actual_grade, caused = student.get_actual_grade(student_grade.round_grade)
+
+    return jsonify(
+        {
+            "ok": True,
+            "scored": scored,
+            "total": len(criterion_scores_data),
+            "result_display": student_grade.get_result_display(),
+            "average_grade": student.get_average_grade(student_grade.round_grade),
+            "actual_grade": actual_grade,
+            "caused": caused or [],
+        }
     )
 
 
