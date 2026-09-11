@@ -25,6 +25,7 @@ from .rubrics import (
     CriterionScore,
     RubricScore,
 )
+from .notifications import DeadlineNotification
 
 from flask_mongoengine import MongoEngine
 

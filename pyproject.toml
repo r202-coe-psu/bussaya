@@ -30,6 +30,7 @@ pypdf2 = "^3.0.1"
 
 [tool.poetry.scripts]
 bussaya-web = 'bussaya.cmd.web:main'
+bussaya-send-deadline-reminders = 'bussaya.cmd.send_deadline_reminders:main'
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

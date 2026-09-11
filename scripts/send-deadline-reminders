@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+# Intended to be run once a day via cron, e.g.:
+#   0 8 * * * BUSSAYA_SETTINGS=/path/to/bussaya.cfg /path/to/scripts/send-deadline-reminders
+#
+# Sends deadline-reminder emails 2 days and 1 day before a RoundGrade's
+# grading window closes (lecturers), and before a Meeting/report/presentation
+# Submission's window closes (students). See bussaya/notifications.py.
+
+poetry run bussaya-send-deadline-reminders
