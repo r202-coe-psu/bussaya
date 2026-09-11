@@ -69,7 +69,7 @@
           </div>
         </td>
         {% if template.is_editable() %}
-        <td>
+        <td class="whitespace-nowrap">
           <a href="{{ url_for('admin.rubrics.edit_criterion', template_id=template.id, criterion_id=criterion.id) }}" class="btn btn-circle btn-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i></a>
           <a href="{{ url_for('admin.rubrics.move_criterion', template_id=template.id, criterion_id=criterion.id, direction='up') }}" class="btn btn-circle btn-sm"><i class="fa-solid fa-arrow-up"></i></a>
           <a href="{{ url_for('admin.rubrics.move_criterion', template_id=template.id, criterion_id=criterion.id, direction='down') }}" class="btn btn-circle btn-sm"><i class="fa-solid fa-arrow-down"></i></a>
@@ -81,7 +81,7 @@
     <tr class="font-bold bg-base-200">
       <td colspan="2" class="text-right">Total Max Score:</td>
       <td>
-        <span class="badge {{ 'badge-success' if template.get_total_max_score() == 100 else 'badge-warning' }} text-sm font-bold">
+        <span class="badge {{ 'badge-success' if template.get_total_max_score() == 100 else 'badge-warning' }} text-sm font-bold whitespace-nowrap h-auto py-1">
           {{ template.get_total_max_score() }} / 100 pts
         </span>
       </td>
