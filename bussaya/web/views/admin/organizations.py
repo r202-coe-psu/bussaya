@@ -10,7 +10,9 @@ from flask import (
 from flask_login import login_required, current_user
 
 import datetime
+import math
 
+import mongoengine as me
 
 from bussaya import models
 from bussaya.web import forms, acl
@@ -18,14 +20,43 @@ from bussaya.web import forms, acl
 
 module = Blueprint("organizations", __name__, url_prefix="/organizations")
 
+ORGANIZATIONS_PER_PAGE = 20
+
 
 @module.route("")
 @acl.roles_required("admin")
 def index():
+    query = request.args.get("q", "").strip()
+    page = request.args.get("page", 1, type=int)
+    if not page or page < 1:
+        page = 1
+
     organizations = models.Organization.objects(status="active")
+    if query:
+        organizations = organizations.filter(
+            me.Q(name__icontains=query)
+            | me.Q(website__icontains=query)
+            | me.Q(address__icontains=query)
+            | me.Q(remark__icontains=query)
+        )
+    organizations = organizations.order_by("name")
+
+    total = organizations.count()
+    total_pages = max(1, math.ceil(total / ORGANIZATIONS_PER_PAGE))
+    if page > total_pages:
+        page = total_pages
+
+    organizations_page = organizations.skip((page - 1) * ORGANIZATIONS_PER_PAGE).limit(
+        ORGANIZATIONS_PER_PAGE
+    )
 
     return render_template(
-        "admin/organizations/index.html.j2", organizations=organizations
+        "admin/organizations/index.html.j2",
+        organizations=organizations_page,
+        query=query,
+        page=page,
+        total_pages=total_pages,
+        total=total,
     )
 
 
