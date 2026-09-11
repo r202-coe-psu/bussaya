@@ -119,6 +119,92 @@ class User(me.Document, UserMixin):
         )
         return student_grades
 
+    def get_skill_summary(self):
+        """Average each rubric criterion's score (by criterion name) across
+        every graded StudentGrade this student has, regardless of class or
+        round, giving an overall skill profile."""
+
+        scores_by_criterion = {}
+        grader_ids = set()
+
+        for student_grade in models.StudentGrade.objects(student=self):
+            rubric_score = student_grade.get_rubric_score()
+            if not rubric_score:
+                continue
+
+            grader = student_grade.get_grader()
+            if grader:
+                grader_ids.add(grader.id)
+
+            for criterion in rubric_score.round_grade_rubric.get_sorted_criteria():
+                criterion_score = rubric_score.get_score_for(criterion.id)
+                if not criterion_score or criterion_score.score is None:
+                    continue
+
+                entry = scores_by_criterion.setdefault(
+                    criterion.name, {"scores": [], "max_score": criterion.max_score}
+                )
+                entry["scores"].append(criterion_score.score)
+
+        if not scores_by_criterion:
+            return None
+
+        criteria = []
+        for name, data in scores_by_criterion.items():
+            avg_score = sum(data["scores"]) / len(data["scores"])
+            percentage = (avg_score / data["max_score"] * 100) if data["max_score"] else 0
+            criteria.append(
+                {
+                    "name": name,
+                    "avg_score": avg_score,
+                    "max_score": data["max_score"],
+                    "percentage": percentage,
+                }
+            )
+
+        criteria.sort(key=lambda c: c["name"])
+        return {"grader_count": len(grader_ids), "criteria": criteria}
+
+    def get_plo_achievement(self):
+        """Roll every scored rubric criterion up to the PLOs it demonstrates
+        (via the criterion's own plos, and via its clos' plos), averaged as a
+        percentage per PLO across every StudentGrade this student has."""
+
+        plo_scores = {}
+
+        for student_grade in models.StudentGrade.objects(student=self):
+            rubric_score = student_grade.get_rubric_score()
+            if not rubric_score:
+                continue
+
+            for criterion in rubric_score.round_grade_rubric.get_sorted_criteria():
+                criterion_score = rubric_score.get_score_for(criterion.id)
+                if not criterion_score or criterion_score.score is None:
+                    continue
+                if not criterion.max_score:
+                    continue
+
+                percentage = (criterion_score.score / criterion.max_score) * 100
+
+                plos = set(criterion.plos)
+                for clo in criterion.clos:
+                    plos.update(clo.plos)
+
+                for plo in plos:
+                    entry = plo_scores.setdefault(plo.id, {"plo": plo, "scores": []})
+                    entry["scores"].append(percentage)
+
+        achievement = [
+            {
+                "plo": entry["plo"],
+                "percentage": sum(entry["scores"]) / len(entry["scores"]),
+                "count": len(entry["scores"]),
+            }
+            for entry in plo_scores.values()
+        ]
+        achievement.sort(key=lambda a: a["plo"].code)
+        return achievement
+
     def get_total_lecturer_grades(self, round_grade):
         student_grades = models.StudentGrade.objects(
             grader__lecturer=self, class_=round_grade.class_, round_grade=round_grade

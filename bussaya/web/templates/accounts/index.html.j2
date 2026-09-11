@@ -62,6 +62,58 @@ Profile
     </div>
   </div>
 
+  {% if skill_summary or plo_achievement %}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+    {% if skill_summary %}
+    <div class="card bg-base-100 shadow">
+      <div class="card-body p-4">
+        <h3 class="text-lg font-semibold flex items-center gap-2">
+          <i class="fa-solid fa-chart-simple text-primary"></i>
+          Skills
+        </h3>
+        <p class="text-xs opacity-60">
+          Averaged across {{ skill_summary.grader_count }} grader{{ 's' if skill_summary.grader_count != 1 else '' }}
+        </p>
+        <div class="space-y-2 mt-2">
+          {% for skill in skill_summary.criteria %}
+          <div>
+            <div class="flex justify-between text-sm">
+              <span class="font-medium">{{ skill.name }}</span>
+              <span class="opacity-70">{{ '%.0f'|format(skill.percentage) }}%</span>
+            </div>
+            <progress class="progress progress-primary w-full" value="{{ skill.percentage }}" max="100"></progress>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if plo_achievement %}
+    <div class="card bg-base-100 shadow">
+      <div class="card-body p-4">
+        <h3 class="text-lg font-semibold flex items-center gap-2">
+          <i class="fa-solid fa-bullseye text-secondary"></i>
+          PLO Achievement
+        </h3>
+        <p class="text-xs opacity-60">Program Learning Outcomes demonstrated via graded rubric criteria</p>
+        <div class="space-y-2 mt-2">
+          {% for item in plo_achievement %}
+          <div>
+            <div class="flex justify-between text-sm">
+              <span class="font-medium tooltip" data-tip="{{ item.plo.description }}">{{ item.plo.code }}</span>
+              <span class="opacity-70">{{ '%.0f'|format(item.percentage) }}% ({{ item.count }} criteri{{ 'on' if item.count == 1 else 'a' }})</span>
+            </div>
+            <progress class="progress progress-secondary w-full" value="{{ item.percentage }}" max="100"></progress>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
   {% set project = user.get_project() %}
   {% if project %}
   <div class="card bg-base-100 shadow my-4">

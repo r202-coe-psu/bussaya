@@ -152,7 +152,24 @@ def profile(user_id):
     biography = ""
     if user.biography:
         biography = markdown.markdown(user.biography)
-    return render_template("/accounts/index.html.j2", user=user, biography=biography)
+
+    can_view_academic = current_user.is_authenticated and (
+        current_user.id == user.id or current_user.has_roles("lecturer", "admin")
+    )
+
+    skill_summary = None
+    plo_achievement = None
+    if "student" in user.roles and can_view_academic:
+        skill_summary = user.get_skill_summary()
+        plo_achievement = user.get_plo_achievement()
+
+    return render_template(
+        "/accounts/index.html.j2",
+        user=user,
+        biography=biography,
+        skill_summary=skill_summary,
+        plo_achievement=plo_achievement,
+    )
 
 
 @module.route("/accounts")
