@@ -278,11 +278,15 @@ def view(round_grade_type):
         ),
     )
 
+    round_grade_rubric = rubric_models.get_or_create_round_grade_rubric(round_grade)
+
     return render_template(
         "/admin/round_grades/view.html.j2",
         user=current_user,
         class_=class_,
         round_grade=round_grade,
+        round_grade_rubric=round_grade_rubric,
+        final_grade_scale=get_final_grade_scale(current_user._get_current_object()),
         round_grade_type=round_grade_type,
         student_grades=student_grades,
     )

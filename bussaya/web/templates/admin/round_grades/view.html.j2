@@ -21,33 +21,243 @@
 
 {{ render_toolbars.render_admin_grade_menu_toolbars(round_grade) }}
 
-<div class="card bg-base-100 shadow my-4">
-    <div class="card-body p-4">
+{% if round_grade_rubric %}
+<div class="flex flex-wrap items-center justify-between gap-2 mb-4 mt-4">
+  <div class="text-sm opacity-70">Total Max Score: {{ round_grade_rubric.get_total_max_score() }} / 100 pts</div>
+  <button type="button" class="btn btn-outline btn-primary btn-sm gap-2"
+          onclick="document.getElementById('rubric_info_modal').showModal()">
+    <i class="fa-solid fa-clipboard-list"></i> View Rubric & Criteria Level Explanations
+  </button>
+</div>
+
+<dialog id="rubric_info_modal" class="modal">
+  <div class="modal-box max-w-[95vw] w-full">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    </form>
+    <h3 class="font-bold text-lg text-primary flex items-center gap-2">
+      <i class="fa-solid fa-clipboard-list"></i>
+      Rubric & Criteria Level Explanations
+    </h3>
+    <p class="text-sm opacity-70 mb-2">Total Max Score: {{ round_grade_rubric.get_total_max_score() }} / 100 pts</p>
+
+    {% if final_grade_scale %}
+    <div class="mb-3">
+      <h4 class="font-semibold text-sm mb-1">Final Grade Scoring</h4>
+      <div class="flex flex-wrap gap-2 text-xs">
+        {% for grade, min_percent in final_grade_scale %}
+          <span class="badge badge-outline">{{ grade }} &ge; {{ '%.2f'|format(min_percent) }}%</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
     <div class="overflow-x-auto">
-    <table class="table table-zebra whitespace-nowrap">
+      <table class="table table-sm border">
+        <thead>
+          <tr class="bg-base-200">
+            <th>Criterion</th>
+            <th>Max Score</th>
+            <th>CLOs</th>
+            {% for lvl in ["A", "B+", "B", "C+", "C", "D+", "D", "E", "I", "W"] %}
+            <th class="text-center text-primary">{{ lvl }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for criterion in round_grade_rubric.get_sorted_criteria() %}
+          <tr>
+            <td class="font-semibold align-top min-w-[14rem] whitespace-normal">
+              {{ criterion.name }}
+              <div class="text-xs font-normal opacity-70">{{ criterion.description }}</div>
+            </td>
+            <td class="font-semibold align-top">{{ criterion.max_score }}</td>
+            <td class="align-top min-w-[14rem]">
+              <div class="flex flex-wrap gap-1">
+                {% for clo in criterion.clos %}
+                  {% set cur_code = clo.curriculum.code if clo.curriculum else '' %}
+                  {% set badge_style = 'badge-primary' if loop.index0 % 4 == 0 else 'badge-secondary' if loop.index0 % 4 == 1 else 'badge-accent' if loop.index0 % 4 == 2 else 'badge-info' %}
+                  <span class="badge {{ badge_style }} text-xs font-semibold gap-1 h-auto whitespace-normal py-1 text-left" title="{{ clo.curriculum.name if clo.curriculum else '' }}">
+                    {% if cur_code %}
+                      <span class="font-bold opacity-90">[{{ cur_code }}]</span>
+                    {% endif %}
+                    {{ clo.code }}
+                  </span>
+                {% endfor %}
+              </div>
+            </td>
+            {% for lvl in ["A", "B+", "B", "C+", "C", "D+", "D", "E", "I", "W"] %}
+            <td class="align-top text-xs min-w-[10rem] whitespace-normal">{{ criterion.get_level_explanation(lvl) or '-' }}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn btn-sm">Close</button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+{% endif %}
+
+<div class="pt-4">
+    <div class="overflow-x-auto border border-base-200 rounded-box">
+    <table class="table table-zebra table-sm table-pin-rows table-pin-cols">
         <thead>
             <tr>
-                <th></th>
-                <th>Student ID</th>
-                <th>Student Name</th>
-                <th>Advisor</th>
+                <th>Student</th>
                 <th>Meeting Report</th>
                 <th>Submissions</th>
                 <th>Given Grade</th>
                 <th>Average Grade</th>
                 <th>Final Grade</th>
-                <th>Total Grade</th>
             </tr>
         </thead>
         <tbody>
             {% for student_grade in student_grades %}
             {% set student = student_grade.student %}
-            <tr class="align-top">
-                <td>{{ loop.index }}</td>
+            {% set student_report = student.get_report(class_, round_grade.type) %}
+            {% set student_presentation = student.get_presentation(class_, round_grade.type) %}
 
-                <td>{{ student.username }}</td>
-                <td>{{ student.first_name }} {{ student.last_name }}</td>
-                <td>{{ student.get_project().advisors|map(attribute='fullname')|join(', ') }}</td>
+            <tr class="align-top">
+                <th class="align-top">
+                  <div class="flex items-start gap-2">
+                    <span class="badge badge-neutral badge-sm shrink-0 mt-0.5">{{ loop.index }}</span>
+                    <div class="min-w-[9rem]">
+                  <div class="font-semibold">{{ student.first_name }} {{ student.last_name }}</div>
+                  <div class="text-xs opacity-70 font-mono">{{ student.username }}</div>
+                  <div class="text-xs text-primary font-medium mt-0.5 truncate max-w-xs">{{ student_grade.project.name }}</div>
+
+                  <button type="button" class="btn btn-xs btn-outline btn-info mt-1.5 gap-1"
+                          onclick="document.getElementById('student_details_modal_{{ student_grade.id }}').showModal()">
+                    <i class="fa-solid fa-circle-info"></i> Info & Submissions
+                  </button>
+
+                  <dialog id="student_details_modal_{{ student_grade.id }}" class="modal text-left"
+                          onclick="if (event.target === this) this.close()">
+                    <div class="modal-box max-w-2xl whitespace-normal">
+                      <button type="button" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                              onclick="this.closest('dialog').close()">✕</button>
+                      <h3 class="font-bold text-lg text-primary flex items-center gap-2">
+                        <i class="fa-solid fa-user-graduate"></i>
+                        {{ student.first_name }} {{ student.last_name }} ({{ student.username }})
+                      </h3>
+                      {% if student.first_name_th or student.last_name_th %}
+                        <p class="text-xs opacity-70">{{ student.first_name_th }} {{ student.last_name_th }}</p>
+                      {% endif %}
+
+                      <div class="divider my-2"></div>
+
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="card bg-base-200 p-3 rounded-box space-y-1 text-xs">
+                          <div class="font-semibold text-sm opacity-90 text-info"><i class="fa-solid fa-diagram-project"></i> Project & Advisors</div>
+                          <div><span class="font-medium">Project:</span> {{ student_grade.project.name }}</div>
+                          {% if student_grade.project.name_th %}
+                            <div class="opacity-70">{{ student_grade.project.name_th }}</div>
+                          {% endif %}
+                          <div><span class="font-medium">Advisors:</span> {{ student.get_project().advisors|map(attribute='fullname')|join(', ') }}</div>
+                        </div>
+
+                        <div class="card bg-base-200 p-3 rounded-box space-y-2 text-xs">
+                          <div class="font-semibold text-sm opacity-90 text-warning"><i class="fa-solid fa-folder-open"></i> Reports & Submissions</div>
+                          <div class="flex items-center gap-2">
+                            <span class="font-medium">Meeting Reports:</span>
+                            <a target="_blank" class="link link-primary font-bold"
+                               href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}">
+                              {{ student.get_meeting_reports(class_, round_grade.type, 'approved').count() }} / {{ student.get_meeting_reports(class_, round_grade.type).count() }} Approved
+                            </a>
+                          </div>
+                          <div class="flex flex-wrap items-center gap-2 pt-1">
+                            <div>
+                              <span class="font-medium mr-1">Report:</span>
+                              {% if student_report %}
+                                <a href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
+                                   target="_blank" class="btn btn-xs btn-outline btn-error">
+                                  <i class="fa-solid fa-file-pdf"></i> PDF
+                                </a>
+                              {% else %}
+                                <span class="badge badge-ghost text-xs opacity-50">Not Submitted</span>
+                              {% endif %}
+                            </div>
+                            <div>
+                              <span class="font-medium mr-1">Presentation:</span>
+                              {% if student_presentation %}
+                                <a href="{{ url_for('submissions.download', progress_report_id=student_presentation.id, filename=student_presentation.file.filename) }}"
+                                   target="_blank" class="btn btn-xs btn-outline btn-warning">
+                                  <i class="fa-solid fa-file-powerpoint"></i> PPT
+                                </a>
+                              {% else %}
+                                <span class="badge badge-ghost text-xs opacity-50">Not Submitted</span>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="card bg-base-200 p-3 rounded-box mt-4 space-y-2 text-xs">
+                        <div class="font-semibold text-sm opacity-90 text-secondary"><i class="fa-solid fa-star"></i> Grader Breakdown & Total Grade</div>
+                        {% set total_grades = student.get_total_student_grades(round_grade) %}
+                        {% if total_grades %}
+                          <ul class="space-y-2 divide-y divide-base-300">
+                            {% for sg in total_grades %}
+                            <li class="pt-2">
+                              <div class="flex items-center justify-between font-semibold">
+                                <span class="flex items-center gap-1">
+                                  {% if sg.get_grader() %}
+                                    {{ sg.get_grader().get_fullname() or sg.get_grader().get_full_name() }}
+                                    {% if sg.get_grader() in student.get_project().advisors %}
+                                      <i class="fa-solid fa-star text-error" title="Advisor"></i>
+                                    {% endif %}
+                                  {% else %}
+                                    Unknown Grader
+                                  {% endif %}
+                                </span>
+                                <span class="badge badge-sm badge-primary">{{ sg.get_result_display() }}</span>
+                              </div>
+                              {% set r_score = sg.get_rubric_score() %}
+                              {% if r_score %}
+                              {% set total_max = r_score.round_grade_rubric.get_total_max_score() %}
+                              {% set score_ns = namespace(total=0) %}
+                              {% for cs in r_score.criterion_scores %}
+                                {% if cs.score is not none %}
+                                  {% set score_ns.total = score_ns.total + cs.score %}
+                                {% endif %}
+                              {% endfor %}
+                              <div class="grid grid-cols-2 gap-1 text-xs opacity-80 mt-1 pl-2 border-l-2 border-primary/30">
+                                {% for criterion in r_score.round_grade_rubric.get_sorted_criteria() %}
+                                {% set cs = r_score.get_score_for(criterion.id) %}
+                                <div>
+                                  <span class="font-medium">{{ criterion.name }}:</span> {{ cs.score if cs and cs.score is not none else '-' }} / {{ criterion.max_score }}
+                                </div>
+                                {% endfor %}
+                              </div>
+                              <div class="text-xs font-semibold mt-1 pl-2 text-primary">
+                                Total Score: {{ '%.2f'|format(score_ns.total) }} / {{ '%.2f'|format(total_max) }}
+                                {% if total_max %}({{ '%.2f'|format((score_ns.total / total_max) * 100) }}%){% endif %}
+                              </div>
+                              {% endif %}
+                            </li>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          <div class="opacity-60">No grades submitted yet.</div>
+                        {% endif %}
+                      </div>
+
+                      <div class="modal-action">
+                        <button type="button" class="btn btn-sm" onclick="this.closest('dialog').close()">Close</button>
+                      </div>
+                    </div>
+                  </dialog>
+                    </div>
+                  </div>
+                </th>
                 <td>
                     <a target="_blank"
                         href="{{ url_for('classes.list_report_by_user', class_id=class_.id, user_id=student.id) }}">
@@ -55,14 +265,11 @@
                         {{ student.get_meeting_reports(class_, round_grade.type).count() }}
                     </a>
                 </td>
-                </a>
-                {% set student_report = student.get_report(class_, round_grade.type) %}
-                {% set student_presentation = student.get_presentation(class_, round_grade.type) %}
                 <td>
                     {% if student_report %}
                     <a target="_blank"
                         href="{{ url_for('submissions.download', progress_report_id=student_report.id, filename=student_report.file.filename) }}"
-                        target="_blank" class="tooltip" data-tip="Report">
+                        class="tooltip" data-tip="Report">
                         <i class="fa-solid fa-file-pdf fa-lg"></i>
                     </a>
                     {% else %}
@@ -77,19 +284,19 @@
                     <i class="fa-solid fa-file-powerpoint fa-lg opacity-30"></i>
                     {% endif %}
                 </td>
-                <td>{{ student_grade.get_result_display() }}</td>
+                <td><span class="badge">{{ student_grade.get_result_display() }}</span></td>
                 <td>{{ student.get_average_grade(student_grade.round_grade) }}</td>
                 {% set actual_grade, caused = student.get_actual_grade(student_grade.round_grade) %}
                 <td>
                     {% if not caused %}
                       {{ actual_grade }}
                     {% else %}
-                    <div class="collapse collapse-arrow bg-base-100">
+                    <div class="collapse collapse-arrow bg-base-100 shadow">
                         <input type="checkbox">
-                        <div class="collapse-title p-1 min-h-0">
+                        <div class="collapse-title p-1 min-h-0 font-semibold">
                             {{ actual_grade }}
                         </div>
-                        <div class="collapse-content text-sm" style="width: fit-content">
+                        <div class="collapse-content text-xs" style="width: fit-content">
                             {% for cause in caused %}
                             - {{ cause }}
                             {% if not loop.last %} <br> {% endif %}
@@ -98,69 +305,11 @@
                     </div>
                     {% endif %}
                 </td>
-                <td>
-                    <div class="title">
-                        <a id="{{student_grade.id}} header total" style="cursor: pointer"
-                            onclick="accordion_view_total('{{student_grade.id}}')">
-                            See More
-                        </a>
-                    </div>
-                    <div id="{{ student_grade.id }} content total" class="content hidden">
-                        <p />
-                        {% for student_grade in student.get_total_student_grades(round_grade) %}
-                        <ul class="space-y-1">
-                            <li class="flex items-center gap-2">
-                                {% if student_grade.get_grader() and student_grade.get_grader().get_picture() %}
-                                <div class="avatar">
-                                    <div class="w-8 rounded-full">
-                                        <img src="{{ student_grade.get_grader().get_picture() }}">
-                                    </div>
-                                </div>
-                                {% else %}
-                                <i class="fa-solid fa-user"></i>
-                                {% endif %}
-                                <div>
-                                  <a class="font-semibold">
-                                    {% if student_grade.get_grader() %}
-                                      {{ student_grade.get_grader().get_full_name() }}
-                                      {% if student_grade.get_grader() == student.get_project().advisor %}
-                                        <i class="fa-solid fa-star text-error"></i>
-                                      {% elif student_grade.grader.mentor %}
-                                        <i class="fa-solid fa-star text-info"></i>
-                                      {% endif %}
-
-                                    {% else %}
-                                      Unknow grader
-                                    {% endif %}
-                                    </a>
-                                    <div class="text-sm opacity-70">{{ student_grade.get_result_display() }}</div>
-                                </div>
-                            </li>
-                        </ul>
-                        {% endfor %}
-                    </div>
-                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     </div>
-    </div>
 </div>
 
 {% endblock %}
-
-
-{% block additional_js %}
-<script type="text/javascript">
-    function accordion_view_total(view_total_id) {
-        document.getElementById(view_total_id + " content total").classList.toggle('hidden')
-
-        if (document.getElementById(view_total_id + " header total").textContent == "Hide") {
-            document.getElementById(view_total_id + " header total").innerHTML = "See More"
-        } else {
-            document.getElementById(view_total_id + " header total").innerHTML = "Hide"
-        }
-    }
-</script>
-{% endblock additional_js %}
