@@ -1,5 +1,6 @@
 *.pyc
 *.cfg
+.env
 venv
 __pycache__
 data

@@ -182,9 +182,9 @@ def send_presentation_reminders(mailer, base_url=""):
     return _send_submission_reminders(mailer, "presentation", base_url)
 
 
-def run_deadline_reminders(app):
-    mailer = Mailer(app.config)
-    base_url = app.config.get("SITE_BASE_URL", "").rstrip("/")
+def run_deadline_reminders(settings):
+    mailer = Mailer(settings)
+    base_url = settings.get("SITE_BASE_URL", "").rstrip("/")
 
     summary = {}
     summary["round_grade"] = send_round_grade_reminders(mailer, base_url)

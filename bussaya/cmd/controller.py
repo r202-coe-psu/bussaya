@@ -1,12 +1,13 @@
 import logging
 
-from bussaya import web
+from bussaya import models
+from bussaya.config import load_settings
 from bussaya.controller import run_deadline_reminders
 
 
 def main():
     logging.basicConfig(level=logging.INFO)
 
-    app = web.create_app()
-    with app.app_context():
-        run_deadline_reminders(app)
+    settings = load_settings()
+    models.init_mongoengine(settings)
+    run_deadline_reminders(settings)
