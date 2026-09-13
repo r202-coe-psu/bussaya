@@ -1,7 +1,7 @@
 import logging
 
 from bussaya import web
-from bussaya.notifications import run_deadline_reminders
+from bussaya.controller import run_deadline_reminders
 
 
 def main():

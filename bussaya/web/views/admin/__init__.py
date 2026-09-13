@@ -33,6 +33,13 @@ def index():
             "count": models.Curriculum.objects(status="active").count(),
         },
         {
+            "label": "Class Type Comparison",
+            "description": "Compare PLO achievement across class types within the same curriculum.",
+            "icon": "fa-solid fa-scale-balanced",
+            "endpoint": "admin.curriculums.compare",
+            "count": None,
+        },
+        {
             "label": "Rubric Templates",
             "description": "Grading rubric templates and criteria.",
             "icon": "fa-solid fa-list-check",

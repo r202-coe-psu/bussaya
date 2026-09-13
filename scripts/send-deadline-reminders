@@ -8,4 +8,4 @@ set -e
 # grading window closes (lecturers), and before a Meeting/report/presentation
 # Submission's window closes (students). See bussaya/notifications.py.
 
-poetry run bussaya-send-deadline-reminders
+poetry run bussaya-controller

@@ -1,5 +1,5 @@
 import datetime
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, request
 from flask_login import current_user
 
 from bussaya import models
@@ -16,6 +16,28 @@ def index():
 
     return render_template(
         "admin/curriculums/index.html.j2", curriculums=curriculums
+    )
+
+
+@module.route("/compare")
+@acl.roles_required("admin")
+def compare():
+    curriculums = models.Curriculum.objects(status="active").order_by("name")
+
+    curriculum_id = request.args.get("curriculum_id")
+    curriculum = None
+    if curriculum_id:
+        curriculum = models.Curriculum.objects(id=curriculum_id, status="active").first()
+    if not curriculum:
+        curriculum = curriculums.first()
+
+    comparison = curriculum.get_plo_achievement_by_class_type() if curriculum else None
+
+    return render_template(
+        "admin/curriculums/compare.html.j2",
+        curriculums=curriculums,
+        curriculum=curriculum,
+        comparison=comparison,
     )
 
 

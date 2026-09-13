@@ -1,0 +1,76 @@
+{% extends '/base/default-dashboard.html.j2' %}
+
+{% block dashboard_title %}
+Class Type Comparison
+{% endblock %}
+
+{% block breadcrumbs %}
+<li><a href="{{ url_for('admin.curriculums.index') }}">Curriculums</a></li>
+<li>Class Type Comparison</li>
+{% endblock %}
+
+{% block content %}
+
+<h1 class="divider text-2xl font-bold">
+	<i class="fa-solid fa-scale-balanced fa-sm"></i>
+	PLO Achievement by Class Type
+</h1>
+
+<form method="GET" class="flex flex-wrap items-center gap-2 mb-4">
+	<label class="text-sm font-medium">Curriculum:</label>
+	<select name="curriculum_id" class="select select-bordered select-sm" onchange="this.form.submit()">
+		{% for c in curriculums %}
+		<option value="{{ c.id }}" {{ 'selected' if curriculum and c.id == curriculum.id else '' }}>{{ c.name }}</option>
+		{% endfor %}
+	</select>
+</form>
+
+{% if not curriculum %}
+<div class="alert alert-info">No active curriculums yet.</div>
+{% elif not comparison.rows %}
+<div class="alert alert-info">
+	No active PLOs recorded for "{{ curriculum.name }}" yet.
+	<a class="link" href="{{ url_for('admin.curriculums.view', curriculum_id=curriculum.id) }}">Manage PLOs</a>
+</div>
+{% else %}
+<p class="text-sm opacity-70 mb-2">
+	Average rubric-criterion achievement per PLO, compared across the class types that share this curriculum.
+</p>
+<div class="overflow-x-auto border border-base-200 rounded-box">
+	<table class="table table-zebra table-sm">
+		<thead>
+			<tr>
+				<th>PLO</th>
+				{% for class_type, label in comparison.class_types %}
+				<th class="text-center">{{ label }}</th>
+				{% endfor %}
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in comparison.rows %}
+			<tr class="align-top">
+				<td class="font-semibold min-w-[16rem] whitespace-normal">
+					{{ row.plo.code }}
+					<div class="text-xs font-normal opacity-70">{{ row.plo.description }}</div>
+				</td>
+				{% for class_type, label in comparison.class_types %}
+				{% set cell = row.by_class_type[class_type] %}
+				<td class="text-center min-w-[8rem]">
+					{% if cell %}
+					<div class="font-semibold">{{ '%.0f'|format(cell.percentage) }}%</div>
+					<div class="text-xs opacity-60">{{ cell.student_count }} student{{ 's' if cell.student_count != 1 else '' }}</div>
+					<progress class="progress progress-secondary w-full mt-1"
+					          value="{{ cell.percentage }}" max="100"></progress>
+					{% else %}
+					<span class="opacity-40 text-xs">No data</span>
+					{% endif %}
+				</td>
+				{% endfor %}
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endif %}
+
+{% endblock %}

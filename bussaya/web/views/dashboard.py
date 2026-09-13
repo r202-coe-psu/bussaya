@@ -70,6 +70,43 @@ def alumni_projects():
     )
 
 
+def get_average_plo_achievement(students):
+    """Average each PLO's achievement percentage (from User.get_plo_achievement)
+    across a set of students, grouped by curriculum since a lecturer may
+    advise students from more than one curriculum and PLOs only make sense
+    within their own curriculum's context."""
+
+    plo_data = {}
+    for student in students:
+        for item in student.get_plo_achievement():
+            entry = plo_data.setdefault(
+                item["plo"].id, {"plo": item["plo"], "percentages": []}
+            )
+            entry["percentages"].append(item["percentage"])
+
+    groups_by_curriculum = {}
+    for data in plo_data.values():
+        plo = data["plo"]
+        curriculum = plo.curriculum
+        curriculum_key = curriculum.id if curriculum else None
+        group = groups_by_curriculum.setdefault(
+            curriculum_key, {"curriculum": curriculum, "plos": []}
+        )
+        group["plos"].append(
+            {
+                "plo": plo,
+                "percentage": sum(data["percentages"]) / len(data["percentages"]),
+                "student_count": len(data["percentages"]),
+            }
+        )
+
+    groups = list(groups_by_curriculum.values())
+    for group in groups:
+        group["plos"].sort(key=lambda item: item["plo"].code)
+    groups.sort(key=lambda group: group["curriculum"].name if group["curriculum"] else "")
+    return groups
+
+
 def index_lecturer():
     now = datetime.date.today()
     opened_classes = models.Class.objects(
@@ -135,10 +172,18 @@ def index_lecturer():
     pending_meeting_reports_count = len(pending_meeting_reports)
     pending_meeting_reports = pending_meeting_reports[:10]
 
+    plo_students = set()
+    for project in advisee_projects:
+        plo_students.update(project.students)
+    for project in committee_projects:
+        plo_students.update(project.students)
+    average_plo_achievement = get_average_plo_achievement(plo_students)
+
     return render_template(
         "/dashboard/index-lecturer.html.j2",
         classes=classes,
         opened_classes=opened_classes,
+        average_plo_achievement=average_plo_achievement,
         alumni_projects_count=alumni_projects_count,
         alumni_project_tags=alumni_project_tags,
         advisee_projects=advisee_projects,
