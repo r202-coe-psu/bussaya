@@ -1,4 +1,12 @@
-from flask import Blueprint, render_template, redirect, url_for, send_file, request
+from flask import (
+    Blueprint,
+    render_template,
+    redirect,
+    url_for,
+    send_file,
+    request,
+    jsonify,
+)
 from flask_login import login_required, current_user
 import mongoengine as me
 import datetime
@@ -54,11 +62,15 @@ def view(round_grade_type):
         ),
     )
 
+    round_grade_rubric = rubric_models.get_or_create_round_grade_rubric(round_grade)
+
     return render_template(
         "/round_grades/view.html.j2",
         user=user,
         class_=class_,
         round_grade=round_grade,
+        round_grade_rubric=round_grade_rubric,
+        final_grade_scale=admin_round_grades.get_final_grade_scale(user),
         round_grade_type=round_grade_type,
         student_grades=student_grades,
     )
@@ -152,6 +164,7 @@ def grading(round_grade_id):
         round_grade_rubric=round_grade_rubric,
         user=user,
         student_grades=student_grades,
+        final_grade_scale=admin_round_grades.get_final_grade_scale(user),
     )
 
 
@@ -221,6 +234,95 @@ def submit_grade(round_grade_id):
             class_id=class_.id,
             round_grade_type=round_grade.type,
         )
+    )
+
+
+@module.route("/<round_grade_id>/submit_grade_one", methods=["POST"])
+@acl.roles_required("lecturer")
+def submit_grade_one(round_grade_id):
+    from flask_wtf.csrf import validate_csrf
+    from wtforms import ValidationError
+
+    round_grade = models.RoundGrade.objects.get(id=round_grade_id)
+    class_ = round_grade.class_
+    user = current_user._get_current_object()
+
+    if not round_grade.is_in_time():
+        return jsonify({"ok": False, "error": "Grading window is closed."}), 400
+
+    payload = request.get_json(silent=True) or {}
+
+    try:
+        validate_csrf(payload.get("csrf_token"))
+    except ValidationError:
+        return jsonify({"ok": False, "error": "Invalid CSRF token."}), 400
+
+    round_grade_rubric = rubric_models.get_or_create_round_grade_rubric(round_grade)
+    if not round_grade_rubric:
+        return jsonify({"ok": False, "error": "No active rubric."}), 400
+
+    student = models.User.objects(id=payload.get("student_id")).first()
+    if not student:
+        return jsonify({"ok": False, "error": "Student not found."}), 404
+
+    student_grade = models.StudentGrade.objects(
+        student=student,
+        class_=class_,
+        round_grade=round_grade,
+        grader__lecturer=user,
+    ).first()
+    if not student_grade:
+        return jsonify({"ok": False, "error": "Grading record not found."}), 404
+
+    criterion_scores_data = []
+    for entry in payload.get("criterion_scores", []):
+        score = entry.get("score")
+        try:
+            score = float(score) if score not in (None, "") else None
+        except (TypeError, ValueError):
+            score = None
+        criterion_scores_data.append(
+            {"criterion_id": entry.get("criterion_id"), "score": score}
+        )
+
+    admin_round_grades.save_rubric_score(
+        student_grade, round_grade_rubric, criterion_scores_data
+    )
+    student_grade.updated_date = datetime.datetime.now()
+    student_grade.save()
+
+    project = models.Project.objects(
+        (me.Q(creator=student) | me.Q(students=student))
+        & (me.Q(advisors=user) | me.Q(committees=user)),
+        status="active",
+    ).first()
+
+    if project and user in project.advisors and student_grade.result != "-":
+        meetings = models.MeetingReport.objects(
+            class_=class_, owner=student, status__in=[None, "wait"]
+        )
+        for meeting in meetings:
+            meeting.status = "approved"
+            meeting.approver = user
+            meeting.approved_date = datetime.datetime.now()
+            meeting.approver_ip_address = request.headers.get(
+                "X-Forwarded-For", request.remote_addr
+            )
+            meeting.save()
+
+    scored = sum(1 for c in criterion_scores_data if c["score"] is not None)
+    actual_grade, caused = student.get_actual_grade(student_grade.round_grade)
+
+    return jsonify(
+        {
+            "ok": True,
+            "scored": scored,
+            "total": len(criterion_scores_data),
+            "result_display": student_grade.get_result_display(),
+            "average_grade": student.get_average_grade(student_grade.round_grade),
+            "actual_grade": actual_grade,
+            "caused": caused or [],
+        }
     )
 
 
