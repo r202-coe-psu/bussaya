@@ -38,6 +38,14 @@
       </ul>
     </li>
 
+    {% if current_user.has_roles('admin', 'lecturer', 'CoE-lecturer') %}
+    <li>
+      <a href="{{ url_for('admin.classes.plo_report', class_id=class_.id) }}">
+        <i class="fa-solid fa-bullseye"></i> PLO Report
+      </a>
+    </li>
+    {% endif %}
+
     {% if current_user.has_roles('admin', 'lecturer') %}
       {% if 'admin' in current_user.roles and 'admin' in request.path %}
     <li>

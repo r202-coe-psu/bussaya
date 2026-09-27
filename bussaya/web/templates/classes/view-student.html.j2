@@ -52,6 +52,53 @@
 </div>
 {% endif %}
 
+{% if round_grade_rubrics %}
+<div class="card bg-base-100 shadow my-4">
+	<div class="card-body p-4">
+		<h2 class="text-2xl font-bold">Round Grades</h2>
+		<div class="divider"></div>
+		{% for entry in round_grade_rubrics %}
+		<div class="card bg-base-200 shadow-sm my-2">
+			<div class="card-body p-4">
+				<h4 class="text-lg font-semibold flex items-center gap-2">
+					{{ entry.round_grade.get_type_display() }}
+					<span class="badge badge-sm {{ 'badge-success' if entry.round_grade.release_status == 'released' else 'badge-ghost' }}">
+						{{ entry.round_grade.get_release_status_display() }}
+					</span>
+				</h4>
+				{% if entry.rubric %}
+				<div class="text-xs opacity-60">Rubric: {{ entry.rubric.template.name }}</div>
+				<div class="overflow-x-auto mt-2">
+					<table class="table table-sm">
+						<thead>
+							<tr>
+								<th>Criterion</th>
+								<th>Max Score</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for criterion in entry.rubric.get_sorted_criteria() %}
+							<tr>
+								<td>
+									<div class="font-semibold">{{ criterion.name }}</div>
+									<div class="text-xs opacity-60">{{ criterion.description }}</div>
+								</td>
+								<td>{{ criterion.max_score }}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				{% else %}
+				<div class="alert alert-info">No rubric has been set for this round yet</div>
+				{% endif %}
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</div>
+{% endif %}
+
 
 <div class="card bg-base-100 shadow my-4">
 	<div class="card-body p-4">

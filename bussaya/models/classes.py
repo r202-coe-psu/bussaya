@@ -92,3 +92,71 @@ class Class(me.Document):
                 grades[grade] = [1, [user]]
 
         return grades
+
+    def get_plo_achievement(self, pass_threshold=60):
+        """For each PLO demonstrated by this class's graded rubric criteria,
+        bucket every enrolled student's own average achievement percentage
+        into "pass" (>= pass_threshold%) or "improvement" (< pass_threshold%).
+
+        Only counts a student's percentage toward a PLO if the student's own
+        curriculum matches that PLO's curriculum, mirroring
+        Curriculum.get_plo_achievement_by_class_type()."""
+
+        from .grades import StudentGrade
+
+        plo_data = {}  # plo.id -> {"plo": plo, "students": {student.id: [percentage, ...]}}
+
+        for student in self.get_students():
+            if not student.curriculum:
+                continue
+
+            for student_grade in StudentGrade.objects(student=student, class_=self):
+                rubric_score = student_grade.get_rubric_score()
+                if not rubric_score:
+                    continue
+
+                for criterion in rubric_score.round_grade_rubric.get_sorted_criteria():
+                    criterion_score = rubric_score.get_score_for(criterion.id)
+                    if not criterion_score or criterion_score.score is None:
+                        continue
+                    if not criterion.max_score:
+                        continue
+
+                    percentage = (criterion_score.score / criterion.max_score) * 100
+
+                    plos = set(criterion.plos)
+                    for clo in criterion.clos:
+                        plos.update(clo.plos)
+
+                    for plo in plos:
+                        if not plo.curriculum or plo.curriculum.id != student.curriculum.id:
+                            continue
+                        entry = plo_data.setdefault(plo.id, {"plo": plo, "students": {}})
+                        entry["students"].setdefault(student.id, {
+                            "student": student,
+                            "percentages": [],
+                        })
+                        entry["students"][student.id]["percentages"].append(percentage)
+
+        rows = []
+        for data in plo_data.values():
+            pass_students = []
+            improvement_students = []
+            for info in data["students"].values():
+                percentage = sum(info["percentages"]) / len(info["percentages"])
+                bucket = pass_students if percentage >= pass_threshold else improvement_students
+                bucket.append({"student": info["student"], "percentage": percentage})
+
+            pass_students.sort(key=lambda s: s["student"].username)
+            improvement_students.sort(key=lambda s: s["student"].username)
+
+            rows.append({
+                "plo": data["plo"],
+                "pass_students": pass_students,
+                "improvement_students": improvement_students,
+                "pass_count": len(pass_students),
+                "improvement_count": len(improvement_students),
+            })
+
+        rows.sort(key=lambda row: row["plo"].code)
+        return rows

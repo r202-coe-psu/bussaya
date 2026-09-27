@@ -6,6 +6,7 @@ from datetime import datetime
 import markdown
 
 from bussaya import models
+from bussaya.models import rubrics as rubric_models
 from .. import acl, forms
 
 
@@ -103,6 +104,17 @@ def view_student(class_id):
         if grade.release_status == "released":
             grade_released = True
 
+    round_grade_rubrics = []
+    for round_grade in round_grades.order_by("type"):
+        round_grade_rubrics.append(
+            {
+                "round_grade": round_grade,
+                "rubric": rubric_models.get_or_create_round_grade_rubric(
+                    round_grade
+                ),
+            }
+        )
+
     project = models.Project.objects(
         students=current_user._get_current_object(), class_=class_, status="active"
     ).first()
@@ -115,6 +127,7 @@ def view_student(class_id):
         meetings=meetings,
         grade_released=grade_released,
         final_submission=final_submission,
+        round_grade_rubrics=round_grade_rubrics,
     )
 
 

@@ -22,6 +22,7 @@ Dashboard
       <th>Description</th>
       <th>Type</th>
       <th>Ended Date</th>
+      <th class="text-right">Actions</th>
     </tr>
   </thead>
 
@@ -40,6 +41,11 @@ Dashboard
       </td>
       <td>
         {{ class_.ended_date }}
+      </td>
+      <td class="text-right">
+        <a href="{{ url_for('admin.classes.plo_report', class_id=class_.id) }}" class="btn btn-primary btn-circle" title="PLO Achievement Report">
+          <i class="fa-solid fa-bullseye"></i>
+        </a>
       </td>
     </tr>
     {% endfor %}

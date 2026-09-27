@@ -216,6 +216,19 @@ def view_students(class_id):
     )
 
 
+@module.route("/<class_id>/plo_report")
+@acl.roles_required("admin", "lecturer", "CoE-lecturer")
+def plo_report(class_id):
+    class_ = models.Class.objects.get(id=class_id)
+    rows = class_.get_plo_achievement()
+
+    return render_template(
+        "/admin/classes/plo-report.html.j2",
+        class_=class_,
+        rows=rows,
+    )
+
+
 @module.route("/<class_id>/projects")
 @acl.roles_required("admin")
 def view_projects(class_id):

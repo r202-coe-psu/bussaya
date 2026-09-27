@@ -72,7 +72,7 @@
                             <tr>
                                 <th class="font-medium">Average Grade Point</th>
                                 <td>
-                                    {{ actual_grade }}
+                                    <span class="badge badge-lg badge-primary font-bold">{{ actual_grade }}</span>
                                 </td>
                                 <td>
                                 {% for cause in causes %}
@@ -210,7 +210,7 @@
                                     </td>
                                     <td>
                                       <div class="flex flex-wrap gap-1">
-                                        {% for clo in criterion.clos %}
+                                        {% for clo in criterion.clos if student.curriculum and clo.curriculum and clo.curriculum.id == student.curriculum.id %}
                                           {% set cur_code = clo.curriculum.code if clo.curriculum else '' %}
                                           {% set badge_style = 'badge-primary' if loop.index0 % 4 == 0 else 'badge-secondary' if loop.index0 % 4 == 1 else 'badge-accent' if loop.index0 % 4 == 2 else 'badge-info' %}
                                           <span class="badge {{ badge_style }} text-xs font-semibold gap-1" title="{{ clo.curriculum.name if clo.curriculum else '' }}">
@@ -246,7 +246,7 @@
                         <tr>
                             <th class="font-medium">Average Grade Point</th>
                             <td>
-                                {{ average_total_grade }}
+                                <span class="badge badge-lg badge-success font-bold">{{ average_total_grade }}</span>
                             </td>
                         </tr>
                     </tbody>
