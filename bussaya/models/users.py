@@ -21,6 +21,8 @@ class User(me.Document, UserMixin):
 
     biography = me.StringField()
 
+    curriculum = me.ReferenceField("Curriculum", dbref=True)
+
     picture = me.ImageField(thumbnail_size=(800, 600, True))
 
     status = me.StringField(required=True, default="disactive")

@@ -204,6 +204,9 @@ def edit_profile():
     form = forms.accounts.ProfileForm(
         obj=current_user,
     )
+    form.curriculum.queryset = models.Curriculum.objects(status="active").order_by(
+        "name"
+    )
     if not form.validate_on_submit():
         return render_template("/accounts/edit-profile.html.j2", form=form)
 

@@ -33,6 +33,7 @@ Edit User
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
                 {{ renderer.render_field(form.email) }}
+                {{ renderer.render_select(form.curriculum) }}
             </div>
             {{ renderer.render_field(form.roles) }}
             <button name="create" type="submit" class="btn btn-primary">Change</button>

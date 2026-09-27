@@ -12,6 +12,7 @@ from .fields import TextListField
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from flask_mongoengine.wtf import model_form
+from flask_mongoengine.wtf.fields import ModelSelectField
 
 from .. import models
 
@@ -76,6 +77,7 @@ BaseProfileForm = model_form(
         "resources",
         "username",
         "roles",
+        "curriculum",
     ],
     field_args={
         "title": {"label": "Title"},
@@ -94,8 +96,22 @@ class ProfileForm(BaseProfileForm):
     pic = fields.FileField(
         "Picture", validators=[FileAllowed(["png", "jpg"], "allow png and jpg")]
     )
+    curriculum = ModelSelectField(
+        "Curriculum",
+        model=models.Curriculum,
+        label_modifier=lambda c: c.name,
+        allow_blank=True,
+        blank_text="No curriculum",
+    )
 
 
 class AdminForm(BaseProfileForm):
     roles = TextListField("Roles", render_kw={"style": "height: 1ch"})
     username = fields.StringField("Username")
+    curriculum = ModelSelectField(
+        "Curriculum",
+        model=models.Curriculum,
+        label_modifier=lambda c: c.name,
+        allow_blank=True,
+        blank_text="No curriculum",
+    )

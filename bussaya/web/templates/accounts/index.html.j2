@@ -42,6 +42,12 @@ Profile
             <i class="fa-solid fa-envelope"></i>
             {{ user.email }}
           </div>
+          {% if user.curriculum %}
+          <div class="badge badge-lg">
+            <i class="fa-solid fa-graduation-cap"></i>
+            {{ user.curriculum.name }}
+          </div>
+          {% endif %}
           <div class="mt-2">
             {% if current_user.is_authenticated and current_user.id == user.id %}
             Role:

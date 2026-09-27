@@ -32,6 +32,9 @@
           {{ renderer.render_field(form.email) }}
           {{ renderer.render_fileinput(form.pic) }}
         </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {{ renderer.render_select(form.curriculum) }}
+        </div>
         {{ renderer.render_field(form.biography) }}
         <button name="create" type="submit" class="btn btn-primary">Change</button>
       </form>

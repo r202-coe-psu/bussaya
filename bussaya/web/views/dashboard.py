@@ -74,13 +74,23 @@ def get_average_plo_achievement(students):
     """Average each PLO's achievement percentage (from User.get_plo_achievement)
     across a set of students, grouped by curriculum since a lecturer may
     advise students from more than one curriculum and PLOs only make sense
-    within their own curriculum's context."""
+    within their own curriculum's context.
+
+    Only counts a student's percentage toward a PLO if the student's own
+    curriculum matches that PLO's curriculum, since a student's rubric grades
+    can touch CLOs/PLOs shared with curriculums they aren't actually enrolled
+    in. Students without a curriculum set are skipped."""
 
     plo_data = {}
     for student in students:
+        if not student.curriculum:
+            continue
         for item in student.get_plo_achievement():
+            plo = item["plo"]
+            if not plo.curriculum or plo.curriculum.id != student.curriculum.id:
+                continue
             entry = plo_data.setdefault(
-                item["plo"].id, {"plo": item["plo"], "percentages": []}
+                plo.id, {"plo": plo, "percentages": []}
             )
             entry["percentages"].append(item["percentage"])
 
