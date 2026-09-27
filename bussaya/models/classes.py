@@ -9,6 +9,7 @@ TYPE_CHOICE = [
     ("project", "Project"),
     ("cooperative", "Cooperative Education"),
     ("precooperative", "Pre-cooperative Education"),
+    ("thesis", "Thesis"),
 ]
 
 
