@@ -214,7 +214,7 @@ class User(me.Document, UserMixin):
         return student_grades
 
     def get_permission_to_upload(self, submission):
-        if submission.class_ and submission.class_.type == "cooperative":
+        if submission.class_ and submission.class_.type == "thesis":
             return True
 
         meetings = models.Meeting.objects(
