@@ -117,6 +117,37 @@ def get_average_plo_achievement(students):
     return groups
 
 
+def group_projects_by_class_type(projects, sort_key):
+    """Split a flat list of projects into per-class-type groups (e.g. so
+    Thesis projects are shown separately from Project/Cooperative ones),
+    ordered to match models.classes.TYPE_CHOICE with any unrecognized/missing
+    type sorted last."""
+
+    type_order = [choice[0] for choice in models.classes.TYPE_CHOICE]
+    type_labels = dict(models.classes.TYPE_CHOICE)
+
+    groups = {}
+    for project in projects:
+        class_ = project.get_opened_class()
+        type_ = class_.type if class_ else None
+        groups.setdefault(type_, []).append(project)
+
+    for group_projects in groups.values():
+        group_projects.sort(key=sort_key)
+
+    return [
+        {
+            "type": type_,
+            "label": type_labels.get(type_, "Other"),
+            "projects": groups[type_],
+        }
+        for type_ in sorted(
+            groups,
+            key=lambda t: type_order.index(t) if t in type_order else len(type_order),
+        )
+    ]
+
+
 def index_lecturer():
     now = datetime.date.today()
     opened_classes = models.Class.objects(
@@ -146,18 +177,14 @@ def index_lecturer():
     alumni_projects_count = alumni_projects_qs.count()
     alumni_project_tags = get_alumni_project_tags(alumni_projects_qs)
 
-    advisee_projects = sorted(
+    advisee_projects = group_projects_by_class_type(
         advisee_projects,
-        key=lambda p: (
-            p.get_opened_class().type,
-            [s.username for s in p.students],
-        ),
+        sort_key=lambda p: [s.username for s in p.students],
     )
 
-    committee_projects = sorted(
+    committee_projects = group_projects_by_class_type(
         committee_projects,
-        key=lambda p: (
-            p.get_opened_class().type,
+        sort_key=lambda p: (
             [advisor.username for advisor in p.advisors],
             [s.username for s in p.students],
         ),
@@ -183,10 +210,12 @@ def index_lecturer():
     pending_meeting_reports = pending_meeting_reports[:10]
 
     plo_students = set()
-    for project in advisee_projects:
-        plo_students.update(project.students)
-    for project in committee_projects:
-        plo_students.update(project.students)
+    for group in advisee_projects:
+        for project in group["projects"]:
+            plo_students.update(project.students)
+    for group in committee_projects:
+        for project in group["projects"]:
+            plo_students.update(project.students)
     average_plo_achievement = get_average_plo_achievement(plo_students)
 
     return render_template(

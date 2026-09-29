@@ -18,6 +18,22 @@
 
 {% endmacro -%}
 
+{% macro render_project_section_grouped(current_user, advisee_groups, committee_groups) -%}
+<div class="card bg-base-100 shadow my-4">
+  <div class="card-body p-4">
+  {%- for group in advisee_groups %}
+  <h4 class="text-lg font-semibold">Advisee Project - {{ group.label }}</h4>
+  {{ render_current_project_table(group.projects, current_user) }}
+  {%- endfor %}
+  {%- for group in committee_groups %}
+  <h4 class="text-lg font-semibold">Examination Project - {{ group.label }}</h4>
+  {{ render_current_project_table(group.projects, current_user) }}
+  {%- endfor %}
+  </div>
+</div>
+
+{% endmacro -%}
+
 {% macro render_alumni_summary(alumni_projects_count, alumni_project_tags) -%}
 {%- if alumni_projects_count > 0 %}
 <div class="card bg-base-100 shadow my-4">
