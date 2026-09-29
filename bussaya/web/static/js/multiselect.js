@@ -22,6 +22,16 @@
     try {
       var ts = new TomSelect(el, options);
       el.setAttribute('data-tomselect-initialized', 'true');
+      if (mode === 'single') {
+        // Drop the previously selected item as soon as the user starts
+        // typing, so searching always starts from a blank slate instead of
+        // looking like it's being appended to the old selection.
+        ts.on('type', function (str) {
+          if (str && ts.items.length) {
+            ts.clear(true);
+          }
+        });
+      }
       if (ts.control) {
         ts.control.classList.remove('input', 'select', 'border', 'border-base-300', 'w-full');
       }

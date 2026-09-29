@@ -65,6 +65,14 @@
 {{ render_field(field) }}
 {%- endmacro %}
 
+{% macro render_search_select(field) -%}
+<div class="w-full mb-3">
+  {{ field.label(class_='label mb-1') }}
+  {{ field(class_=field_class(field), data_tomselect='single') }}
+</div>
+{{ eh.get_error_messages(field.errors) }}
+{%- endmacro %}
+
 {% macro render_multiple_select(field) -%}
 {{ render_field(field) }}
 {%- endmacro %}

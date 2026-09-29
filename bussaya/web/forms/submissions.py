@@ -6,6 +6,7 @@ from .fields import TagListField
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from flask_mongoengine.wtf import model_form
+from flask_mongoengine.wtf.fields import ModelSelectField
 
 from bussaya import models
 
@@ -72,6 +73,11 @@ class ProgressReportDateForm(FlaskForm):
 
 
 class AdminProgressReportForm(ProgressReportForm):
+    project = ModelSelectField(
+        "Project",
+        model=models.Project,
+        label_modifier=lambda p: f"{p.name} - {''.join([s.username + ' ' + s.get_fullname() + ' ' for s in p.students])}",
+    )
     student = fields.SelectField("Student")
     uploaded_date = fields.DateTimeField(
         "Uploaded Date", widget=widgets.TextInput(), format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"]

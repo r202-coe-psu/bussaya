@@ -49,8 +49,8 @@ Submission Form
       <div class="card-body">
       {{ form.csrf_token }}
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>{{ renderer.render_select(form.student) }}</div>
-        <div>{{ renderer.render_select(form.project) }}</div>
+        <div>{{ renderer.render_search_select(form.student) }}</div>
+        <div>{{ renderer.render_search_select(form.project) }}</div>
       </div>
       {{ renderer.render_field(form.description) }}
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

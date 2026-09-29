@@ -52,8 +52,8 @@ Meeting Form
     <div class="card bg-base-100 shadow my-4">
       <div class="card-body space-y-1">
       {{ form.csrf_token }}
-      {{ renderer.render_select(form.project) }}
-      {{ renderer.render_select(form.student) }}
+      {{ renderer.render_search_select(form.project) }}
+      {{ renderer.render_search_select(form.student) }}
       {{ renderer.render_field(form.title) }}
       {{ renderer.render_field(form.description) }}
       {{ renderer.render_field(form.remark) }}
