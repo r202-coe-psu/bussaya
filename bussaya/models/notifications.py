@@ -30,3 +30,6 @@ class DeadlineNotification(me.Document):
 
     status = me.StringField(required=True, default="sent", choices=["sent", "failed"])
     sent_date = me.DateTimeField(required=True, default=datetime.datetime.now)
+
+    subject = me.StringField()
+    error = me.StringField()

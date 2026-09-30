@@ -55,6 +55,13 @@ def index():
             "count_label": "customized",
         },
         {
+            "label": "Email Audit Logs",
+            "description": "Sent/failed deadline-reminder emails.",
+            "icon": "fa-solid fa-envelope-circle-check",
+            "endpoint": "admin.email_logs.index",
+            "count": models.DeadlineNotification.objects.count(),
+        },
+        {
             "label": "Users",
             "description": "Accounts, roles, and permissions.",
             "icon": "fa-solid fa-award",

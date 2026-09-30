@@ -23,13 +23,16 @@ class Mailer:
         self.sender_name = config.get("MAIL_SENDER_NAME", "")
 
     def send(self, to_email, subject, body):
+        """Returns (sent, error): error is None on success, else a short
+        human-readable reason suitable for an audit log."""
+
         if not self.enabled:
             logger.debug("Mail disabled, skipping send to %s: %s", to_email, subject)
-            return False
+            return False, "Mail sending is disabled (MAIL_ENABLED=False)"
 
         if not to_email:
             logger.debug("No recipient email, skipping send: %s", subject)
-            return False
+            return False, "Recipient has no email address"
 
         sender = self.sender
         if self.sender_name:
@@ -51,8 +54,8 @@ class Mailer:
                 server.sendmail(self.sender, [to_email], message.as_string())
             finally:
                 server.quit()
-        except Exception:
+        except Exception as exc:
             logger.exception("Failed to send email to %s", to_email)
-            return False
+            return False, str(exc)
 
-        return True
+        return True, None

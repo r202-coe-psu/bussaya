@@ -27,5 +27,19 @@ services:
       - default
     restart: always
     command: /venv/bin/gunicorn -w 4 --bind 0.0.0.0:8080 "bussaya.web:create_app()" --capture-output
+  controller:
+    image: bussaya-image
+    container_name: bussaya-controller
+    volumes:
+      - ../deployment:/deployment
+      - /etc/localtime:/etc/localtime:ro
+    links:
+      - mongodb
+    networks:
+      - default
+    restart: always
+    command: /venv/bin/python3 -c "from bussaya.cmd.controller import main; main()"
 networks:
   default:
+volumes:
+  certificates:

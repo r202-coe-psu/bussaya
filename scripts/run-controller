@@ -1,0 +1,3 @@
+#!/bin/sh
+
+BUSSAYA_SETTINGS=$(pwd)/bussaya-development.cfg poetry run bussaya-controller 

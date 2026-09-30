@@ -10,6 +10,10 @@ Designed to be run once a day (e.g. via cron calling
 scripts/send_deadline_reminders.py). Idempotent: each (target, recipient,
 days_before) combination is recorded in DeadlineNotification so re-running
 the job the same day never sends duplicate emails.
+
+Each daily run also deletes DeadlineNotification (email audit log) records
+older than EMAIL_AUDIT_LOG_RETENTION_DAYS (1 year), so the audit log doesn't
+grow forever.
 """
 
 import datetime
@@ -22,6 +26,7 @@ from bussaya.utils.mailer import Mailer
 logger = logging.getLogger(__name__)
 
 REMINDER_DAYS_BEFORE = [2, 1]
+EMAIL_AUDIT_LOG_RETENTION_DAYS = 365
 
 class Server:
     def __init__(self, settings):
@@ -38,23 +43,26 @@ class Server:
     async def run(self):
         self.running = True
         while self.running:
+            logger.info("Sleeping until next run time...")
+            await self._sleep_until_next_run_time()
+            logger.info("Running deadline reminders...")
+            await self.run_deadline_reminders(self.settings)
+            logger.info("Cleaning up old email audit logs...")
+            removed_count = await self.cleanup_email_audit_logs()
+            logger.info(
+                "Removed %s email audit log(s) older than %s days",
+                removed_count,
+                EMAIL_AUDIT_LOG_RETENTION_DAYS,
+            )
 
-            summary = {}
-            summary["round_grade"] = send_round_grade_reminders(self.mailer, self.base_url)
-            summary["meeting"] = send_meeting_report_reminders(self.mailer, self.base_url)
-            summary["report"] = send_report_reminders(self.mailer, self.base_url)
-            summary["presentation"] = send_presentation_reminders(self.mailer, self.base_url)
+    async def _sleep_until_next_run_time(self, hour=3, minute=0):
+        now = datetime.datetime.now()
+        next_run = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        if next_run <= now:
+            next_run += datetime.timedelta(days=1)
+        await asyncio.sleep((next_run - now).total_seconds())
 
-            for target_type, counts in summary.items():
-                logger.info(
-                    "Deadline reminders for %s: sent=%s failed=%s skipped=%s",
-                    target_type,
-                    counts["sent"],
-                    counts["failed"],
-                    counts["skipped"],
-                )
 
-            return summary
 
     async def _days_until(self, target_date):
         return (target_date.date() - datetime.date.today()).days
@@ -69,35 +77,40 @@ class Server:
         ).first()
 
 
-    async def _record_notification(self, target_type, target_id, recipient, days_before, status):
+    async def _record_notification(self, target_type, target_id, recipient, days_before, status, subject=None, error=None):
         models.DeadlineNotification(
             target_type=target_type,
             target_id=target_id,
             recipient=recipient,
             days_before=days_before,
             status=status,
+            subject=subject,
+            error=error,
         ).save()
 
 
-    async def _send_reminder(self, mailer, target_type, target_id, recipient, days_before, subject, body):
+    async def _send_reminder(self,  target_type, target_id, recipient, days_before, subject, body):
         if await self._already_notified(target_type, target_id, recipient, days_before):
             return "skipped"
 
-        sent = mailer.send(recipient.email, subject, body)
+        logger.info(f"Sending reminder to {recipient.email} for {target_type} {target_id} ({days_before} days before)")
+        sent, error = self.mailer.send(recipient.email, subject, body)
         await self._record_notification(
-            target_type, target_id, recipient, days_before, "sent" if sent else "failed"
+            target_type, target_id, recipient, days_before, "sent" if sent else "failed",
+            subject=subject, error=error,
         )
         return "sent" if sent else "failed"
+    
 
 
-    async def send_round_grade_reminders(self, mailer, base_url=""):
+    async def send_round_grade_reminders(self):
         """Email lecturers who still have pending (result == '-') grades in a
         RoundGrade whose grading window closes in 2 or 1 day(s)."""
 
         counts = {"sent": 0, "failed": 0, "skipped": 0}
         template = models.EmailTemplate.get_or_create_default("round_grade_reminder")
 
-        round_grades = models.RoundGrade.objects(release_status__ne="released")
+        round_grades = models.RoundGrade.objects(release_status__ne="released", ended_date__gte=datetime.datetime.now())
         for round_grade in round_grades:
             days_before = await self._days_until(round_grade.ended_date)
             if days_before not in REMINDER_DAYS_BEFORE:
@@ -120,7 +133,7 @@ class Server:
                 if not lecturer:
                     continue
 
-                link = f"{base_url}/round_grades/{round_grade.id}/grading" if base_url else ""
+                link = f"{self.base_url}/round_grades/{round_grade.id}/grading" if self.base_url else ""
                 subject, body = template.render(
                     lecturer_name=lecturer.fullname,
                     class_name=class_.name,
@@ -132,21 +145,22 @@ class Server:
                 )
 
                 result = await self._send_reminder(
-                    mailer, "round_grade", round_grade.id, lecturer, days_before, subject, body
+                    "round_grade", round_grade.id, lecturer, days_before, subject, body
                 )
                 counts[result] += 1
 
         return counts
 
 
-    async def send_meeting_report_reminders(self, mailer, base_url=""):
+    async def send_meeting_report_reminders(self):
         """Email students in a class who haven't submitted their meeting report
         yet for a Meeting whose window closes in 2 or 1 day(s)."""
 
         counts = {"sent": 0, "failed": 0, "skipped": 0}
         template = models.EmailTemplate.get_or_create_default("meeting_reminder")
+        meetings = models.Meeting.objects(ended_date__gte=datetime.datetime.now())
 
-        for meeting in models.Meeting.objects:
+        for meeting in meetings:
             days_before = await self._days_until(meeting.ended_date)
             if days_before not in REMINDER_DAYS_BEFORE:
                 continue
@@ -156,7 +170,7 @@ class Server:
                 if meeting.get_meeting_report_by_owner(student):
                     continue
 
-                link = f"{base_url}/classes/{class_.id}" if base_url else ""
+                link = f"{self.base_url}/classes/{class_.id}" if self.base_url else ""
                 subject, body = template.render(
                     student_name=student.fullname,
                     class_name=class_.name,
@@ -167,18 +181,18 @@ class Server:
                 )
 
                 result = await self._send_reminder(
-                    mailer, "meeting", meeting.id, student, days_before, subject, body
+                    "meeting", meeting.id, student, days_before, subject, body
                 )
                 counts[result] += 1
 
         return counts
 
 
-    async def _send_submission_reminders(self, mailer, submission_type, base_url):
+    async def _send_submission_reminders(self, submission_type):
         counts = {"sent": 0, "failed": 0, "skipped": 0}
         template = models.EmailTemplate.get_or_create_default(f"{submission_type}_reminder")
 
-        submissions = models.Submission.objects(type=submission_type)
+        submissions = models.Submission.objects(type=submission_type, ended_date__gte=datetime.datetime.now())
         for submission in submissions:
             days_before = await self._days_until(submission.ended_date)
             if days_before not in REMINDER_DAYS_BEFORE:
@@ -189,7 +203,7 @@ class Server:
                 if submission.get_progress_report_by_owner(student):
                     continue
 
-                link = f"{base_url}/classes/{class_.id}" if base_url else ""
+                link = f"{self.base_url}/classes/{class_.id}" if self.base_url else ""
                 subject, body = template.render(
                     student_name=student.fullname,
                     class_name=class_.name,
@@ -200,19 +214,33 @@ class Server:
                 )
 
                 result = await  self._send_reminder(
-                    mailer, submission_type, submission.id, student, days_before, subject, body
+                    submission_type, submission.id, student, days_before, subject, body
                 )
                 counts[result] += 1
 
         return counts
 
 
-    async def send_report_reminders(self, mailer, base_url=""):
-        return await self._send_submission_reminders(mailer, "report", base_url)
+    async def send_report_reminders(self ):
+        return await self._send_submission_reminders("report")
 
 
-    async def send_presentation_reminders(self, mailer, base_url=""):
-        return await self._send_submission_reminders(mailer, "presentation", base_url)
+    async def send_presentation_reminders(self ):
+        return await self._send_submission_reminders("presentation")
+
+
+    async def cleanup_email_audit_logs(self):
+        """Delete DeadlineNotification records older than
+        EMAIL_AUDIT_LOG_RETENTION_DAYS, so the email audit log doesn't grow
+        forever."""
+
+        cutoff = datetime.datetime.now() - datetime.timedelta(
+            days=EMAIL_AUDIT_LOG_RETENTION_DAYS
+        )
+        old_logs = models.DeadlineNotification.objects(sent_date__lt=cutoff)
+        count = old_logs.count()
+        old_logs.delete()
+        return count
 
 
     async def run_deadline_reminders(self, settings):
@@ -220,10 +248,11 @@ class Server:
         base_url = settings.get("SITE_BASE_URL", "").rstrip("/")
 
         summary = {}
-        summary["round_grade"] = await self.send_round_grade_reminders(mailer, base_url)
-        summary["meeting"] = await self.send_meeting_report_reminders(mailer, base_url)
-        summary["report"] = await self.send_report_reminders(mailer, base_url)
-        summary["presentation"] = await self.send_presentation_reminders(mailer, base_url)
+        summary["round_grade"] = await self.send_round_grade_reminders()
+        # summary["meeting"] = await self.send_meeting_report_reminders()
+
+        # summary["report"] = await self.send_report_reminders(mailer, base_url)
+        # summary["presentation"] = await self.send_presentation_reminders(mailer, base_url)
 
         for target_type, counts in summary.items():
             logger.info(

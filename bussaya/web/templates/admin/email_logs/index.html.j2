@@ -1,0 +1,104 @@
+{% extends '/base/default-dashboard.html.j2' %}
+
+{% block dashboard_title %}
+Email Audit Logs
+{% endblock %}
+
+{% block breadcrumbs %}
+<li><a href="{{ url_for('admin.email_logs.index') }}">Email Audit Logs</a></li>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <form method="GET" class="flex flex-wrap items-center gap-2 mb-4">
+        <select name="target_type" class="select select-bordered">
+            <option value="">All events</option>
+            {% for value, label in target_types %}
+            <option value="{{ value }}" {{ 'selected' if value == target_type else '' }}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="status" class="select select-bordered">
+            <option value="">All statuses</option>
+            <option value="sent" {{ 'selected' if status == 'sent' else '' }}>Sent</option>
+            <option value="failed" {{ 'selected' if status == 'failed' else '' }}>Failed</option>
+        </select>
+        <button type="submit" class="btn btn-primary gap-1">
+            <i class="fa-solid fa-magnifying-glass"></i> Filter
+        </button>
+        {% if target_type or status %}
+        <a href="{{ url_for('admin.email_logs.index') }}" class="btn btn-ghost">Clear</a>
+        {% endif %}
+    </form>
+
+    {% if rows %}
+    <div class="overflow-x-auto">
+    <table class="table table-zebra">
+        <thead>
+            <tr>
+                <th>Sent Date</th>
+                <th>Event</th>
+                <th>Recipient</th>
+                <th>Subject</th>
+                <th>Days Before</th>
+                <th>Status</th>
+                <th>Error</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for row in rows %}
+            {% set log = row.log %}
+            <tr class="align-top">
+                <td class="whitespace-nowrap">{{ log.sent_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td class="whitespace-nowrap">
+                    <span class="badge badge-outline">{{ log.get_target_type_display() }}</span>
+                    <div class="text-xs opacity-70 mt-1">{{ row.target_description }}</div>
+                </td>
+                <td class="whitespace-nowrap">
+                    {% if log.recipient %}
+                    <a href="{{ url_for('accounts.profile', user_id=log.recipient.id) }}">{{ log.recipient.fullname }}</a>
+                    <div class="text-xs opacity-70">{{ log.recipient.email }}</div>
+                    {% else %}
+                    (deleted)
+                    {% endif %}
+                </td>
+                <td>{{ log.subject or '' }}</td>
+                <td class="text-right">{{ log.days_before }}</td>
+                <td>
+                    <span class="badge {{ 'badge-success' if log.status == 'sent' else 'badge-error' }}">
+                        {{ log.status }}
+                    </span>
+                </td>
+                <td class="text-error text-xs">{{ log.error or '' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+    {% if total_pages > 1 %}
+    <div class="flex items-center justify-between mt-4">
+        <div class="text-sm opacity-70">
+            Page {{ page }} of {{ total_pages }} ({{ total }} log{{ 's' if total != 1 else '' }})
+        </div>
+        <div class="join">
+            <a href="{{ url_for('admin.email_logs.index', target_type=target_type, status=status, page=page - 1) }}"
+               class="join-item btn {{ 'btn-disabled' if page <= 1 else '' }}">&laquo;</a>
+            {% for p in range(1, total_pages + 1) %}
+            <a href="{{ url_for('admin.email_logs.index', target_type=target_type, status=status, page=p) }}"
+               class="join-item btn {{ 'btn-active' if p == page else '' }}">{{ p }}</a>
+            {% endfor %}
+            <a href="{{ url_for('admin.email_logs.index', target_type=target_type, status=status, page=page + 1) }}"
+               class="join-item btn {{ 'btn-disabled' if page >= total_pages else '' }}">&raquo;</a>
+        </div>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="alert alert-info mb-4">
+        No email logs {{ 'match this filter' if target_type or status else 'yet' }}.
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
