@@ -9,7 +9,7 @@ COE_LECTURERS = []
 
 LOGIN_PROVIDER = ["GOOGLE", "ENGPSU"]
 
-# Deadline-reminder emails (see bussaya/notifications.py). Disabled by
+# Deadline-reminder emails (see bussaya/controller/__init__.py). Disabled by
 # default so dev/test environments never send real mail; set MAIL_ENABLED
 # = True and the SMTP settings below in an environment's .cfg to enable.
 MAIL_ENABLED = False

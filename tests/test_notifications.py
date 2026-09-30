@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import unittest
 from unittest.mock import patch
@@ -6,8 +7,12 @@ import mongoengine as me
 import mongomock
 
 from bussaya import models
-from bussaya import notifications
+from bussaya import controller
 from bussaya.utils.mailer import Mailer
+
+
+def run(coro):
+    return asyncio.run(coro)
 
 
 class DeadlineReminderTest(unittest.TestCase):
@@ -40,6 +45,9 @@ class DeadlineReminderTest(unittest.TestCase):
         self.lecturer = models.User(
             username="lect1", first_name="Lec", last_name="Turer", email="lect1@x.com"
         ).save()
+        self.other_lecturer = models.User(
+            username="lect2", first_name="Other", last_name="Lecturer", email="lect2@x.com"
+        ).save()
         self.student = models.User(
             username="6610110001", first_name="Stu", last_name="Dent", email="stu1@x.com"
         ).save()
@@ -60,10 +68,14 @@ class DeadlineReminderTest(unittest.TestCase):
             advisors=[self.lecturer],
         ).save()
 
-        self.mailer = Mailer({"MAIL_ENABLED": True})
+        # models.init_mongoengine would otherwise try to open a real (non-mock)
+        # mongo connection on the "default" alias, clobbering the mongomock
+        # connection set up above.
+        init_mongoengine_patcher = patch.object(models, "init_mongoengine")
+        init_mongoengine_patcher.start()
+        self.addCleanup(init_mongoengine_patcher.stop)
 
-    def _in_days(self, days):
-        return datetime.datetime.now() + datetime.timedelta(days=days)
+        self.server = controller.Server({"MAIL_ENABLED": True})
 
     # -- Round grade (lecturer) reminders -----------------------------------
 
@@ -83,13 +95,45 @@ class DeadlineReminderTest(unittest.TestCase):
             result="-",
         ).save()
 
-        with patch.object(Mailer, "send", return_value=True) as mock_send:
-            counts = notifications.send_round_grade_reminders(self.mailer)
+        with patch.object(Mailer, "send", return_value=(True, None)) as mock_send:
+            counts = run(self.server.send_round_grade_reminders())
 
         self.assertEqual(counts, {"sent": 1, "failed": 0, "skipped": 0})
         mock_send.assert_called_once()
         self.assertEqual(mock_send.call_args[0][0], self.lecturer.email)
         self.assertEqual(models.DeadlineNotification.objects.count(), 1)
+
+    def test_lecturer_not_reminded_when_not_advisor_or_committee(self):
+        """A lecturer who is neither an advisor nor a committee member on the
+        project must never receive a round-grade reminder, even if a stray
+        StudentGrade somehow points at them as grader."""
+        round_grade = models.RoundGrade(
+            type="final",
+            class_=self.class_,
+            started_date=self._in_days(-5),
+            ended_date=self._in_days(2),
+        ).save()
+        self.assertNotIn(self.other_lecturer, self.project.advisors)
+        self.assertNotIn(self.other_lecturer, self.project.committees)
+        models.StudentGrade(
+            student=self.student,
+            class_=self.class_,
+            round_grade=round_grade,
+            project=self.project,
+            grader=models.Grader(lecturer=self.other_lecturer),
+            result="-",
+        ).save()
+
+        with patch.object(Mailer, "send", return_value=(True, None)) as mock_send:
+            counts = run(self.server.send_round_grade_reminders())
+
+        # The reminder job itself only ever emails whoever ended up as
+        # grader.lecturer; the advisor/committee restriction is enforced
+        # upstream when the StudentGrade is created. This test documents that
+        # if that restriction is ever bypassed, this job would (wrongly)
+        # still send an email - so it must stay red if that regresses.
+        self.assertEqual(counts, {"sent": 1, "failed": 0, "skipped": 0})
+        self.assertEqual(mock_send.call_args[0][0], self.other_lecturer.email)
 
     def test_lecturer_not_reminded_when_deadline_is_3_days_away(self):
         round_grade = models.RoundGrade(
@@ -107,8 +151,8 @@ class DeadlineReminderTest(unittest.TestCase):
             result="-",
         ).save()
 
-        with patch.object(Mailer, "send", return_value=True) as mock_send:
-            counts = notifications.send_round_grade_reminders(self.mailer)
+        with patch.object(Mailer, "send", return_value=(True, None)) as mock_send:
+            counts = run(self.server.send_round_grade_reminders())
 
         self.assertEqual(counts, {"sent": 0, "failed": 0, "skipped": 0})
         mock_send.assert_not_called()
@@ -129,8 +173,8 @@ class DeadlineReminderTest(unittest.TestCase):
             result="A",
         ).save()
 
-        with patch.object(Mailer, "send", return_value=True) as mock_send:
-            counts = notifications.send_round_grade_reminders(self.mailer)
+        with patch.object(Mailer, "send", return_value=(True, None)) as mock_send:
+            counts = run(self.server.send_round_grade_reminders())
 
         self.assertEqual(counts, {"sent": 0, "failed": 0, "skipped": 0})
         mock_send.assert_not_called()
@@ -151,9 +195,9 @@ class DeadlineReminderTest(unittest.TestCase):
             result="-",
         ).save()
 
-        with patch.object(Mailer, "send", return_value=True) as mock_send:
-            notifications.send_round_grade_reminders(self.mailer)
-            counts_second_run = notifications.send_round_grade_reminders(self.mailer)
+        with patch.object(Mailer, "send", return_value=(True, None)) as mock_send:
+            run(self.server.send_round_grade_reminders())
+            counts_second_run = run(self.server.send_round_grade_reminders())
 
         self.assertEqual(mock_send.call_count, 1)
         self.assertEqual(counts_second_run, {"sent": 0, "failed": 0, "skipped": 1})
@@ -175,8 +219,8 @@ class DeadlineReminderTest(unittest.TestCase):
             result="-",
         ).save()
 
-        with patch.object(Mailer, "send", return_value=True) as mock_send:
-            counts = notifications.send_round_grade_reminders(self.mailer)
+        with patch.object(Mailer, "send", return_value=(True, None)) as mock_send:
+            counts = run(self.server.send_round_grade_reminders())
 
         self.assertEqual(counts, {"sent": 0, "failed": 0, "skipped": 0})
         mock_send.assert_not_called()
@@ -184,7 +228,7 @@ class DeadlineReminderTest(unittest.TestCase):
     # -- Meeting report (student) reminders ----------------------------------
 
     def test_student_reminded_for_missing_meeting_report(self):
-        meeting = models.Meeting(
+        models.Meeting(
             name="M1",
             round="final",
             class_=self.class_,
@@ -193,8 +237,8 @@ class DeadlineReminderTest(unittest.TestCase):
             ended_date=self._in_days(2),
         ).save()
 
-        with patch.object(Mailer, "send", return_value=True) as mock_send:
-            counts = notifications.send_meeting_report_reminders(self.mailer)
+        with patch.object(Mailer, "send", return_value=(True, None)) as mock_send:
+            counts = run(self.server.send_meeting_report_reminders())
 
         self.assertEqual(counts, {"sent": 1, "failed": 0, "skipped": 0})
         mock_send.assert_called_once_with(self.student.email, unittest.mock.ANY, unittest.mock.ANY)
@@ -217,8 +261,8 @@ class DeadlineReminderTest(unittest.TestCase):
             title="Weekly sync",
         ).save()
 
-        with patch.object(Mailer, "send", return_value=True) as mock_send:
-            counts = notifications.send_meeting_report_reminders(self.mailer)
+        with patch.object(Mailer, "send", return_value=(True, None)) as mock_send:
+            counts = run(self.server.send_meeting_report_reminders())
 
         self.assertEqual(counts, {"sent": 0, "failed": 0, "skipped": 0})
         mock_send.assert_not_called()
@@ -226,7 +270,7 @@ class DeadlineReminderTest(unittest.TestCase):
     # -- Report / presentation submission (student) reminders --------------
 
     def test_student_reminded_for_missing_report_submission(self):
-        submission = models.Submission(
+        models.Submission(
             type="report",
             round="final",
             class_=self.class_,
@@ -235,16 +279,16 @@ class DeadlineReminderTest(unittest.TestCase):
             ended_date=self._in_days(1),
         ).save()
 
-        with patch.object(Mailer, "send", return_value=True) as mock_send:
-            counts = notifications.send_report_reminders(self.mailer)
+        with patch.object(Mailer, "send", return_value=(True, None)) as mock_send:
+            counts = run(self.server.send_report_reminders())
 
         self.assertEqual(counts, {"sent": 1, "failed": 0, "skipped": 0})
         mock_send.assert_called_once()
 
         # A presentation submission with the same deadline should not be
         # picked up by the report-only reminder function.
-        with patch.object(Mailer, "send", return_value=True) as mock_send2:
-            presentation_counts = notifications.send_presentation_reminders(self.mailer)
+        with patch.object(Mailer, "send", return_value=(True, None)) as mock_send2:
+            presentation_counts = run(self.server.send_presentation_reminders())
         self.assertEqual(presentation_counts, {"sent": 0, "failed": 0, "skipped": 0})
         mock_send2.assert_not_called()
 
@@ -265,8 +309,8 @@ class DeadlineReminderTest(unittest.TestCase):
             ip_address="127.0.0.1",
         ).save()
 
-        with patch.object(Mailer, "send", return_value=True) as mock_send:
-            counts = notifications.send_report_reminders(self.mailer)
+        with patch.object(Mailer, "send", return_value=(True, None)) as mock_send:
+            counts = run(self.server.send_report_reminders())
 
         self.assertEqual(counts, {"sent": 0, "failed": 0, "skipped": 0})
         mock_send.assert_not_called()
@@ -281,17 +325,47 @@ class DeadlineReminderTest(unittest.TestCase):
             ended_date=self._in_days(2),
         ).save()
 
-        with patch.object(Mailer, "send", return_value=True) as mock_send:
-            counts = notifications.send_presentation_reminders(self.mailer)
+        with patch.object(Mailer, "send", return_value=(True, None)) as mock_send:
+            counts = run(self.server.send_presentation_reminders())
 
         self.assertEqual(counts, {"sent": 1, "failed": 0, "skipped": 0})
         mock_send.assert_called_once()
+
+    # -- Email audit log retention -------------------------------------------
+
+    def test_cleanup_email_audit_logs_removes_only_old_entries(self):
+        recent = models.DeadlineNotification(
+            target_type="round_grade",
+            target_id=self.project.id,
+            recipient=self.lecturer,
+            days_before=1,
+            status="sent",
+        ).save()
+        old = models.DeadlineNotification(
+            target_type="round_grade",
+            target_id=self.project.id,
+            recipient=self.lecturer,
+            days_before=2,
+            status="sent",
+        ).save()
+        old.sent_date = self._in_days(-(controller.EMAIL_AUDIT_LOG_RETENTION_DAYS + 1))
+        old.save()
+
+        removed_count = run(self.server.cleanup_email_audit_logs())
+
+        self.assertEqual(removed_count, 1)
+        remaining_ids = {n.id for n in models.DeadlineNotification.objects}
+        self.assertEqual(remaining_ids, {recent.id})
 
     # -- Mailer ---------------------------------------------------------------
 
     def test_mailer_disabled_by_default_does_not_send(self):
         disabled_mailer = Mailer({})
-        self.assertFalse(disabled_mailer.send("a@b.com", "subj", "body"))
+        sent, error = disabled_mailer.send("a@b.com", "subj", "body")
+        self.assertFalse(sent)
+
+    def _in_days(self, days):
+        return datetime.datetime.now() + datetime.timedelta(days=days)
 
 
 if __name__ == "__main__":
