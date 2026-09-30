@@ -25,7 +25,7 @@ pymongo = "^4.10.1"
 jinja2 = "^3.1.4"
 endesive = "2.17.3"
 fpdf2 = "^2.8.2"
-pypdf2 = "^3.0.1"
+pypdf = "^5.1.0"
 python-dotenv = "^1.0.1"
 
 

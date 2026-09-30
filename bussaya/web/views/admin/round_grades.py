@@ -11,7 +11,7 @@ from flask import (
     flash,
 )
 from flask_login import login_required, current_user
-from PyPDF2 import PdfReader, PdfWriter
+from pypdf import PdfReader, PdfWriter
 import io
 import tempfile
 import os
