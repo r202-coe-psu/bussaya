@@ -1,5 +1,6 @@
 {% extends '/admin/classes/index.html.j2' %}
 {% import '/base/error-handler.html.j2' as eh %}
+{% import '/base/signature-renderer.html.j2' as renderer_signature %}
 
 {% block breadcrumbs %}
 <li><a href="{{ url_for('classes.index') }}">Classes</a></li>
@@ -73,6 +74,7 @@
             <th>File</th>
             <th>Description</th>
             <th>Submitted time</th>
+            <th>Signature</th>
             <th>Operation</th>
         </tr>
     </thead>
@@ -114,6 +116,9 @@
                 {{ progress_report.get_uploaded_date() }}
             </td>
             <td>
+                {{ renderer_signature.render_signature_badge(progress_report, signatures_by_report[progress_report.id], loop.index0) }}
+            </td>
+            <td>
               <a class="btn btn-primary btn-square" href="{{ url_for('admin.submissions.change_reported_date', submission_id=submission.id, progress_report_id=progress_report.id) }}"><i class="fa-solid fa-calendar"></i></a>
             </td>
         </tr>
@@ -122,6 +127,10 @@
     </tbody>
 </table>
 </div>
+
+{% for progress_report in progress_reports %}
+{{ renderer_signature.render_signature_modal(progress_report, signatures_by_report[progress_report.id], loop.index0) }}
+{% endfor %}
 
 
 

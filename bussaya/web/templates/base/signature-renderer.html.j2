@@ -1,0 +1,105 @@
+{% macro render_signature_badge(progress_report, info, index) -%}
+{% if not info.has_file %}
+<div class="badge badge-neutral min-w-[120px] justify-center">No file</div>
+{% elif not info.raw_signatures %}
+<div class="badge badge-warning min-w-[120px] justify-center">No signatures</div>
+{% else %}
+{% set all_signed = info.verified_count == info.total %}
+<div class="flex items-center gap-2">
+    <div class="badge {{ 'badge-success' if info.verified_count > 0 else 'badge-error' }} min-w-[120px] justify-center">
+        {{ 'Verify Success' if all_signed else ('Partially Signed' if info.verified_count > 0 else 'Verify Failed') }}
+        ({{ info.verified_count }}/{{ info.total }})
+    </div>
+    <button type="button" class="btn btn-square btn-xs"
+        onclick="document.getElementById('signature-modal-{{ index }}').showModal()">
+        <i class="fa-solid fa-eye"></i>
+    </button>
+</div>
+{% endif %}
+{%- endmacro %}
+
+
+{% macro render_signature_modal(progress_report, info, index) -%}
+{% if info.has_file %}
+<dialog id="signature-modal-{{ index }}" class="modal">
+    <div class="modal-box max-w-3xl">
+        <h3 class="text-xl font-semibold">
+            <i class="fa-solid fa-file-signature"></i>
+            Signature verification for {{ progress_report.file.filename }}
+        </h3>
+
+        <div class="card bg-base-200 my-4">
+            <div class="card-body p-4">
+                <h4 class="text-lg font-semibold border-b border-base-300 pb-1">
+                    <i class="fa-solid fa-users"></i>
+                    Expected Signers
+                </h4>
+                <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Expired</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for signer in info.signers %}
+                        <tr>
+                            <td>{{ signer.user.get_fullname() }} ({{ signer.user.username }})</td>
+                            <td>
+                                {% if signer.signed %}
+                                <i class="fa-solid fa-circle-check text-success"></i> Signed
+                                {% else %}
+                                <span class="opacity-60">Not-Signed</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not signer.signed %}
+                                <span class="opacity-60">Not-Signed</span>
+                                {% elif signer.not_expired %}
+                                <i class="fa-solid fa-circle-check text-success"></i> Not-Expired
+                                {% else %}
+                                <i class="fa-solid fa-circle-xmark text-error"></i> Expired
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-base-200 my-4">
+            <div class="card-body p-4">
+                <h4 class="text-lg font-semibold border-b border-base-300 pb-1">
+                    <i class="fa-solid fa-signature"></i>
+                    All Signatures Found in PDF
+                </h4>
+                {% if info.raw_signatures %}
+                <ul class="space-y-1 list-disc list-inside">
+                    {% for signature in info.raw_signatures %}
+                    <li>{{ signature }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="opacity-60">No verified signatures found.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn btn-error">
+                    <i class="fa-solid fa-xmark"></i> Close
+                </button>
+            </form>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+{% endif %}
+{%- endmacro %}

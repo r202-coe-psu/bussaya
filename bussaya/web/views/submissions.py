@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, redirect, url_for, send_file, requ
 from flask_login import login_required, current_user
 
 from bussaya import models
+from bussaya import utils
 
 from .. import forms
 from .. import acl
@@ -13,6 +14,63 @@ import datetime
 import socket
 
 module = Blueprint("submissions", __name__, url_prefix="/submissions")
+
+CERTIFICATE_CA_PATH = "bussaya/certificate/certificate_key.pem"
+
+
+def get_report_signature_info(progress_report):
+    """Verify the digital signature(s) embedded in a ProgressReport's PDF
+    against the project's advisors and the report's own owner (student).
+
+    Returns a dict:
+      - has_file: whether there's a PDF to check at all.
+      - signers: one entry per expected signer (advisors + owner), each
+        {"user": User, "signed": bool, "not_expired": bool}.
+      - verified_count / total: signer counts, for a summary badge.
+      - raw_signatures: every verified certificate CN found in the PDF
+        (may include people other than the expected signers).
+    """
+
+    project = progress_report.project
+    advisors = list(project.advisors) if project else []
+    expected_signers = advisors + [progress_report.owner]
+
+    if not progress_report.file:
+        return {
+            "has_file": False,
+            "signers": [],
+            "verified_count": 0,
+            "total": len(expected_signers),
+            "raw_signatures": [],
+        }
+
+    try:
+        file_content = progress_report.get_file_content()
+        signature_list, is_not_expired_list = utils.verrify_pdf.extract_certificates(
+            file_content, CERTIFICATE_CA_PATH
+        )
+    except Exception:
+        signature_list, is_not_expired_list = [], []
+
+    signers = []
+    verified_count = 0
+    for signer in expected_signers:
+        matched_indexes = [
+            i for i, cn in enumerate(signature_list) if cn == signer.username
+        ]
+        signed = bool(matched_indexes)
+        not_expired = signed and any(is_not_expired_list[i] for i in matched_indexes)
+        if signed:
+            verified_count += 1
+        signers.append({"user": signer, "signed": signed, "not_expired": not_expired})
+
+    return {
+        "has_file": True,
+        "signers": signers,
+        "verified_count": verified_count,
+        "total": len(expected_signers),
+        "raw_signatures": signature_list,
+    }
 
 
 @module.route("/create", methods=["GET", "POST"])
@@ -59,11 +117,16 @@ def view_lecturer(submission_id):
     progress_reports = models.ProgressReport.objects.all().filter(
         class_=class_, submission=submission
     )
+    signatures_by_report = {
+        progress_report.id: get_report_signature_info(progress_report)
+        for progress_report in progress_reports
+    }
     return render_template(
         "/submissions/view.html.j2",
         submission=submission,
         class_=class_,
         progress_reports=progress_reports,
+        signatures_by_report=signatures_by_report,
     )
 
 
@@ -75,11 +138,16 @@ def view_admin(submission_id):
     progress_reports = models.ProgressReport.objects.all().filter(
         class_=class_, submission=submission
     )
+    signatures_by_report = {
+        progress_report.id: get_report_signature_info(progress_report)
+        for progress_report in progress_reports
+    }
     return render_template(
         "/admin/submissions/view.html.j2",
         submission=submission,
         class_=class_,
         progress_reports=progress_reports,
+        signatures_by_report=signatures_by_report,
     )
 
 
