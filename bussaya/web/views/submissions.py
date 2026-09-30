@@ -15,7 +15,7 @@ import socket
 
 module = Blueprint("submissions", __name__, url_prefix="/submissions")
 
-CERTIFICATE_CA_PATH = "bussaya/certificate/certificate_key.pem"
+CERTIFICATE_CA_PATH = "certificates/certificate_key.pem"
 
 
 def get_report_signature_info(progress_report):

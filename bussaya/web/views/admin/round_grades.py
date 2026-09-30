@@ -335,7 +335,7 @@ def approve_report(round_grade_type):
                 file_content = report.file.read()  # ใช้ read() เพื่อดึงเนื้อหาของไฟล์
                 
                 # ตรวจสอบใบรับรองในไฟล์ PDF
-                signature,is_not_expired = utils.verrify_pdf.extract_certificates(file_content, 'bussaya/certificate/certificate_key.pem')
+                signature,is_not_expired = utils.verrify_pdf.extract_certificates(file_content, 'certificates/certificate_key.pem')
                 signatures.append(signature)
                 is_not_expireds.append(is_not_expired)
 

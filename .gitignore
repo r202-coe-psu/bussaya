@@ -10,4 +10,4 @@ deployment
 bussaya/web/static/css/tailwind.css
 *.egg-*
 .coverage
-certificate
+certificates

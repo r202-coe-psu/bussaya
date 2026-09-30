@@ -66,15 +66,28 @@ def extract_certificate_from_signature(signature_binary):
     certs = [cert.strip() + "\n-----END CERTIFICATE-----" for cert in certs if "-----BEGIN CERTIFICATE-----" in cert]
     return certs  # คืนค่าใบรับรองทั้งหมดในรูปแบบลิสต์
 
-def verify_certificate(ca_cert_path, cert_pem):
-    """ตรวจสอบใบรับรองกับ CA ที่กำหนด โดยไม่ต้องใช้ไฟล์ และไม่สนใจวันหมดอายุ"""
-    command = ["openssl", "verify", "-CAfile", ca_cert_path, "-no_check_time"]
-
-    # ใช้ subprocess เพื่อส่งข้อมูลใบรับรองเข้า OpenSSL ผ่าน stdin
+def _run_openssl_verify(command, cert_pem):
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate(input=cert_pem.encode())
+    _, stderr = process.communicate(input=cert_pem.encode())
+    return process.returncode == 0, stderr
 
-    is_verified = process.returncode == 0  # ตรวจสอบว่าใบรับรองผ่านการตรวจสอบหรือไม่
+
+def verify_certificate(ca_cert_path, cert_pem):
+    """ตรวจสอบใบรับรองกับ CA โดยไม่ต้องใช้ไฟล์ และไม่สนใจวันหมดอายุ
+
+    ตรวจสอบกับ global certificate (ระบบ CA store ของเครื่อง) ก่อน
+    ถ้าตรวจสอบไม่ผ่านจึงลองตรวจสอบกับ local certificate (ca_cert_path) แทน"""
+
+    # ลองตรวจสอบกับ global certificate (system CA store) ก่อน
+    is_verified, stderr = _run_openssl_verify(
+        ["openssl", "verify", "-no_check_time"], cert_pem
+    )
+
+    # ถ้าไม่ผ่าน ลองตรวจสอบกับ local certificate แทน
+    if not is_verified:
+        is_verified, stderr = _run_openssl_verify(
+            ["openssl", "verify", "-CAfile", ca_cert_path, "-no_check_time"], cert_pem
+        )
 
     # ตรวจสอบวันหมดอายุของใบรับรอง
     expiration_command = ["openssl", "x509", "-noout", "-checkend", "0"]
