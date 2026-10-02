@@ -6,7 +6,8 @@ from . import projects
 
 TYPE_CHOICE = [
     ("preproject", "Preproject"),
-    ("project", "Project"),
+    ("project 1", "Project I"),
+    ("project 2", "Project II"),
     ("cooperative", "Cooperative Education"),
     ("precooperative", "Pre-cooperative Education"),
     ("thesis", "Thesis"),
@@ -104,7 +105,9 @@ class Class(me.Document):
 
         from .grades import StudentGrade
 
-        plo_data = {}  # plo.id -> {"plo": plo, "students": {student.id: [percentage, ...]}}
+        plo_data = (
+            {}
+        )  # plo.id -> {"plo": plo, "students": {student.id: [percentage, ...]}}
 
         for student in self.get_students():
             if not student.curriculum:
@@ -129,13 +132,21 @@ class Class(me.Document):
                         plos.update(clo.plos)
 
                     for plo in plos:
-                        if not plo.curriculum or plo.curriculum.id != student.curriculum.id:
+                        if (
+                            not plo.curriculum
+                            or plo.curriculum.id != student.curriculum.id
+                        ):
                             continue
-                        entry = plo_data.setdefault(plo.id, {"plo": plo, "students": {}})
-                        entry["students"].setdefault(student.id, {
-                            "student": student,
-                            "percentages": [],
-                        })
+                        entry = plo_data.setdefault(
+                            plo.id, {"plo": plo, "students": {}}
+                        )
+                        entry["students"].setdefault(
+                            student.id,
+                            {
+                                "student": student,
+                                "percentages": [],
+                            },
+                        )
                         entry["students"][student.id]["percentages"].append(percentage)
 
         rows = []
@@ -144,19 +155,25 @@ class Class(me.Document):
             improvement_students = []
             for info in data["students"].values():
                 percentage = sum(info["percentages"]) / len(info["percentages"])
-                bucket = pass_students if percentage >= pass_threshold else improvement_students
+                bucket = (
+                    pass_students
+                    if percentage >= pass_threshold
+                    else improvement_students
+                )
                 bucket.append({"student": info["student"], "percentage": percentage})
 
             pass_students.sort(key=lambda s: s["student"].username)
             improvement_students.sort(key=lambda s: s["student"].username)
 
-            rows.append({
-                "plo": data["plo"],
-                "pass_students": pass_students,
-                "improvement_students": improvement_students,
-                "pass_count": len(pass_students),
-                "improvement_count": len(improvement_students),
-            })
+            rows.append(
+                {
+                    "plo": data["plo"],
+                    "pass_students": pass_students,
+                    "improvement_students": improvement_students,
+                    "pass_count": len(pass_students),
+                    "improvement_count": len(improvement_students),
+                }
+            )
 
         rows.sort(key=lambda row: row["plo"].code)
         return rows
