@@ -249,10 +249,10 @@ class Server:
 
         summary = {}
         summary["round_grade"] = await self.send_round_grade_reminders()
-        # summary["meeting"] = await self.send_meeting_report_reminders()
+        summary["meeting"] = await self.send_meeting_report_reminders()
 
-        # summary["report"] = await self.send_report_reminders(mailer, base_url)
-        # summary["presentation"] = await self.send_presentation_reminders(mailer, base_url)
+        summary["report"] = await self.send_report_reminders(mailer, base_url)
+        summary["presentation"] = await self.send_presentation_reminders(mailer, base_url)
 
         for target_type, counts in summary.items():
             logger.info(
