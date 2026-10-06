@@ -8,4 +8,3 @@ def init_cache(app):
 
     with app.app_context():
         cache.clear()
-

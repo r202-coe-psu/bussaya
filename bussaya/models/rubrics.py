@@ -144,7 +144,9 @@ class RubricCriterionSnapshot(me.EmbeddedDocument):
 class RoundGradeRubric(me.Document):
     meta = {"collection": "round_grade_rubrics"}
 
-    round_grade = me.ReferenceField("RoundGrade", dbref=True, required=True, unique=True)
+    round_grade = me.ReferenceField(
+        "RoundGrade", dbref=True, required=True, unique=True
+    )
     template = me.ReferenceField("RubricTemplate", dbref=True, required=True)
     criteria = me.EmbeddedDocumentListField(RubricCriterionSnapshot)
 
@@ -193,7 +195,9 @@ def set_round_grade_rubric(round_grade, template):
 
     round_grade_rubric = RoundGradeRubric.objects(round_grade=round_grade).first()
     if not round_grade_rubric:
-        round_grade_rubric = RoundGradeRubric(round_grade=round_grade, template=template)
+        round_grade_rubric = RoundGradeRubric(
+            round_grade=round_grade, template=template
+        )
     else:
         round_grade_rubric.template = template
 
@@ -236,7 +240,9 @@ class RubricScore(me.Document):
     student_grade = me.ReferenceField(
         "StudentGrade", dbref=True, required=True, unique=True
     )
-    round_grade_rubric = me.ReferenceField("RoundGradeRubric", dbref=True, required=True)
+    round_grade_rubric = me.ReferenceField(
+        "RoundGradeRubric", dbref=True, required=True
+    )
     criterion_scores = me.EmbeddedDocumentListField(CriterionScore)
 
     created_date = me.DateTimeField(required=True, default=datetime.datetime.now)
@@ -260,9 +266,7 @@ class RubricScore(me.Document):
         if not scored:
             return None
 
-        criteria_by_id = {
-            str(c.id): c for c in self.round_grade_rubric.criteria
-        }
+        criteria_by_id = {str(c.id): c for c in self.round_grade_rubric.criteria}
         total_score = 0
         total_max = 0
         for cs in scored:

@@ -89,9 +89,7 @@ def get_average_plo_achievement(students):
             plo = item["plo"]
             if not plo.curriculum or plo.curriculum.id != student.curriculum.id:
                 continue
-            entry = plo_data.setdefault(
-                plo.id, {"plo": plo, "percentages": []}
-            )
+            entry = plo_data.setdefault(plo.id, {"plo": plo, "percentages": []})
             entry["percentages"].append(item["percentage"])
 
     groups_by_curriculum = {}
@@ -113,7 +111,9 @@ def get_average_plo_achievement(students):
     groups = list(groups_by_curriculum.values())
     for group in groups:
         group["plos"].sort(key=lambda item: item["plo"].code)
-    groups.sort(key=lambda group: group["curriculum"].name if group["curriculum"] else "")
+    groups.sort(
+        key=lambda group: group["curriculum"].name if group["curriculum"] else ""
+    )
     return groups
 
 

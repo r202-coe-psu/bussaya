@@ -17,7 +17,6 @@ import mongoengine as me
 from bussaya import models
 from bussaya.web import forms, acl
 
-
 module = Blueprint("organizations", __name__, url_prefix="/organizations")
 
 ORGANIZATIONS_PER_PAGE = 20
@@ -105,7 +104,9 @@ def view(organization_id):
     if not organization:
         return redirect(url_for("admin.organizations.index"))
 
-    return render_template("admin/organizations/view.html.j2", organization=organization)
+    return render_template(
+        "admin/organizations/view.html.j2", organization=organization
+    )
 
 
 @module.route(

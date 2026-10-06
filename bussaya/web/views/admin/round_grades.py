@@ -24,7 +24,6 @@ from bussaya.web import forms, acl
 from bussaya import utils
 from bussaya.models import rubrics as rubric_models
 
-
 module = Blueprint("round_grades", __name__, url_prefix="/round_grades")
 
 
@@ -333,29 +332,31 @@ def approve_report(round_grade_type):
             try:
                 # ดึงเนื้อหาของไฟล์จาก GridFS
                 file_content = report.file.read()  # ใช้ read() เพื่อดึงเนื้อหาของไฟล์
-                
+
                 # ตรวจสอบใบรับรองในไฟล์ PDF
-                signature,is_not_expired = utils.verrify_pdf.extract_certificates(file_content, 'certificates/certificate_key.pem')
+                signature, is_not_expired = utils.verrify_pdf.extract_certificates(
+                    file_content, "certificates/certificate_key.pem"
+                )
                 signatures.append(signature)
                 is_not_expireds.append(is_not_expired)
 
             except Exception as e:
 
-                '''   
+                """
                 debug code
 
-                print(f"❌ ไม่สามารถอ่านไฟล์ PDF: {e}")   
-                '''
+                print(f"❌ ไม่สามารถอ่านไฟล์ PDF: {e}")
+                """
 
                 signatures.append(None)
                 is_not_expireds.append(None)
         else:
 
-            '''  
+            """
             #####debug code
-            print("❌ ไม่พบไฟล์ในรายงาน")  
-            '''
-            
+            print("❌ ไม่พบไฟล์ในรายงาน")
+            """
+
             signatures.append(None)
             is_not_expireds.append(None)
 
@@ -539,9 +540,15 @@ def grading(round_grade_id):
     )
 
     round_grade_rubric = rubric_models.get_or_create_round_grade_rubric(round_grade)
-    form = build_rubric_grading_form(
-        forms.round_grades.GroupRubricGradingForm, student_grades, round_grade_rubric
-    ) if round_grade_rubric else forms.round_grades.GroupRubricGradingForm()
+    form = (
+        build_rubric_grading_form(
+            forms.round_grades.GroupRubricGradingForm,
+            student_grades,
+            round_grade_rubric,
+        )
+        if round_grade_rubric
+        else forms.round_grades.GroupRubricGradingForm()
+    )
 
     rubric_templates = models.RubricTemplate.objects(class_type=class_.type).order_by(
         "-status", "name"
@@ -573,7 +580,9 @@ def select_rubric(round_grade_id):
     template = models.RubricTemplate.objects(id=request.form.get("template_id")).first()
     if not template:
         flash("Rubric template not found.", "error")
-        return redirect(url_for("admin.round_grades.grading", round_grade_id=round_grade.id))
+        return redirect(
+            url_for("admin.round_grades.grading", round_grade_id=round_grade.id)
+        )
 
     existing = models.RoundGradeRubric.objects(round_grade=round_grade).first()
     if existing and models.RubricScore.objects(round_grade_rubric=existing).first():
@@ -581,11 +590,15 @@ def select_rubric(round_grade_id):
             "Cannot change the rubric: scores have already been entered for this round.",
             "warning",
         )
-        return redirect(url_for("admin.round_grades.grading", round_grade_id=round_grade.id))
+        return redirect(
+            url_for("admin.round_grades.grading", round_grade_id=round_grade.id)
+        )
 
     rubric_models.set_round_grade_rubric(round_grade, template)
     flash(f'Rubric set to "{template.name}".', "success")
-    return redirect(url_for("admin.round_grades.grading", round_grade_id=round_grade.id))
+    return redirect(
+        url_for("admin.round_grades.grading", round_grade_id=round_grade.id)
+    )
 
 
 @module.route("/<round_grade_id>/submit-grade", methods=["GET", "POST"])
@@ -615,7 +628,9 @@ def submit_grade(round_grade_id):
         if not student_grade:
             continue
 
-        save_rubric_score(student_grade, round_grade_rubric, grading["criterion_scores"])
+        save_rubric_score(
+            student_grade, round_grade_rubric, grading["criterion_scores"]
+        )
         student_grade.save()
 
         if student_grade.result != "-":
@@ -799,7 +814,9 @@ def submit_mentor_grade(round_grade_id):
             continue
 
         student_grade.grader.mentor = mentor
-        save_rubric_score(student_grade, round_grade_rubric, grading["criterion_scores"])
+        save_rubric_score(
+            student_grade, round_grade_rubric, grading["criterion_scores"]
+        )
         student_grade.updated_date = datetime.datetime.now()
 
         student_grade.save()

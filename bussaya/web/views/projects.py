@@ -14,7 +14,6 @@ from .. import forms
 
 import datetime
 
-
 module = Blueprint("projects", __name__, url_prefix="/projects")
 
 

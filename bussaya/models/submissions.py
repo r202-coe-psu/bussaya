@@ -1,4 +1,3 @@
-
 import mongoengine as me
 import gridfs
 
@@ -184,7 +183,7 @@ class ProgressReport(me.Document):
 
     def get_uploaded_date(self):
         return self.updated_date.strftime("%Y-%m-%d %H:%M")
-    
+
     def get_file_content(self):
         """ดึงเนื้อหาของไฟล์จาก progress_report_fs โดยใช้ file_id"""
         return self.file.read()

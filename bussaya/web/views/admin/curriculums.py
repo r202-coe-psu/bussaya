@@ -5,7 +5,6 @@ from flask_login import current_user
 from bussaya import models
 from bussaya.web import forms, acl
 
-
 module = Blueprint("curriculums", __name__, url_prefix="/curriculums")
 
 
@@ -14,9 +13,7 @@ module = Blueprint("curriculums", __name__, url_prefix="/curriculums")
 def index():
     curriculums = models.Curriculum.objects(status="active").order_by("name")
 
-    return render_template(
-        "admin/curriculums/index.html.j2", curriculums=curriculums
-    )
+    return render_template("admin/curriculums/index.html.j2", curriculums=curriculums)
 
 
 @module.route("/compare")
@@ -27,7 +24,9 @@ def compare():
     curriculum_id = request.args.get("curriculum_id")
     curriculum = None
     if curriculum_id:
-        curriculum = models.Curriculum.objects(id=curriculum_id, status="active").first()
+        curriculum = models.Curriculum.objects(
+            id=curriculum_id, status="active"
+        ).first()
     if not curriculum:
         curriculum = curriculums.first()
 
@@ -82,9 +81,7 @@ def view(curriculum_id):
     if not curriculum:
         return redirect(url_for("admin.curriculums.index"))
 
-    return render_template(
-        "admin/curriculums/view.html.j2", curriculum=curriculum
-    )
+    return render_template("admin/curriculums/view.html.j2", curriculum=curriculum)
 
 
 @module.route(

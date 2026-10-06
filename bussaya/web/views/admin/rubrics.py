@@ -4,7 +4,6 @@ from flask_login import current_user
 from bussaya import models
 from bussaya.web import forms, acl
 
-
 module = Blueprint("rubrics", __name__, url_prefix="/rubrics")
 
 
@@ -60,9 +59,7 @@ def create_or_edit(template_id):
     template.name = form.name.data
     template.class_type = form.class_type.data
     template.description = form.description.data
-    template.curriculums = list(
-        models.Curriculum.objects(id__in=form.curriculums.data)
-    )
+    template.curriculums = list(models.Curriculum.objects(id__in=form.curriculums.data))
     template.save()
 
     return redirect(url_for("admin.rubrics.criteria", template_id=template.id))
@@ -153,9 +150,7 @@ def edit_criterion(template_id, criterion_id):
 def remove_criterion(template_id, criterion_id):
     template = models.RubricTemplate.objects.get(id=template_id)
     if template.is_editable():
-        template.criteria = [
-            c for c in template.criteria if str(c.id) != criterion_id
-        ]
+        template.criteria = [c for c in template.criteria if str(c.id) != criterion_id]
         template.save()
 
     return redirect(url_for("admin.rubrics.criteria", template_id=template.id))

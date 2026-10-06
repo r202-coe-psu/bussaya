@@ -19,7 +19,9 @@ class DeadlineReminderTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         me.connect(
-            "test_notifications", mongo_client_class=mongomock.MongoClient, alias="default"
+            "test_notifications",
+            mongo_client_class=mongomock.MongoClient,
+            alias="default",
         )
 
     @classmethod
@@ -46,10 +48,16 @@ class DeadlineReminderTest(unittest.TestCase):
             username="lect1", first_name="Lec", last_name="Turer", email="lect1@x.com"
         ).save()
         self.other_lecturer = models.User(
-            username="lect2", first_name="Other", last_name="Lecturer", email="lect2@x.com"
+            username="lect2",
+            first_name="Other",
+            last_name="Lecturer",
+            email="lect2@x.com",
         ).save()
         self.student = models.User(
-            username="6610110001", first_name="Stu", last_name="Dent", email="stu1@x.com"
+            username="6610110001",
+            first_name="Stu",
+            last_name="Dent",
+            email="stu1@x.com",
         ).save()
         self.class_ = models.Class(
             name="Test Class",
@@ -241,7 +249,9 @@ class DeadlineReminderTest(unittest.TestCase):
             counts = run(self.server.send_meeting_report_reminders())
 
         self.assertEqual(counts, {"sent": 1, "failed": 0, "skipped": 0})
-        mock_send.assert_called_once_with(self.student.email, unittest.mock.ANY, unittest.mock.ANY)
+        mock_send.assert_called_once_with(
+            self.student.email, unittest.mock.ANY, unittest.mock.ANY
+        )
 
     def test_student_not_reminded_once_meeting_report_submitted(self):
         meeting = models.Meeting(

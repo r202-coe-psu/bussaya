@@ -5,8 +5,8 @@ from flask_wtf import FlaskForm
 
 
 class VotingForm(FlaskForm):
-    location = fields.HiddenField('Current Location')
-    remark = fields.HiddenField('Remark')
+    location = fields.HiddenField("Current Location")
+    remark = fields.HiddenField("Remark")
 
     # projects = fields.SelectMultipleField(
     #         'Projects',

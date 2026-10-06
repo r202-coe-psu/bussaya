@@ -11,6 +11,6 @@ class FirstPageTest(unittest.TestCase):
         self.client.testing = True
 
     def test_first_page(self):
-        result = self.client.get('/')
+        result = self.client.get("/")
         self.assertEqual(result.status_code, 200)
-        self.assertIn('Bussaya', result.data.decode())
+        self.assertIn("Bussaya", result.data.decode())

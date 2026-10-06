@@ -19,7 +19,6 @@ import pandas
 from bussaya import models
 from bussaya.web import acl
 
-
 module = Blueprint("exports", __name__, url_prefix="/exports")
 
 

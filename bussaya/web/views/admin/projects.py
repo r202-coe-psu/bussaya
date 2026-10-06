@@ -12,7 +12,6 @@ from flask_login import login_required, current_user
 from bussaya import models
 from bussaya.web import forms, acl
 
-
 module = Blueprint("projects", __name__, url_prefix="/projects")
 
 

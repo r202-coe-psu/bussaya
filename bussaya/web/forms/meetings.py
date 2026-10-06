@@ -110,7 +110,9 @@ class DisapproveForm(BaseMeetingReportForm):
 class ForceAddMeetingReportForm(FlaskForm):
     student = fields.SelectField("Student", validators=[validators.DataRequired()])
     title = fields.StringField("Title", validators=[validators.DataRequired()])
-    description = fields.TextAreaField("Description", validators=[validators.Optional()])
+    description = fields.TextAreaField(
+        "Description", validators=[validators.Optional()]
+    )
     meeting_date = fields.DateField(
         "Meeting Date",
         default=datetime.date.today,

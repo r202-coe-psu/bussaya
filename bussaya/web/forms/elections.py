@@ -6,17 +6,14 @@ from flask_wtf import FlaskForm
 
 
 class ElectionForm(FlaskForm):
-    class_ = fields.SelectField(
-            'Class',
-            validators=[validators.InputRequired()]
-            )
+    class_ = fields.SelectField("Class", validators=[validators.InputRequired()])
     started_date = fields.DateTimeField(
-            'Start Date',
-            format=['%Y-%m-%d %H:%M', '%Y-%m-%dT%H:%M'],
-            widget=widgets.TextInput()
-            )
+        "Start Date",
+        format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"],
+        widget=widgets.TextInput(),
+    )
     ended_date = fields.DateTimeField(
-            'Update Date',
-            widget=widgets.TextInput(),
-            format=['%Y-%m-%d %H:%M', '%Y-%m-%dT%H:%M']
-            )
+        "Update Date",
+        widget=widgets.TextInput(),
+        format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"],
+    )

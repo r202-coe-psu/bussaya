@@ -10,7 +10,6 @@ from bussaya import models
 from .projects import BaseProjectForm
 from .fields import TextListField
 
-
 BaseGroupForm = model_form(
     models.Group,
     FlaskForm,

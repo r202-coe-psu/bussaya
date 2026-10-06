@@ -10,27 +10,28 @@ class URIListField(fields.Field):
 
     def _value(self):
         if self.data:
-            return ', '.join(self.data)
+            return ", ".join(self.data)
         else:
-            return ''
+            return ""
 
     def process_formdata(self, valuelist):
         data = []
         if valuelist:
-            data = [tag.strip() for tag in valuelist[0].split(',') if len(tag.strip()) > 0]
+            data = [
+                tag.strip() for tag in valuelist[0].split(",") if len(tag.strip()) > 0
+            ]
         self.data = data
 
 
 class OAuthProjectForm(FlaskForm):
     name = fields.TextField(
-            'Name',
-            validators=[validators.InputRequired(),
-                        validators.Length(min=3)])
+        "Name", validators=[validators.InputRequired(), validators.Length(min=3)]
+    )
     description = fields.TextField(
-            'Description',
-            validators=[validators.InputRequired()])
+        "Description", validators=[validators.InputRequired()]
+    )
     confidential = fields.BooleanField(default=False)
 
     redirect_uris = URIListField(
-            'Redirect URIs',
-            validators=[validators.InputRequired()])
+        "Redirect URIs", validators=[validators.InputRequired()]
+    )

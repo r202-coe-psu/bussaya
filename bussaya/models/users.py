@@ -154,7 +154,9 @@ class User(me.Document, UserMixin):
         criteria = []
         for name, data in scores_by_criterion.items():
             avg_score = sum(data["scores"]) / len(data["scores"])
-            percentage = (avg_score / data["max_score"] * 100) if data["max_score"] else 0
+            percentage = (
+                (avg_score / data["max_score"] * 100) if data["max_score"] else 0
+            )
             criteria.append(
                 {
                     "name": name,

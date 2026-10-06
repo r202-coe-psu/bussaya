@@ -81,9 +81,13 @@ class RubricCriterionLevelTest(unittest.TestCase):
 
         cs1 = models.CriterionScore(criterion_id=c1.id, score=40)  # A (100% = 40)
         cs2 = models.CriterionScore(criterion_id=c2.id, score=45)  # B (75% = 45)
-        score_doc = models.RubricScore(round_grade_rubric=round_rubric, criterion_scores=[cs1, cs2])
+        score_doc = models.RubricScore(
+            round_grade_rubric=round_rubric, criterion_scores=[cs1, cs2]
+        )
 
-        self.assertEqual(score_doc.get_percentage(), 85.0)  # (40 + 45) / 100 * 100 = 85%
+        self.assertEqual(
+            score_doc.get_percentage(), 85.0
+        )  # (40 + 45) / 100 * 100 = 85%
         self.assertEqual(score_doc.get_point(), 3.4)  # 85% * 4.0 / 100 = 3.4
         user = models.User()
         self.assertEqual(user.get_point_to_grade(score_doc.get_point()), "B+")

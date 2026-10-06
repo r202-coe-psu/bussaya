@@ -3,7 +3,6 @@ from flask import Blueprint, render_template
 from bussaya import models
 from bussaya.web import acl
 
-
 module = Blueprint("admin", __name__, url_prefix="/admin")
 
 

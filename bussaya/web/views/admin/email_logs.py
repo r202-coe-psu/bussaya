@@ -51,7 +51,9 @@ def index():
         page = total_pages
 
     logs_page = logs.skip((page - 1) * LOGS_PER_PAGE).limit(LOGS_PER_PAGE)
-    rows = [{"log": log, "target_description": _describe_target(log)} for log in logs_page]
+    rows = [
+        {"log": log, "target_description": _describe_target(log)} for log in logs_page
+    ]
 
     return render_template(
         "/admin/email_logs/index.html.j2",

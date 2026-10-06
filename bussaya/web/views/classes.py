@@ -9,7 +9,6 @@ from bussaya import models
 from bussaya.models import rubrics as rubric_models
 from .. import acl, forms
 
-
 module = Blueprint(
     "classes",
     __name__,
@@ -109,9 +108,7 @@ def view_student(class_id):
         round_grade_rubrics.append(
             {
                 "round_grade": round_grade,
-                "rubric": rubric_models.get_or_create_round_grade_rubric(
-                    round_grade
-                ),
+                "rubric": rubric_models.get_or_create_round_grade_rubric(round_grade),
             }
         )
 

@@ -13,7 +13,6 @@ from bussaya import models
 from .. import forms
 from .. import acl
 
-
 module = Blueprint("elections", __name__, url_prefix="/elections")
 subviews = []
 

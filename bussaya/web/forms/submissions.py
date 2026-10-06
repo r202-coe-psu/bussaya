@@ -33,13 +33,19 @@ BaseSubmissionForm = model_form(
 
 class SubmissionForm(BaseSubmissionForm):
     started_date = fields.DateTimeField(
-        "Started Date", widget=widgets.TextInput(), format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"]
+        "Started Date",
+        widget=widgets.TextInput(),
+        format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"],
     )
     ended_date = fields.DateTimeField(
-        "Ended date", widget=widgets.TextInput(), format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"]
+        "Ended date",
+        widget=widgets.TextInput(),
+        format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"],
     )
     extended_date = fields.DateTimeField(
-        "Extended date", widget=widgets.TextInput(), format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"]
+        "Extended date",
+        widget=widgets.TextInput(),
+        format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"],
     )
 
 
@@ -63,10 +69,14 @@ class ProgressReportForm(BaseProgressReportForm):
 
 class ProgressReportDateForm(FlaskForm):
     created_date = fields.DateTimeField(
-        "Created Date", widget=widgets.TextInput(), format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"]
+        "Created Date",
+        widget=widgets.TextInput(),
+        format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"],
     )
     updated_date = fields.DateTimeField(
-        "Updated Date", widget=widgets.TextInput(), format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"]
+        "Updated Date",
+        widget=widgets.TextInput(),
+        format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"],
     )
 
     remark = fields.StringField("Remark", widget=widgets.TextArea())
@@ -80,7 +90,9 @@ class AdminProgressReportForm(ProgressReportForm):
     )
     student = fields.SelectField("Student")
     uploaded_date = fields.DateTimeField(
-        "Uploaded Date", widget=widgets.TextInput(), format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"]
+        "Uploaded Date",
+        widget=widgets.TextInput(),
+        format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"],
     )
 
 
@@ -103,13 +115,19 @@ BaseFinalSubmissionForm = model_form(
 
 class FinalSubmissionForm(BaseFinalSubmissionForm):
     started_date = fields.DateTimeField(
-        "Started Date", widget=widgets.TextInput(), format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"]
+        "Started Date",
+        widget=widgets.TextInput(),
+        format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"],
     )
     ended_date = fields.DateTimeField(
-        "Ended date", widget=widgets.TextInput(), format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"]
+        "Ended date",
+        widget=widgets.TextInput(),
+        format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"],
     )
     extended_date = fields.DateTimeField(
-        "Extended date", widget=widgets.TextInput(), format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"]
+        "Extended date",
+        widget=widgets.TextInput(),
+        format=["%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M"],
     )
 
 
