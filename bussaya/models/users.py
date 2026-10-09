@@ -219,19 +219,27 @@ class User(me.Document, UserMixin):
         if submission.class_ and submission.class_.type == "thesis":
             return True
 
-        meetings = models.Meeting.objects(
-            class_=submission.class_,
-            round=submission.round,
-        )
-        report_count = models.MeetingReport.objects(
-            class_=submission.class_,
-            owner=self,
-            status__in=["approved", "wait", None],
-            meeting__in=meetings,
-        ).count()
+        if submission.type == "report":
+            meetings = models.Meeting.objects(
+                class_=submission.class_,
+                round=submission.round,
+            )
+            report_count = models.MeetingReport.objects(
+                class_=submission.class_,
+                owner=self,
+                status__in=["approved", "wait", None],
+                meeting__in=meetings,
+            ).count()
 
-        if report_count > 2:
-            return True
+            if report_count > 2:
+                return True
+
+        elif submission.type == "presentation":
+            submission_report = models.Submission.objects(
+                round=submission.round, type="report"
+            ).first()
+            if submission_report:
+                return True
 
         return False
 
