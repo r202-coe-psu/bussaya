@@ -241,7 +241,7 @@
 			</tr>
 		</thead>
 
-		<body>
+		<tbody>
 			{% for submission in submissions %}
 			{% set progress_report = submission.get_progress_report_by_owner(user) %}
 			<tr class="align-top">
@@ -318,7 +318,7 @@
 					  	Upload
 					</a>
 
-					{% elif (submission.get_status() == "opened" or submission.get_status() == "lated") and submissions[loop.index-2].get_progress_report_by_owner(user) and submission.get_type_display()=="Presentation" %}
+					{% elif (submission.get_status() == "opened" or submission.get_status() == "lated") and submission.get_type_display()=="Presentation" %}
 
 					<a class="btn btn-sm btn-block {{ 'btn-primary' if current_user.get_permission_to_upload(submission) else 'btn-disabled' }}" href="{{ url_for('submissions.upload', submission_id=submission.id)}}">
 						<i class="fa-solid fa-upload"></i>
@@ -339,7 +339,7 @@
 				</td>
 			</tr>
 			{% endfor %}
-		</body>
+		</tbody>
 	</table>
 	</div>
 	{% else %}
