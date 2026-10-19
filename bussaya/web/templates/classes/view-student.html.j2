@@ -1,5 +1,6 @@
 {% extends '/classes/index.html.j2' %}
 {% import '/base/project-material-renderer.html.j2' as project_material_renderer %}
+{% import '/base/signature-renderer.html.j2' as renderer_signature %}
 
 {% block breadcrumbs %}
 <li><a href="{{ url_for('dashboard.index') }}">Classes</a></li>
@@ -237,11 +238,13 @@
 				<th>Status</th>
 				<th>Time Remaining</th>
 				<th>File</th>
+				<th>Signature</th>
 				<th>Action</th>
 			</tr>
 		</thead>
 
 		<tbody>
+			{% set modal_index = namespace(value=0) %}
 			{% for submission in submissions %}
 			{% set progress_report = submission.get_progress_report_by_owner(user) %}
 			<tr class="align-top">
@@ -312,6 +315,15 @@
 				</td>
 
 				<td>
+					{% if progress_report %}
+					{{ renderer_signature.render_signature_badge(progress_report, signatures_by_report[progress_report.id], modal_index.value) }}
+					{% set modal_index.value = modal_index.value + 1 %}
+					{% else %}
+					-
+					{% endif %}
+				</td>
+
+				<td>
 					{% if (submission.get_status() == "opened" or submission.get_status() == "lated") and submission.get_type_display()=="Report" %}
 					<a class="btn btn-sm btn-block {{ 'btn-primary' if current_user.get_permission_to_upload(submission) else 'btn-disabled' }}" href="{{ url_for('submissions.upload', submission_id=submission.id)}}">
 						<i class="fa-solid fa-upload"></i>
@@ -342,6 +354,16 @@
 		</tbody>
 	</table>
 	</div>
+
+	{% set modal_index = namespace(value=0) %}
+	{% for submission in submissions %}
+	{% set progress_report = submission.get_progress_report_by_owner(user) %}
+	{% if progress_report %}
+	{{ renderer_signature.render_signature_modal(progress_report, signatures_by_report[progress_report.id], modal_index.value) }}
+	{% set modal_index.value = modal_index.value + 1 %}
+	{% endif %}
+	{% endfor %}
+
 	{% else %}
 	<div class="alert alert-info">No submission at this time.</div>
 {% endif %}

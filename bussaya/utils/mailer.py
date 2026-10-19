@@ -17,7 +17,7 @@ class Mailer:
         self.host = config.get("MAIL_HOST", "localhost")
         self.port = int(config.get("MAIL_PORT", 587))
         self.use_tls = bool(config.get("MAIL_USE_TLS", True))
-        self.username = config.get("MAIL_USERNAME", "")
+        self.username = config.get("MAIL_USER", "")
         self.password = config.get("MAIL_PASSWORD", "")
         self.sender = config.get("MAIL_SENDER") or self.username
         self.sender_name = config.get("MAIL_SENDER_NAME", "")

@@ -8,6 +8,7 @@ import markdown
 from bussaya import models
 from bussaya.models import rubrics as rubric_models
 from .. import acl, forms
+from .submissions import get_report_signature_info
 
 module = Blueprint(
     "classes",
@@ -115,6 +116,15 @@ def view_student(class_id):
     project = models.Project.objects(
         students=current_user._get_current_object(), class_=class_, status="active"
     ).first()
+
+    signatures_by_report = {}
+    for submission in submissions:
+        progress_report = submission.get_progress_report_by_owner(user)
+        if progress_report:
+            signatures_by_report[progress_report.id] = get_report_signature_info(
+                progress_report
+            )
+
     return render_template(
         "/classes/view-student.html.j2",
         user=user,
@@ -125,6 +135,7 @@ def view_student(class_id):
         grade_released=grade_released,
         final_submission=final_submission,
         round_grade_rubrics=round_grade_rubrics,
+        signatures_by_report=signatures_by_report,
     )
 
 
