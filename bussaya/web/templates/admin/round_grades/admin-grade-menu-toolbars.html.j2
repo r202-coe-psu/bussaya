@@ -53,12 +53,12 @@
     </a>
     {% endif %}
 
-    <a aria-disabled="true" class="btn btn-warning"
+    <a class="btn btn-warning"
         href="{{ url_for('admin.round_grades.set_time', round_grade_id=round_grade.id) }}">
         <i class="fa-solid fa-clock"></i>
         Set Time Off Grading System
     </a>
-    <a aria-disabled="true" class="btn btn-accent" onclick="showRelease()">
+    <a class="btn btn-accent" onclick="showRelease()">
         <i class="fa-solid fa-share-nodes"></i>
         {{'Release' if round_grade.release_status == 'unreleased' else "Unrelease"}}
         {{ round_grade.get_type_display() }} Grade
@@ -88,7 +88,7 @@
             class {{ round_grade.class_.name }} ?
         </p>
         <div class="modal-action">
-            <a aria-disabled="true" class="btn btn-accent"
+            <a class="btn btn-accent"
                 href="{{ url_for('admin.round_grades.change_release_status', round_grade_id=round_grade.id) }}">
                 <i class="fa-solid fa-share-nodes"></i>
                 {{ 'Release' if round_grade.release_status == 'unreleased' else "Unrelease" }}
