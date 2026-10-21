@@ -85,6 +85,7 @@ class StudentGrade(me.Document):
     meta = {"collection": "student_grades"}
 
     result = me.StringField(choices=STUDENT_GRADE_CHOICES, default="-")
+    comment = me.StringField(default="")
     project = me.ReferenceField("Project", dbref=True)
     round_grade = me.ReferenceField("RoundGrade", dbref=True, required=True)
 

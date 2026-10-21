@@ -165,6 +165,8 @@ def grading(round_grade_id):
         user=user,
         student_grades=student_grades,
         final_grade_scale=admin_round_grades.get_final_grade_scale(user),
+        is_admin=False,
+        endpoint_prefix="round_grades",
     )
 
 
@@ -206,6 +208,7 @@ def submit_grade(round_grade_id):
         if not student_grade:
             continue
 
+        student_grade.comment = grading.get("comment") or ""
         admin_round_grades.save_rubric_score(
             student_grade, round_grade_rubric, grading["criterion_scores"]
         )
@@ -285,6 +288,7 @@ def submit_grade_one(round_grade_id):
             {"criterion_id": entry.get("criterion_id"), "score": score}
         )
 
+    student_grade.comment = payload.get("comment") or ""
     admin_round_grades.save_rubric_score(
         student_grade, round_grade_rubric, criterion_scores_data
     )

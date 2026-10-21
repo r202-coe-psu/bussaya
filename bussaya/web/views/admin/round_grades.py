@@ -197,6 +197,7 @@ def build_rubric_grading_form(form_class, student_grades, round_grade_rubric):
             {
                 "student_id": str(student_grade.student.id),
                 "criterion_scores": criterion_scores,
+                "comment": student_grade.comment,
             }
         )
     return form
@@ -569,6 +570,8 @@ def grading(round_grade_id):
         user=user,
         student_grades=student_grades,
         final_grade_scale=get_final_grade_scale(user),
+        is_admin=True,
+        endpoint_prefix="admin.round_grades",
     )
 
 
@@ -628,6 +631,7 @@ def submit_grade(round_grade_id):
         if not student_grade:
             continue
 
+        student_grade.comment = grading.get("comment") or ""
         save_rubric_score(
             student_grade, round_grade_rubric, grading["criterion_scores"]
         )
@@ -703,6 +707,7 @@ def submit_grade_one(round_grade_id):
             {"criterion_id": entry.get("criterion_id"), "score": score}
         )
 
+    student_grade.comment = payload.get("comment") or ""
     save_rubric_score(student_grade, round_grade_rubric, criterion_scores_data)
     student_grade.save()
 

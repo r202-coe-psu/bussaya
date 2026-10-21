@@ -1,0 +1,323 @@
+<script type="text/javascript">
+    const FINAL_GRADE_SCALE = [
+        {% for grade, min_percent in final_grade_scale %}
+        {grade: "{{ grade }}", min_percent: {{ min_percent }}}{{ "," if not loop.last }}
+        {% endfor %}
+    ];
+
+    function getProjectedGrade(percentage) {
+        for (const entry of FINAL_GRADE_SCALE) {
+            if (percentage >= entry.min_percent) return entry.grade;
+        }
+        return FINAL_GRADE_SCALE.length ? FINAL_GRADE_SCALE[FINAL_GRADE_SCALE.length - 1].grade : "-";
+    }
+
+    // Keep in sync with GRADE_COLORS / GRADE_COLOR_DEFAULT in bussaya/web/views/__init__.py
+    const GRADE_COLORS = {
+        "A": ["#38bdf8", "#ffffff"],
+        "B+": ["#22c55e", "#ffffff"],
+        "B": ["#bbf7d0", "#14532d"],
+        "C+": ["#facc15", "#713f12"],
+        "C": ["#fef08a", "#713f12"],
+        "D+": ["#fb923c", "#ffffff"],
+        "D": ["#fed7aa", "#7c2d12"],
+        "E": ["#ef4444", "#ffffff"],
+    };
+    const GRADE_COLOR_DEFAULT = ["#d1d5db", "#374151"];
+
+    function applyGradeColor(el, grade) {
+        if (!el) return;
+        const [bg, fg] = GRADE_COLORS[grade] || GRADE_COLOR_DEFAULT;
+        el.style.backgroundColor = bg;
+        el.style.border = '';
+        el.style.color = fg;
+    }
+
+    function updateLiveGradeCalculation(dialog) {
+        const panel = dialog.querySelector('.live-grade-panel');
+        if (!panel) return;
+
+        let scoredCount = 0;
+        let scoredSum = 0;
+        let scoredMax = 0;
+        let fullMax = 0;
+
+        const rows = dialog.querySelectorAll('.criterion-row');
+        rows.forEach(function(row) {
+            const select = row.querySelector('.grade-level-select');
+            const input = row.querySelector('.criterion-score-input');
+            const maxScore = select ? parseFloat(select.getAttribute('data-max-score')) : NaN;
+            const rowMax = isNaN(maxScore) ? 0 : maxScore;
+            fullMax += rowMax;
+
+            if (input && input.value !== "") {
+                const score = parseFloat(input.value);
+                if (!isNaN(score)) {
+                    scoredCount++;
+                    scoredSum += score;
+                    scoredMax += rowMax;
+                }
+            }
+        });
+
+        const total = rows.length;
+        const isComplete = total > 0 && scoredCount === total;
+        const percentage = scoredMax > 0 ? (scoredSum / scoredMax) * 100 : 0;
+
+        const scoredCountEl = panel.querySelector('.live-scored-count');
+        if (scoredCountEl) scoredCountEl.textContent = scoredCount + ' / ' + total;
+
+        const scoreSumEl = panel.querySelector('.live-score-sum');
+        if (scoreSumEl) scoreSumEl.textContent = scoredSum.toFixed(2) + ' / ' + fullMax.toFixed(2);
+
+        const percentageEl = panel.querySelector('.live-percentage');
+        if (percentageEl) percentageEl.textContent = percentage.toFixed(2) + '%';
+
+        const progressEl = panel.querySelector('.live-progress');
+        if (progressEl) progressEl.value = percentage;
+
+        const gradeBadge = panel.querySelector('.live-projected-grade');
+        if (gradeBadge) {
+            if (!isComplete) {
+                gradeBadge.textContent = 'Incomplete';
+                applyGradeColor(gradeBadge, null);
+            } else {
+                const projectedGrade = getProjectedGrade(percentage);
+                gradeBadge.textContent = projectedGrade;
+                applyGradeColor(gradeBadge, projectedGrade);
+            }
+        }
+    }
+
+    function openGradingModal(suffix) {
+        const dialog = document.getElementById('grading_modal_' + suffix);
+        if (!dialog) return;
+
+        const inputs = dialog.querySelectorAll('.criterion-score-input');
+        const allEmpty = Array.from(inputs).every(function(input) { return input.value === ""; });
+        const promptPanel = dialog.querySelector('.overall-grade-prompt');
+        if (promptPanel) {
+            promptPanel.classList.toggle('hidden', !allEmpty);
+            if (allEmpty) {
+                const select = promptPanel.querySelector('.overall-grade-select');
+                if (select) {
+                    select.value = "";
+                    select.classList.remove('select-error');
+                }
+            }
+        }
+
+        dialog.showModal();
+    }
+
+    function applyOverallGrade(button) {
+        const promptPanel = button.closest('.overall-grade-prompt');
+        const dialog = button.closest('dialog');
+        const select = promptPanel.querySelector('.overall-grade-select');
+        const level = select.value;
+
+        if (!level) {
+            select.classList.add('select-error');
+            return;
+        }
+
+        dialog.querySelectorAll('.grade-level-select').forEach(function(levelSelect) {
+            levelSelect.value = level;
+            onGradeLevelChange(levelSelect);
+        });
+
+        promptPanel.classList.add('hidden');
+    }
+
+    function dismissOverallGradePrompt(button) {
+        button.closest('.overall-grade-prompt').classList.add('hidden');
+    }
+
+    function accordion_show_hide(show_hide_id) {
+        document.getElementById(show_hide_id + " content").classList.toggle('hidden')
+
+        if (document.getElementById(show_hide_id).textContent.trim() == "Hide") {
+            document.getElementById(show_hide_id).innerHTML = "See More"
+        } else {
+            document.getElementById(show_hide_id).innerHTML = "Hide"
+        }
+    }
+
+    function refreshGradingStatus(el) {
+        const dialog = el.closest('dialog');
+        if (!dialog || !dialog.id.startsWith('grading_modal_')) return;
+        const statusEl = document.getElementById(dialog.id.replace('grading_modal_', 'grading_status_'));
+        if (!statusEl) return;
+        const inputs = dialog.querySelectorAll('.criterion-score-input');
+        let scored = 0;
+        inputs.forEach(function(input) { if (input.value !== "") scored++; });
+        const total = inputs.length;
+        const badge = statusEl.querySelector('span');
+        if (badge) {
+            badge.textContent = scored + '/' + total + ' scored';
+            badge.classList.toggle('badge-success', scored === total && total > 0);
+            badge.classList.toggle('badge-warning', !(scored === total && total > 0));
+        }
+        updateLiveGradeCalculation(dialog);
+    }
+
+    function updateCriterionHighlight(row) {
+        const input = row.querySelector('.criterion-score-input');
+        const isEmpty = !input || input.value === "";
+        row.classList.toggle('border-error', isEmpty);
+        row.classList.toggle('bg-error/10', isEmpty);
+
+        const select = row.querySelector('.grade-level-select');
+        if (select) applyGradeColor(select, select.value);
+    }
+
+    function onGradeLevelChange(selectElem) {
+        const option = selectElem.options[selectElem.selectedIndex];
+        const ratioStr = option ? option.getAttribute('data-ratio') : null;
+        const container = selectElem.closest('.criterion-row');
+        if (ratioStr === null || ratioStr === "") {
+            updateCriterionHighlight(container);
+            return;
+        }
+        const ratio = parseFloat(ratioStr);
+        const maxScore = parseFloat(selectElem.getAttribute('data-max-score'));
+        const input = container.querySelector('.criterion-score-input');
+        if (!isNaN(ratio) && !isNaN(maxScore) && input) {
+            const calculatedScore = Math.round((ratio * maxScore) * 100) / 100;
+            input.value = calculatedScore;
+        }
+        updateCriterionHighlight(container);
+        refreshGradingStatus(selectElem);
+    }
+
+    function onScoreInputChange(inputElem) {
+        const container = inputElem.closest('.criterion-row');
+        const selectElem = container.querySelector('.grade-level-select');
+        if (selectElem) {
+            const score = parseFloat(inputElem.value);
+            const maxScore = parseFloat(selectElem.getAttribute('data-max-score'));
+            if (isNaN(score) || isNaN(maxScore) || maxScore === 0) {
+                selectElem.value = "";
+            } else {
+                const ratio = score / maxScore;
+                if (ratio >= 0.9375) selectElem.value = "A";
+                else if (ratio >= 0.8125) selectElem.value = "B+";
+                else if (ratio >= 0.6875) selectElem.value = "B";
+                else if (ratio >= 0.5625) selectElem.value = "C+";
+                else if (ratio >= 0.4375) selectElem.value = "C";
+                else if (ratio >= 0.3125) selectElem.value = "D+";
+                else if (ratio >= 0.1875) selectElem.value = "D";
+                else if (ratio > 0) selectElem.value = "E";
+                else selectElem.value = "I";
+            }
+        }
+        updateCriterionHighlight(container);
+        refreshGradingStatus(inputElem);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.criterion-score-input').forEach(function(input) {
+            if (input.value !== "") {
+                onScoreInputChange(input);
+            }
+        });
+        document.querySelectorAll('.criterion-row').forEach(updateCriterionHighlight);
+        document.querySelectorAll('dialog[id^="grading_modal_"]').forEach(updateLiveGradeCalculation);
+    });
+
+    function saveGrading(button) {
+        const dialog = button.closest('dialog');
+        const statusMsg = dialog.querySelector('.grading-save-status');
+        const form = document.getElementById('form-round_grade');
+        const csrfInput = form.querySelector('input[name="csrf_token"]');
+        const dialogSuffix = dialog.id.replace('grading_modal_', '');
+
+        const criterionScores = [];
+        dialog.querySelectorAll('.criterion-row').forEach(function(row) {
+            const idInput = row.querySelector('.criterion-id-input');
+            const scoreInput = row.querySelector('.criterion-score-input');
+            criterionScores.push({
+                criterion_id: idInput ? idInput.value : null,
+                score: scoreInput && scoreInput.value !== "" ? scoreInput.value : null
+            });
+        });
+
+        const commentInput = dialog.querySelector('.student-comment-input');
+        const comment = commentInput ? commentInput.value : "";
+
+        button.disabled = true;
+        if (statusMsg) {
+            statusMsg.textContent = "Saving...";
+            statusMsg.className = "grading-save-status text-xs opacity-70 mr-auto";
+        }
+
+        fetch(form.dataset.submitOneUrl, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                csrf_token: csrfInput ? csrfInput.value : "",
+                student_id: dialog.dataset.userId,
+                criterion_scores: criterionScores,
+                comment: comment
+            })
+        })
+        .then(function(resp) { return resp.json(); })
+        .then(function(data) {
+            button.disabled = false;
+            if (!data.ok) {
+                if (statusMsg) {
+                    statusMsg.textContent = data.error || "Save failed.";
+                    statusMsg.className = "grading-save-status text-xs text-error mr-auto";
+                }
+                return;
+            }
+
+            const fullyScored = data.scored === data.total && data.total > 0;
+
+            if (statusMsg) {
+                statusMsg.textContent = "Saved";
+                statusMsg.className = "grading-save-status text-xs text-success mr-auto";
+            }
+
+            const statusWrap = document.getElementById('grading_status_' + dialogSuffix);
+            if (statusWrap) {
+                const badge = statusWrap.querySelector('span');
+                if (badge) {
+                    badge.textContent = data.scored + '/' + data.total + ' scored';
+                    badge.classList.toggle('badge-success', fullyScored);
+                    badge.classList.toggle('badge-warning', !fullyScored);
+                }
+            }
+
+            const thisGradeEl = document.getElementById('this_grade_' + dialogSuffix);
+            if (thisGradeEl) {
+                thisGradeEl.textContent = data.result_display;
+                applyGradeColor(thisGradeEl, data.result_display);
+            }
+
+            const avgEl = document.getElementById('average_grade_' + dialogSuffix);
+            if (avgEl) {
+                avgEl.textContent = data.average_grade;
+                applyGradeColor(avgEl, data.average_grade);
+            }
+
+            const finalEl = document.getElementById('final_grade_' + dialogSuffix);
+            if (finalEl) {
+                finalEl.textContent = data.actual_grade;
+                finalEl.title = (data.caused || []).join('\n');
+                applyGradeColor(finalEl, data.actual_grade);
+            }
+
+            if (fullyScored) {
+                setTimeout(function() { dialog.close(); }, 600);
+            }
+        })
+        .catch(function() {
+            button.disabled = false;
+            if (statusMsg) {
+                statusMsg.textContent = "Network error.";
+                statusMsg.className = "grading-save-status text-xs text-error mr-auto";
+            }
+        });
+    }
+</script>

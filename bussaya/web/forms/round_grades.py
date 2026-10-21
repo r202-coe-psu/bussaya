@@ -47,6 +47,7 @@ class CriterionScoreForm(Form):
 class RubricGradingEntryForm(Form):
     student_id = fields.HiddenField()
     criterion_scores = fields.FieldList(fields.FormField(CriterionScoreForm))
+    comment = fields.TextAreaField(validators=[validators.Optional()])
 
 
 class MentorRubricGradingEntryForm(RubricGradingEntryForm):

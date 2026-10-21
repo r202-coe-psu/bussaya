@@ -11,6 +11,24 @@ def add_date_url(url):
     return f'{url}?date={now.strftime("%Y%m%d")}'
 
 
+GRADE_COLORS = {
+    "A": ("#38bdf8", "#ffffff"),
+    "B+": ("#22c55e", "#ffffff"),
+    "B": ("#bbf7d0", "#14532d"),
+    "C+": ("#facc15", "#713f12"),
+    "C": ("#fef08a", "#713f12"),
+    "D+": ("#fb923c", "#ffffff"),
+    "D": ("#fed7aa", "#7c2d12"),
+    "E": ("#ef4444", "#ffffff"),
+}
+GRADE_COLOR_DEFAULT = ("#d1d5db", "#374151")
+
+
+def grade_style(grade):
+    bg, fg = GRADE_COLORS.get(grade, GRADE_COLOR_DEFAULT)
+    return f"background-color: {bg}; color: {fg};"
+
+
 def get_subblueprints(directory):
     blueprints = []
 
@@ -58,6 +76,7 @@ def get_subblueprints(directory):
 
 def register_blueprint(app):
     app.add_template_filter(add_date_url)
+    app.add_template_filter(grade_style)
     parent = pathlib.Path(__file__).parent
     blueprints = get_subblueprints(parent)
 
