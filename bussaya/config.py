@@ -24,7 +24,7 @@ _SETTINGS = [
     ("MAIL_HOST", default_settings.MAIL_HOST),
     ("MAIL_PORT", default_settings.MAIL_PORT),
     ("MAIL_USE_TLS", default_settings.MAIL_USE_TLS),
-    ("MAIL_USERNAME", default_settings.MAIL_USERNAME),
+    ("MAIL_USER", default_settings.MAIL_USER),
     ("MAIL_PASSWORD", default_settings.MAIL_PASSWORD),
     ("MAIL_SENDER", default_settings.MAIL_SENDER),
     ("MAIL_SENDER_NAME", default_settings.MAIL_SENDER_NAME),
