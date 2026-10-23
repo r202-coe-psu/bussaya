@@ -44,18 +44,18 @@ class Mailer:
         message["To"] = to_email
         message.attach(MIMEText(body, "plain"))
 
+        server = smtplib.SMTP(self.host, self.port, timeout=15)
         try:
-            server = smtplib.SMTP(self.host, self.port, timeout=15)
-            try:
-                if self.use_tls:
-                    server.starttls()
-                if self.username:
-                    server.login(self.username, self.password)
-                server.sendmail(self.sender, [to_email], message.as_string())
-            finally:
-                server.quit()
+            if self.use_tls:
+                server.starttls()
+            if self.username and self.password:
+                server.login(self.username, self.password)
+            server.sendmail(self.sender, [to_email], message.as_string())
+
         except Exception as exc:
             logger.exception("Failed to send email to %s", to_email)
             return False, str(exc)
+        finally:
+            server.quit()
 
         return True, None
