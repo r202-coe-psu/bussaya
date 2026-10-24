@@ -44,7 +44,7 @@ class Mailer:
         message["To"] = to_email
         message.attach(MIMEText(body, "plain"))
 
-        server = smtplib.SMTP(self.host, self.port, timeout=15)
+        server = smtplib.SMTP(self.host, self.port, timeout=300)
         try:
             if self.use_tls:
                 server.starttls()
